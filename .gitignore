@@ -1,0 +1,59 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Uploads utilisateur — ne pas versionner ###
+holyflame_uploads/
+uploads/
+
+### Logs ###
+*.log
+logs/
+
+### Secrets ###
+application-prod.properties
+application-prod.yml
+*.p12
+*.jks
+.env*
+
+### Config locale des outils (agent/IDE) — ne pas versionner ###
+.claude/
+.sixth/
+
+### Logs compressés ###
+*.log.*.gz
+*.gz
+
+### Fichiers temporaires Office ###
+~$*

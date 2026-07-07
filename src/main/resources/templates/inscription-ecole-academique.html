@@ -1,0 +1,374 @@
+<!DOCTYPE html><html class="light" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EduSystem Pro | Configuration Academique</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .stepper-line {
+      height: 2px;
+      background: #e0e3e5;
+    }
+    .stepper-line-active {
+      height: 2px;
+      background: #00236f;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "primary-fixed-dim": "#b6c4ff",
+                  "on-primary-fixed-variant": "#264191",
+                  "error-container": "#ffdad6",
+                  "on-background": "#191c1e",
+                  "primary-fixed": "#dce1ff",
+                  "on-error": "#ffffff",
+                  "surface-tint": "#4059aa",
+                  "surface-container-highest": "#e0e3e5",
+                  "surface-dim": "#d8dadc",
+                  "on-secondary-fixed-variant": "#38485d",
+                  "outline-variant": "#c5c5d3",
+                  "on-tertiary-fixed-variant": "#3f465c",
+                  "surface-container-high": "#e6e8ea",
+                  "error": "#ba1a1a",
+                  "tertiary-fixed": "#dae2fd",
+                  "surface": "#f7f9fb",
+                  "secondary": "#505f76",
+                  "primary": "#00236f",
+                  "surface-bright": "#f7f9fb",
+                  "inverse-surface": "#2d3133",
+                  "outline": "#757682",
+                  "on-secondary-fixed": "#0b1c30",
+                  "tertiary-container": "#384055",
+                  "on-tertiary": "#ffffff",
+                  "background": "#f7f9fb",
+                  "surface-container-lowest": "#ffffff",
+                  "inverse-on-surface": "#eff1f3",
+                  "on-tertiary-fixed": "#131b2e",
+                  "secondary-container": "#d0e1fb",
+                  "tertiary": "#222a3e",
+                  "inverse-primary": "#b6c4ff",
+                  "secondary-fixed-dim": "#b7c8e1",
+                  "on-primary-fixed": "#00164e",
+                  "on-secondary-container": "#54647a",
+                  "secondary-fixed": "#d3e4fe",
+                  "on-tertiary-container": "#a4acc5",
+                  "on-secondary": "#ffffff",
+                  "surface-variant": "#e0e3e5",
+                  "tertiary-fixed-dim": "#bec6e0",
+                  "on-primary": "#ffffff",
+                  "on-primary-container": "#90a8ff",
+                  "on-error-container": "#93000a",
+                  "on-surface-variant": "#444651",
+                  "surface-container": "#eceef0",
+                  "on-surface": "#191c1e",
+                  "surface-container-low": "#f2f4f6",
+                  "primary-container": "#1e3a8a"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.125rem",
+                  "lg": "0.25rem",
+                  "xl": "0.5rem",
+                  "full": "0.75rem"
+          },
+          "spacing": {
+                  "sidebar-width": "260px",
+                  "lg": "24px",
+                  "xs": "4px",
+                  "md": "16px",
+                  "base": "4px",
+                  "sm": "8px",
+                  "xl": "32px",
+                  "gutter": "24px",
+                  "container-max": "1440px"
+          },
+          "fontFamily": {
+                  "headline-lg-mobile": ["Inter"],
+                  "headline-sm": ["Inter"],
+                  "headline-lg": ["Inter"],
+                  "code": ["Inter"],
+                  "body-lg": ["Inter"],
+                  "label-md": ["Inter"],
+                  "body-md": ["Inter"],
+                  "headline-md": ["Inter"],
+                  "label-sm": ["Inter"]
+          },
+          "fontSize": {
+                  "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                  "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                  "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                  "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                  "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 w-full z-50 flex justify-between items-center px-md py-xs bg-surface shadow-sm border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+<h1 class="font-headline-sm text-headline-sm font-semibold text-primary">EduSystem Pro | Inscription</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-xs text-on-surface-variant hover:bg-surface-variant px-sm py-xs rounded transition-all">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+<span class="font-label-md text-label-md">Centre d'aide</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">person</span>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center py-xl px-md">
+<!-- Stepper -->
+<div class="w-full max-w-4xl mb-xl">
+<div class="flex items-center justify-between relative px-xl">
+<!-- Etape 1 : Terminee -->
+<div class="flex flex-col items-center z-10">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-sm shadow-sm">
+<span class="material-symbols-outlined">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary">Informations generales</span>
+</div>
+<div class="flex-grow mx-sm h-0.5 bg-primary absolute top-5 left-24 right-24 -z-0 opacity-20"></div>
+<div class="flex-grow mx-sm h-0.5 bg-primary absolute top-5 left-24 w-1/3 -z-0"></div>
+<!-- Etape 2 : Active -->
+<div class="flex flex-col items-center z-10">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center mb-sm shadow-md ring-4 ring-primary-fixed-dim">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold">Academique</span>
+</div>
+<!-- Etape 3 : A venir -->
+<div class="flex flex-col items-center z-10">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-sm border border-outline-variant">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Parties prenantes</span>
+</div>
+<!-- Etape 4 : A venir -->
+<div class="flex flex-col items-center z-10">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-sm border border-outline-variant">
+<span class="material-symbols-outlined">settings_suggest</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Revision</span>
+</div>
+</div>
+</div>
+<!-- Zone de configuration -->
+<div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Panneau lateral -->
+<div class="md:col-span-4 flex flex-col gap-md">
+<div class="bg-primary text-on-primary p-lg rounded-xl shadow-lg relative overflow-hidden h-fit">
+<div class="absolute -right-8 -top-8 opacity-10">
+<span class="material-symbols-outlined text-[160px]">auto_stories</span>
+</div>
+<h2 class="font-headline-md text-headline-md mb-md">Cadre academique</h2>
+<p class="font-body-md text-body-md opacity-90 leading-relaxed mb-lg">
+            Etablissez la colonne vertebrale institutionnelle. Definissez comment le temps, la performance et l'assiduite sont mesures dans votre organisation pour garantir une coherence systemique.
+          </p>
+<div class="space-y-sm">
+<div class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim">info</span>
+<span class="font-label-sm text-label-sm">Toute modification du systeme de notation apres le debut de la session necessitera une autorisation administrative.</span>
+</div>
+</div>
+</div>
+<!-- Ressources utiles -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase mb-sm">Directives</h3>
+<ul class="space-y-md">
+<li class="flex items-center gap-sm text-secondary hover:text-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="font-body-md text-body-md">Calendriers academiques standards</span>
+</li>
+<li class="flex items-center gap-sm text-secondary hover:text-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">grading</span>
+<span class="font-body-md text-body-md">Logique de calcul de la moyenne</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- Formulaire principal -->
+<form class="md:col-span-8 flex flex-col gap-lg" th:action="@{/inscription-ecole/academique}" method="post">
+<!-- Calendrier de l'annee academique -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl shadow-sm transition-all hover:shadow-md">
+<div class="flex items-center gap-sm mb-lg border-b border-outline-variant pb-md">
+<span class="material-symbols-outlined text-primary">event_available</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Calendrier de l'annee academique</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Date de debut de session</label>
+<div class="relative">
+<input class="w-full h-12 px-md pt-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md" name="dateDebut" type="date">
+<span class="absolute right-3 top-3 text-on-surface-variant material-symbols-outlined pointer-events-none">calendar_month</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Date de fin de session</label>
+<div class="relative">
+<input class="w-full h-12 px-md pt-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md" name="dateFin" type="date">
+<span class="absolute right-3 top-3 text-on-surface-variant material-symbols-outlined pointer-events-none">event</span>
+</div>
+</div>
+<div class="md:col-span-2">
+<div class="flex items-center gap-md p-md bg-secondary-container/30 border border-secondary-container rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-fixed-variant">update</span>
+<p class="font-body-md text-body-md text-on-secondary-fixed-variant">Cette session s'etendra sur <b>284 jours academiques</b>, hors jours feries definis dans vos parametres regionaux.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Systeme de notation -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl shadow-sm transition-all hover:shadow-md">
+<div class="flex items-center gap-sm mb-lg border-b border-outline-variant pb-md">
+<span class="material-symbols-outlined text-primary">format_list_numbered</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Systeme de notation</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="group relative flex flex-col p-lg border-2 border-primary rounded-xl bg-primary-container/10 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-primary text-[32px]">calculate</span>
+<input checked="" class="w-5 h-5 text-primary border-primary focus:ring-primary" name="systemeNotation" type="radio" value="NUMERIQUE">
+</div>
+<h4 class="font-label-md text-label-md text-primary mb-xs">Numerique (0-100)</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Notation quantitative traditionnelle avec precision decimale. Ideal pour les matieres scientifiques et les modules standardises.</p>
+</div>
+<div class="group relative flex flex-col p-lg border border-outline-variant rounded-xl hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[32px]">spellcheck</span>
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary" name="systemeNotation" type="radio" value="LETTRES">
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-xs">Lettres (A-F)</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Categorisation qualitative correspondant a des echelles de moyenne ponderee. Ideal pour les filieres litteraires et la petite enfance.</p>
+</div>
+</div>
+<div class="mt-lg flex flex-col gap-sm">
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary" name="statutsIncompletAbandon" type="checkbox" value="true">
+<span class="font-body-md text-body-md text-on-surface">Activer les codes de statut « Incomplet » (I) et « Abandon » (A)</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary" name="rangAutomatique" type="checkbox" value="true">
+<span class="font-body-md text-body-md text-on-surface">Calculer automatiquement le rang de classe selon la moyenne ponderee</span>
+</label>
+</div>
+</div>
+<!-- Politiques d'assiduite -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl shadow-sm transition-all hover:shadow-md">
+<div class="flex items-center gap-sm mb-lg border-b border-outline-variant pb-md">
+<span class="material-symbols-outlined text-primary">how_to_reg</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Politiques d'assiduite</h3>
+</div>
+<div class="space-y-xl">
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface">Seuil d'assiduite minimum (%)</label>
+<span class="bg-primary text-on-primary px-sm py-xs rounded-full font-code text-code">75%</span>
+</div>
+<input class="w-full h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="50" name="seuilAssiduite" type="range" value="75">
+<p class="font-label-sm text-label-sm text-on-surface-variant italic">Les eleves en dessous de ce seuil seront signales pour mise a l'epreuve academique.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Alerte d'absences consecutives</label>
+<select class="w-full h-12 px-md border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md bg-white" name="alerteAbsences">
+<option value="3 jours">3 jours</option>
+<option selected="" value="5 jours">5 jours</option>
+<option value="10 jours">10 jours</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Calcul des retards</label>
+<select class="w-full h-12 px-md border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md bg-white" name="calculRetard">
+<option selected="" value="3 retards = 1 absence">3 retards = 1 absence</option>
+<option value="5 retards = 1 absence">5 retards = 1 absence</option>
+<option value="Discretionnaire">Discretionnaire (pas de conversion automatique)</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Barre d'actions -->
+<div class="flex items-center justify-between mt-md pb-xl">
+<button class="flex items-center gap-sm text-secondary font-label-md text-label-md px-lg py-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-all" type="button" onclick="window.location.href='/inscription-ecole'">
+<span class="material-symbols-outlined">arrow_back</span>
+            Retour aux informations generales
+          </button>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant font-label-md text-label-md hover:underline" type="button">Enregistrer comme brouillon</button>
+<button class="flex items-center gap-sm bg-primary text-on-primary font-label-md text-label-md px-xl py-md rounded-lg shadow-lg hover:bg-primary-container transition-all" type="submit">
+              Continuer vers les parties prenantes
+              <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</form>
+</div>
+</main>
+<!-- Pied de page -->
+<footer class="w-full py-xl px-lg flex flex-col md:flex-row justify-between items-center gap-md bg-tertiary text-on-tertiary border-t border-tertiary-container">
+<div class="flex flex-col md:items-start items-center">
+<div class="font-headline-sm text-headline-sm text-on-tertiary font-bold mb-xs">EduSystem Pro</div>
+<p class="font-label-sm text-label-sm opacity-60 text-on-tertiary-container">© 2026 EduSystem Pro. Gestion academique agreee.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-lg">
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Politique de confidentialite</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Conditions d'utilisation</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Securite institutionnelle</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Contact</a>
+</div>
+</footer>
+<script>
+    // Interaction pour la mise en surbrillance des options de notation
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const containers = e.target.closest('.grid').querySelectorAll('.group');
+        containers.forEach(c => {
+          c.classList.remove('border-primary', 'bg-primary-container/10');
+          c.classList.add('border-outline-variant');
+          c.querySelector('h4').classList.replace('text-primary', 'text-on-surface');
+          c.querySelector('.material-symbols-outlined').classList.replace('text-primary', 'text-on-surface-variant');
+        });
+
+        const selected = e.target.closest('.group');
+        selected.classList.replace('border-outline-variant', 'border-primary');
+        selected.classList.add('bg-primary-container/10');
+        selected.querySelector('h4').classList.replace('text-on-surface', 'text-primary');
+        selected.querySelector('.material-symbols-outlined').classList.replace('text-on-surface-variant', 'text-primary');
+      });
+    });
+
+    const range = document.querySelector('input[type="range"]');
+    const badge = document.querySelector('.bg-primary.text-on-primary.px-sm');
+    if(range && badge) {
+      range.addEventListener('input', (e) => {
+        badge.textContent = e.target.value + '%';
+      });
+    }
+  </script>
+</body></html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Bulletin — ' + ${eleve.prenom} + ' ' + ${eleve.nom}">Bulletin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f2f4f6; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    @media print { .no-print { display: none !important; } body { background: #fff; } }
+</style>
+</head>
+<body class="min-h-screen py-lg text-[#191c1e]">
+
+<div class="max-w-[1000px] mx-auto px-lg no-print flex justify-between items-center mb-md">
+<a class="text-[#00236f] font-bold flex items-center gap-xs" th:href="${estAdminOuEnseignant} ? @{/bulletins} : @{/portail-parent}">
+<span class="material-symbols-outlined">arrow_back</span> Retour
+</a>
+<div class="flex gap-sm">
+<a class="px-lg py-2 border border-[#c5c5d3] rounded-lg font-bold flex items-center gap-xs" th:href="@{/bulletins/{id}(id=${eleve.id},trimestre=1)}">T1</a>
+<a class="px-lg py-2 border border-[#c5c5d3] rounded-lg font-bold flex items-center gap-xs" th:href="@{/bulletins/{id}(id=${eleve.id},trimestre=2)}">T2</a>
+<a class="px-lg py-2 border border-[#c5c5d3] rounded-lg font-bold flex items-center gap-xs" th:href="@{/bulletins/{id}(id=${eleve.id},trimestre=3)}">T3</a>
+<button class="px-lg py-2 bg-[#00236f] text-white rounded-lg font-bold flex items-center gap-xs" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer
+</button>
+</div>
+</div>
+
+<div class="max-w-[1000px] mx-auto bg-white border border-[#c5c5d3] p-xl shadow-sm relative overflow-hidden">
+
+<!-- Entete etablissement -->
+<div class="flex justify-between items-start mb-xl border-b-2 border-[#00236f] pb-lg">
+<div class="flex items-center gap-lg">
+<div class="w-20 h-20 bg-[#00236f] rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+<img class="w-full h-full object-contain" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
+<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;" th:if="${logoPath == null}">school</span>
+</div>
+<div>
+<h2 class="text-2xl font-bold text-[#00236f] tracking-tight" th:text="${#strings.toUpperCase(nomEtab)}">ETABLISSEMENT</h2>
+<p class="text-[#444651]" th:if="${adresseEtab != null and !adresseEtab.isEmpty()}" th:text="${adresseEtab} + (${emailEtab != null and !emailEtab.isEmpty()} ? ' • ' + emailEtab : '')">Adresse</p>
+</div>
+</div>
+<div class="text-right">
+<h3 class="text-lg font-bold" th:text="'ANNÉE SCOLAIRE ' + ${anneeScolaire}">Annee</h3>
+<div class="inline-block mt-1 px-3 py-1 bg-[#d0e1fb] text-[#54647a] rounded font-bold text-sm" th:text="${trimestre == 1 ? 'PREMIER' : (trimestre == 2 ? 'DEUXIEME' : 'TROISIEME')} + ' TRIMESTRE'">TRIMESTRE</div>
+</div>
+</div>
+
+<!-- Profil eleve -->
+<div class="grid grid-cols-3 gap-xl mb-xl bg-[#f2f4f6] p-lg rounded-xl border border-[#c5c5d3]/30">
+<div class="col-span-2 flex gap-lg">
+<div class="w-20 h-20 bg-white rounded border border-[#c5c5d3] overflow-hidden shrink-0 flex items-center justify-center">
+<img class="w-full h-full object-cover" th:if="${photoPath != null}" th:src="@{'/uploads/' + ${photoPath}}"/>
+<span class="material-symbols-outlined text-[#757682] text-4xl" th:if="${photoPath == null}">account_circle</span>
+</div>
+<div class="space-y-xs">
+<div>
+<span class="text-xs uppercase text-[#757682] font-bold block">Eleve</span>
+<span class="text-lg font-bold" th:text="${#strings.toUpperCase(eleve.nom)} + ' ' + ${eleve.prenom}">Eleve</span>
+</div>
+<div class="flex gap-xl mt-2">
+<div>
+<span class="text-xs text-[#757682] block">Ne(e) le</span>
+<span th:text="${eleve.dateNaissance != null ? #temporals.format(eleve.dateNaissance, 'dd/MM/yyyy') : '--'}">--</span>
+</div>
+<div>
+<span class="text-xs text-[#757682] block">Sexe</span>
+<span th:text="${eleve.genre != null ? #strings.substring(eleve.genre,0,1) : '--'}">--</span>
+</div>
+<div>
+<span class="text-xs text-[#757682] block">Identifiant</span>
+<span class="font-mono" th:text="${eleve.matricule}">--</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-l border-[#c5c5d3] pl-lg space-y-md">
+<div>
+<span class="text-xs text-[#757682] block">Classe</span>
+<span class="text-lg font-bold" th:text="${eleve.classe != null ? eleve.classe.nom : '?'}">Classe</span>
+</div>
+<div>
+<span class="text-xs text-[#757682] block">Professeur Titulaire</span>
+<span class="font-semibold" th:text="${professeurTitulaire != null ? professeurTitulaire.prenom + ' ' + professeurTitulaire.nom : 'Non assigne'}">--</span>
+</div>
+</div>
+</div>
+
+<!-- Tableau des notes, regroupe par pole -->
+<div class="mb-xl overflow-hidden rounded-lg border border-[#c5c5d3]">
+<table class="w-full text-left border-collapse">
+<thead class="bg-[#f2f4f6] text-[#444651] text-xs uppercase">
+<tr>
+<th class="px-3 py-2 border-b border-[#c5c5d3]">Matieres</th>
+<th class="px-3 py-2 border-b border-[#c5c5d3] text-center">Coef</th>
+<th class="px-3 py-2 border-b border-[#c5c5d3] text-center">Note /20</th>
+<th class="px-3 py-2 border-b border-[#c5c5d3] text-center">Moy. Cl.</th>
+<th class="px-3 py-2 border-b border-[#c5c5d3] text-center">Min / Max</th>
+<th class="px-3 py-2 border-b border-[#c5c5d3]">Appreciation des professeurs</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#c5c5d3]/30">
+<th:block th:each="entree : ${poles}">
+<tr class="bg-[#f2f4f6] text-xs uppercase text-[#00236f]">
+<td class="px-3 py-1 font-bold tracking-wider" colspan="6" th:text="${entree.key}">Pole</td>
+</tr>
+<tr th:each="ligne : ${entree.value}">
+<td class="px-3 py-2 font-semibold" th:text="${ligne.matiere.nom}">Matiere</td>
+<td class="px-3 py-2 text-center" th:text="${ligne.matiere.coefficient}">--</td>
+<td class="px-3 py-2 text-center font-bold" th:text="${ligne.moyenne}">--</td>
+<td class="px-3 py-2 text-center" th:text="${ligne.moyenneClasse}">--</td>
+<td class="px-3 py-2 text-center text-xs text-[#444651]" th:text="${ligne.min} + ' / ' + ${ligne.max}">--</td>
+<td class="px-3 py-2 italic text-[#444651]" th:text="${ligne.appreciation}">--</td>
+</tr>
+</th:block>
+<tr th:if="${poles.isEmpty()}">
+<td class="px-3 py-8 text-center text-[#757682]" colspan="6">Aucune note publiee pour ce trimestre.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- Synthese -->
+<div class="grid grid-cols-2 gap-xl mb-xl">
+<div class="space-y-lg">
+<div class="bg-[#00236f] text-white p-lg rounded-xl flex items-center justify-between">
+<div>
+<span class="text-xs opacity-80 block">MOYENNE GENERALE</span>
+<span class="text-4xl font-bold" th:text="${moyenneGenerale} + ' / 20'">--</span>
+</div>
+<div class="text-right">
+<span class="text-xs opacity-80 block">RANG</span>
+<span class="text-4xl font-bold" th:text="${rang}">--</span><span class="text-lg font-normal" th:text="' / ' + ${effectif}">/--</span>
+</div>
+</div>
+<div class="border border-[#c5c5d3] p-md rounded-xl space-y-sm bg-[#f7f9fb]">
+<div class="flex justify-between text-sm">
+<span>Absences justifiees :</span>
+<span class="font-bold" th:text="${absencesJustifiees}">0</span>
+</div>
+<div class="flex justify-between text-sm">
+<span>Absences non justifiees :</span>
+<span class="font-bold" th:classappend="${absencesNonJustifiees > 0} ? 'text-[#ba1a1a]' : ''" th:text="${absencesNonJustifiees}">0</span>
+</div>
+<div class="flex justify-between text-sm">
+<span>Conduite &amp; Comportement :</span>
+<span class="text-[#00236f] font-bold" th:text="${conduite != null ? conduite.evaluation : 'Non renseignee'}">--</span>
+</div>
+<div class="flex justify-between text-sm">
+<span>Moyenne Classe :</span>
+<span class="font-semibold" th:text="${moyenneClasseGenerale} + ' / 20'">--</span>
+</div>
+</div>
+
+<!-- Formulaire de saisie de la conduite, reserve au personnel -->
+<form class="border border-[#c5c5d3] p-md rounded-xl no-print flex items-end gap-sm" method="post" th:action="@{/bulletins/{id}/conduite(id=${eleve.id})}" th:if="${estAdminOuEnseignant}">
+<input name="trimestre" th:value="${trimestre}" type="hidden"/>
+<div class="flex-1">
+<label class="text-xs text-[#757682] block mb-1">Evaluer la conduite</label>
+<select class="w-full p-2 border border-[#c5c5d3] rounded-lg text-sm" name="evaluation">
+<option th:selected="${conduite != null and conduite.evaluation == 'EXCELLENTE'}" value="EXCELLENTE">Excellente</option>
+<option th:selected="${conduite != null and conduite.evaluation == 'BONNE'}" value="BONNE">Bonne</option>
+<option th:selected="${conduite != null and conduite.evaluation == 'MOYENNE'}" value="MOYENNE">Moyenne</option>
+<option th:selected="${conduite != null and conduite.evaluation == 'A_AMELIORER'}" value="A_AMELIORER">A ameliorer</option>
+</select>
+</div>
+<button class="px-md py-2 bg-[#00236f] text-white rounded-lg text-sm font-bold" type="submit">Enregistrer</button>
+</form>
+</div>
+
+<div class="border-2 border-[#00236f]/20 p-lg rounded-xl relative">
+<span class="absolute -top-3 left-6 bg-white px-3 font-bold text-[#00236f] uppercase text-sm">Observations du Conseil</span>
+<p class="leading-relaxed mt-2 text-[#444651]" th:text="${appreciation}">Appreciation</p>
+<div class="mt-lg flex gap-2" th:if="${felicitations or tableauHonneur}">
+<span class="px-3 py-1 bg-[#00236f]/10 text-[#00236f] border border-[#00236f]/20 rounded-full text-xs" th:if="${felicitations}">Felicitations</span>
+<span class="px-3 py-1 bg-[#222a3e]/10 text-[#222a3e] border border-[#222a3e]/20 rounded-full text-xs" th:if="${tableauHonneur}">Tableau d'Honneur</span>
+</div>
+</div>
+</div>
+
+<!-- Signatures -->
+<div class="grid grid-cols-3 gap-xl pt-xl border-t border-[#c5c5d3] text-center">
+<div>
+<span class="text-xs text-[#757682] uppercase block mb-8">L'Eleve / Parent</span>
+<div class="h-16 flex items-center justify-center">
+<span class="text-xs text-[#c5c5d3] italic">(Signature)</span>
+</div>
+</div>
+<div>
+<span class="text-xs text-[#757682] uppercase block mb-8">Le Professeur Titulaire</span>
+<div class="h-16 flex flex-col items-center justify-center">
+<span class="text-xs text-[#c5c5d3] italic" th:if="${professeurTitulaire == null}">(Signature)</span>
+<span class="font-medium mt-2" th:if="${professeurTitulaire != null}" th:text="${professeurTitulaire.prenom} + ' ' + ${professeurTitulaire.nom}">--</span>
+</div>
+</div>
+<div>
+<span class="text-xs text-[#757682] uppercase block mb-8">Le Chef d'Etablissement</span>
+<div class="h-16 flex flex-col items-center justify-center">
+<span class="text-xs text-[#c5c5d3] italic" th:if="${chefEtablissement == null}">(Signature)</span>
+<span class="font-bold mt-2" th:if="${chefEtablissement != null}" th:text="${chefEtablissement}">--</span>
+</div>
+</div>
+</div>
+
+<!-- Pied de page -->
+<div class="mt-xl pt-md border-t border-[#c5c5d3]/30 flex justify-between items-center text-xs text-[#757682]">
+<span th:text="'Emis le : ' + ${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy à HH:mm')}">--</span>
+<span class="font-mono" th:text="'VERIF: ' + ${codeVerification}">--</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">shield_lock</span>
+Authentifie par EduSystem Pro
+</div>
+</div>
+</div>
+
+<p class="max-w-[1000px] mx-auto mt-md text-[#757682] text-xs flex items-center gap-2 no-print">
+<span class="material-symbols-outlined text-sm">info</span>
+Ce document est un modele officiel genere par le systeme a partir des notes reellement saisies et publiees.
+</p>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Signalements | EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#f7f9fb", "background": "#f7f9fb", "on-primary": "#ffffff",
+            "error": "#ba1a1a", "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5",
+            "error-container": "#ffdad6", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+            "outline": "#757682", "primary-fixed-dim": "#b6c4ff", "surface-container-lowest": "#ffffff",
+            "outline-variant": "#c5c5d3", "primary": "#00236f", "secondary-fixed-dim": "#b7c8e1",
+            "on-error": "#ffffff", "on-error-container": "#93000a", "on-secondary-container": "#54647a",
+            "surface-container": "#eceef0", "on-background": "#191c1e", "on-primary-container": "#90a8ff",
+            "on-surface-variant": "#444651", "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a",
+            "surface-container-high": "#e6e8ea", "tertiary": "#222a3e", "surface": "#f7f9fb",
+            "secondary": "#505f76", "secondary-fixed": "#d3e4fe", "surface-container-low": "#f2f4f6",
+            "surface-dim": "#d8dadc", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},
+          "fontFamily": {"headline-md": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"]}
+        }
+      }
+    }
+</script>
+</head>
+<body class="bg-background text-on-background antialiased">
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-headline-sm">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
+<p class="text-on-tertiary-container text-[10px] tracking-widest uppercase mt-1">Portail Admin</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-sm">
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span> Tableau de bord
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/secretariat">
+<span class="material-symbols-outlined">group</span> Eleves
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/personnel">
+<span class="material-symbols-outlined">school</span> Personnel
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/examens">
+<span class="material-symbols-outlined">quiz</span> Examens
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/messagerie">
+<span class="material-symbols-outlined">forum</span> Messagerie
+</a>
+<a class="px-md py-sm flex items-center gap-md text-white border-l-4 border-primary-fixed bg-tertiary-container font-bold font-label-md text-label-md rounded-lg" href="/parametres/signalements">
+<span class="material-symbols-outlined">flag</span> Signalements
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/finances">
+<span class="material-symbols-outlined">account_balance</span> Tresorerie
+</a>
+</nav>
+<div class="mt-auto border-t border-tertiary-container/30 pt-md px-sm">
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/parametres">
+<span class="material-symbols-outlined">settings</span> Parametres
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span> Deconnexion
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<main class="ml-sidebar-width p-xl">
+<div class="max-w-container-max mx-auto">
+
+<div class="mb-xl flex justify-between items-end flex-wrap gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Signalements de la messagerie</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Problemes signales par les parents depuis le portail parent.</p>
+</div>
+<div class="px-lg py-md bg-surface-container-lowest border border-outline-variant rounded-xl text-center">
+<p class="text-[10px] text-outline uppercase tracking-wider">Ouverts</p>
+<p class="font-headline-md text-headline-md text-error" th:text="${nbOuverts}">0</p>
+</div>
+</div>
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="p-md font-label-sm text-label-sm text-on-surface-variant uppercase">Signale par</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface-variant uppercase">Concernant</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface-variant uppercase">Motif</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface-variant uppercase">Description</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface-variant uppercase">Date</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface-variant uppercase">Statut</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface-variant uppercase">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr th:if="${signalements.isEmpty()}">
+<td class="p-lg text-center text-on-surface-variant" colspan="7">Aucun signalement pour le moment.</td>
+</tr>
+<tr class="border-t border-outline-variant" th:each="s : ${signalements}">
+<td class="p-md font-body-md text-body-md" th:text="${s.signalePar}">parent@mail.com</td>
+<td class="p-md font-body-md text-body-md" th:text="${s.concernant}">contact@mail.com</td>
+<td class="p-md font-body-md text-body-md" th:text="${s.motif}">Motif</td>
+<td class="p-md font-body-md text-body-md max-w-[280px] truncate" th:text="${s.description}">Description</td>
+<td class="p-md font-body-md text-body-md" th:text="${#temporals.format(s.dateSignalement, 'dd/MM/yyyy HH:mm')}">--</td>
+<td class="p-md">
+<span class="px-sm py-1 rounded font-label-sm text-label-sm"
+      th:classappend="${s.statut == 'OUVERT'} ? 'bg-error-container text-on-error-container' : 'bg-success-container text-on-success-container'"
+      th:text="${s.statut}">OUVERT</span>
+</td>
+<td class="p-md">
+<form th:if="${s.statut == 'OUVERT'}" method="post" th:action="@{/parametres/signalements/{id}/traiter(id=${s.id})}">
+<button class="px-md py-1 border border-outline-variant rounded font-label-sm text-label-sm hover:bg-surface-container-high transition-colors" type="submit">Marquer traite</button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</main>
+</body>
+</html>

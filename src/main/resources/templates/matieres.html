@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Matieres - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
+<div>
+<h1 class="text-xl font-bold text-blue-900">Matieres</h1>
+<p class="text-gray-500 text-sm">Gestion des matieres enseignees et de leurs coefficients.</p>
+</div>
+<button class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" onclick="document.getElementById('modal-matiere').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span> Nouvelle matiere
+</button>
+</header>
+
+<main class="max-w-4xl mx-auto px-8 py-8">
+
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 font-medium" th:text="${erreur}"></div>
+<div th:if="${success}" class="mb-lg p-md rounded-lg bg-green-100 text-green-800 font-medium" th:text="${success}"></div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+<table class="w-full text-left text-sm">
+<thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+<tr><th class="px-5 py-3">Nom</th><th class="px-5 py-3">Pole</th><th class="px-5 py-3">Coefficient</th><th class="px-5 py-3">Description</th><th class="px-5 py-3 text-right">Actions</th></tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr th:if="${matieres.isEmpty()}">
+<td class="px-5 py-8 text-center text-gray-500" colspan="5">Aucune matiere enregistree.</td>
+</tr>
+<tr class="ligne-matiere" th:data-coef="${m.coefficient}" th:data-description="${m.description}" th:data-id="${m.id}" th:data-nom="${m.nom}" th:data-pole="${m.pole}" th:each="m : ${matieres}">
+<td class="px-5 py-3 font-medium" th:text="${m.nom}">Nom</td>
+<td class="px-5 py-3">
+<span class="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800" th:text="${m.pole != null ? m.pole : 'AUTRE'}">Pole</span>
+</td>
+<td class="px-5 py-3" th:text="${m.coefficient}">1.0</td>
+<td class="px-5 py-3 text-gray-500" th:text="${m.description}">Description</td>
+<td class="px-5 py-3 text-right space-x-2">
+<button class="text-blue-900 hover:underline text-xs bouton-modifier" type="button">Modifier</button>
+<form class="inline" method="post" th:action="@{/matieres/{id}/supprimer(id=${m.id})}" onsubmit="return confirm('Supprimer cette matiere ?');">
+<button class="text-red-600 hover:underline text-xs" type="submit">Supprimer</button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</main>
+
+<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-matiere">
+<div class="bg-white rounded-xl p-xl max-w-md w-full">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-bold text-lg" id="modal-titre">Nouvelle matiere</h3>
+<button onclick="fermerModal()" type="button"><span class="material-symbols-outlined">close</span></button>
+</div>
+<form class="space-y-3" id="form-matiere" method="post" th:action="@{/matieres}">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Nom</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" id="input-nom" name="nom" required="required" type="text"/>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Pole</label>
+<select class="w-full p-2 border border-gray-300 rounded-lg" id="input-pole" name="pole">
+<option value="SCIENTIFIQUE">Scientifique</option>
+<option value="LITTERAIRE">Litteraire &amp; Langues</option>
+<option value="ARTS_SPORT">Arts &amp; Sport</option>
+<option value="AUTRE">Autre</option>
+</select>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Coefficient</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" id="input-coef" min="0" name="coefficient" step="0.5" type="number" value="1"/>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Description</label>
+<textarea class="w-full p-2 border border-gray-300 rounded-lg" id="input-description" name="description" rows="2"></textarea>
+</div>
+<div class="flex justify-end gap-2 pt-2">
+<button class="px-4 py-2 border border-gray-300 rounded-lg" onclick="fermerModal()" type="button">Annuler</button>
+<button class="px-4 py-2 bg-blue-900 text-white rounded-lg" type="submit">Enregistrer</button>
+</div>
+</form>
+</div>
+</div>
+
+<script>
+    function fermerModal() { document.getElementById('modal-matiere').classList.add('hidden'); }
+    document.querySelectorAll('.bouton-modifier').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var row = btn.closest('.ligne-matiere');
+            document.getElementById('modal-titre').textContent = 'Modifier la matiere';
+            document.getElementById('form-matiere').action = '/matieres/' + row.getAttribute('data-id') + '/modifier';
+            document.getElementById('input-nom').value = row.getAttribute('data-nom') || '';
+            document.getElementById('input-pole').value = row.getAttribute('data-pole') || 'AUTRE';
+            document.getElementById('input-coef').value = row.getAttribute('data-coef') || '1';
+            document.getElementById('input-description').value = row.getAttribute('data-description') || '';
+            document.getElementById('modal-matiere').classList.remove('hidden');
+        });
+    });
+</script>
+</body>
+</html>

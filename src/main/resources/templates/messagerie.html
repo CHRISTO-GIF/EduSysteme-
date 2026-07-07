@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Messagerie - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e6e8ea", "error-container": "#ffdad6", "surface-dim": "#d8dadc",
+                    "secondary-fixed-dim": "#b7c8e1", "surface-tint": "#4059aa", "primary-fixed": "#dce1ff",
+                    "tertiary-fixed-dim": "#bec6e0", "on-tertiary": "#ffffff", "surface": "#f7f9fb",
+                    "on-tertiary-container": "#a4acc5", "on-primary": "#ffffff", "outline-variant": "#c5c5d3",
+                    "on-primary-fixed-variant": "#264191", "on-primary-fixed": "#00164e", "surface-bright": "#f7f9fb",
+                    "secondary-fixed": "#d3e4fe", "surface-variant": "#e0e3e5", "secondary-container": "#d0e1fb",
+                    "secondary": "#505f76", "outline": "#757682", "error": "#ba1a1a", "on-tertiary-fixed": "#131b2e",
+                    "on-tertiary-fixed-variant": "#3f465c", "surface-container-low": "#f2f4f6", "on-error": "#ffffff",
+                    "primary": "#00236f", "on-surface-variant": "#444651", "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#384055", "on-background": "#191c1e", "primary-fixed-dim": "#b6c4ff",
+                    "tertiary": "#222a3e", "on-secondary-fixed-variant": "#38485d", "on-secondary-container": "#54647a",
+                    "on-primary-container": "#90a8ff", "tertiary-fixed": "#dae2fd", "surface-container-highest": "#e0e3e5",
+                    "on-secondary": "#ffffff", "on-error-container": "#93000a", "background": "#f7f9fb",
+                    "primary-container": "#1e3a8a", "on-secondary-fixed": "#0b1c30", "surface-container": "#eceef0",
+                    "on-surface": "#191c1e", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"gutter": "24px", "base": "4px", "container-max": "1440px", "xl": "32px", "lg": "24px", "md": "16px", "sidebar-width": "260px", "sm": "8px", "xs": "4px"},
+            "fontFamily": {"headline-md": ["Inter"], "headline-sm": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "body-lg": ["Inter"], "headline-lg": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .sidebar-active { border-left: 4px solid #4059aa; background-color: rgba(56, 64, 85, 0.3); color: #dce1ff; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-surface-bright">EduSystem Pro</h1>
+<p class="text-label-sm text-on-tertiary-container">Administration</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/dashboard">
+<span class="material-symbols-outlined mr-3">dashboard</span> Tableau de bord
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/secretariat">
+<span class="material-symbols-outlined mr-3">group</span> Eleves
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/personnel">
+<span class="material-symbols-outlined mr-3">school</span> Personnel
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/notes/saisie">
+<span class="material-symbols-outlined mr-3">grading</span> Notes
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/examens">
+<span class="material-symbols-outlined mr-3">quiz</span> Examens
+</a>
+<a class="flex items-center px-lg py-3 sidebar-active font-label-md text-label-md" href="/messagerie">
+<span class="material-symbols-outlined mr-3">forum</span> Messagerie
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/finances">
+<span class="material-symbols-outlined mr-3">account_balance</span> Tresorerie
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/emploi-du-temps">
+<span class="material-symbols-outlined mr-3">calendar_today</span> Emploi du temps
+</a>
+</nav>
+<div class="mt-auto px-lg space-y-2">
+<div class="pt-lg border-t border-outline-variant/30 space-y-1">
+<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="/parametres">
+<span class="material-symbols-outlined mr-3">settings</span> Parametres
+</a>
+<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined mr-3">logout</span> Deconnexion
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</div>
+</aside>
+
+<header class="h-16 fixed top-0 right-0 left-sidebar-width bg-surface border-b border-outline-variant flex justify-between items-center px-lg z-40">
+<div class="flex items-center w-1/3">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Messagerie</h2>
+</div>
+</header>
+
+<main class="ml-sidebar-width pt-16 h-screen">
+<div class="flex h-[calc(100vh-64px)]">
+
+<!-- Colonne conversations -->
+<div class="w-[320px] shrink-0 border-r border-outline-variant bg-surface-container-lowest overflow-y-auto">
+<div class="p-lg border-b border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Conversations avec les parents</p>
+</div>
+<div th:if="${conversations.isEmpty()}" class="p-lg text-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[36px] text-outline mb-sm">forum</span>
+<p class="font-body-md text-body-md">Aucun parent joignable pour le moment.</p>
+</div>
+<a th:each="conv : ${conversations}"
+   class="flex items-start gap-md p-lg border-b border-outline-variant hover:bg-surface-container-low transition-colors"
+   th:classappend="${correspondantActif != null and #strings.equalsIgnoreCase(correspondantActif, conv.email)} ? 'bg-primary-fixed/30' : ''"
+   th:href="@{/messagerie(avec=${conv.email})}">
+<div class="w-11 h-11 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold shrink-0" th:text="${#strings.substring(conv.nom,0,1)}">?</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center">
+<p class="font-label-md text-label-md text-on-surface truncate" th:text="${conv.nom}">Nom</p>
+<span class="text-[10px] text-on-surface-variant shrink-0 ml-xs" th:if="${conv.dernierDate != null}" th:text="${#temporals.format(conv.dernierDate, 'dd/MM')}">--</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate" th:text="${conv.role}">Classe</p>
+<p class="font-body-md text-body-md text-on-surface-variant truncate mt-xs"
+   th:text="${conv.dernierMessage != null ? conv.dernierMessage : 'Demarrer la conversation...'}">Dernier message</p>
+</div>
+<span th:if="${conv.nonLus > 0}" class="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] flex items-center justify-center font-bold shrink-0" th:text="${conv.nonLus}">1</span>
+</a>
+</div>
+
+<!-- Fil de discussion -->
+<div class="flex-1 flex flex-col bg-background" th:if="${correspondantActif != null}">
+<div class="p-lg border-b border-outline-variant bg-surface-container-lowest flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold" th:text="${contactActif != null ? #strings.substring(contactActif.nom,0,1) : '?'}">?</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface" th:text="${contactActif != null ? contactActif.nom : correspondantActif}">Nom</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${contactActif != null ? contactActif.role : correspondantActif}">Classe</p>
+</div>
+</div>
+
+<div class="flex-1 overflow-y-auto p-lg space-y-md" id="fil-messages">
+<div th:if="${fil.isEmpty()}" class="text-center text-on-surface-variant mt-xl">
+<p class="font-body-md text-body-md">Aucun message. Envoyez le premier message ci-dessous.</p>
+</div>
+<div th:each="m : ${fil}" class="flex" th:classappend="${#strings.equalsIgnoreCase(m.expediteurEmail, monEmail)} ? 'justify-end' : 'justify-start'">
+<div class="max-w-[65%] px-md py-sm rounded-xl"
+     th:classappend="${#strings.equalsIgnoreCase(m.expediteurEmail, monEmail)} ? 'bg-primary text-on-primary rounded-br-none' : 'bg-surface-container-high text-on-surface rounded-bl-none'">
+<p class="font-body-md text-body-md" th:if="${!#strings.isEmpty(m.contenu)}" th:text="${m.contenu}">Message</p>
+<a th:if="${m.pieceJointeChemin != null}" th:href="@{'/uploads/' + ${m.pieceJointeChemin}}" target="_blank"
+   class="flex items-center gap-sm mt-xs p-sm bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+<span class="font-label-sm text-label-sm truncate" th:text="${m.pieceJointeNom}">fichier.pdf</span>
+</a>
+<p class="text-[10px] mt-xs opacity-70 text-right" th:text="${#temporals.format(m.dateEnvoi, 'dd/MM HH:mm')}">--</p>
+</div>
+</div>
+</div>
+
+<form class="p-lg border-t border-outline-variant bg-surface-container-lowest flex items-center gap-md" enctype="multipart/form-data" method="post" th:action="@{/messagerie/envoyer}">
+<input name="destinataire" th:value="${correspondantActif}" type="hidden"/>
+<label class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors shrink-0 cursor-pointer" title="Joindre un fichier">
+<span class="material-symbols-outlined">attach_file</span>
+<input class="hidden" name="pieceJointe" type="file"/>
+</label>
+<input class="flex-1 p-md bg-surface-container-low border-none rounded-lg font-body-md text-body-md" name="contenu" placeholder="Ecrivez votre reponse..." type="text"/>
+<button class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center hover:opacity-90 transition-opacity shrink-0" type="submit">
+<span class="material-symbols-outlined">send</span>
+</button>
+</form>
+</div>
+
+<div class="flex-1 flex items-center justify-center text-on-surface-variant" th:if="${correspondantActif == null}">
+<div class="text-center">
+<span class="material-symbols-outlined text-[48px] text-outline mb-md">forum</span>
+<p class="font-body-lg text-body-lg">Aucun parent joignable pour le moment.</p>
+</div>
+</div>
+
+<!-- Colonne medias partages -->
+<div class="w-[280px] shrink-0 border-l border-outline-variant bg-surface-container-lowest overflow-y-auto" th:if="${correspondantActif != null}">
+<div class="p-lg border-b border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Medias Partages</p>
+</div>
+<div class="p-lg" th:if="${mediasPartages.isEmpty()}">
+<p class="font-body-md text-body-md text-on-surface-variant">Aucun fichier partage dans cette conversation.</p>
+</div>
+<a th:each="media : ${mediasPartages}" th:href="@{'/uploads/' + ${media.pieceJointeChemin}}" target="_blank"
+   class="flex items-center gap-md p-md mx-md mb-sm bg-surface-container-low rounded-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary">description</span>
+<div class="flex-1 min-w-0">
+<p class="font-label-sm text-label-sm text-on-surface truncate" th:text="${media.pieceJointeNom}">fichier.pdf</p>
+<p class="text-[10px] text-on-surface-variant" th:text="${#temporals.format(media.dateEnvoi, 'dd/MM/yyyy')}">--</p>
+</div>
+</a>
+</div>
+
+</div>
+</main>
+<script>
+    var filMessages = document.getElementById('fil-messages');
+    if (filMessages) { filMessages.scrollTop = filMessages.scrollHeight; }
+</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Archives - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
+<div>
+<h1 class="text-xl font-bold text-blue-900">Archives</h1>
+<p class="text-gray-500 text-sm">Documents administratifs archives de l'etablissement.</p>
+</div>
+<button class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" onclick="document.getElementById('modal-archive').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">upload</span> Archiver un document
+</button>
+</header>
+
+<main class="max-w-6xl mx-auto px-8 py-8">
+
+<form class="bg-white border border-gray-200 rounded-xl p-lg mb-lg flex flex-wrap gap-md items-end" method="get">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Recherche</label>
+<input class="p-2 border border-gray-300 rounded-lg" name="q" placeholder="Nom ou tag..." th:value="${q}" type="text"/>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Categorie</label>
+<select class="p-2 border border-gray-300 rounded-lg" name="categorie">
+<option value="">Toutes</option>
+<option th:each="cat : ${categories}" th:selected="${categorieFiltre == cat}" th:text="${cat}" th:value="${cat}"></option>
+</select>
+</div>
+<button class="bg-blue-900 text-white px-lg py-2 rounded-lg font-medium" type="submit">Filtrer</button>
+<a class="text-gray-500 text-sm" href="/archives">Reinitialiser</a>
+<span class="ml-auto text-sm text-gray-500" th:text="${totalDocs} + ' document(s) au total'">0 documents</span>
+</form>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+<table class="w-full text-left text-sm">
+<thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+<tr><th class="px-5 py-3">Nom</th><th class="px-5 py-3">Categorie</th><th class="px-5 py-3">Ajoute par</th><th class="px-5 py-3">Date</th><th class="px-5 py-3 text-right">Actions</th></tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr th:if="${docs.isEmpty()}">
+<td class="px-5 py-8 text-center text-gray-500" colspan="5">Aucun document archive.</td>
+</tr>
+<tr th:each="d : ${docs}">
+<td class="px-5 py-3 font-medium">
+<span th:text="${d.nom}">Nom</span>
+<span class="material-symbols-outlined text-[14px] text-amber-600 ml-1" th:if="${d.confidentiel}" title="Confidentiel">lock</span>
+</td>
+<td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800" th:text="${d.categorie}">Categorie</span></td>
+<td class="px-5 py-3 text-gray-500" th:text="${d.uploadePar}">Auteur</td>
+<td class="px-5 py-3 text-gray-500" th:text="${#temporals.format(d.dateArchive, 'dd/MM/yyyy')}">--</td>
+<td class="px-5 py-3 text-right space-x-2">
+<a class="text-blue-900 hover:underline text-xs" th:href="@{/archives/{id}/telecharger(id=${d.id})}">Telecharger</a>
+<form class="inline" method="post" th:action="@{/archives/{id}/supprimer(id=${d.id})}" onsubmit="return confirm('Supprimer ce document ?');">
+<button class="text-red-600 hover:underline text-xs" type="submit">Supprimer</button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</main>
+
+<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-archive">
+<div class="bg-white rounded-xl p-xl max-w-md w-full">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-bold text-lg">Archiver un document</h3>
+<button onclick="document.getElementById('modal-archive').classList.add('hidden')" type="button"><span class="material-symbols-outlined">close</span></button>
+</div>
+<form class="space-y-3" enctype="multipart/form-data" method="post" th:action="@{/archives}">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Nom</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" name="nom" required="required" type="text"/>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Categorie</label>
+<select class="w-full p-2 border border-gray-300 rounded-lg" name="categorie">
+<option value="ELEVE">Eleve</option>
+<option value="PERSONNEL">Personnel</option>
+<option value="FINANCES">Finances</option>
+<option value="RH">RH</option>
+<option value="ADMINISTRATIF">Administratif</option>
+<option value="PEDAGOGIQUE">Pedagogique</option>
+</select>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Description</label>
+<textarea class="w-full p-2 border border-gray-300 rounded-lg" name="description" rows="2"></textarea>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Tags (separes par des virgules)</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" name="tags" type="text"/>
+</div>
+<label class="flex items-center gap-2 text-sm">
+<input name="confidentiel" type="checkbox" value="true"/> Document confidentiel
+</label>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Fichier</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" name="fichier" required="required" type="file"/>
+</div>
+<div class="flex justify-end gap-2 pt-2">
+<button class="px-4 py-2 border border-gray-300 rounded-lg" onclick="document.getElementById('modal-archive').classList.add('hidden')" type="button">Annuler</button>
+<button class="px-4 py-2 bg-blue-900 text-white rounded-lg" type="submit">Archiver</button>
+</div>
+</form>
+</div>
+</div>
+</body>
+</html>

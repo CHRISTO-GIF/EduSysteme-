@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recu de paiement - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { vertical-align: middle; }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-md mx-auto py-xl px-lg">
+<div class="no-print flex justify-between items-center mb-lg">
+<a class="flex items-center gap-xs text-blue-900 font-medium" href="/finances">
+<span class="material-symbols-outlined">arrow_back</span> Retour
+</a>
+<button class="px-lg py-2 bg-blue-900 text-white rounded-lg font-bold flex items-center gap-xs" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer
+</button>
+</div>
+
+<div class="bg-white rounded-xl border border-gray-200 p-xl">
+<div class="text-center mb-lg pb-lg border-b border-dashed border-gray-300">
+<img alt="Logo" class="h-12 mx-auto mb-2" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
+<h1 class="text-lg font-bold text-blue-900" th:text="${nomEtab}">EduSystem Pro</h1>
+<p class="text-xs text-gray-500" th:text="${adresseEtab}">Adresse</p>
+<p class="text-xs text-gray-500" th:text="${telEtab}">Telephone</p>
+</div>
+
+<div class="text-center mb-lg">
+<span class="material-symbols-outlined text-green-600 text-[40px]" style="font-variation-settings: 'FILL' 1">check_circle</span>
+<p class="font-bold text-lg mt-1">Recu de Paiement</p>
+<p class="text-xs text-gray-500" th:text="'N° ' + ${paiement.recuNumero}">N° --</p>
+</div>
+
+<table class="w-full text-sm mb-lg">
+<tr class="border-b border-gray-100">
+<td class="py-2 text-gray-500">Eleve</td>
+<td class="py-2 text-right font-medium" th:text="${paiement.eleve != null ? paiement.eleve.prenom + ' ' + paiement.eleve.nom : '?'}">Eleve</td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="py-2 text-gray-500">Type</td>
+<td class="py-2 text-right" th:text="${paiement.fraisScolarite != null ? paiement.fraisScolarite.designation : paiement.typePaiement}">Type</td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="py-2 text-gray-500">Mode de paiement</td>
+<td class="py-2 text-right" th:text="${paiement.modePaiement}">Mode</td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="py-2 text-gray-500">Date</td>
+<td class="py-2 text-right" th:text="${#temporals.format(paiement.datePaiement, 'dd/MM/yyyy HH:mm')}">--</td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="py-2 text-gray-500">Annee scolaire</td>
+<td class="py-2 text-right" th:text="${anneeScolaire}">2025-2026</td>
+</tr>
+</table>
+
+<div class="bg-gray-50 rounded-lg p-4 flex justify-between items-center">
+<span class="font-bold">Montant verse</span>
+<span class="font-bold text-xl text-blue-900" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</span>
+</div>
+
+<p class="text-[10px] text-gray-400 text-center mt-lg">Ce recu a ete genere automatiquement par EduSystem Pro.</p>
+</div>
+</div>
+</body>
+</html>

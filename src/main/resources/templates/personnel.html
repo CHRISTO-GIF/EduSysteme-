@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Personnel | EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bento-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#f7f9fb", "background": "#f7f9fb", "on-primary": "#ffffff",
+                      "error": "#ba1a1a", "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5",
+                      "error-container": "#ffdad6", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                      "outline": "#757682", "primary-fixed-dim": "#b6c4ff", "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c5c5d3", "primary": "#00236f", "on-error-container": "#93000a",
+                      "on-secondary-container": "#54647a", "surface-container": "#eceef0", "on-background": "#191c1e",
+                      "on-surface-variant": "#444651", "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a",
+                      "surface-container-high": "#e6e8ea", "tertiary": "#222a3e", "surface": "#f7f9fb",
+                      "secondary": "#505f76", "surface-container-low": "#f2f4f6"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},
+              "fontFamily": {"headline-md": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "code": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70">Portail Admin</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-xs px-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span> Tableau de bord
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat">
+<span class="material-symbols-outlined">group</span> Eleves
+</a>
+<a class="flex items-center gap-md px-md py-sm text-white border-l-4 border-primary-fixed bg-tertiary-container rounded-lg font-label-md text-label-md font-bold" href="/personnel">
+<span class="material-symbols-outlined">school</span> Personnel
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_month</span> Emploi du temps
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/notes/saisie">
+<span class="material-symbols-outlined">grading</span> Notes
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/examens">
+<span class="material-symbols-outlined">quiz</span> Examens
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/messagerie">
+<span class="material-symbols-outlined">forum</span> Messagerie
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/finances">
+<span class="material-symbols-outlined">account_balance</span> Tresorerie
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/journal">
+<span class="material-symbols-outlined">assessment</span> Rapports
+</a>
+</nav>
+<div class="px-sm mt-auto space-y-xs pt-md border-t border-tertiary-container/30">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/parametres">
+<span class="material-symbols-outlined">settings</span> Parametres
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span> Deconnexion
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<!-- Barre superieure -->
+<header class="h-16 fixed top-0 right-0 left-[260px] bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-10 pr-4 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="recherche-personnel" placeholder="Rechercher un membre du personnel..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md ml-lg">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrateur</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border-2 border-primary-fixed" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'A'}">A</div>
+</div>
+</div>
+</header>
+
+<main class="ml-[260px] pt-24 px-lg pb-xl max-w-container-max mx-auto">
+<div th:if="${migrationMsg}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${migrationMsg}"></div>
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${infoMsg}" class="mb-lg p-md rounded-lg bg-surface-container-high text-on-surface font-body-md text-body-md" th:text="${infoMsg}"></div>
+
+<!-- En-tete -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-xl gap-lg">
+<div class="space-y-xs">
+<nav class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span>EduSystem Pro</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Annuaire du Personnel</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Gestion du Personnel</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Gerez les membres du personnel de votre etablissement, leurs fonctions et leurs classes assignees.</p>
+</div>
+<a class="bg-primary text-on-primary font-label-md text-label-md px-lg py-md rounded-lg flex items-center gap-sm hover:opacity-90 active:scale-95 transition-all shadow-sm" href="/personnel/nouveau">
+<span class="material-symbols-outlined">person_add</span> Ajouter un membre
+</a>
+</div>
+
+<!-- Filtres -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md mb-lg flex flex-wrap items-center gap-md">
+<form class="flex flex-wrap items-center gap-md" method="get" th:action="@{/personnel}">
+<div class="flex items-center gap-sm bg-surface-container-low px-sm py-xs rounded border border-outline-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Fonction :</span>
+<select class="bg-transparent border-none font-label-md text-label-md p-0 focus:ring-0 cursor-pointer" name="fonction" onchange="this.form.submit()">
+<option value="">Toutes</option>
+<option th:selected="${selectedFonction == 'ENSEIGNANT'}" value="ENSEIGNANT">Enseignant</option>
+<option th:selected="${selectedFonction == 'DIRECTEUR'}" value="DIRECTEUR">Directeur</option>
+<option th:selected="${selectedFonction == 'SECRETAIRE'}" value="SECRETAIRE">Secretaire</option>
+<option th:selected="${selectedFonction == 'SURVEILLANT'}" value="SURVEILLANT">Surveillant</option>
+<option th:selected="${selectedFonction == 'COMPTABLE'}" value="COMPTABLE">Comptable</option>
+<option th:selected="${selectedFonction == 'AUTRE'}" value="AUTRE">Autre</option>
+</select>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-low px-sm py-xs rounded border border-outline-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Statut :</span>
+<select class="bg-transparent border-none font-label-md text-label-md p-0 focus:ring-0 cursor-pointer" name="statut" onchange="this.form.submit()">
+<option value="">Tous</option>
+<option th:selected="${selectedStatut == 'ACTIF'}" value="ACTIF">Actif</option>
+<option th:selected="${selectedStatut == 'ARCHIVE'}" value="ARCHIVE">Archive</option>
+</select>
+</div>
+</form>
+</div>
+
+<!-- Grille du personnel -->
+<div class="bento-grid" id="grille-personnel">
+<div class="personnel-card bg-surface-container-lowest border border-outline-variant rounded-xl p-lg hover:shadow-md transition-all group"
+     th:attr="data-nom=${p.nom + ' ' + p.prenom}"
+     th:each="p : ${personnels}">
+<div class="flex justify-between items-start mb-md">
+<div class="w-16 h-16 rounded-xl bg-primary-fixed flex items-center justify-center text-primary font-bold text-headline-sm border border-outline-variant" th:text="${#strings.isEmpty(p.prenom) ? '' : #strings.substring(p.prenom,0,1)} + ${#strings.isEmpty(p.nom) ? '' : #strings.substring(p.nom,0,1)}">--</div>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-1 rounded font-label-sm text-label-sm" th:switch="${p.fonction}">
+<span th:case="'ENSEIGNANT'">Enseignant</span>
+<span th:case="'DIRECTEUR'">Directeur</span>
+<span th:case="'SECRETAIRE'">Secretaire</span>
+<span th:case="'SURVEILLANT'">Surveillant</span>
+<span th:case="'COMPTABLE'">Comptable</span>
+<span th:case="*">Autre</span>
+</span>
+</div>
+<div class="mb-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors" th:text="${p.prenom} + ' ' + ${p.nom}">Nom Prenom</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs" th:if="${p.email != null}">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+<span th:text="${p.email}">email</span>
+</p>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs" th:if="${p.matiereEnseignee != null and !#strings.isEmpty(p.matiereEnseignee)}">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+<span th:text="${p.matiereEnseignee}">Matiere</span>
+</p>
+</div>
+<div class="space-y-sm" th:if="${classesParPersonnel[p.id] != null and !#lists.isEmpty(classesParPersonnel[p.id])}">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Classes assignees</p>
+<div class="flex flex-wrap gap-xs">
+<span class="px-2 py-1 bg-surface-container-high rounded font-code text-code text-on-surface" th:each="cn : ${classesParPersonnel[p.id]}" th:text="${cn}">Classe</span>
+</div>
+</div>
+<div class="mt-lg pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="flex items-center gap-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full" th:classappend="${p.statut == 'ACTIF'} ? 'bg-green-500' : 'bg-outline'"></span>
+<span th:text="${p.statut == 'ACTIF'} ? 'Actif' : 'Archive'">Statut</span>
+</span>
+<a class="text-primary font-label-md text-label-md flex items-center gap-xs hover:underline" th:href="@{/personnel/{id}(id=${p.id})}">
+Voir le profil <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Carte d'ajout -->
+<div class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container-high transition-all group" onclick="window.location.href='/personnel/nouveau'">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-md group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant text-[32px]">add</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface">Ajouter un membre</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Commencez le processus d'integration.</p>
+</div>
+</div>
+<div class="text-center text-on-surface-variant py-xl" th:if="${#lists.isEmpty(personnels)}">
+Aucun membre du personnel ne correspond a ces filtres.
+</div>
+<!-- Pagination -->
+<div class="mt-lg flex items-center justify-center gap-xs" id="pagination-pages"></div>
+
+<!-- Statistiques -->
+<div class="mt-xl grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Personnel</p>
+<h4 class="font-headline-lg text-headline-lg text-on-surface mt-xs" th:text="${totalPersonnels}">0</h4>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Actifs</p>
+<h4 class="font-headline-lg text-headline-lg text-on-surface mt-xs" th:text="${totalActifs}">0</h4>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Enseignants</p>
+<h4 class="font-headline-lg text-headline-lg text-on-surface mt-xs" th:text="${totalEnseignants}">0</h4>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Archives</p>
+<h4 class="font-headline-lg text-headline-lg text-on-surface mt-xs" th:text="${totalArchives}">0</h4>
+</div>
+</div>
+</main>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Recherche + pagination numerotee cote client
+    const recherche = document.getElementById('recherche-personnel');
+    const grille = document.getElementById('grille-personnel');
+    const cartes = grille ? Array.from(grille.querySelectorAll('.personnel-card')) : [];
+    const PAGE_SIZE = 9;
+    let pageActuelle = 1;
+
+    function render() {
+        if (!grille) return;
+        const q = (recherche ? recherche.value : '').toLowerCase().trim();
+        const visibles = cartes.filter(c => c.getAttribute('data-nom').toLowerCase().includes(q));
+
+        cartes.forEach(c => c.style.display = 'none');
+        const totalPages = Math.max(1, Math.ceil(visibles.length / PAGE_SIZE));
+        if (pageActuelle > totalPages) pageActuelle = totalPages;
+        const start = (pageActuelle - 1) * PAGE_SIZE;
+        visibles.slice(start, start + PAGE_SIZE).forEach(c => c.style.display = '');
+
+        const pagesEl = document.getElementById('pagination-pages');
+        if (pagesEl) {
+            pagesEl.innerHTML = '';
+            for (let p = 1; p <= totalPages; p++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = p;
+                btn.className = p === pageActuelle
+                    ? 'w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-label-md'
+                    : 'w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-high transition-colors font-label-md';
+                btn.addEventListener('click', () => { pageActuelle = p; render(); });
+                pagesEl.appendChild(btn);
+            }
+        }
+    }
+    if (recherche) recherche.addEventListener('input', () => { pageActuelle = 1; render(); });
+    render();
+    /*]]>*/
+</script>
+</body>
+</html>

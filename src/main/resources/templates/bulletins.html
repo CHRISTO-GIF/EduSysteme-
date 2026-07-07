@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bulletins - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
+<div>
+<h1 class="text-xl font-bold text-blue-900">Bulletins</h1>
+<p class="text-gray-500 text-sm">Consultez et imprimez les bulletins de chaque eleve.</p>
+</div>
+<a class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" th:href="@{/bulletins/impression(classeId=${classeId})}">
+<span class="material-symbols-outlined text-[18px]">print</span> Impression par classe
+</a>
+</header>
+
+<main class="max-w-5xl mx-auto px-8 py-8">
+
+<form class="bg-white border border-gray-200 rounded-xl p-lg mb-lg flex items-end gap-md" method="get">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Classe</label>
+<select class="p-2 border border-gray-300 rounded-lg" name="classeId" onchange="this.form.submit()">
+<option value="">Toutes les classes</option>
+<option th:each="c : ${classes}" th:selected="${classeId != null and classeId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</div>
+</form>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+<table class="w-full text-left text-sm">
+<thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+<tr><th class="px-5 py-3">Eleve</th><th class="px-5 py-3">Matricule</th><th class="px-5 py-3">Classe</th><th class="px-5 py-3 text-right">Actions</th></tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr th:if="${eleves.isEmpty()}">
+<td class="px-5 py-8 text-center text-gray-500" colspan="4">Aucun eleve trouve.</td>
+</tr>
+<tr th:each="e : ${eleves}">
+<td class="px-5 py-3 font-medium" th:text="${e.prenom} + ' ' + ${e.nom}">Eleve</td>
+<td class="px-5 py-3 text-gray-500" th:text="${e.matricule}">Matricule</td>
+<td class="px-5 py-3" th:text="${e.classe != null ? e.classe.nom : '?'}">Classe</td>
+<td class="px-5 py-3 text-right">
+<a class="text-blue-900 hover:underline text-xs font-medium" th:href="@{/bulletins/{id}(id=${e.id})}">Voir le bulletin</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</main>
+</body>
+</html>

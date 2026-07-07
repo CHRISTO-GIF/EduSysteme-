@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Inscription Eleve - Etape 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#0b1c30", "secondary": "#505f76", "on-error": "#ffffff",
+                        "surface-tint": "#4059aa", "on-surface-variant": "#444651", "surface": "#f7f9fb",
+                        "on-primary-fixed-variant": "#264191", "outline-variant": "#c5c5d3", "primary-container": "#1e3a8a",
+                        "on-surface": "#191c1e", "inverse-on-surface": "#eff1f3", "error-container": "#ffdad6",
+                        "inverse-primary": "#b6c4ff", "tertiary-fixed-dim": "#bec6e0", "surface-bright": "#f7f9fb",
+                        "secondary-fixed": "#d3e4fe", "on-secondary": "#ffffff", "on-primary-fixed": "#00164e",
+                        "surface-container": "#eceef0", "on-tertiary-fixed-variant": "#3f465c", "surface-variant": "#e0e3e5",
+                        "surface-dim": "#d8dadc", "surface-container-high": "#e6e8ea", "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a", "tertiary": "#222a3e", "surface-container-low": "#f2f4f6",
+                        "on-primary-container": "#90a8ff", "inverse-surface": "#2d3133", "primary-fixed-dim": "#b6c4ff",
+                        "outline": "#757682", "on-primary": "#ffffff", "secondary-fixed-dim": "#b7c8e1",
+                        "on-secondary-fixed-variant": "#38485d", "primary": "#00236f", "on-error-container": "#93000a",
+                        "primary-fixed": "#dce1ff", "tertiary-fixed": "#dae2fd", "on-tertiary": "#ffffff",
+                        "tertiary-container": "#384055", "surface-container-highest": "#e0e3e5", "background": "#f7f9fb",
+                        "secondary-container": "#d0e1fb", "on-secondary-container": "#54647a", "on-tertiary-fixed": "#131b2e",
+                        "on-tertiary-container": "#a4acc5", "on-background": "#191c1e"
+                    },
+                    "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                    "spacing": {"base": "4px", "xl": "32px", "sidebar-width": "260px", "gutter": "24px", "container-max": "1440px", "xs": "4px", "md": "16px", "sm": "8px", "lg": "24px"},
+                    "fontFamily": {"headline-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"]},
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #f7f9fb; font-family: 'Inter', sans-serif; }
+        .step-active { position: relative; }
+        .step-active::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background-color: #00236f; border-radius: 0 4px 4px 0; }
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col">
+<div th:replace="~{fragments/eleve-wizard-sidebar :: topbar}"></div>
+<main class="flex flex-1 overflow-hidden">
+<div th:replace="~{fragments/eleve-wizard-sidebar :: sidebar(1)}"></div>
+<section class="flex-1 overflow-y-auto p-lg md:p-xl flex justify-center">
+<div class="w-full max-w-4xl">
+<div class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Informations Personnelles</h1>
+<p class="font-body-md text-body-md text-secondary">Details de base de l'eleve a inscrire.</p>
+</div>
+
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg md:p-xl">
+<form class="space-y-xl" method="post" th:action="@{/secretariat/eleves/nouveau/etape-1}">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface flex items-center gap-xs">Nom Complet <span class="text-error">*</span></label>
+<input class="w-full h-12 px-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-body-md" name="nomComplet" placeholder="Ex: Jean Dupont" required="required" th:value="${donnees.nomComplet}" type="text"/>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface">Date de Naissance</label>
+<input class="w-full h-12 px-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-body-md" name="dateNaissance" th:value="${donnees.dateNaissance}" type="date"/>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface">Genre</label>
+<select class="w-full h-12 px-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none font-body-md" name="genre">
+<option th:selected="${donnees.genre == 'MASCULIN'}" value="MASCULIN">Masculin</option>
+<option th:selected="${donnees.genre == 'FEMININ'}" value="FEMININ">Feminin</option>
+<option th:selected="${donnees.genre == 'AUTRE'}" value="AUTRE">Autre</option>
+</select>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface">Nationalite</label>
+<input class="w-full h-12 px-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-body-md" name="nationalite" placeholder="Ex: Ivoirienne" th:value="${donnees.nationalite}" type="text"/>
+</div>
+<div class="col-span-full space-y-sm">
+<label class="font-label-md text-label-md text-on-surface">Adresse Residentielle</label>
+<textarea class="w-full px-md py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-body-md" name="adresse" placeholder="Numero, Rue, Ville, Code Postal" rows="2" th:text="${donnees.adresse}"></textarea>
+</div>
+</div>
+
+<div class="pt-xl flex flex-col sm:flex-row items-center justify-between gap-md border-t border-outline-variant">
+<a class="w-full sm:w-auto px-xl h-12 flex items-center justify-center gap-sm font-label-md text-label-md text-secondary border border-outline-variant rounded-lg hover:bg-surface-container transition-all active:scale-95" th:href="@{/secretariat}">
+<span class="material-symbols-outlined">close</span> Annuler
+</a>
+<button class="w-full sm:w-auto px-xl h-12 flex items-center justify-center gap-sm font-label-md text-label-md text-white bg-primary rounded-lg shadow-sm hover:opacity-90 transition-all active:scale-95" type="submit">
+Suivant <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+</main>
+</body>
+</html>

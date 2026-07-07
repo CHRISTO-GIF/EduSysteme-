@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Rapport des Depenses de Fonctionnement</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2d3133", "primary-fixed-dim": "#b6c4ff", "on-surface-variant": "#444651",
+                    "tertiary-container": "#384055", "secondary": "#505f76", "outline-variant": "#c5c5d3",
+                    "surface-container-high": "#e6e8ea", "primary": "#00236f", "outline": "#757682",
+                    "surface-container-highest": "#e0e3e5", "on-surface": "#191c1e", "tertiary": "#222a3e",
+                    "surface-container": "#eceef0", "surface-container-low": "#f2f4f6", "surface-dim": "#d8dadc",
+                    "on-tertiary-fixed-variant": "#3f465c", "on-background": "#191c1e", "on-tertiary-container": "#a4acc5",
+                    "on-primary-container": "#90a8ff", "on-primary": "#ffffff", "on-error-container": "#93000a",
+                    "secondary-fixed": "#d3e4fe", "error": "#ba1a1a", "tertiary-fixed": "#dae2fd",
+                    "surface-variant": "#e0e3e5", "surface": "#f7f9fb", "on-primary-fixed-variant": "#264191",
+                    "surface-container-lowest": "#ffffff", "primary-fixed": "#dce1ff", "primary-container": "#1e3a8a",
+                    "background": "#f7f9fb", "on-tertiary": "#ffffff", "on-error": "#ffffff",
+                    "error-container": "#ffdad6", "on-secondary": "#ffffff", "secondary-container": "#d0e1fb",
+                    "surface-bright": "#f7f9fb", "on-secondary-container": "#54647a", "success-container": "#c8f7d4",
+                    "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sm": "8px", "container-max": "1440px", "xs": "4px", "lg": "24px", "gutter": "24px", "xl": "32px", "base": "4px", "md": "16px", "sidebar-width": "260px"},
+            "fontFamily": {"headline-sm": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "body-lg": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden">
+<aside class="fixed left-0 top-0 h-full w-[260px] bg-tertiary flex flex-col border-r border-outline-variant z-50">
+<div class="p-lg flex flex-col gap-xs">
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="text-on-tertiary-container/70 font-label-sm text-label-sm uppercase tracking-wider">Gestion Tresorerie</p>
+</div>
+<nav class="flex-1 px-sm py-md space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/dashboard}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/secretariat}">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Eleves</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10" th:href="@{/finances}">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Financier</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/examens}">
+<span class="material-symbols-outlined">school</span>
+<span class="font-body-md text-body-md">Academique</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/personnel}">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-body-md text-body-md">Personnel</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/journal}">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Rapports</span>
+</a>
+</nav>
+<div class="mt-auto p-md space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary transition-colors" th:href="@{/parametres}">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Parametres</span>
+</a>
+</div>
+</aside>
+<main class="ml-[260px] flex-1 flex flex-col h-screen overflow-hidden bg-background">
+<header class="flex justify-between items-center w-full h-16 px-lg sticky top-0 z-40 bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-lg">
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full pl-xl pr-md py-xs bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none" placeholder="Rechercher des depenses..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-sm">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="text-label-sm text-outline" th:text="${utilisateurConnecte != null ? utilisateurConnecte.role : ''}">Role</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed border border-outline-variant flex items-center justify-center text-primary font-bold" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'U'}">U</div>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-lg">
+<div class="max-w-container-max mx-auto space-y-lg">
+
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<nav class="flex text-label-sm text-outline mb-xs">
+<a class="hover:text-primary" th:href="@{/finances}">Finance</a>
+<span class="mx-xs">/</span>
+<span class="text-on-surface font-medium">Depenses de Fonctionnement</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary">Rapport des Depenses de Fonctionnement</h2>
+<p class="text-body-md text-secondary" th:text="'Apercu analytique des couts operationnels — ' + ${nomMoisFiltre} + ' ' + ${anneeFiltre} + '.'">Apercu.</p>
+</div>
+<div class="flex items-center gap-md">
+<a class="flex items-center gap-sm px-md py-sm bg-surface-container-lowest border border-outline-variant text-secondary font-label-md text-label-md rounded-lg hover:bg-surface-container transition-all" th:href="@{/finances/depenses/detail}">
+<span class="material-symbols-outlined text-md">query_stats</span>
+Rapport detaille
+</a>
+<button class="flex items-center gap-sm px-md py-sm bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:opacity-90 transition-all shadow-sm" onclick="document.getElementById('modal-depense').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-md">add_circle</span>
+Ajouter une Depense
+</button>
+</div>
+</div>
+
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-sm">
+<span class="p-xs bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">payments</span>
+</span>
+</div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-xs">Total des Depenses</p>
+<h3 class="text-headline-md font-headline-md text-on-surface" th:text="${#numbers.formatDecimal(totalDuMois, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+<p class="text-label-sm text-secondary mt-sm" th:text="'Periode : ' + ${nomMoisFiltre} + ' ' + ${anneeFiltre}">Periode</p>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-sm">
+<span class="p-xs bg-secondary-container text-on-secondary-container rounded-lg">
+<span class="material-symbols-outlined">compare_arrows</span>
+</span>
+</div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-xs">Vs Mois Precedent</p>
+<h3 class="text-headline-md font-headline-md text-on-surface" th:text="(${variationVsMoisPrecedent} >= 0 ? '+ ' : '') + ${#numbers.formatDecimal(variationVsMoisPrecedent, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+<p class="text-label-sm text-secondary mt-sm">Vs le mois calendaire precedent</p>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-sm">
+<span class="p-xs bg-tertiary-container text-on-tertiary-container rounded-lg">
+<span class="material-symbols-outlined">category</span>
+</span>
+</div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-xs">Categorie Majeure</p>
+<h3 class="text-headline-md font-headline-md text-on-surface" th:text="${categorieMajeure != null ? categorieMajeure : '—'}">—</h3>
+<p class="text-label-sm text-secondary mt-sm" th:text="${pourcentageCategorieMajeure} + '% du total des depenses'">0%</p>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-sm">
+<span class="p-xs bg-green-100 text-green-700 rounded-lg">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</span>
+</div>
+<p class="text-label-sm text-outline uppercase tracking-wider mb-xs">Budget Restant (annuel)</p>
+<h3 class="text-headline-md font-headline-md text-on-surface" th:text="${#numbers.formatDecimal(budgetRestant, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+<div class="w-full bg-outline-variant h-1.5 rounded-full mt-sm overflow-hidden">
+<div class="bg-primary h-full" th:style="'width:' + ${tauxBudgetUtilise} + '%'"></div>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<div class="lg:col-span-2 space-y-md">
+<form class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant flex flex-wrap items-end gap-md" method="get" th:action="@{/finances/depenses}">
+<div class="flex-1 min-w-[150px]">
+<label class="block text-label-sm text-outline mb-xs">Mois</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg text-body-md px-sm py-xs" name="mois">
+<option th:each="nom, iter : ${nomsMois}" th:selected="${(iter.index + 1) == moisFiltre}" th:text="${nom}" th:value="${iter.index + 1}"></option>
+</select>
+</div>
+<div class="flex-1 min-w-[100px]">
+<label class="block text-label-sm text-outline mb-xs">Annee</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg text-body-md px-sm py-xs" min="2020" name="annee" th:value="${anneeFiltre}" type="number"/>
+</div>
+<div class="flex-1 min-w-[150px]">
+<label class="block text-label-sm text-outline mb-xs">Categorie</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg text-body-md px-sm py-xs" name="categorie">
+<option th:selected="${categorieFiltre == null or categorieFiltre.isEmpty()}" value="">Toutes les categories</option>
+<option th:selected="${categorieFiltre == 'SERVICES_PUBLICS'}" value="SERVICES_PUBLICS">Services Publics</option>
+<option th:selected="${categorieFiltre == 'MAINTENANCE'}" value="MAINTENANCE">Maintenance</option>
+<option th:selected="${categorieFiltre == 'FOURNITURES'}" value="FOURNITURES">Fournitures</option>
+<option th:selected="${categorieFiltre == 'SALAIRES'}" value="SALAIRES">Salaires</option>
+<option th:selected="${categorieFiltre == 'LOYER'}" value="LOYER">Loyer</option>
+<option th:selected="${categorieFiltre == 'AUTRE'}" value="AUTRE">Autre</option>
+</select>
+</div>
+<div class="flex-1 min-w-[150px]">
+<label class="block text-label-sm text-outline mb-xs">Statut</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg text-body-md px-sm py-xs" name="statut">
+<option th:selected="${statutFiltre == null or statutFiltre.isEmpty()}" value="">Tous les statuts</option>
+<option th:selected="${statutFiltre == 'PAYE'}" value="PAYE">Paye</option>
+<option th:selected="${statutFiltre == 'EN_ATTENTE'}" value="EN_ATTENTE">En attente</option>
+</select>
+</div>
+<button class="px-md py-xs bg-secondary text-on-secondary rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Filtrer</button>
+</form>
+
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="depenses-table">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="p-md font-label-sm text-label-sm text-outline uppercase border-b border-outline-variant">Date</th>
+<th class="p-md font-label-sm text-label-sm text-outline uppercase border-b border-outline-variant">Description</th>
+<th class="p-md font-label-sm text-label-sm text-outline uppercase border-b border-outline-variant">Categorie</th>
+<th class="p-md font-label-sm text-label-sm text-outline uppercase border-b border-outline-variant">Beneficiaire</th>
+<th class="p-md font-label-sm text-label-sm text-outline uppercase border-b border-outline-variant text-right">Montant</th>
+<th class="p-md font-label-sm text-label-sm text-outline uppercase border-b border-outline-variant">Statut</th>
+<th class="p-md border-b border-outline-variant"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant" id="depenses-tbody">
+<tr class="depense-row hover:bg-surface-container/30 transition-colors group" th:each="d : ${depenses}">
+<td class="p-md text-body-md text-on-surface" th:text="${#temporals.format(d.dateDepense, 'dd MMM yyyy')}"></td>
+<td class="p-md text-body-md text-on-surface font-medium" th:text="${d.designation}"></td>
+<td class="p-md">
+<span class="px-sm py-0.5 rounded-full bg-blue-50 text-blue-700 text-label-sm font-bold" th:text="${d.categorie}"></span>
+</td>
+<td class="p-md text-body-md text-secondary" th:text="${d.beneficiaire}"></td>
+<td class="p-md text-body-md text-on-surface font-bold text-right" th:text="${#numbers.formatDecimal(d.montant, 0, 'COMMA', 0, 'POINT')} + ' F'"></td>
+<td class="p-md">
+<span class="px-sm py-0.5 rounded-full bg-green-50 text-green-700 text-label-sm font-bold flex items-center gap-xs w-fit" th:if="${d.statut == 'PAYE'}">
+<span class="w-1.5 h-1.5 bg-green-600 rounded-full"></span> Paye
+</span>
+<span class="px-sm py-0.5 rounded-full bg-amber-50 text-amber-700 text-label-sm font-bold flex items-center gap-xs w-fit" th:if="${d.statut == 'EN_ATTENTE'}">
+<span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span> En attente
+</span>
+</td>
+<td class="p-md text-right">
+<form method="post" th:action="@{/finances/depenses/{id}/supprimer(id=${d.id})}">
+<button class="text-outline hover:text-error transition-colors opacity-0 group-hover:opacity-100" type="submit">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</form>
+</td>
+</tr>
+<tr th:if="${depenses.isEmpty()}">
+<td class="p-lg text-center text-secondary" colspan="7">Aucune depense pour cette periode.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md border-t border-outline-variant flex items-center justify-between flex-wrap gap-md">
+<span class="text-label-sm text-outline" id="pagination-info"></span>
+<div class="flex items-center gap-xs" id="pagination-pages"></div>
+</div>
+</div>
+</div>
+
+<div class="space-y-lg">
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<h4 class="font-label-md text-label-md text-on-surface mb-lg">Depenses par Categorie</h4>
+<div class="relative w-48 h-48 mx-auto mb-lg" th:if="${!repartition.isEmpty()}">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#e2e8f0" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#00236f" th:attr="stroke-dasharray=${r.pourcentage} + ' ' + (100 - r.pourcentage), stroke-dashoffset=${r.offsetCumule}" stroke-width="4" th:each="r, iter : ${repartition}" th:if="${iter.index == 0}"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#505f76" th:attr="stroke-dasharray=${r.pourcentage} + ' ' + (100 - r.pourcentage), stroke-dashoffset=${r.offsetCumule}" stroke-width="4" th:each="r, iter : ${repartition}" th:if="${iter.index == 1}"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#ba1a1a" th:attr="stroke-dasharray=${r.pourcentage} + ' ' + (100 - r.pourcentage), stroke-dashoffset=${r.offsetCumule}" stroke-width="4" th:each="r, iter : ${repartition}" th:if="${iter.index == 2}"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#c5c5d3" th:attr="stroke-dasharray=${r.pourcentage} + ' ' + (100 - r.pourcentage), stroke-dashoffset=${r.offsetCumule}" stroke-width="4" th:each="r, iter : ${repartition}" th:if="${iter.index >= 3}"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-headline-sm font-bold text-primary" th:text="${pourcentageCategorieMajeure} + '%'">0%</span>
+<span class="text-label-sm text-outline" th:text="${categorieMajeure}">—</span>
+</div>
+</div>
+<p class="text-body-md text-secondary text-center mb-lg" th:if="${repartition.isEmpty()}">Aucune depense ce mois-ci.</p>
+<div class="space-y-sm">
+<div class="flex items-center justify-between" th:each="r, iter : ${repartition}">
+<div class="flex items-center gap-sm">
+<div class="w-3 h-3 rounded-full" th:classappend="${iter.index == 0 ? 'bg-primary' : (iter.index == 1 ? 'bg-secondary' : (iter.index == 2 ? 'bg-error' : 'bg-outline-variant'))}"></div>
+<span class="text-body-md text-on-surface" th:text="${r.categorie}"></span>
+</div>
+<span class="text-label-md font-bold" th:text="${#numbers.formatDecimal(r.montant, 0, 'COMMA', 0, 'POINT')} + ' F'"></span>
+</div>
+</div>
+</div>
+
+<div class="bg-primary text-on-primary p-lg rounded-xl shadow-lg" th:if="${etablissement != null}">
+<p class="text-label-sm text-primary-fixed-dim uppercase tracking-widest mb-xs">Etablissement</p>
+<h4 class="font-headline-sm text-headline-sm mb-md" th:text="${etablissement.nom}">Etablissement</h4>
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-md">location_on</span>
+<span class="text-body-md" th:text="${etablissement.adresse}">Adresse</span>
+</div>
+<div class="bg-on-primary/10 rounded-lg p-md border border-on-primary/20" th:if="${plusGrosseDepense != null}">
+<p class="text-label-sm text-primary-fixed-dim">Plus grosse depense ce mois-ci</p>
+<p class="font-bold" th:text="${plusGrosseDepense.designation} + ' — ' + ${#numbers.formatDecimal(plusGrosseDepense.montant, 0, 'COMMA', 0, 'POINT')} + ' F'">—</p>
+</div>
+</div>
+
+<div class="bg-surface-container p-lg rounded-xl border border-outline-variant">
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Sante du Budget Annuel</h4>
+<div class="space-y-md">
+<div>
+<div class="flex justify-between text-label-sm mb-xs">
+<span th:text="'Depense : ' + ${#numbers.formatDecimal(depenseAnnuelleTotale, 0, 'COMMA', 0, 'POINT')} + ' F'">Depense</span>
+<span th:text="'Total : ' + ${#numbers.formatDecimal(budgetAnnuelPrevu, 0, 'COMMA', 0, 'POINT')} + ' F'">Total</span>
+</div>
+<div class="h-2 bg-outline-variant rounded-full overflow-hidden">
+<div class="bg-primary h-full" th:style="'width:' + ${tauxBudgetUtilise} + '%'"></div>
+</div>
+</div>
+<div class="p-sm bg-surface-container-highest rounded border border-outline-variant flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">info</span>
+<p class="text-label-sm text-secondary" th:text="${tauxBudgetUtilise} + '% du budget annuel de depenses est utilise.'">Info</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<!-- Modal Ajouter une Depense -->
+<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-depense">
+<div class="bg-white rounded-xl p-xl max-w-lg w-full">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-primary">Ajouter une Depense</h3>
+<button onclick="document.getElementById('modal-depense').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="space-y-md" method="post" th:action="@{/finances/depenses}">
+<div>
+<label class="text-label-sm text-secondary block mb-1">Description</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" name="designation" placeholder="Ex: Facture d'electricite" required="required" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div>
+<label class="text-label-sm text-secondary block mb-1">Categorie</label>
+<select class="w-full p-2 border border-outline-variant rounded-lg" name="categorie">
+<option value="SERVICES_PUBLICS">Services Publics</option>
+<option value="MAINTENANCE">Maintenance</option>
+<option value="FOURNITURES">Fournitures</option>
+<option value="SALAIRES">Salaires</option>
+<option value="LOYER">Loyer</option>
+<option value="AUTRE">Autre</option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-secondary block mb-1">Beneficiaire</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" name="beneficiaire" placeholder="Ex: EDF France" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div>
+<label class="text-label-sm text-secondary block mb-1">Montant</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" min="0" name="montant" required="required" step="0.01" type="number"/>
+</div>
+<div>
+<label class="text-label-sm text-secondary block mb-1">Date</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" name="dateDepense" required="required" type="date"/>
+</div>
+</div>
+<div>
+<label class="text-label-sm text-secondary block mb-1">Statut</label>
+<select class="w-full p-2 border border-outline-variant rounded-lg" name="statut">
+<option value="PAYE">Paye</option>
+<option value="EN_ATTENTE">En attente</option>
+</select>
+</div>
+<div class="flex justify-end gap-sm pt-md">
+<button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md" onclick="document.getElementById('modal-depense').classList.add('hidden')" type="button">Annuler</button>
+<button class="px-lg py-2 bg-primary text-white rounded-lg font-label-md" type="submit">Enregistrer</button>
+</div>
+</form>
+</div>
+</div>
+
+<script>
+        // Pagination cote client, par numeros de page (10 lignes / page)
+        (function () {
+            const rows = Array.from(document.querySelectorAll('#depenses-tbody .depense-row'));
+            const pageSize = 10;
+            const totalPages = Math.max(Math.ceil(rows.length / pageSize), 1);
+            let currentPage = 1;
+
+            function renderPage(page) {
+                currentPage = page;
+                rows.forEach((row, i) => {
+                    row.style.display = (i >= (page - 1) * pageSize && i < page * pageSize) ? '' : 'none';
+                });
+                const info = document.getElementById('pagination-info');
+                if (rows.length > 0) {
+                    const start = (page - 1) * pageSize + 1;
+                    const end = Math.min(page * pageSize, rows.length);
+                    info.textContent = 'Affichage de ' + start + ' a ' + end + ' sur ' + rows.length + ' depenses';
+                } else {
+                    info.textContent = '';
+                }
+                renderPagination();
+            }
+
+            function renderPagination() {
+                const container = document.getElementById('pagination-pages');
+                container.innerHTML = '';
+                for (let p = 1; p <= totalPages; p++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = p;
+                    btn.className = p === currentPage
+                        ? 'px-sm py-xs bg-primary text-on-primary rounded text-label-sm font-bold'
+                        : 'px-sm py-xs hover:bg-surface-container rounded text-label-sm';
+                    btn.addEventListener('click', () => renderPage(p));
+                    container.appendChild(btn);
+                }
+            }
+
+            renderPage(1);
+        })();
+    </script>
+</body>
+</html>

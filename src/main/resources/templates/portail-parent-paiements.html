@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Suivi Financier</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a", "on-primary-container": "#90a8ff", "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#bec6e0", "primary-container": "#1e3a8a", "surface-container-low": "#f2f4f6",
+                    "surface-container": "#eceef0", "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                    "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "secondary-fixed-dim": "#b7c8e1",
+                    "tertiary": "#222a3e", "secondary-container": "#d0e1fb", "surface-variant": "#e0e3e5",
+                    "on-tertiary-container": "#a4acc5", "on-secondary": "#ffffff", "secondary-fixed": "#d3e4fe",
+                    "error": "#ba1a1a", "surface-container-high": "#e6e8ea", "outline-variant": "#c5c5d3",
+                    "surface-container-lowest": "#ffffff", "tertiary-container": "#384055", "on-tertiary": "#ffffff",
+                    "background": "#f7f9fb", "outline": "#757682", "surface-bright": "#f7f9fb", "secondary": "#505f76",
+                    "primary": "#00236f", "surface": "#f7f9fb", "on-background": "#191c1e", "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#b6c4ff", "surface-dim": "#d8dadc", "surface-container-highest": "#e0e3e5",
+                    "on-error": "#ffffff", "primary-fixed": "#dce1ff", "success-container": "#c8f7d4",
+                    "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "lg": "24px", "xs": "4px", "md": "16px", "base": "4px", "sm": "8px", "xl": "32px", "gutter": "24px", "container-max": "1440px"},
+            "fontFamily": {"label-md": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<aside class="w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex flex-col py-lg border-r border-outline-variant z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase tracking-widest mt-xs">Portail Parent</p>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail-parent}">
+<span class="material-symbols-outlined mr-md">family_restroom</span>
+<span class="font-label-md text-label-md">Mes Enfants</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail-parent/calendrier}">
+<span class="material-symbols-outlined mr-md">calendar_today</span>
+<span class="font-label-md text-label-md">Calendrier</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined mr-md">chat_bubble</span>
+<span class="font-label-md text-label-md">Messagerie</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-primary-container border-l-4 border-primary bg-primary-container/10 transition-colors duration-200" th:href="@{/portail-parent/paiements}">
+<span class="material-symbols-outlined mr-md">payments</span>
+<span class="font-label-md text-label-md">Paiements</span>
+</a>
+</nav>
+<div class="px-lg mt-auto pt-lg border-t border-tertiary-container">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-tertiary font-bold" th:text="${#strings.substring(emailParent,0,1)}">P</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-tertiary truncate" th:text="${emailParent}">parent@mail.com</p>
+</div>
+</div>
+</div>
+</aside>
+
+<header class="fixed top-0 right-0 w-[calc(100%-260px)] h-16 bg-surface-container-lowest flex justify-between items-center px-lg border-b border-outline-variant z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full focus-within:ring-2 focus-within:ring-primary rounded-lg transition-all">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg font-body-md text-on-surface focus:ring-0" id="recherche-facture" placeholder="Rechercher une facture..." type="text"/>
+</div>
+</div>
+</header>
+
+<main class="ml-sidebar-width min-h-screen">
+<div class="pt-24 pb-12 px-lg max-w-container-max mx-auto">
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<div class="flex justify-between items-end mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Suivi Financier</h2>
+<p class="text-on-surface-variant font-body-md">Gerez les reglements et l'historique des frais de scolarite.</p>
+</div>
+<a class="bg-primary text-on-primary px-lg py-2 rounded-lg font-label-md flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all" th:href="@{/portail-parent/paiements/releve}" target="_blank">
+<span class="material-symbols-outlined text-sm">download</span>
+Telecharger Releve Annuel
+</a>
+</div>
+
+<div class="grid grid-cols-12 gap-gutter mb-xl">
+<div class="col-span-12 lg:col-span-5 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Solde total a regler</span>
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<div class="text-headline-lg text-primary font-bold" th:text="${#numbers.formatDecimal(soldeTotalARegler, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</div>
+<p class="text-on-surface-variant mt-2" th:if="${prochaineEcheance != null}" th:text="'Echeance la plus proche : ' + ${#temporals.format(prochaineEcheance, 'dd MMMM yyyy')}">Echeance</p>
+<p class="text-on-surface-variant mt-2" th:if="${prochaineEcheance == null}">Aucune echeance connue pour le moment.</p>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant flex items-center justify-between">
+<span class="text-body-md font-medium" th:classappend="${nbEnRetard > 0} ? 'text-error' : 'text-on-surface-variant'" th:text="${nbEnRetard} + ' facture(s) en retard'">0 facture en retard</span>
+<a class="text-primary font-label-md hover:underline" href="#factures">Voir le detail</a>
+</div>
+</div>
+
+<div class="col-span-12 lg:col-span-7 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl">
+<div class="flex items-center justify-between mb-6">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Derniers paiements effectues</span>
+<span class="material-symbols-outlined text-on-surface-variant">history</span>
+</div>
+<div class="space-y-4" th:if="${!derniersPaiements.isEmpty()}">
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-lg" th:each="p : ${derniersPaiements}">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined"
+      th:text="${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'CANTINE' ? 'restaurant' : ((${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'TRANSPORT') ? 'directions_bus' : ((${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'INSCRIPTION') ? 'app_registration' : ((${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'SCOLARITE') ? 'school' : 'receipt_long')))">receipt_long</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface" th:text="(${p.fraisScolarite != null ? p.fraisScolarite.designation : p.typePaiement}) + ' - ' + (${p.eleve != null ? p.eleve.prenom : '?'})">Designation</p>
+<p class="text-xs text-on-surface-variant" th:text="${#temporals.format(p.datePaiement, 'dd MMM yyyy')} + ' - ' + ${p.modePaiement}">Date</p>
+</div>
+</div>
+<span class="font-label-md text-primary" th:text="${#numbers.formatDecimal(p.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</span>
+</div>
+</div>
+<p class="text-on-surface-variant" th:if="${derniersPaiements.isEmpty()}">Aucun paiement enregistre pour le moment.</p>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm" id="factures">
+<div class="px-lg py-4 border-b border-outline-variant flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Factures &amp; Frais</h3>
+<div class="flex gap-2">
+<select class="text-label-sm border border-outline-variant rounded px-2 py-1 bg-surface-container-lowest text-on-surface-variant" id="filtre-categorie">
+<option value="">Toutes les categories</option>
+<option th:each="cat : ${categories}" th:text="${cat}" th:value="${cat}"></option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container text-on-surface-variant font-label-sm uppercase tracking-wider">
+<tr>
+<th class="px-lg py-3 font-semibold">Designation</th>
+<th class="px-lg py-3 font-semibold">Montant</th>
+<th class="px-lg py-3 font-semibold">Date d'echeance</th>
+<th class="px-lg py-3 font-semibold">Statut</th>
+<th class="px-lg py-3 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:if="${lignes.isEmpty()}">
+<td class="px-lg py-4 text-center text-on-surface-variant" colspan="5">Aucun frais applicable pour le moment.</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors ligne-facture" th:data-categorie="${l.categorie}" th:each="l : ${lignes}">
+<td class="px-lg py-4">
+<div class="flex flex-col">
+<span class="font-label-md text-on-surface" th:text="${l.designation}">Designation</span>
+<span class="text-xs text-on-surface-variant" th:text="${l.enfant.prenom} + ' ' + ${l.enfant.nom} + (${l.enfant.classe != null} ? ' (' + ${l.enfant.classe.niveau} + ')' : '')">Enfant</span>
+</div>
+</td>
+<td class="px-lg py-4 font-label-md text-on-surface" th:text="${#numbers.formatDecimal(l.montant, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</td>
+<td class="px-lg py-4 text-body-md"
+    th:classappend="${l.statut == 'EN_RETARD'} ? 'text-error font-medium' : 'text-on-surface-variant'"
+    th:text="${l.echeanceDate != null} ? ${#temporals.format(l.echeanceDate, 'dd MMM yyyy')} : '--'">Date</td>
+<td class="px-lg py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+      th:classappend="${l.statut == 'PAYE'} ? 'bg-surface-container-high text-on-surface-variant' : (${l.statut == 'EN_RETARD'} ? 'bg-error-container text-on-error-container' : 'bg-secondary-container text-on-secondary-container')"
+      th:text="${l.statut == 'PAYE'} ? 'Paye' : (${l.statut == 'EN_RETARD'} ? 'En retard' : 'En attente')">Statut</span>
+</td>
+<td class="px-lg py-4 text-right">
+<form th:if="${l.statut != 'PAYE'}" method="post" th:action="@{/portail-parent/paiements/demander}">
+<input name="fraisId" th:value="${l.fraisId}" type="hidden"/>
+<input name="eleveId" th:value="${l.eleveId}" type="hidden"/>
+<button class="bg-primary text-on-primary text-xs px-4 py-1.5 rounded font-label-md hover:brightness-110 active:scale-95 transition-all" type="submit">Payer maintenant</button>
+</form>
+<span class="text-on-surface-variant" th:if="${l.statut == 'PAYE'}">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1">check_circle</span>
+</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="mt-xl grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="bg-primary-container/5 rounded-xl p-lg border border-primary/10 flex items-center gap-4">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">info</span>
+</div>
+<div>
+<h4 class="font-label-md text-primary">Comment fonctionne "Payer maintenant" ?</h4>
+<p class="text-body-md text-on-surface-variant">Une demande reelle est transmise a l'administration via la messagerie, qui vous recontactera pour finaliser le reglement.</p>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl p-lg flex items-center gap-4 border border-outline-variant">
+<div class="w-12 h-12 bg-on-surface-variant rounded-full flex items-center justify-center text-surface">
+<span class="material-symbols-outlined">help</span>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface">Besoin d'assistance ?</h4>
+<p class="text-body-md text-on-surface-variant">Contactez l'administration pour un echeancier.</p>
+</div>
+<a class="ml-auto bg-surface-container-lowest border border-outline text-on-surface-variant px-4 py-1.5 rounded text-xs font-label-md hover:bg-surface-container-high transition-colors"
+   th:if="${adminEmail != null}" th:href="@{/portail-parent/messages(avec=${adminEmail})}">Message</a>
+</div>
+</div>
+
+</div>
+</main>
+<script>
+    var rechercheInput = document.getElementById('recherche-facture');
+    var filtreCategorie = document.getElementById('filtre-categorie');
+    function appliquerFiltres() {
+        var q = rechercheInput ? rechercheInput.value.toLowerCase() : '';
+        var cat = filtreCategorie ? filtreCategorie.value : '';
+        document.querySelectorAll('.ligne-facture').forEach(function (row) {
+            var texte = row.textContent.toLowerCase();
+            var matchTexte = (q === '' || texte.indexOf(q) !== -1);
+            var matchCat = (cat === '' || row.getAttribute('data-categorie') === cat);
+            row.style.display = (matchTexte && matchCat) ? '' : 'none';
+        });
+    }
+    if (rechercheInput) rechercheInput.addEventListener('input', appliquerFiltres);
+    if (filtreCategorie) filtreCategorie.addEventListener('change', appliquerFiltres);
+</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Portail Eleve</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a", "on-primary-container": "#90a8ff", "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#bec6e0", "primary-container": "#1e3a8a", "surface-container-low": "#f2f4f6",
+                    "surface-container": "#eceef0", "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                    "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "secondary-fixed-dim": "#b7c8e1",
+                    "tertiary": "#222a3e", "secondary-container": "#d0e1fb", "surface-variant": "#e0e3e5",
+                    "on-tertiary-container": "#a4acc5", "on-secondary": "#ffffff", "secondary-fixed": "#d3e4fe",
+                    "error": "#ba1a1a", "surface-container-high": "#e6e8ea", "outline-variant": "#c5c5d3",
+                    "surface-container-lowest": "#ffffff", "tertiary-container": "#384055", "on-tertiary": "#ffffff",
+                    "background": "#f7f9fb", "outline": "#757682", "surface-bright": "#f7f9fb", "secondary": "#505f76",
+                    "primary": "#00236f", "surface": "#f7f9fb", "on-background": "#191c1e", "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#b6c4ff", "surface-dim": "#d8dadc", "surface-container-highest": "#e0e3e5",
+                    "on-error": "#ffffff", "primary-fixed": "#dce1ff", "success-container": "#c8f7d4",
+                    "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "lg": "24px", "xs": "4px", "md": "16px", "base": "4px", "sm": "8px", "xl": "32px", "gutter": "24px", "container-max": "1440px"},
+            "fontFamily": {"label-md": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<aside class="w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex flex-col py-lg border-r border-outline-variant z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase tracking-widest mt-xs">Portail Eleve</p>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center px-lg py-md text-on-primary-container border-l-4 border-primary bg-primary-container/10 transition-colors duration-200" th:href="@{/portail}">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-md text-label-md">Mon Espace</span>
+</a>
+</nav>
+<div class="px-lg mt-auto pt-lg border-t border-tertiary-container">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-tertiary font-bold">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-tertiary truncate" th:if="${eleve != null}" th:text="${eleve.prenom} + ' ' + ${eleve.nom}">Eleve</p>
+</div>
+</div>
+</div>
+</aside>
+
+<header class="fixed top-0 right-0 w-[calc(100%-260px)] h-16 bg-surface-container-lowest flex justify-between items-center px-lg border-b border-outline-variant z-40">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Mon Espace</h2>
+</header>
+
+<main class="ml-sidebar-width pt-16 min-h-screen p-lg">
+<div class="max-w-container-max mx-auto">
+
+<div th:if="${pasDeCompte}" class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[48px] text-outline mb-md">person_off</span>
+<p class="font-body-lg text-body-lg">Aucun dossier eleve n'est associe a ce compte. Contactez le secretariat.</p>
+</div>
+
+<div th:if="${pasDeCompte == null or pasDeCompte == false}">
+<div class="mb-xl flex justify-between items-end flex-wrap gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface" th:text="'Bonjour, ' + ${eleve.prenom}">Bonjour</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs" th:text="${eleve.classe != null ? 'Classe de ' + eleve.classe.nom : ''}">Classe</p>
+</div>
+<div class="flex gap-sm">
+<a class="px-md py-sm border border-outline-variant rounded font-label-md text-label-md" th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : ''" th:href="@{/portail(trimestre=1)}">Trimestre 1</a>
+<a class="px-md py-sm border border-outline-variant rounded font-label-md text-label-md" th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : ''" th:href="@{/portail(trimestre=2)}">Trimestre 2</a>
+<a class="px-md py-sm border border-outline-variant rounded font-label-md text-label-md" th:classappend="${trimestre == 3} ? 'bg-primary text-on-primary' : ''" th:href="@{/portail(trimestre=3)}">Trimestre 3</a>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Moyenne Generale</p>
+<div class="flex items-baseline gap-xs">
+<span class="font-headline-lg text-headline-lg text-primary" th:text="${moyenneGenerale}">0</span>
+<span class="text-on-surface-variant">/20</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Absences recentes</p>
+<div class="font-headline-lg text-headline-lg text-primary" th:text="${absences.size()}">0</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Annonces</p>
+<div class="font-headline-lg text-headline-lg text-primary" th:text="${publications.size()}">0</div>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden mb-xl">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Mes Notes</h3>
+</div>
+<div th:if="${notes.isEmpty()}" class="p-xl text-center text-on-surface-variant">Aucune note publiee pour ce trimestre.</div>
+<table class="w-full text-left" th:if="${!notes.isEmpty()}">
+<thead class="bg-surface-container text-on-surface-variant font-label-sm uppercase">
+<tr><th class="px-lg py-3">Matiere</th><th class="px-lg py-3">Type</th><th class="px-lg py-3">Note</th><th class="px-lg py-3">Date</th></tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="n : ${notes}">
+<td class="px-lg py-3 font-label-md" th:text="${n.matiere != null ? n.matiere.nom : '?'}">Matiere</td>
+<td class="px-lg py-3 text-on-surface-variant" th:text="${n.type}">Type</td>
+<td class="px-lg py-3 font-bold text-primary" th:text="${n.valeur} + '/20'">--</td>
+<td class="px-lg py-3 text-on-surface-variant" th:text="${n.dateEvaluation != null ? #temporals.format(n.dateEvaluation, 'dd/MM/yyyy') : '--'}">--</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Absences</h3>
+</div>
+<div th:if="${absences.isEmpty()}" class="p-lg text-center text-on-surface-variant">Aucune absence enregistree.</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-lg py-md flex justify-between items-center" th:each="a : ${absences}">
+<div>
+<p class="font-label-md" th:text="${#temporals.format(a.date, 'dd/MM/yyyy')} + ' - ' + ${a.periode}">Date</p>
+<p class="text-xs text-on-surface-variant" th:text="${a.motif}">Motif</p>
+</div>
+<span class="px-sm py-1 rounded-full text-xs font-medium" th:classappend="${a.estJustifiee} ? 'bg-success-container text-on-success-container' : 'bg-error-container text-on-error-container'" th:text="${a.estJustifiee} ? 'Justifiee' : 'Non justifiee'">Statut</span>
+</div>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Annonces</h3>
+</div>
+<div th:if="${publications.isEmpty()}" class="p-lg text-center text-on-surface-variant">Aucune annonce pour le moment.</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-lg py-md" th:each="p : ${publications}">
+<p class="font-label-md" th:text="${p.titre}">Titre</p>
+<p class="text-xs text-on-surface-variant mt-xs" th:text="${p.contenu}">Contenu</p>
+<p class="text-[10px] text-outline mt-xs" th:text="${#temporals.format(p.datePublication, 'dd/MM/yyyy')}">--</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Historique des Paiements</h3>
+</div>
+<div th:if="${paiements.isEmpty()}" class="p-xl text-center text-on-surface-variant">Aucun paiement enregistre.</div>
+<table class="w-full text-left" th:if="${!paiements.isEmpty()}">
+<thead class="bg-surface-container text-on-surface-variant font-label-sm uppercase">
+<tr><th class="px-lg py-3">Date</th><th class="px-lg py-3">Type</th><th class="px-lg py-3">Mode</th><th class="px-lg py-3 text-right">Montant</th></tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="p : ${paiements}">
+<td class="px-lg py-3" th:text="${#temporals.format(p.datePaiement, 'dd/MM/yyyy')}">--</td>
+<td class="px-lg py-3" th:text="${p.typePaiement}">Type</td>
+<td class="px-lg py-3 text-on-surface-variant" th:text="${p.modePaiement}">Mode</td>
+<td class="px-lg py-3 text-right font-bold text-primary" th:text="${#numbers.formatDecimal(p.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</div>
+</main>
+</body>
+</html>

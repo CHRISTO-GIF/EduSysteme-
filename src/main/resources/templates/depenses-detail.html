@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rapport detaille des Depenses de fonctionnement - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#b7c8e1", "surface-dim": "#d8dadc", "outline-variant": "#c5c5d3",
+                    "on-primary-container": "#90a8ff", "tertiary-container": "#384055", "surface": "#f7f9fb",
+                    "primary-fixed": "#dce1ff", "on-surface-variant": "#444651", "surface-container-low": "#f2f4f6",
+                    "error": "#ba1a1a", "tertiary-fixed-dim": "#bec6e0", "on-background": "#191c1e",
+                    "tertiary-fixed": "#dae2fd", "tertiary": "#222a3e", "surface-container-high": "#e6e8ea",
+                    "error-container": "#ffdad6", "surface-container": "#eceef0", "secondary": "#505f76",
+                    "on-surface": "#191c1e", "on-secondary-container": "#54647a", "surface-container-highest": "#e0e3e5",
+                    "outline": "#757682", "on-primary-fixed": "#00164e", "primary": "#00236f",
+                    "surface-bright": "#f7f9fb", "on-primary": "#ffffff", "secondary-container": "#d0e1fb",
+                    "on-tertiary-container": "#a4acc5", "primary-container": "#1e3a8a", "primary-fixed-dim": "#b6c4ff",
+                    "surface-container-lowest": "#ffffff", "background": "#f7f9fb", "on-tertiary-fixed-variant": "#3f465c",
+                    "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"container-max": "1440px", "sm": "8px", "xl": "32px", "base": "4px", "sidebar-width": "260px", "xs": "4px", "lg": "24px", "md": "16px", "gutter": "24px"},
+            "fontFamily": {"headline-sm": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden h-screen flex">
+<aside class="fixed left-0 top-0 h-full w-[260px] flex flex-col py-lg z-40 bg-tertiary">
+<div class="px-md mb-xl flex items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm opacity-70 text-on-tertiary">Gestion Tresorerie</p>
+</div>
+</div>
+<nav class="flex-1 px-sm space-y-base overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg opacity-80 hover:bg-tertiary-container/50 transition-all font-label-md text-label-md text-on-tertiary" th:href="@{/dashboard}">
+<span class="material-symbols-outlined">dashboard</span> Tableau de bord
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg bg-tertiary-container text-on-tertiary-container border-l-4 border-primary-fixed transition-all font-label-md text-label-md" th:href="@{/finances}">
+<span class="material-symbols-outlined">payments</span> Financier
+</a>
+</nav>
+<div class="px-sm pt-md border-t border-white/10 mt-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg opacity-80 hover:bg-tertiary-container/50 transition-all font-label-md text-label-md text-on-tertiary" th:href="@{/parametres}">
+<span class="material-symbols-outlined">settings</span> Parametres
+</a>
+</div>
+</aside>
+<main class="flex-1 ml-[260px] flex flex-col h-screen bg-surface">
+<header class="sticky top-0 z-50 flex items-center justify-between px-lg h-16 w-full bg-surface-container-lowest border-b border-outline-variant">
+<nav class="flex text-label-sm text-outline">
+<a class="hover:text-primary" th:href="@{/finances}">Finance</a>
+<span class="mx-xs">/</span>
+<a class="hover:text-primary" th:href="@{/finances/depenses}">Depenses</a>
+<span class="mx-xs">/</span>
+<span class="text-on-surface font-medium">Rapport detaille</span>
+</nav>
+<div class="flex items-center gap-md">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="text-label-sm text-outline" th:text="${utilisateurConnecte != null ? utilisateurConnecte.role : ''}">Role</p>
+</div>
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'U'}">U</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-lg space-y-lg max-w-[1440px] mx-auto w-full">
+
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Rapport detaille des Depenses de fonctionnement</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant" th:text="'Du ' + ${#temporals.format(debutPeriode, 'dd/MM/yyyy')} + ' au ' + ${#temporals.format(finPeriode, 'dd/MM/yyyy')}">Periode</p>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-low p-base rounded-lg border border-outline-variant">
+<a class="px-md py-sm font-label-md text-label-md rounded transition-colors" th:classappend="${periode == 'MOIS'} ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-highest'" th:href="@{/finances/depenses/detail(periode='MOIS',mois=${moisFiltre},annee=${anneeFiltre})}">Mensuel</a>
+<a class="px-md py-sm font-label-md text-label-md rounded transition-colors" th:classappend="${periode == 'TRIMESTRE'} ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-highest'" th:href="@{/finances/depenses/detail(periode='TRIMESTRE',mois=${moisFiltre},annee=${anneeFiltre})}">Trimestriel</a>
+<a class="px-md py-sm font-label-md text-label-md rounded transition-colors" th:classappend="${periode == 'ANNEE'} ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-highest'" th:href="@{/finances/depenses/detail(periode='ANNEE',mois=${moisFiltre},annee=${anneeFiltre})}">Annuel</a>
+</div>
+</div>
+
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-primary-fixed/20 rounded-lg">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Depenses Totales</p>
+<h3 class="font-headline-lg text-headline-lg mt-xs" th:text="${#numbers.formatDecimal(totalPeriode, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+<p class="text-body-md text-on-surface-variant mt-sm" th:text="(${variationVsPeriodePrecedente} >= 0 ? '+ ' : '') + ${#numbers.formatDecimal(variationVsPeriodePrecedente, 0, 'COMMA', 0, 'POINT')} + ' F vs periode precedente'">vs</p>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-secondary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-secondary">pie_chart</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Utilisation du Budget</p>
+<h3 class="font-headline-lg text-headline-lg mt-xs" th:text="${tauxBudgetUtilise} + '%'">0%</h3>
+<div class="w-full bg-surface-container rounded-full h-2 mt-md">
+<div class="bg-primary h-2 rounded-full" th:style="'width:' + ${tauxBudgetUtilise} + '%'"></div>
+</div>
+<p class="text-body-md text-on-surface-variant mt-sm" th:text="'Budget annuel : ' + ${#numbers.formatDecimal(budgetAnnuelPrevu, 0, 'COMMA', 0, 'POINT')} + ' F'">Budget</p>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-tertiary-fixed/20 rounded-lg">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant">energy_savings_leaf</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Services Publics (Eau/Elec)</p>
+<h3 class="font-headline-lg text-headline-lg mt-xs" th:text="(${variationServicesPublics} >= 0 ? '+ ' : '') + ${#numbers.formatDecimal(variationServicesPublics, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+<p class="text-body-md text-on-surface-variant mt-sm">Variation vs periode precedente</p>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<div class="lg:col-span-2 bg-surface-container-lowest p-xl rounded-xl border border-outline-variant">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xl">Repartition par Categorie</h4>
+<div class="flex flex-col gap-lg" th:if="${!repartition.isEmpty()}">
+<div class="space-y-sm" th:each="r : ${repartition}">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-on-surface" th:text="${r.categorie}"></span>
+<span class="font-bold" th:text="${#numbers.formatDecimal(r.montant, 0, 'COMMA', 0, 'POINT')} + ' F'"></span>
+</div>
+<div class="relative w-full h-8 bg-surface-container rounded overflow-hidden">
+<div class="absolute h-full bg-primary" th:style="'width:' + ${r.pourcentageBarre} + '%'"></div>
+</div>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant" th:if="${repartition.isEmpty()}">Aucune depense sur cette periode.</p>
+</div>
+
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant flex flex-col">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xl">Principaux Fournisseurs</h4>
+<div class="space-y-lg flex-1" th:if="${!principauxFournisseurs.isEmpty()}">
+<div class="flex items-center gap-md" th:each="f : ${principauxFournisseurs}">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center font-bold text-on-surface-variant" th:text="${f.initiales}">--</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface" th:text="${f.nom}">Fournisseur</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant" th:text="${f.categorie}">Categorie</p>
+</div>
+<span class="font-bold text-on-surface" th:text="${#numbers.formatDecimal(f.montant, 0, 'COMMA', 0, 'POINT')} + ' F'"></span>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant" th:if="${principauxFournisseurs.isEmpty()}">Aucun beneficiaire renseigne sur cette periode.</p>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-xl py-lg flex items-center justify-between border-b border-outline-variant">
+<h4 class="font-headline-sm text-headline-sm text-primary">Journal des Transactions</h4>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="transactions-table">
+<thead class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<tr>
+<th class="px-xl py-md font-bold uppercase tracking-wider">Date</th>
+<th class="px-xl py-md font-bold uppercase tracking-wider">Description</th>
+<th class="px-xl py-md font-bold uppercase tracking-wider">Categorie</th>
+<th class="px-xl py-md font-bold uppercase tracking-wider">Fournisseur</th>
+<th class="px-xl py-md font-bold uppercase tracking-wider text-right">Montant</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant" id="transactions-tbody">
+<tr class="transaction-row hover:bg-surface-container/30 transition-colors" th:each="d : ${depensesPeriode}">
+<td class="px-xl py-md text-body-md font-body-md" th:text="${#temporals.format(d.dateDepense, 'dd MMM yyyy')}"></td>
+<td class="px-xl py-md text-body-md font-body-md font-bold" th:text="${d.designation}"></td>
+<td class="px-xl py-md">
+<span class="px-sm py-base rounded bg-primary-container/10 text-primary-container text-[11px] font-bold" th:text="${d.categorie}"></span>
+</td>
+<td class="px-xl py-md text-body-md font-body-md text-on-surface-variant" th:text="${d.beneficiaire}"></td>
+<td class="px-xl py-md text-body-md font-body-md text-right font-bold" th:text="${#numbers.formatDecimal(d.montant, 0, 'COMMA', 0, 'POINT')} + ' F'"></td>
+</tr>
+<tr th:if="${depensesPeriode.isEmpty()}">
+<td class="px-xl py-8 text-center text-on-surface-variant" colspan="5">Aucune transaction sur cette periode.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-xl py-md bg-surface-container-low flex items-center justify-between flex-wrap gap-md">
+<p class="text-label-sm font-label-sm text-on-surface-variant" id="pagination-info"></p>
+<div class="flex items-center gap-xs" id="pagination-pages"></div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        (function () {
+            const rows = Array.from(document.querySelectorAll('#transactions-tbody .transaction-row'));
+            const pageSize = 10;
+            const totalPages = Math.max(Math.ceil(rows.length / pageSize), 1);
+            let currentPage = 1;
+
+            function renderPage(page) {
+                currentPage = page;
+                rows.forEach((row, i) => {
+                    row.style.display = (i >= (page - 1) * pageSize && i < page * pageSize) ? '' : 'none';
+                });
+                const info = document.getElementById('pagination-info');
+                if (rows.length > 0) {
+                    const start = (page - 1) * pageSize + 1;
+                    const end = Math.min(page * pageSize, rows.length);
+                    info.textContent = 'Affichage de ' + start + ' a ' + end + ' sur ' + rows.length + ' transactions';
+                } else {
+                    info.textContent = '';
+                }
+                renderPagination();
+            }
+
+            function renderPagination() {
+                const container = document.getElementById('pagination-pages');
+                container.innerHTML = '';
+                for (let p = 1; p <= totalPages; p++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = p;
+                    btn.className = p === currentPage
+                        ? 'px-sm py-xs bg-primary text-on-primary rounded text-label-sm font-bold'
+                        : 'px-sm py-xs hover:bg-surface-container rounded text-label-sm';
+                    btn.addEventListener('click', () => renderPage(p));
+                    container.appendChild(btn);
+                }
+            }
+
+            renderPage(1);
+        })();
+    </script>
+</body>
+</html>

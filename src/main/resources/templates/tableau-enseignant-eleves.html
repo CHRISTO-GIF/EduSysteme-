@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mes Eleves - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#00236f", "primary-container": "#1e3a8a", "on-primary": "#ffffff",
+                      "on-primary-container": "#90a8ff", "primary-fixed": "#dce1ff", "primary-fixed-dim": "#b6c4ff",
+                      "secondary": "#505f76", "secondary-container": "#d0e1fb", "on-secondary-container": "#54647a",
+                      "tertiary": "#222a3e", "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5",
+                      "error": "#ba1a1a", "error-container": "#ffdad6", "on-error-container": "#93000a",
+                      "surface": "#f7f9fb", "background": "#f7f9fb", "on-background": "#191c1e",
+                      "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                      "surface-container-lowest": "#ffffff", "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "surface-container-highest": "#e0e3e5",
+                      "outline": "#757682", "outline-variant": "#c5c5d3"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "sm": "8px", "md": "16px", "lg": "24px", "xl": "32px", "gutter": "24px", "sidebar-width": "260px", "container-max": "1440px", "base": "4px"},
+              "fontFamily": {"headline-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"]},
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-white leading-tight">EduSystem Pro</span>
+<span class="text-[10px] uppercase tracking-wider text-on-tertiary-container opacity-70">Portail Enseignant</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-sm space-y-1">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/tableau-enseignant">
+<span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg border-l-4 border-primary-fixed bg-tertiary-container text-white font-bold" href="/tableau-enseignant/eleves">
+<span class="material-symbols-outlined">group</span><span class="font-label-md text-label-md">Eleves</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/surveillance">
+<span class="material-symbols-outlined">fact_check</span><span class="font-label-md text-label-md">Surveillance</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/notes/saisie">
+<span class="material-symbols-outlined">edit_note</span><span class="font-label-md text-label-md">Saisie des notes</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/examens">
+<span class="material-symbols-outlined">quiz</span><span class="font-label-md text-label-md">Examens</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/messagerie">
+<span class="material-symbols-outlined">forum</span><span class="font-label-md text-label-md">Messagerie</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_today</span><span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/bulletins">
+<span class="material-symbols-outlined">description</span><span class="font-label-md text-label-md">Bulletins</span>
+</a>
+</nav>
+<div class="px-sm mt-auto space-y-1 pt-md border-t border-tertiary-container/50">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span><span class="font-label-md text-label-md">Deconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<!-- Barre superieure -->
+<header class="h-16 fixed top-0 right-0 left-[260px] bg-surface-container-lowest flex justify-between items-center px-lg border-b border-outline-variant z-40">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 py-2 font-body-md text-body-md focus:ring-2 focus:ring-primary-container outline-none transition-all" id="recherche-eleve" placeholder="Rechercher un eleve par nom ou matricule..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-label-md leading-none" th:if="${utilisateurConnecte != null}" th:text="'M. ' + ${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Enseignant</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Enseignant</p>
+</div>
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'U'}">U</div>
+</div>
+</div>
+</header>
+
+<main class="ml-sidebar-width pt-16 min-h-screen">
+<div class="max-w-container-max mx-auto p-lg">
+<div class="flex justify-between items-end mb-xl flex-wrap gap-md">
+<div>
+<nav class="flex items-center gap-xs text-on-surface-variant font-label-sm mb-xs">
+<span>Gestion academique</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Mes Eleves</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Mes Eleves</h2>
+<p class="text-on-surface-variant font-body-md">Retrouvez les eleves de vos classes et leurs coordonnees.</p>
+</div>
+</div>
+
+<!-- Statistiques reelles -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center gap-lg">
+<div class="w-12 h-12 bg-primary-fixed/30 text-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">groups</span>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-sm uppercase">Mes Eleves</p>
+<p class="text-headline-md font-headline-md" th:text="${totalEleves}">0</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center gap-lg">
+<div class="w-12 h-12 bg-secondary-container text-secondary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">meeting_room</span>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-sm uppercase">Mes Classes</p>
+<p class="text-headline-md font-headline-md" th:text="${totalClasses}">0</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center gap-lg">
+<div class="w-12 h-12 bg-tertiary-container text-on-tertiary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">menu_book</span>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-sm uppercase">Mes Matieres</p>
+<p class="text-headline-md font-headline-md" th:text="${totalMatieres}">0</p>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-lg rounded-xl flex flex-col justify-center overflow-hidden relative">
+<div class="z-10">
+<p class="text-primary-fixed font-label-sm uppercase">Absences ce mois</p>
+<p class="text-headline-md font-headline-md" th:text="${absencesCeMois}">0</p>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-[96px] opacity-10">event_busy</span>
+</div>
+</div>
+
+<!-- Tableau -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="p-lg border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-lg">
+<form class="flex items-center gap-md flex-1" method="get" th:action="@{/tableau-enseignant/eleves}">
+<select class="bg-surface-container-low border border-outline-variant rounded-lg px-md py-2 font-body-md text-body-md focus:ring-1 focus:ring-primary focus:border-primary text-on-surface" name="classeId" onchange="this.form.submit()">
+<option value="">Toutes mes classes</option>
+<option th:each="c : ${mesClasses}" th:selected="${selectedClasseId != null and selectedClasseId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</form>
+<span class="text-on-surface-variant font-label-sm" id="pagination-info">Affichage</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="px-lg py-md font-label-sm text-on-surface-variant uppercase tracking-wider">Eleve</th>
+<th class="px-lg py-md font-label-sm text-on-surface-variant uppercase tracking-wider">Matricule</th>
+<th class="px-lg py-md font-label-sm text-on-surface-variant uppercase tracking-wider">Classe</th>
+<th class="px-lg py-md font-label-sm text-on-surface-variant uppercase tracking-wider">Contact Parent</th>
+<th class="px-lg py-md font-label-sm text-on-surface-variant uppercase tracking-wider">Statut</th>
+<th class="px-lg py-md font-label-sm text-on-surface-variant uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50" id="tbody-eleves">
+<tr class="row-eleve hover:bg-surface-container-low/50 transition-colors group" th:attr="data-nom=${e.nom + ' ' + e.prenom + ' ' + e.matricule}" th:each="e : ${eleves}">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-[13px]" th:text="${#strings.isEmpty(e.prenom) ? '' : #strings.substring(e.prenom,0,1)} + ${#strings.isEmpty(e.nom) ? '' : #strings.substring(e.nom,0,1)}">--</div>
+<div>
+<p class="font-label-md text-on-surface" th:text="${e.prenom} + ' ' + ${e.nom}">Nom Eleve</p>
+<p class="font-body-md text-on-surface-variant text-[12px]" th:if="${e.emailParent != null}" th:text="${e.emailParent}">email</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md font-code text-code text-on-surface-variant" th:text="${e.matricule}">#---</td>
+<td class="px-lg py-md font-body-md text-on-surface" th:text="${e.classe != null ? e.classe.nom : '—'}">Classe</td>
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-label-md text-on-surface" th:text="${e.telephoneParent != null ? e.telephoneParent : '—'}">—</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[11px] font-bold uppercase tracking-wider" th:text="${e.statutInscription != null ? e.statutInscription : 'Inscrit'}">Inscrit</span>
+</td>
+<td class="px-lg py-md">
+<a class="flex items-center gap-xs text-primary font-label-sm hover:underline" th:href="@{/notes/bulletin/{id}(id=${e.id})}">
+<span class="material-symbols-outlined text-[18px]">description</span> Bulletin
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-lg bg-surface-container-low text-center text-on-surface-variant" th:if="${#lists.isEmpty(eleves)}">
+Aucun eleve trouve pour cette selection.
+</div>
+<!-- Pagination -->
+<div class="p-lg bg-surface-container-low flex items-center justify-center gap-xs" id="pagination-pages"></div>
+</div>
+</div>
+</main>
+
+<script>
+    // Recherche client (nom, prenom, matricule)
+    const recherche = document.getElementById('recherche-eleve');
+    const tbody = document.getElementById('tbody-eleves');
+    const allRows = tbody ? Array.from(tbody.querySelectorAll('.row-eleve')) : [];
+    const PAGE_SIZE = 10;
+    let pageActuelle = 1;
+
+    function render() {
+        if (!tbody) return;
+        const q = (recherche ? recherche.value : '').toLowerCase().trim();
+        const visibles = allRows.filter(r => r.getAttribute('data-nom').toLowerCase().includes(q));
+
+        allRows.forEach(r => r.style.display = 'none');
+        const totalPages = Math.max(1, Math.ceil(visibles.length / PAGE_SIZE));
+        if (pageActuelle > totalPages) pageActuelle = totalPages;
+        const start = (pageActuelle - 1) * PAGE_SIZE;
+        visibles.slice(start, start + PAGE_SIZE).forEach(r => r.style.display = '');
+
+        const infoEl = document.getElementById('pagination-info');
+        if (infoEl) {
+            infoEl.textContent = visibles.length === 0
+                ? 'Aucun eleve trouve.'
+                : `Affichage de ${start + 1} a ${Math.min(start + PAGE_SIZE, visibles.length)} sur ${visibles.length} eleve(s).`;
+        }
+
+        const pagesEl = document.getElementById('pagination-pages');
+        if (pagesEl) {
+            pagesEl.innerHTML = '';
+            for (let p = 1; p <= totalPages; p++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = p;
+                btn.className = p === pageActuelle
+                    ? 'w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-label-md'
+                    : 'w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-high transition-colors font-label-md';
+                btn.addEventListener('click', () => { pageActuelle = p; render(); });
+                pagesEl.appendChild(btn);
+            }
+        }
+    }
+    if (recherche) recherche.addEventListener('input', () => { pageActuelle = 1; render(); });
+    render();
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="${personnel.prenom} + ' ' + ${personnel.nom} + ' - EduSystem Pro'">Fiche Personnel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#f7f9fb", "on-primary": "#ffffff", "error": "#ba1a1a",
+                      "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5", "error-container": "#ffdad6",
+                      "primary-fixed": "#dce1ff", "on-surface": "#191c1e", "outline": "#757682",
+                      "primary-fixed-dim": "#b6c4ff", "surface-container-lowest": "#ffffff", "outline-variant": "#c5c5d3",
+                      "primary": "#00236f", "on-error-container": "#93000a", "on-secondary-container": "#54647a",
+                      "surface-container": "#eceef0", "on-background": "#191c1e", "on-surface-variant": "#444651",
+                      "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a", "surface-container-high": "#e6e8ea",
+                      "tertiary": "#222a3e", "surface": "#f7f9fb", "secondary": "#505f76", "surface-container-low": "#f2f4f6"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},
+              "fontFamily": {"headline-md": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "code": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70">Portail Admin</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-xs px-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span> Tableau de bord
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat">
+<span class="material-symbols-outlined">group</span> Eleves
+</a>
+<a class="flex items-center gap-md px-md py-sm text-white border-l-4 border-primary-fixed bg-tertiary-container rounded-lg font-label-md text-label-md font-bold" href="/personnel">
+<span class="material-symbols-outlined">school</span> Personnel
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_month</span> Emploi du temps
+</a>
+</nav>
+<div class="px-sm mt-auto space-y-xs pt-md border-t border-tertiary-container/30">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/parametres">
+<span class="material-symbols-outlined">settings</span> Parametres
+</a>
+</div>
+</aside>
+
+<main class="ml-[260px] pt-lg px-lg pb-xl max-w-container-max mx-auto">
+<nav class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant mb-md">
+<a class="hover:text-primary" href="/personnel">Personnel</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold" th:text="${personnel.prenom} + ' ' + ${personnel.nom}">Nom</span>
+</nav>
+
+<div th:if="${param.uploaded}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md">Document televerse avec succes.</div>
+<div th:if="${param.error}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md">Erreur lors du televersement du document.</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Colonne gauche : profil -->
+<div class="lg:col-span-1 space-y-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg text-center">
+<div class="w-24 h-24 mx-auto rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-headline-lg mb-md" th:text="${#strings.isEmpty(personnel.prenom) ? '' : #strings.substring(personnel.prenom,0,1)} + ${#strings.isEmpty(personnel.nom) ? '' : #strings.substring(personnel.nom,0,1)}">--</div>
+<h2 class="font-headline-md text-headline-md text-on-surface" th:text="${personnel.prenom} + ' ' + ${personnel.nom}">Nom Prenom</h2>
+<span class="inline-block mt-xs bg-secondary-container text-on-secondary-container px-sm py-1 rounded font-label-sm text-label-sm" th:text="${personnel.fonction}">Fonction</span>
+<div class="mt-md flex items-center justify-center gap-xs font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full" th:classappend="${personnel.statut == 'ACTIF'} ? 'bg-green-500' : 'bg-outline'"></span>
+<span th:text="${personnel.statut == 'ACTIF'} ? 'Actif' : 'Archive'">Statut</span>
+</div>
+<div class="mt-lg pt-md border-t border-outline-variant text-left space-y-sm">
+<p class="flex items-center gap-sm font-body-md text-body-md text-on-surface-variant" th:if="${personnel.email != null}">
+<span class="material-symbols-outlined text-[18px]">mail</span> <span th:text="${personnel.email}">email</span>
+</p>
+<p class="flex items-center gap-sm font-body-md text-body-md text-on-surface-variant" th:if="${personnel.telephone != null}">
+<span class="material-symbols-outlined text-[18px]">call</span> <span th:text="${personnel.telephone}">tel</span>
+</p>
+<p class="flex items-center gap-sm font-body-md text-body-md text-on-surface-variant" th:if="${personnel.adresse != null}">
+<span class="material-symbols-outlined text-[18px]">home</span> <span th:text="${personnel.adresse}">adresse</span>
+</p>
+<p class="flex items-center gap-sm font-body-md text-body-md text-on-surface-variant" th:if="${personnel.dateNaissance != null}">
+<span class="material-symbols-outlined text-[18px]">cake</span> <span th:text="${personnel.dateNaissance}">date</span>
+</p>
+<p class="flex items-center gap-sm font-body-md text-body-md text-on-surface-variant" th:if="${personnel.codeAcces != null}">
+<span class="material-symbols-outlined text-[18px]">badge</span> <span th:text="${personnel.codeAcces}">ID</span>
+</p>
+<p class="flex items-center gap-sm font-body-md text-body-md text-on-surface-variant" th:if="${personnel.dateEmbauche != null}">
+<span class="material-symbols-outlined text-[18px]">work_history</span> <span th:text="'Embauche : ' + ${personnel.dateEmbauche}">date</span>
+</p>
+</div>
+</div>
+
+<!-- Parcours academique -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg" th:if="${personnel.matiereEnseignee != null or personnel.diplomes != null or personnel.specialisations != null}">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-sm"><span class="material-symbols-outlined text-primary">school</span> Parcours academique</h3>
+<div class="space-y-sm font-body-md text-body-md text-on-surface-variant">
+<p th:if="${personnel.matiereEnseignee != null}"><strong class="text-on-surface">Matiere : </strong><span th:text="${personnel.matiereEnseignee}"></span></p>
+<p th:if="${personnel.anneesExperience != null}"><strong class="text-on-surface">Experience : </strong><span th:text="${personnel.anneesExperience} + ' an(s)'"></span></p>
+<p th:if="${personnel.diplomes != null and !#strings.isEmpty(personnel.diplomes)}"><strong class="text-on-surface">Diplomes : </strong><span th:text="${personnel.diplomes}"></span></p>
+<p th:if="${personnel.specialisations != null and !#strings.isEmpty(personnel.specialisations)}"><strong class="text-on-surface">Specialisations : </strong><span th:text="${personnel.specialisations}"></span></p>
+</div>
+</div>
+</div>
+
+<!-- Colonne droite -->
+<div class="lg:col-span-2 space-y-lg">
+<!-- Documents administratifs -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg" id="documents">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center gap-sm"><span class="material-symbols-outlined text-primary">attach_file</span> Documents administratifs</h3>
+
+<form class="flex flex-wrap items-end gap-md mb-lg p-md bg-surface-container-low rounded-lg" enctype="multipart/form-data" method="post" th:action="@{/personnel/{id}/documents(id=${personnel.id})}">
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Type de document</label>
+<select class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" name="typeDocument">
+<option value="CARTE_NNI">Carte NNI</option>
+<option value="ACTE_NAISSANCE">Acte de naissance</option>
+<option value="DIPLOME">Diplome</option>
+<option value="AUTRE">Autre (CV, etc.)</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs flex-1 min-w-[200px]">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Fichier</label>
+<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md w-full" name="fichier" required="required" type="file"/>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-lg py-2 rounded-lg hover:opacity-90 transition-all flex items-center gap-xs" type="submit">
+<span class="material-symbols-outlined text-[20px]">upload</span> Televerser
+</button>
+</form>
+
+<div class="space-y-sm" th:if="${!#lists.isEmpty(documents)}">
+<div class="flex items-center justify-between p-md border border-outline-variant rounded-lg" th:each="doc : ${documents}">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">description</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface" th:text="${doc.nomOriginal}">fichier.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${doc.typeDocument}">Type</p>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<a class="p-2 text-primary hover:bg-secondary-container rounded-full transition-colors" th:href="@{/personnel/{id}/documents/{docId}/telecharger(id=${personnel.id},docId=${doc.id})}">
+<span class="material-symbols-outlined">download</span>
+</a>
+<form method="post" th:action="@{/personnel/{id}/documents/{docId}/supprimer(id=${personnel.id},docId=${doc.id})}">
+<button class="p-2 text-error hover:bg-error-container rounded-full transition-colors" type="submit">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</form>
+</div>
+</div>
+</div>
+<p class="text-center text-on-surface-variant font-body-md text-body-md py-md" th:if="${#lists.isEmpty(documents)}">Aucun document televerse pour le moment.</p>
+</div>
+
+<!-- Contrats -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg" th:if="${!#lists.isEmpty(contrats)}">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center gap-sm"><span class="material-symbols-outlined text-primary">description</span> Contrats</h3>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md border border-outline-variant rounded-lg" th:each="c : ${contrats}">
+<div>
+<p class="font-label-md text-label-md text-on-surface" th:text="${c.typeContrat}">CDI</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${c.dateDebut} + (${c.dateFin} != null ? ' au ' + ${c.dateFin} : ' - en cours')">dates</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-1 rounded font-label-sm text-label-sm" th:text="${c.statut}">Statut</span>
+</div>
+</div>
+</div>
+
+<!-- Conges -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg" th:if="${!#lists.isEmpty(conges)}">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center gap-sm"><span class="material-symbols-outlined text-primary">event_busy</span> Conges</h3>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md border border-outline-variant rounded-lg" th:each="cg : ${conges}">
+<div>
+<p class="font-label-md text-label-md text-on-surface" th:text="${cg.typeConge}">Type</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${cg.dateDebut} + ' au ' + ${cg.dateFin} + ' (' + ${cg.joursNombre} + ' j)'">dates</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-1 rounded font-label-sm text-label-sm" th:text="${cg.statut}">Statut</span>
+</div>
+</div>
+</div>
+
+<!-- Salaires -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg" th:if="${!#lists.isEmpty(salaires)}">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center gap-sm"><span class="material-symbols-outlined text-primary">payments</span> Historique des salaires</h3>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md border border-outline-variant rounded-lg" th:each="s : ${salaires}">
+<p class="font-label-md text-label-md text-on-surface" th:text="${s.mois} + '/' + ${s.annee}">Mois/Annee</p>
+<p class="font-label-md text-label-md text-primary" th:text="${s.net} + ' FCFA'">Net</p>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-1 rounded font-label-sm text-label-sm" th:text="${s.statut}">Statut</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

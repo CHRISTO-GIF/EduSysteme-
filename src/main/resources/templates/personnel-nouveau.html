@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Ajouter un Enseignant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#dae2fd", "primary-fixed-dim": "#b6c4ff", "tertiary": "#222a3e",
+                    "on-primary-fixed-variant": "#264191", "surface-container-low": "#f2f4f6", "surface-container": "#eceef0",
+                    "surface-container-highest": "#e0e3e5", "surface-container-lowest": "#ffffff", "surface": "#f7f9fb",
+                    "outline-variant": "#c5c5d3", "primary": "#00236f", "on-background": "#191c1e",
+                    "surface-bright": "#f7f9fb", "error-container": "#ffdad6", "surface-variant": "#e0e3e5",
+                    "background": "#f7f9fb", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                    "on-error-container": "#93000a", "tertiary-container": "#384055", "secondary": "#505f76",
+                    "on-primary": "#ffffff", "error": "#ba1a1a", "on-tertiary-container": "#a4acc5",
+                    "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a", "surface-dim": "#d8dadc",
+                    "on-surface-variant": "#444651", "on-secondary-container": "#54647a", "surface-container-high": "#e6e8ea",
+                    "outline": "#757682", "on-error": "#ffffff"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "base": "4px", "lg": "24px", "xs": "4px", "xl": "32px", "gutter": "24px", "md": "16px", "container-max": "1440px", "sm": "8px"},
+            "fontFamily": {"headline-sm": ["Inter"], "body-lg": ["Inter"], "code": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"]},
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; line-height: 1; }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-active { background-color: rgba(255, 255, 255, 0.05); border-left: 4px solid #b6c4ff; color: #dce1ff; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-white">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container/70">Portail Admin</p>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/dashboard">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center px-lg py-md sidebar-active transition-colors duration-200" href="/personnel">
+<span class="material-symbols-outlined mr-md">school</span>
+<span class="font-label-md text-label-md">Personnel</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/secretariat">
+<span class="material-symbols-outlined mr-md">group</span>
+<span class="font-label-md text-label-md">Eleves</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/gestion-classes">
+<span class="material-symbols-outlined mr-md">account_tree</span>
+<span class="font-label-md text-label-md">Classes</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/parametres">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-label-md text-label-md">Parametres</span>
+</a>
+</nav>
+</aside>
+
+<!-- Contenu principal -->
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<header class="sticky top-0 z-40 bg-surface border-b border-outline-variant flex justify-between items-center h-16 px-gutter">
+<div class="flex items-center gap-md">
+<div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<span>Personnel</span>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="text-primary font-bold">Ajouter un Enseignant</span>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-full">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'A'}">A</div>
+</div>
+</header>
+
+<div class="flex-1 p-gutter max-w-container-max mx-auto w-full">
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary">Ajouter un Nouvel Enseignant</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Veuillez remplir les informations ci-dessous pour creer le profil de l'enseignant.</p>
+</div>
+
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
+
+<form class="space-y-lg pb-xl" method="post" th:action="@{/personnel/nouveau}">
+<!-- Section 1: Informations Personnelles -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg border-b border-surface-container pb-md">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Informations Personnelles</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Nom Complet</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="nomComplet" placeholder="ex: Jean Dupont" required="required" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Email Professionnel</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="email" placeholder="j.dupont@edusystem.com" type="email"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Telephone</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="telephone" placeholder="+225 07 00 00 00 00" type="tel"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Date de Naissance</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="dateNaissance" type="date"/>
+</div>
+<div class="flex flex-col gap-xs md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Genre</label>
+<div class="flex gap-lg mt-sm">
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="text-primary focus:ring-primary" name="genre" type="radio" value="HOMME"/>
+<span class="font-body-md text-body-md">Homme</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="text-primary focus:ring-primary" name="genre" type="radio" value="FEMME"/>
+<span class="font-body-md text-body-md">Femme</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="text-primary focus:ring-primary" name="genre" type="radio" value="AUTRE"/>
+<span class="font-body-md text-body-md">Autre</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Section 2: Details Professionnels -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg border-b border-surface-container pb-md">
+<span class="material-symbols-outlined text-primary">work</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Details Professionnels</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Matiere principale</label>
+<select class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="matiereEnseignee">
+<option value="">Selectionnez une matiere</option>
+<option th:each="m : ${matieres}" th:text="${m.nom}" th:value="${m.nom}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">ID Employe</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="codeAcces" placeholder="EMP-2026-001 (auto si vide)" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Date d'Embauche</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="dateEmbauche" type="date"/>
+</div>
+</div>
+</div>
+
+<!-- Section 3: Parcours Academique -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg border-b border-surface-container pb-md">
+<span class="material-symbols-outlined text-primary">school</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Parcours Academique</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Diplomes / Certifications</label>
+<textarea class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="diplomes" placeholder="Doctorat en Mathematiques, Master en Pedagogie..." rows="3"></textarea>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Specialisations</label>
+<textarea class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="specialisations" placeholder="Analyse Complexe, Algebre Lineaire, Statistique Appliquee..." rows="3"></textarea>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Annees d'Experience</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" min="0" name="anneesExperience" placeholder="0" type="number"/>
+</div>
+</div>
+</div>
+
+<!-- Section 4: Documents Administratifs -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg border-b border-surface-container pb-md">
+<span class="material-symbols-outlined text-primary">attach_file</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Documents Administratifs</h3>
+</div>
+<div class="p-md bg-secondary-container/30 border border-secondary-container rounded-lg flex gap-md items-start">
+<span class="material-symbols-outlined text-on-secondary-container mt-xs">info</span>
+<p class="font-body-md text-body-md text-on-secondary-container">
+                    Les documents (carte NNI, CV, diplomes...) pourront etre televerses juste apres la creation du profil, depuis la fiche de l'enseignant.
+                </p>
+</div>
+</div>
+
+<!-- Section 5: Affectation des Classes -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="flex items-center justify-between mb-lg border-b border-surface-container pb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">view_module</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Affectation des Classes</h3>
+</div>
+<button class="flex items-center gap-xs px-md py-sm text-primary hover:bg-primary-fixed/20 rounded-lg transition-colors font-label-md text-label-md" id="btn-ajouter-affectation" type="button">
+<span class="material-symbols-outlined text-base">add</span> Ajouter une affectation
+</button>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-md">
+                Si vous affectez au moins une classe, un compte de connexion enseignant sera automatiquement cree (avec un mot de passe temporaire affiche a la fin).
+            </p>
+<div class="space-y-sm" id="liste-affectations">
+<div class="row-affectation grid grid-cols-1 md:grid-cols-12 gap-md items-center p-sm border border-surface-container-high rounded-lg bg-surface-container-lowest">
+<div class="md:col-span-6 flex flex-col gap-xs">
+<label class="md:hidden font-label-sm text-label-sm text-on-surface-variant">Matiere</label>
+<select class="w-full rounded border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="affectationMatiereId">
+<option th:each="m : ${matieres}" th:text="${m.nom}" th:value="${m.id}"></option>
+</select>
+</div>
+<div class="md:col-span-5 flex flex-col gap-xs">
+<label class="md:hidden font-label-sm text-label-sm text-on-surface-variant">Classe</label>
+<select class="w-full rounded border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="affectationClasseId">
+<option th:each="c : ${classes}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</div>
+<div class="md:col-span-1 flex justify-end">
+<button class="btn-supprimer-affectation p-sm text-error hover:bg-error-container rounded-full transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Boutons d'action -->
+<div class="flex justify-end items-center gap-md pt-lg">
+<a class="px-xl py-md border border-outline text-on-surface hover:bg-surface-container-highest transition-colors font-label-md text-label-md rounded-lg" href="/personnel">Annuler</a>
+<button class="px-xl py-md bg-primary text-white hover:bg-primary-container transition-colors font-label-md text-label-md rounded-lg shadow-sm" type="submit">Enregistrer le Profil</button>
+</div>
+</form>
+</div>
+</main>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Ajout/suppression dynamique des lignes d'affectation de classe
+    const liste = document.getElementById('liste-affectations');
+    const btnAjouter = document.getElementById('btn-ajouter-affectation');
+
+    function brancherSuppression(row) {
+        const btn = row.querySelector('.btn-supprimer-affectation');
+        btn.addEventListener('click', () => {
+            if (liste.querySelectorAll('.row-affectation').length > 1) row.remove();
+        });
+    }
+    liste.querySelectorAll('.row-affectation').forEach(brancherSuppression);
+
+    if (btnAjouter) {
+        btnAjouter.addEventListener('click', () => {
+            const premiere = liste.querySelector('.row-affectation');
+            const clone = premiere.cloneNode(true);
+            liste.appendChild(clone);
+            brancherSuppression(clone);
+        });
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

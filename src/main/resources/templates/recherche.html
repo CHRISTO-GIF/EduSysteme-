@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recherche - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<a class="text-gray-500" href="/dashboard"><span class="material-symbols-outlined">arrow_back</span></a>
+<h1 class="text-xl font-bold text-blue-900">Resultats de recherche</h1>
+</div>
+<form action="/recherche" class="flex items-center gap-2" method="get">
+<input class="p-2 border border-gray-300 rounded-lg w-80" name="q" placeholder="Rechercher un eleve, un enseignant..." th:value="${q}" type="text"/>
+<button class="bg-blue-900 text-white px-4 py-2 rounded-lg" type="submit">
+<span class="material-symbols-outlined text-[18px]">search</span>
+</button>
+</form>
+</header>
+
+<main class="max-w-5xl mx-auto px-8 py-8">
+
+<div th:if="${tropCourt}" class="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500">
+<span class="material-symbols-outlined text-[40px] text-gray-300 mb-2">search</span>
+<p>Saisissez au moins 2 caracteres pour lancer une recherche.</p>
+</div>
+
+<div th:if="${tropCourt == null or tropCourt == false}">
+<p class="text-gray-500 mb-6" th:text="'Resultats pour &quot;' + ${q} + '&quot;'">Resultats</p>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6" th:if="${eleves != null and !eleves.isEmpty()}">
+<div class="px-5 py-3 border-b border-gray-200"><h3 class="font-semibold">Eleves</h3></div>
+<div class="divide-y divide-gray-100">
+<a class="px-5 py-3 flex items-center justify-between hover:bg-gray-50" th:each="e : ${eleves}" th:href="@{/secretariat/eleves/{id}/edit(id=${e.id})}">
+<span th:text="${e.prenom} + ' ' + ${e.nom} + ' (' + ${e.matricule} + ')'">Eleve</span>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</a>
+</div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6" th:if="${personnels != null and !personnels.isEmpty()}">
+<div class="px-5 py-3 border-b border-gray-200"><h3 class="font-semibold">Personnel</h3></div>
+<div class="divide-y divide-gray-100">
+<div class="px-5 py-3" th:each="p : ${personnels}" th:text="${p.prenom} + ' ' + ${p.nom} + ' - ' + ${p.fonction}">Personnel</div>
+</div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6" th:if="${classes != null and !classes.isEmpty()}">
+<div class="px-5 py-3 border-b border-gray-200"><h3 class="font-semibold">Classes</h3></div>
+<div class="divide-y divide-gray-100">
+<a class="px-5 py-3 block hover:bg-gray-50" th:each="c : ${classes}" th:href="@{/gestion-classes}" th:text="${c.nom}">Classe</a>
+</div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden" th:if="${matieres != null and !matieres.isEmpty()}">
+<div class="px-5 py-3 border-b border-gray-200"><h3 class="font-semibold">Matieres</h3></div>
+<div class="divide-y divide-gray-100">
+<a class="px-5 py-3 block hover:bg-gray-50" th:each="m : ${matieres}" th:href="@{/matieres}" th:text="${m.nom}">Matiere</a>
+</div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500"
+     th:if="${(eleves == null or eleves.isEmpty()) and (personnels == null or personnels.isEmpty()) and (classes == null or classes.isEmpty()) and (matieres == null or matieres.isEmpty())}">
+Aucun resultat trouve.
+</div>
+</div>
+
+</main>
+</body>
+</html>

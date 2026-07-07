@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Emploi du temps</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .schedule-grid-bg { background-size: 100% 64px; background-image: linear-gradient(to bottom, #f1f5f9 1px, transparent 1px); }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#f7f9fb", "on-primary": "#ffffff", "error": "#ba1a1a",
+                      "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5", "error-container": "#ffdad6",
+                      "primary-fixed": "#dce1ff", "on-surface": "#191c1e", "outline": "#757682",
+                      "primary-fixed-dim": "#b6c4ff", "surface-container-lowest": "#ffffff", "outline-variant": "#c5c5d3",
+                      "primary": "#00236f", "on-error": "#ffffff", "on-error-container": "#93000a",
+                      "on-secondary-container": "#54647a", "surface-container": "#eceef0", "on-background": "#191c1e",
+                      "on-surface-variant": "#444651", "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a",
+                      "surface-container-high": "#e6e8ea", "tertiary": "#222a3e", "surface": "#f7f9fb",
+                      "secondary": "#505f76", "secondary-fixed": "#d3e4fe", "on-secondary-fixed": "#0b1c30",
+                      "on-secondary-fixed-variant": "#38485d", "on-primary-fixed-variant": "#264191",
+                      "on-tertiary": "#ffffff", "on-tertiary-fixed": "#131b2e", "on-tertiary-fixed-variant": "#3f465c",
+                      "tertiary-fixed": "#dae2fd"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},
+              "fontFamily": {"headline-md": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"]},
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-tight">EduSystem Pro</h1>
+<p class="text-on-tertiary-container text-xs opacity-80">Portail Admin</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/dashboard">
+<span class="material-symbols-outlined mr-md">dashboard</span> Tableau de bord
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/secretariat">
+<span class="material-symbols-outlined mr-md">group</span> Eleves
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/personnel">
+<span class="material-symbols-outlined mr-md">school</span> Personnel
+</a>
+<a class="flex items-center px-lg py-md text-white border-l-4 border-primary-fixed bg-tertiary-container transition-colors duration-200 font-label-md text-label-md" href="/emploi-du-temps">
+<span class="material-symbols-outlined mr-md">calendar_month</span> Emploi du temps
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/examens">
+<span class="material-symbols-outlined mr-md">quiz</span> Examens
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/messagerie">
+<span class="material-symbols-outlined mr-md">forum</span> Messagerie
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/finances">
+<span class="material-symbols-outlined mr-md">account_balance</span> Tresorerie
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/journal">
+<span class="material-symbols-outlined mr-md">assessment</span> Rapports
+</a>
+</nav>
+<div class="mt-auto border-t border-tertiary-container/30 pt-md px-lg">
+<a class="flex items-center py-sm text-on-tertiary-container hover:text-white transition-colors duration-200 font-label-md text-label-md" href="/parametres">
+<span class="material-symbols-outlined mr-md">settings</span> Parametres
+</a>
+<a class="flex items-center py-sm text-on-tertiary-container hover:text-white transition-colors duration-200 font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined mr-md">logout</span> Deconnexion
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="ml-sidebar-width min-h-screen flex flex-col">
+<header class="h-16 fixed top-0 right-0 left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg w-full z-40">
+<div class="flex items-center gap-md w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-lg pl-10 py-2 font-body-md text-body-md focus:ring-1 focus:ring-primary" id="recherche-creneau" placeholder="Rechercher un cours, une salle..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<button class="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="text-[10px] text-on-surface-variant font-medium">Administrateur</p>
+</div>
+</div>
+</div>
+</header>
+
+<main class="mt-16 p-lg max-w-container-max mx-auto w-full flex-1">
+<div th:if="${success}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${success}"></div>
+
+<!-- En-tete -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Emploi du temps</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs" th:text="'Annee scolaire ' + ${annee} + ' — ' + ${nomEtab}">Annee scolaire</p>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-high p-1 rounded-xl border border-outline-variant/30 flex-wrap">
+<a class="px-md py-2 rounded-lg font-label-md text-label-md transition-all"
+   th:classappend="${classeId == null} ? 'bg-white shadow-sm text-primary' : 'hover:bg-surface-container-lowest text-on-surface-variant'"
+   th:href="@{/emploi-du-temps}">Toutes les classes</a>
+<a class="px-md py-2 rounded-lg font-label-md text-label-md transition-all"
+   th:classappend="${classeId != null and classeId == c.id} ? 'bg-white shadow-sm text-primary' : 'hover:bg-surface-container-lowest text-on-surface-variant'"
+   th:each="c : ${classes}"
+   th:href="@{/emploi-du-temps(classeId=${c.id})}"
+   th:text="${c.nom}">Classe</a>
+</div>
+</div>
+
+<!-- Statistiques reelles -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg mb-xl">
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Creneaux</span>
+<div class="flex items-baseline gap-sm">
+<span class="font-headline-md text-headline-md text-primary" th:text="${totalCreneaux}">0</span>
+<span class="text-xs text-secondary font-medium">/ Semaine</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Enseignants Actifs</span>
+<span class="font-headline-md text-headline-md text-primary" th:text="${totalEnseignants}">0</span>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Salles Utilisees</span>
+<span class="font-headline-md text-headline-md text-primary" th:text="${totalSalles}">0</span>
+</div>
+<div class="bg-primary p-lg rounded-xl border border-primary flex flex-col justify-center gap-sm">
+<span class="font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider">Action rapide</span>
+<button class="w-full bg-primary-container text-on-primary-container border border-on-primary-container/30 font-label-md text-label-md py-2 rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-xs" onclick="document.getElementById('import-file-input').click()" type="button">
+<span class="material-symbols-outlined text-sm">upload_file</span> Importer depuis Excel
+</button>
+<button class="w-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md py-2 rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-xs" onclick="document.getElementById('modal-ajout').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-sm">add</span> Creer un creneau
+</button>
+</div>
+</div>
+
+<form enctype="multipart/form-data" id="import-form" method="post" th:action="@{/emploi-du-temps/import}">
+<input name="classeId" th:if="${classeId != null}" th:value="${classeId}" type="hidden"/>
+<input accept=".xlsx,.xls" class="hidden" id="import-file-input" name="fichier" onchange="document.getElementById('import-form').submit()" type="file"/>
+</form>
+
+<!-- Grille de l'emploi du temps -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden flex flex-col">
+<div class="grid grid-cols-[100px_repeat(6,1fr)] border-b border-outline-variant bg-surface-container-low">
+<div class="p-md text-center border-r border-outline-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant">HEURE</span>
+</div>
+<div class="p-md text-center border-r border-outline-variant last:border-r-0" th:each="j : ${#numbers.sequence(1,6)}">
+<span class="block font-label-md text-label-md text-on-surface" th:text="${#strings.toUpperCase(jours[j])}">JOUR</span>
+</div>
+</div>
+<div class="relative overflow-y-auto max-h-[700px] schedule-grid-bg">
+<div class="grid grid-cols-[100px_repeat(6,1fr)]" id="grille-horaire">
+<!-- Colonne des heures : 07:00 a 18:00 -->
+<div class="flex flex-col">
+<div class="h-16 flex items-start justify-center pt-2 border-r border-outline-variant" th:each="h : ${#numbers.sequence(7,17)}">
+<span class="font-label-sm text-label-sm text-on-surface-variant" th:text="${(h &lt; 10 ? '0' + h : '' + h)} + ':00'">07:00</span>
+</div>
+</div>
+<!-- Colonnes des jours -->
+<div class="relative border-r border-outline-variant last:border-r-0" style="height: 704px;" th:each="j : ${#numbers.sequence(1,6)}">
+<div class="creneau-card absolute left-1 right-1 rounded-lg p-2 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group bg-primary-fixed border border-on-primary-fixed-variant"
+     th:attr="data-debut=${cr.heureDebut},data-fin=${cr.heureFin}"
+     th:each="cr : ${parJour.get(j-1)}">
+<div class="flex justify-between items-start">
+<p class="font-label-md text-label-md text-on-primary-fixed" th:text="${(cr.matiere != null ? cr.matiere.nom : '?') + (classeId == null ? ' — ' + (cr.classe != null ? cr.classe.nom : '') : '')}">Matiere</p>
+<form method="post" th:action="@{/emploi-du-temps/{id}/supprimer(id=${cr.id})}">
+<input name="classeId" th:if="${classeId != null}" th:value="${classeId}" type="hidden"/>
+<button class="opacity-0 group-hover:opacity-100 text-on-primary-fixed-variant hover:text-error transition-opacity" title="Supprimer" type="submit">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</form>
+</div>
+<p class="text-[11px] text-on-primary-fixed-variant font-medium mt-1" th:text="${cr.heureDebut} + ' - ' + ${cr.heureFin}">horaire</p>
+<p class="text-[11px] text-on-primary-fixed-variant font-medium" th:text="${(cr.salle != null ? cr.salle : '') + (cr.enseignantNom != null ? ' • ' + cr.enseignantNom : '')}">salle • prof</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Alertes de conflits reelles -->
+<div class="mt-lg space-y-md">
+<div class="flex items-center gap-md bg-error-container/40 border border-error/20 p-md rounded-xl" th:each="conflit : ${conflits}">
+<div class="w-10 h-10 rounded-full bg-error flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-error">warning</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-error-container">Conflit de salle detecte</p>
+<p class="text-xs text-on-error-container/80" th:text="${conflit}">Detail</p>
+</div>
+</div>
+<div class="flex items-center gap-md bg-secondary-container/40 border border-outline-variant p-md rounded-xl" th:if="${#lists.isEmpty(conflits)}">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary">check_circle</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Aucun conflit detecte</p>
+<p class="text-xs text-on-surface-variant">Toutes les salles sont correctement planifiees.</p>
+</div>
+</div>
+</div>
+</main>
+
+<footer class="p-lg text-center text-[10px] text-on-surface-variant uppercase tracking-widest opacity-50 ml-sidebar-width">
+            EduSystem Pro — <span th:text="${nomEtab}">Etablissement</span>
+        </footer>
+</div>
+
+<!-- Modale d'ajout de creneau -->
+<div class="fixed inset-0 z-50 hidden items-center justify-center bg-inverse-surface/40 backdrop-blur-sm p-md" id="modal-ajout">
+<div class="bg-surface rounded-xl border border-outline shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+<div class="px-xl py-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Importer un Creneau</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Ajoutez un nouveau cours a l'emploi du temps academique.</p>
+</div>
+<button class="p-sm hover:bg-surface-container-high rounded-full transition-colors" onclick="document.getElementById('modal-ajout').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-xl space-y-lg" id="form-ajout-creneau" method="post" th:action="@{/emploi-du-temps}">
+<div class="grid grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">Matiere</label>
+<select class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all" name="matiereId" required="required">
+<option disabled="disabled" selected="selected" value="">Selectionner une matiere</option>
+<option th:each="m : ${matieres}" th:text="${m.nom}" th:value="${m.id}"></option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">Classe / Niveau</label>
+<select class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all" name="classeId" required="required">
+<option disabled="disabled" selected="selected" value="">Selectionner une classe</option>
+<option th:each="c : ${classes}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">Enseignant</label>
+<select class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all" id="select-enseignant">
+<option value="">Selectionner un enseignant</option>
+<option th:each="ens : ${enseignants}" th:text="${ens.prenom} + ' ' + ${ens.nom}" th:value="${ens.prenom} + ' ' + ${ens.nom}"></option>
+<option value="__autre__">Autre (saisir un nom)...</option>
+</select>
+<input class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md mt-xs hidden" id="input-enseignant-autre" placeholder="Nom de l'enseignant" type="text"/>
+<input id="hidden-enseignant" name="enseignantNom" type="hidden"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">Salle</label>
+<select class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all" id="select-salle">
+<option value="">Selectionner une salle</option>
+<option th:each="s : ${salles}" th:text="${s}" th:value="${s}"></option>
+<option value="__autre__">Autre (saisir un nom)...</option>
+</select>
+<input class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md mt-xs hidden" id="input-salle-autre" placeholder="Nom de la salle" type="text"/>
+<input id="hidden-salle" name="salle" type="hidden"/>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-lg border border-outline-variant space-y-md">
+<div class="flex items-center gap-sm text-primary">
+<span class="material-symbols-outlined">schedule</span>
+<span class="font-label-md text-label-md">Planification temporelle</span>
+</div>
+<div class="grid grid-cols-3 gap-md">
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-secondary">Jour de la semaine</label>
+<select class="w-full h-10 px-sm bg-white border border-outline rounded font-body-md text-body-md" id="select-jour" name="jour" required="required">
+<option th:each="j : ${#numbers.sequence(1,6)}" th:text="${jours[j]}" th:value="${j}"></option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-secondary">Heure de debut</label>
+<input class="w-full h-10 px-sm bg-white border border-outline rounded font-body-md text-body-md" id="input-heure-debut" name="heureDebut" required="required" type="time"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-secondary">Heure de fin</label>
+<input class="w-full h-10 px-sm bg-white border border-outline rounded font-body-md text-body-md" id="input-heure-fin" name="heureFin" required="required" type="time"/>
+</div>
+</div>
+</div>
+<!-- Verification des conflits -->
+<div class="flex items-center justify-between p-md bg-secondary-container/20 rounded-lg border border-secondary-container">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+<div>
+<p class="font-label-md text-label-md text-primary">Verifier les conflits</p>
+<p class="font-body-md text-body-md text-on-secondary-container text-xs">Verifie la disponibilite de la salle et de l'enseignant.</p>
+</div>
+</div>
+<button class="px-md py-xs bg-primary text-on-primary rounded font-label-sm text-label-sm hover:bg-primary-container transition-colors shadow-sm" id="btn-verifier" type="button">
+                    Lancer l'analyse
+                </button>
+</div>
+<div class="hidden" id="resultat-conflit"></div>
+<div class="flex justify-end gap-md pt-md">
+<button class="px-lg py-sm border border-outline text-secondary font-label-md text-label-md rounded hover:bg-surface-container-high transition-colors" onclick="document.getElementById('modal-ajout').classList.add('hidden')" type="button">Annuler</button>
+<button class="px-xl py-sm bg-primary text-on-primary font-label-md text-label-md rounded shadow-md hover:bg-primary-container active:scale-95 transition-all flex items-center gap-sm" type="submit">
+<span class="material-symbols-outlined text-lg">save</span> Confirmer l'Importation
+</button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- Modale d'apercu d'importation Excel -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-inverse-surface/40 backdrop-blur-sm p-md" th:if="${importApercu != null}">
+<div class="w-full max-w-3xl bg-surface rounded-xl border border-outline shadow-xl flex flex-col max-h-[90vh]">
+<div class="px-xl py-lg border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<div class="flex items-center gap-sm">
+<div class="p-2 bg-secondary-container rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container">upload_file</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Apercu de l'importation</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="'Fichier : ' + ${importFichierNom}">Fichier</p>
+</div>
+</div>
+<a class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors" th:href="@{/emploi-du-temps(classeId=${classeIdImport})}">
+<span class="material-symbols-outlined">close</span>
+</a>
+</div>
+
+<div th:if="${importErreurFichier}" class="mx-xl mt-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${importErreurFichier}"></div>
+
+<div class="px-xl py-lg grid grid-cols-3 gap-md bg-surface-container-low" th:if="${importErreurFichier == null}">
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary">analytics</span></div>
+<div><p class="text-on-surface-variant font-label-sm text-label-sm">Total Detecte</p><p class="font-headline-md text-headline-md text-primary" th:text="${importTotal}">0</p></div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center"><span class="material-symbols-outlined text-green-600">check_circle</span></div>
+<div><p class="text-on-surface-variant font-label-sm text-label-sm">Pret</p><p class="font-headline-md text-headline-md text-green-600" th:text="${importPret}">0</p></div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-error-container flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center"><span class="material-symbols-outlined text-error">error</span></div>
+<div><p class="text-on-surface-variant font-label-sm text-label-sm">Erreurs</p><p class="font-headline-md text-headline-md text-error" th:text="${importErreurs}">0</p></div>
+</div>
+</div>
+
+<div class="flex-1 overflow-auto" th:if="${importErreurFichier == null}">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface z-10">
+<tr>
+<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Jour</th>
+<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Classe</th>
+<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Matiere</th>
+<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Horaire</th>
+<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Statut</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors" th:classappend="${!ligne.valide} ? 'bg-error-container/5'" th:each="ligne : ${importApercu}">
+<td class="px-lg py-md font-label-md text-label-md" th:classappend="${ligne.statut == 'JOUR_INVALIDE'} ? 'text-error'" th:text="${ligne.jourTexte}">Jour</td>
+<td class="px-lg py-md font-body-md text-body-md text-on-surface-variant" th:classappend="${ligne.statut == 'CLASSE_INCONNUE'} ? 'text-error'" th:text="${ligne.classeTexte}">Classe</td>
+<td class="px-lg py-md font-body-md text-body-md text-on-surface-variant" th:classappend="${ligne.statut == 'MATIERE_INCONNUE'} ? 'text-error'" th:text="${ligne.matiereTexte}">Matiere</td>
+<td class="px-lg py-md font-code text-code text-on-surface-variant" th:classappend="${ligne.statut == 'HORAIRE_INVALIDE'} ? 'text-error'" th:text="${ligne.heureDebut} + ' - ' + ${ligne.heureFin}">horaire</td>
+<td class="px-lg py-md">
+<span class="inline-flex items-center gap-1 bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'VALIDE'}"><span class="material-symbols-outlined text-[14px]">check</span> Valide</span>
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'JOUR_INVALIDE'}"><span class="material-symbols-outlined text-[14px]">warning</span> Jour invalide</span>
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'CLASSE_INCONNUE'}"><span class="material-symbols-outlined text-[14px]">error</span> Classe inconnue</span>
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'MATIERE_INCONNUE'}"><span class="material-symbols-outlined text-[14px]">error</span> Matiere inconnue</span>
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'HORAIRE_INVALIDE'}"><span class="material-symbols-outlined text-[14px]">warning</span> Horaire invalide</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="px-xl py-lg bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">info</span>
+<p class="text-label-sm font-label-sm">Format attendu : Jour | Classe | Matiere | Enseignant | Salle | Heure debut | Heure fin. Les lignes en erreur ne seront pas importees.</p>
+</div>
+<div class="flex items-center gap-md">
+<a class="px-lg py-sm rounded-lg border border-outline text-secondary font-label-md hover:bg-surface-container-high transition-colors" th:href="@{/emploi-du-temps(classeId=${classeIdImport})}">Annuler</a>
+<form method="post" th:action="@{/emploi-du-temps/import/confirmer}">
+<input name="classeId" th:if="${classeIdImport != null}" th:value="${classeIdImport}" type="hidden"/>
+<button class="px-xl py-sm rounded-lg bg-primary text-on-primary font-label-md shadow-lg hover:bg-primary-container transition-colors flex items-center gap-sm" th:disabled="${importPret == null or importPret == 0}" type="submit">
+<span class="material-symbols-outlined text-[18px]">publish</span> Confirmer l'importation
+</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Positionnement absolu des creneaux selon leurs horaires reels (grille 07:00-18:00, 64px/heure)
+    const DEBUT_GRILLE_MIN = 7 * 60;
+    const PX_PAR_HEURE = 64;
+
+    function minutes(hhmm) {
+        const parts = hhmm.split(':');
+        return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    }
+
+    document.querySelectorAll('.creneau-card').forEach(card => {
+        const debut = minutes(card.getAttribute('data-debut'));
+        const fin = minutes(card.getAttribute('data-fin'));
+        const top = (debut - DEBUT_GRILLE_MIN) / 60 * PX_PAR_HEURE;
+        const hauteur = Math.max(40, (fin - debut) / 60 * PX_PAR_HEURE);
+        card.style.top = top + 'px';
+        card.style.height = hauteur + 'px';
+    });
+
+    // Recherche client (matiere, classe, salle, enseignant)
+    const recherche = document.getElementById('recherche-creneau');
+    if (recherche) {
+        recherche.addEventListener('input', () => {
+            const q = recherche.value.toLowerCase().trim();
+            document.querySelectorAll('.creneau-card').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    }
+
+    // Bascule "Autre" pour Enseignant / Salle : synchronise un champ cache selon le choix de l'utilisateur
+    function brancherAutre(selectId, inputId, hiddenId) {
+        const select = document.getElementById(selectId);
+        const input = document.getElementById(inputId);
+        const hidden = document.getElementById(hiddenId);
+        if (!select || !input || !hidden) return;
+
+        function maj() {
+            if (select.value === '__autre__') {
+                input.classList.remove('hidden');
+                hidden.value = input.value;
+            } else {
+                input.classList.add('hidden');
+                hidden.value = select.value;
+            }
+        }
+        select.addEventListener('change', maj);
+        input.addEventListener('input', () => { hidden.value = input.value; });
+        maj();
+    }
+    brancherAutre('select-enseignant', 'input-enseignant-autre', 'hidden-enseignant');
+    brancherAutre('select-salle', 'input-salle-autre', 'hidden-salle');
+
+    // Verification reelle des conflits (salle + enseignant) avant import, via l'API du serveur
+    const btnVerifier = document.getElementById('btn-verifier');
+    const resultatConflit = document.getElementById('resultat-conflit');
+    if (btnVerifier) {
+        btnVerifier.addEventListener('click', () => {
+            const jour = document.getElementById('select-jour').value;
+            const heureDebut = document.getElementById('input-heure-debut').value;
+            const heureFin = document.getElementById('input-heure-fin').value;
+            const salle = document.getElementById('hidden-salle').value;
+            const enseignantNom = document.getElementById('hidden-enseignant').value;
+
+            if (!heureDebut || !heureFin) {
+                resultatConflit.className = 'flex items-center gap-sm px-md py-sm bg-error-container text-on-error-container rounded font-label-sm text-label-sm border border-error';
+                resultatConflit.innerHTML = '<span class="material-symbols-outlined text-sm">warning</span> Renseignez d\'abord l\'heure de debut et de fin.';
+                resultatConflit.classList.remove('hidden');
+                return;
+            }
+
+            btnVerifier.disabled = true;
+            btnVerifier.textContent = 'Analyse...';
+
+            const params = new URLSearchParams({ jour, heureDebut, heureFin, salle, enseignantNom });
+            fetch('/emploi-du-temps/verifier-conflit?' + params.toString())
+                .then(r => r.json())
+                .then(data => {
+                    btnVerifier.disabled = false;
+                    btnVerifier.textContent = 'Lancer l\'analyse';
+                    resultatConflit.classList.remove('hidden');
+                    if (data.conflit) {
+                        resultatConflit.className = 'flex flex-col gap-xs px-md py-sm bg-error-container text-on-error-container rounded font-label-sm text-label-sm border border-error';
+                        resultatConflit.innerHTML = data.messages.map(m =>
+                            '<div class="flex items-start gap-sm"><span class="material-symbols-outlined text-sm">warning</span><span>' + m + '</span></div>'
+                        ).join('');
+                    } else {
+                        resultatConflit.className = 'flex items-center gap-sm px-md py-sm bg-secondary-container text-on-secondary-container rounded font-label-sm text-label-sm border border-secondary-container';
+                        resultatConflit.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Aucun conflit detecte, ce creneau est disponible.';
+                    }
+                })
+                .catch(() => {
+                    btnVerifier.disabled = false;
+                    btnVerifier.textContent = 'Lancer l\'analyse';
+                });
+        });
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

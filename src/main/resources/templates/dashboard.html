@@ -1,0 +1,388 @@
+<!DOCTYPE html><html class="light" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EduSystem Pro | Tableau de bord</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#f7f9fb",
+                    "background": "#f7f9fb",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e0e3e5",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#384055",
+                    "inverse-on-surface": "#eff1f3",
+                    "surface-tint": "#4059aa",
+                    "on-tertiary-container": "#a4acc5",
+                    "on-primary-fixed-variant": "#264191",
+                    "surface-container-highest": "#e0e3e5",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#dce1ff",
+                    "on-surface": "#191c1e",
+                    "outline": "#757682",
+                    "secondary-fixed": "#d3e4fe",
+                    "on-secondary-fixed": "#0b1c30",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c5c5d3",
+                    "primary": "#00236f",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#54647a",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#dae2fd",
+                    "surface-container": "#eceef0",
+                    "on-background": "#191c1e",
+                    "inverse-primary": "#b6c4ff",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2d3133",
+                    "on-primary-container": "#90a8ff",
+                    "on-surface-variant": "#444651",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "on-primary-fixed": "#00164e",
+                    "secondary-container": "#d0e1fb",
+                    "primary-container": "#1e3a8a",
+                    "surface-container-high": "#e6e8ea",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "tertiary": "#222a3e",
+                    "surface": "#f7f9fb",
+                    "secondary": "#505f76",
+                    "surface-container-low": "#f2f4f6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "base": "4px",
+                    "sidebar-width": "260px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "code": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            border-left-width: 4px;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface-bright text-on-surface">
+<!-- Menu lateral persistant -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary dark:bg-tertiary-container flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-sm text-headline-sm text-on-primary-fixed font-bold">EduSystem Pro</h1>
+<p class="text-on-tertiary-container font-label-sm text-label-sm opacity-80" th:text="${nomEtablissement}">Portail Admin</p>
+</div>
+<nav class="flex-grow flex flex-col space-y-xs overflow-y-auto hide-scrollbar">
+<a class="flex items-center px-lg py-md gap-md text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary cursor-pointer active:scale-95 transition-all duration-200" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/secretariat">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Eleves</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/secretariat/cartes">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Cartes d'identite</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/personnel">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Personnel</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/notes/saisie">
+<span class="material-symbols-outlined">grading</span>
+<span class="font-label-md text-label-md">Notes</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/examens">
+<span class="material-symbols-outlined">quiz</span>
+<span class="font-label-md text-label-md">Examens</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/messagerie">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-label-md text-label-md">Messagerie</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/finances">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-md text-label-md">Tresorerie</span>
+</a>
+<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/journal">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-label-md text-label-md">Rapports</span>
+</a>
+</nav>
+<div class="mt-auto px-lg border-t border-tertiary-container/30 pt-lg space-y-xs">
+<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" href="/parametres">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Parametres</span>
+</a>
+<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Deconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+<!-- Zone de contenu principale -->
+<div class="ml-sidebar-width min-h-screen flex flex-col">
+<!-- Barre superieure -->
+<header class="h-16 fixed top-0 right-0 left-sidebar-width bg-surface-container-lowest dark:bg-surface-container-low border-b border-outline-variant dark:border-outline flex justify-between items-center px-lg z-40">
+<form action="/recherche" class="flex items-center bg-surface-container-high dark:bg-surface-container-highest px-md py-xs rounded-lg w-96 transition-all duration-200 ease-in-out" method="get">
+<span class="material-symbols-outlined text-on-surface-variant mr-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-body-md w-full placeholder:text-on-surface-variant" name="q" placeholder="Rechercher eleves, classes, dossiers..." type="text"/>
+</form>
+<div class="flex items-center gap-lg">
+<button class="relative text-on-surface-variant hover:bg-surface-container-high p-sm rounded-full transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full" th:if="${not #lists.isEmpty(alertes)}"></span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high p-sm rounded-full transition-all duration-200">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="flex items-center gap-md pl-md border-l border-outline-variant">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-label-md leading-none" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Utilisateur</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:if="${utilisateurConnecte != null}" th:switch="${utilisateurConnecte.role}">
+<span th:case="'ADMIN'">Administrateur</span>
+<span th:case="'SECRETAIRE'">Secretaire</span>
+<span th:case="'TRESORIER'">Tresorier</span>
+<span th:case="'ENSEIGNANT'">Enseignant</span>
+<span th:case="'ELEVE'">Eleve</span>
+<span th:case="'SUPER_ADMIN'">Super administrateur</span>
+<span th:case="*" th:text="${utilisateurConnecte.role}">Role</span>
+</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'U'}">U</div>
+</div>
+</div>
+</header>
+<!-- Contenu de la page -->
+<main class="mt-16 p-lg max-w-container-max mx-auto w-full">
+<!-- En-tete du tableau de bord -->
+<div class="mb-xl flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg">Vue d'ensemble de l'etablissement</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" th:text="${(utilisateurConnecte != null ? 'Bon retour, ' + utilisateurConnecte.prenom : 'Bon retour') + '. Voici l''activite de ' + nomEtablissement + ' aujourd''hui.'}">Bon retour.</p>
+</div>
+<a class="bg-primary text-on-primary font-label-md text-label-md px-lg py-md rounded-lg flex items-center gap-sm hover:brightness-110 active:scale-95 transition-all" href="/journal">
+<span class="material-symbols-outlined text-[20px]">assessment</span>
+                    Voir le journal
+                </a>
+</div>
+<!-- Cartes statistiques -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total eleves</p>
+<h3 class="font-headline-md text-headline-md mt-xs" th:text="${totalEleves}">0</h3>
+<div class="flex items-center mt-sm text-primary">
+<span class="material-symbols-outlined text-[16px] mr-xs">school</span>
+<span class="font-label-sm text-label-sm" th:text="${'Repartis sur ' + totalClasses + ' classe(s)'}">0 classes</span>
+</div>
+</div>
+<div class="w-14 h-14 bg-primary-fixed rounded-full flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-[28px]">group</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Personnel</p>
+<h3 class="font-headline-md text-headline-md mt-xs" th:text="${totalPersonnels}">0</h3>
+<div class="flex items-center mt-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mr-xs">check_circle</span>
+<span class="font-label-sm text-label-sm">Personnel actif</span>
+</div>
+</div>
+<div class="w-14 h-14 bg-secondary-fixed rounded-full flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[28px]">school</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Absences enregistrees</p>
+<h3 class="font-headline-md text-headline-md mt-xs" th:text="${totalAbsences}">0</h3>
+<div class="flex items-center mt-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mr-xs">event_busy</span>
+<span class="font-label-sm text-label-sm" th:text="${'Annee ' + anneeScolaire}">Annee scolaire</span>
+</div>
+</div>
+<div class="w-14 h-14 bg-tertiary-fixed rounded-full flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[28px]">how_to_reg</span>
+</div>
+</div>
+</div>
+<!-- Grille principale : graphique, activite -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Graphique des absences mensuelles -->
+<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<h4 class="font-headline-sm text-headline-sm">Absences mensuelles</h4>
+<span class="bg-surface-container-low border-outline-variant text-label-sm font-label-sm rounded-lg px-md py-xs" th:text="${anneeScolaire}">Annee</span>
+</div>
+<div class="p-lg flex-grow flex flex-col justify-end min-h-[350px] bg-gradient-to-t from-surface-container-low/20 to-transparent">
+<div class="flex items-end justify-between gap-sm h-full w-full px-lg">
+<div class="flex flex-col items-center gap-sm flex-1" th:each="mois, iStat : ${paiementsLabels}">
+<div class="w-full bg-primary-fixed-dim/40 rounded-t-lg relative group transition-all duration-300 hover:bg-primary" th:style="'height:' + (5 + (${absencesData[iStat.index]} * 90 / ${maxAbsences})) + '%'">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-tertiary text-on-tertiary px-sm py-xs rounded text-[10px] opacity-0 group-hover:opacity-100 transition-opacity" th:text="${absencesData[iStat.index]}">0</div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant" th:text="${mois}">Mois</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Fil d'activite / alertes reelles -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col">
+<div class="p-lg border-b border-outline-variant">
+<h4 class="font-headline-sm text-headline-sm">Alertes et activite</h4>
+</div>
+<div class="flex-grow p-lg space-y-lg overflow-y-auto max-h-[400px]">
+<div class="flex gap-md" th:each="alerte : ${alertes}">
+<div class="mt-1 w-2 h-2 rounded-full flex-shrink-0"
+     th:classappend="${alerte.niveau == 'danger'} ? 'bg-error' : (${alerte.niveau == 'warning'} ? 'bg-secondary' : 'bg-primary')"></div>
+<div>
+<p class="font-body-md text-body-md text-on-surface" th:text="${alerte.message}">Message</p>
+<a class="font-label-sm text-label-sm text-primary hover:underline mt-xs inline-block" th:href="${alerte.lien}">Voir</a>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant" th:if="${#lists.isEmpty(alertes)}">Aucune alerte pour le moment. Tout va bien !</p>
+</div>
+</div>
+<!-- Repartition des notes et resume budgetaire -->
+<div class="lg:col-span-3 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div class="md:col-span-1 border-r border-outline-variant pr-lg">
+<h4 class="font-headline-sm text-headline-sm mb-md">Resume budgetaire</h4>
+<div class="bg-surface-container-low rounded-lg p-md space-y-md">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Revenus prevus</p>
+<p class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(budgetRevenu,0,'COMMA',0,'POINT')} + ' FCFA'">0</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Depenses prevues</p>
+<p class="font-headline-sm text-headline-sm text-error" th:text="${#numbers.formatDecimal(budgetDepense,0,'COMMA',0,'POINT')} + ' FCFA'">0</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Encaisse a ce jour</p>
+<p class="font-headline-sm text-headline-sm" th:text="${#numbers.formatDecimal(totalEncaisse,0,'COMMA',0,'POINT')} + ' FCFA'">0</p>
+</div>
+</div>
+</div>
+<div class="md:col-span-3">
+<div class="flex items-center justify-between mb-md">
+<h4 class="font-headline-sm text-headline-sm">Repartition des notes par mention</h4>
+<a class="font-label-md text-label-md text-primary hover:underline flex items-center gap-xs" href="/notes/saisie">
+Gerer les notes
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<div class="space-y-md">
+<div class="flex items-center gap-md">
+<span class="w-32 font-label-sm text-label-sm text-on-surface-variant">Excellent (≥16)</span>
+<div class="flex-1 bg-surface-container-high rounded-full h-3 overflow-hidden">
+<div class="bg-primary h-full" th:style="'width:' + (${notesMentions[0]} * 100 / ${totalNotes}) + '%'"></div>
+</div>
+<span class="w-10 text-right font-label-sm text-label-sm" th:text="${notesMentions[0]}">0</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="w-32 font-label-sm text-label-sm text-on-surface-variant">Bien (14-16)</span>
+<div class="flex-1 bg-surface-container-high rounded-full h-3 overflow-hidden">
+<div class="bg-secondary h-full" th:style="'width:' + (${notesMentions[1]} * 100 / ${totalNotes}) + '%'"></div>
+</div>
+<span class="w-10 text-right font-label-sm text-label-sm" th:text="${notesMentions[1]}">0</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="w-32 font-label-sm text-label-sm text-on-surface-variant">Assez bien (12-14)</span>
+<div class="flex-1 bg-surface-container-high rounded-full h-3 overflow-hidden">
+<div class="bg-tertiary h-full" th:style="'width:' + (${notesMentions[2]} * 100 / ${totalNotes}) + '%'"></div>
+</div>
+<span class="w-10 text-right font-label-sm text-label-sm" th:text="${notesMentions[2]}">0</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="w-32 font-label-sm text-label-sm text-on-surface-variant">Passable (10-12)</span>
+<div class="flex-1 bg-surface-container-high rounded-full h-3 overflow-hidden">
+<div class="bg-outline h-full" th:style="'width:' + (${notesMentions[3]} * 100 / ${totalNotes}) + '%'"></div>
+</div>
+<span class="w-10 text-right font-label-sm text-label-sm" th:text="${notesMentions[3]}">0</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="w-32 font-label-sm text-label-sm text-on-surface-variant">Insuffisant (&lt;10)</span>
+<div class="flex-1 bg-surface-container-high rounded-full h-3 overflow-hidden">
+<div class="bg-error h-full" th:style="'width:' + (${notesMentions[4]} * 100 / ${totalNotes}) + '%'"></div>
+</div>
+<span class="w-10 text-right font-label-sm text-label-sm" th:text="${notesMentions[4]}">0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Micro-interactions -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tiles = document.querySelectorAll('.bg-surface-container-lowest');
+            tiles.forEach(tile => {
+                tile.addEventListener('mouseenter', () => {
+                    tile.style.transform = 'translateY(-2px)';
+                    tile.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+                    tile.style.transition = 'all 0.2s ease-in-out';
+                });
+                tile.addEventListener('mouseleave', () => {
+                    tile.style.transform = 'translateY(0)';
+                    tile.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body></html>

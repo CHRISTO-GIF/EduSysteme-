@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Impression des Bulletins - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { vertical-align: middle; }
+        .bulletin-page { page-break-after: always; }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body class="bg-gray-100">
+<div class="no-print bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+<form class="flex items-end gap-3" method="get">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Classe</label>
+<select class="p-2 border border-gray-300 rounded-lg" name="classeId" onchange="this.form.submit()">
+<option value="">Toutes les classes</option>
+<option th:each="c : ${classes}" th:selected="${classeId != null and classeId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Trimestre</label>
+<select class="p-2 border border-gray-300 rounded-lg" name="trimestre" onchange="this.form.submit()">
+<option th:each="t : ${trimestres}" th:selected="${trimestre == t}" th:text="'Trimestre ' + ${t}" th:value="${t}"></option>
+</select>
+</div>
+</form>
+<button class="px-lg py-2 bg-blue-900 text-white rounded-lg font-bold flex items-center gap-xs" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer tout
+</button>
+</div>
+
+<div class="max-w-3xl mx-auto py-lg">
+<div th:if="${bulletins.isEmpty()}" class="bg-white rounded-xl p-xl text-center text-gray-500">Aucun eleve trouve pour cette selection.</div>
+
+<div class="bulletin-page bg-white border border-gray-200 rounded-xl p-xl mb-lg" th:each="b : ${bulletins}">
+<div class="flex justify-between items-start mb-lg border-b border-gray-200 pb-lg">
+<div>
+<h1 class="text-lg font-bold text-blue-900" th:text="${nomEtab}">Etablissement</h1>
+<p class="text-sm text-gray-500" th:text="'Bulletin - Trimestre ' + ${trimestre}">Bulletin</p>
+</div>
+<div class="text-right">
+<p class="font-bold" th:text="${b.eleve.prenom} + ' ' + ${b.eleve.nom}">Eleve</p>
+<p class="text-xs text-gray-500" th:text="${classeNom} + ' — Rang ' + ${b.rang} + '/' + ${b.effectif}">Classe</p>
+</div>
+</div>
+
+<table class="w-full text-sm mb-lg">
+<thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+<tr><th class="p-2 text-left">Matiere</th><th class="p-2 text-left">Type</th><th class="p-2 text-right">Note</th><th class="p-2 text-right">Coef.</th></tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr th:each="n : ${b.notes}">
+<td class="p-2" th:text="${n.matiere != null ? n.matiere.nom : '?'}">Matiere</td>
+<td class="p-2 text-gray-500" th:text="${n.type}">Type</td>
+<td class="p-2 text-right font-medium" th:text="${n.valeur} + '/20'">--</td>
+<td class="p-2 text-right text-gray-500" th:text="${n.coefficient}">--</td>
+</tr>
+</tbody>
+</table>
+
+<div class="flex justify-between items-center bg-gray-50 rounded-lg p-4 mb-md">
+<span class="font-bold">Moyenne generale</span>
+<span class="font-bold text-xl text-blue-900" th:text="${b.moyenne} + '/20'">0/20</span>
+</div>
+<p class="text-sm mb-xs"><span class="font-bold">Mention :</span> <span th:text="${b.mention}">Mention</span></p>
+<p class="text-sm text-gray-600" th:text="${b.appreciation}">Appreciation</p>
+</div>
+</div>
+</body>
+</html>

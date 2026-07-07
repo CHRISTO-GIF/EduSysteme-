@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Tableau de bord Enseignant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .zebra-table tr:nth-child(even) { background-color: #f8fafc; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#00236f", "primary-container": "#1e3a8a", "on-primary": "#ffffff",
+                      "on-primary-container": "#90a8ff", "primary-fixed": "#dce1ff", "primary-fixed-dim": "#b6c4ff",
+                      "on-primary-fixed-variant": "#264191", "secondary": "#505f76", "secondary-container": "#d0e1fb",
+                      "tertiary": "#222a3e", "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5",
+                      "tertiary-fixed": "#dae2fd", "on-tertiary-fixed-variant": "#3f465c",
+                      "error": "#ba1a1a", "error-container": "#ffdad6", "on-error-container": "#93000a",
+                      "surface": "#f7f9fb", "background": "#f7f9fb", "on-background": "#191c1e",
+                      "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                      "surface-container-lowest": "#ffffff", "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "surface-container-highest": "#e0e3e5",
+                      "outline": "#757682", "outline-variant": "#c5c5d3", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "sm": "8px", "md": "16px", "lg": "24px", "xl": "32px", "gutter": "24px", "sidebar-width": "260px", "container-max": "1440px", "base": "4px"},
+              "fontFamily": {"headline-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"]},
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-white leading-tight">EduSystem Pro</span>
+<span class="text-[10px] uppercase tracking-wider text-on-tertiary-container opacity-70">Portail Enseignant</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-sm space-y-1">
+<a class="flex items-center gap-md px-md py-sm rounded-lg border-l-4 border-primary-fixed bg-tertiary-container text-white font-bold" href="/tableau-enseignant">
+<span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/tableau-enseignant/eleves">
+<span class="material-symbols-outlined">group</span><span class="font-label-md text-label-md">Eleves</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/surveillance">
+<span class="material-symbols-outlined">fact_check</span><span class="font-label-md text-label-md">Surveillance</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/notes/saisie">
+<span class="material-symbols-outlined">edit_note</span><span class="font-label-md text-label-md">Saisie des notes</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/examens">
+<span class="material-symbols-outlined">quiz</span><span class="font-label-md text-label-md">Examens</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/messagerie">
+<span class="material-symbols-outlined">forum</span><span class="font-label-md text-label-md">Messagerie</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_today</span><span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="/bulletins">
+<span class="material-symbols-outlined">description</span><span class="font-label-md text-label-md">Bulletins</span>
+</a>
+</nav>
+<div class="px-sm mt-auto space-y-1 pt-md border-t border-tertiary-container/50">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span><span class="font-label-md text-label-md">Deconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<header class="h-16 fixed top-0 right-0 left-[260px] bg-surface-container-lowest flex justify-between items-center px-lg border-b border-outline-variant z-40">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Tableau de bord</h2>
+<div class="flex items-center gap-sm">
+<span class="font-label-md text-label-md" th:if="${utilisateurConnecte != null}" th:text="'M. ' + ${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Enseignant</span>
+</div>
+</header>
+
+<main class="ml-sidebar-width pt-16 p-lg">
+<div class="max-w-container-max mx-auto">
+
+<div class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-on-surface" th:text="${utilisateurConnecte != null} ? 'Bonjour, ' + ${utilisateurConnecte.prenom} : 'Bonjour'">Bonjour</h1>
+<p class="text-on-surface-variant font-body-lg mt-xs">Voici un apercu de vos classes et matieres pour l'annee en cours.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="flex items-center justify-between mb-md">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Mes Classes</span>
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-primary" th:text="${totalClasses}">0</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="flex items-center justify-between mb-md">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Mes Matieres</span>
+<span class="material-symbols-outlined text-primary">menu_book</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-primary" th:text="${totalMatieres}">0</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="flex items-center justify-between mb-md">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Total Eleves</span>
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-primary" th:text="${totalEleves}">0</div>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden mb-xl">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Mes Classes &amp; Matieres</h3>
+</div>
+<div th:if="${!hasAutorisations}" class="p-xl text-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[40px] text-outline mb-sm">info</span>
+<p>Aucune autorisation d'enseignement ne vous a encore ete attribuee. Contactez l'administration.</p>
+</div>
+<table class="w-full text-left zebra-table" th:if="${hasAutorisations}">
+<thead class="bg-surface-container text-on-surface-variant font-label-sm uppercase">
+<tr>
+<th class="px-lg py-3">Classe</th>
+<th class="px-lg py-3">Niveau</th>
+<th class="px-lg py-3">Matiere</th>
+<th class="px-lg py-3 text-right">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="auth : ${autorisations}">
+<td class="px-lg py-3 font-label-md" th:text="${classeMap.get(auth.classeId) != null ? classeMap.get(auth.classeId).nom : '?'}">Classe</td>
+<td class="px-lg py-3 text-on-surface-variant" th:text="${classeMap.get(auth.classeId) != null ? classeMap.get(auth.classeId).niveau : '?'}">Niveau</td>
+<td class="px-lg py-3" th:text="${matiereMap.get(auth.matiereId) != null ? matiereMap.get(auth.matiereId).nom : '?'}">Matiere</td>
+<td class="px-lg py-3 text-right">
+<a class="text-primary font-label-md hover:underline" th:href="@{/notes/saisie(classeId=${auth.classeId},matiereId=${auth.matiereId})}">Saisir les notes</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col items-center gap-sm hover:border-primary transition-colors" href="/tableau-enseignant/eleves">
+<span class="material-symbols-outlined text-primary text-[28px]">group</span>
+<span class="font-label-md text-label-md text-center">Mes Eleves</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col items-center gap-sm hover:border-primary transition-colors" href="/examens">
+<span class="material-symbols-outlined text-primary text-[28px]">quiz</span>
+<span class="font-label-md text-label-md text-center">Examens</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col items-center gap-sm hover:border-primary transition-colors" href="/messagerie">
+<span class="material-symbols-outlined text-primary text-[28px]">forum</span>
+<span class="font-label-md text-label-md text-center">Messagerie</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col items-center gap-sm hover:border-primary transition-colors" href="/emploi-du-temps">
+<span class="material-symbols-outlined text-primary text-[28px]">calendar_today</span>
+<span class="font-label-md text-label-md text-center">Emploi du temps</span>
+</a>
+</div>
+
+</div>
+</main>
+</body>
+</html>

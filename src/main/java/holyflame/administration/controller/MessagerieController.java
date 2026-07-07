@@ -1,0 +1,156 @@
+package holyflame.administration.controller;
+
+import holyflame.administration.model.Eleve;
+import holyflame.administration.model.EnseignantAutorisation;
+import holyflame.administration.model.Matiere;
+import holyflame.administration.model.MessagePrive;
+import holyflame.administration.model.SignalementMessagerie;
+import holyflame.administration.model.Utilisateur;
+import holyflame.administration.repository.EleveRepository;
+import holyflame.administration.repository.EnseignantAutorisationRepository;
+import holyflame.administration.repository.MatiereRepository;
+import holyflame.administration.repository.SignalementMessagerieRepository;
+import holyflame.administration.repository.UtilisateurRepository;
+import holyflame.administration.service.EtablissementService;
+import holyflame.administration.service.MessagerieService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/portail-parent/messages")
+public class MessagerieController {
+
+    @Autowired private EleveRepository eleveRepository;
+    @Autowired private EnseignantAutorisationRepository enseignantAutorisationRepository;
+    @Autowired private MatiereRepository matiereRepository;
+    @Autowired private UtilisateurRepository utilisateurRepository;
+    @Autowired private EtablissementService etablissementService;
+    @Autowired private MessagerieService messagerieService;
+    @Autowired private SignalementMessagerieRepository signalementMessagerieRepository;
+
+    @GetMapping
+    public String index(@RequestParam(required = false) String avec, Authentication auth, Model model) {
+        String email = auth != null ? auth.getName() : "";
+        List<Eleve> enfants = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email);
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (etabId == null && !enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
+
+        // Contacts reels : enseignants des classes de mes enfants + Administration de l'etablissement
+        Map<String, Map<String, Object>> contactsParEmail = new LinkedHashMap<>();
+
+        if (etabId != null) {
+            List<Long> classeIds = enfants.stream()
+                .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).distinct().toList();
+
+            List<EnseignantAutorisation> autorisations = enseignantAutorisationRepository.findByEtablissementId(etabId).stream()
+                .filter(a -> classeIds.contains(a.getClasseId())).toList();
+
+            for (EnseignantAutorisation autorisation : autorisations) {
+                Utilisateur enseignant = utilisateurRepository.findById(autorisation.getEnseignantId()).orElse(null);
+                if (enseignant == null || enseignant.getEmail() == null) continue;
+                Matiere matiere = matiereRepository.findById(autorisation.getMatiereId()).orElse(null);
+                Map<String, Object> contact = contactsParEmail.computeIfAbsent(enseignant.getEmail(), k -> messagerieService.creerContact(
+                    enseignant.getEmail(),
+                    (enseignant.getPrenom() != null ? enseignant.getPrenom() + " " : "") + (enseignant.getNom() != null ? enseignant.getNom() : enseignant.getEmail()),
+                    "Enseignant"));
+                if (matiere != null) {
+                    @SuppressWarnings("unchecked")
+                    List<String> matieres = (List<String>) contact.get("matieres");
+                    if (!matieres.contains(matiere.getNom())) matieres.add(matiere.getNom());
+                }
+            }
+
+            for (Utilisateur admin : utilisateurRepository.findByEtablissementId(etabId)) {
+                if (("ADMIN".equals(admin.getRole()) || "SECRETAIRE".equals(admin.getRole())) && admin.getEmail() != null
+                        && !contactsParEmail.containsKey(admin.getEmail())) {
+                    contactsParEmail.put(admin.getEmail(), messagerieService.creerContact(admin.getEmail(), "Administration", "Secretariat"));
+                    break;
+                }
+            }
+        }
+
+        List<Map<String, Object>> conversations = messagerieService.construireConversations(email, contactsParEmail);
+
+        String correspondantActif = avec;
+        if (correspondantActif == null && !conversations.isEmpty()) {
+            correspondantActif = (String) conversations.get(0).get("email");
+        }
+
+        List<MessagePrive> fil = new java.util.ArrayList<>();
+        Map<String, Object> contactActif = null;
+        List<Utilisateur> membresGroupe = List.of();
+        if (correspondantActif != null) {
+            fil = messagerieService.chargerFilEtMarquerLu(email, correspondantActif);
+            contactActif = contactsParEmail.get(correspondantActif);
+            if (contactActif == null) {
+                final String ca = correspondantActif;
+                contactActif = conversations.stream()
+                    .filter(c -> ca.equalsIgnoreCase((String) c.get("email"))).findFirst().orElse(null);
+            }
+            if (contactActif != null && "Secretariat".equals(contactActif.get("role")) && etabId != null) {
+                membresGroupe = utilisateurRepository.findByEtablissementId(etabId).stream()
+                    .filter(u -> "ADMIN".equals(u.getRole()) || "SECRETAIRE".equals(u.getRole()))
+                    .toList();
+            }
+        }
+
+        long totalNonLus = conversations.stream().mapToLong(c -> (Long) c.get("nonLus")).sum();
+
+        model.addAttribute("conversations", conversations);
+        model.addAttribute("correspondantActif", correspondantActif);
+        model.addAttribute("contactActif", contactActif);
+        model.addAttribute("fil", fil);
+        model.addAttribute("filAvecSeparateurs", messagerieService.avecSeparateursDate(fil));
+        model.addAttribute("mediasPartages", messagerieService.mediasPartages(fil));
+        model.addAttribute("membresGroupe", membresGroupe);
+        model.addAttribute("totalNonLus", totalNonLus);
+        model.addAttribute("emailParent", email);
+        return "portail-parent-messagerie";
+    }
+
+    @PostMapping("/envoyer")
+    public String envoyer(@RequestParam String destinataire, @RequestParam(required = false) String contenu,
+                           @RequestParam(required = false) MultipartFile pieceJointe,
+                           Authentication auth, RedirectAttributes ra) throws IOException {
+        String email = auth != null ? auth.getName() : "";
+        messagerieService.envoyerMessage(email, destinataire, contenu, pieceJointe);
+        return "redirect:/portail-parent/messages?avec=" + destinataire;
+    }
+
+    @PostMapping("/signaler")
+    public String signaler(@RequestParam String concernant, @RequestParam String motif,
+                            @RequestParam(required = false) String description,
+                            Authentication auth, RedirectAttributes ra) {
+        String email = auth != null ? auth.getName() : "";
+        SignalementMessagerie s = new SignalementMessagerie();
+        s.setSignalePar(email);
+        s.setConcernant(concernant);
+        s.setMotif(motif);
+        s.setDescription(description);
+        s.setDateSignalement(LocalDateTime.now());
+        s.setStatut("OUVERT");
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (etabId == null) {
+            List<Eleve> enfants = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email);
+            if (!enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
+        }
+        s.setEtablissementId(etabId);
+        signalementMessagerieRepository.save(s);
+        ra.addFlashAttribute("successMsg", "Votre signalement a ete transmis a l'administration.");
+        return "redirect:/portail-parent/messages?avec=" + concernant;
+    }
+}

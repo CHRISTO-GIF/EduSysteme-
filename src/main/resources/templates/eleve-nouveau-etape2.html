@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Inscription Eleve - Etape 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#0b1c30", "secondary": "#505f76", "on-error": "#ffffff",
+                        "surface-tint": "#4059aa", "on-surface-variant": "#444651", "surface": "#f7f9fb",
+                        "on-primary-fixed-variant": "#264191", "outline-variant": "#c5c5d3", "primary-container": "#1e3a8a",
+                        "on-surface": "#191c1e", "inverse-on-surface": "#eff1f3", "error-container": "#ffdad6",
+                        "inverse-primary": "#b6c4ff", "tertiary-fixed-dim": "#bec6e0", "surface-bright": "#f7f9fb",
+                        "secondary-fixed": "#d3e4fe", "on-secondary": "#ffffff", "on-primary-fixed": "#00164e",
+                        "surface-container": "#eceef0", "on-tertiary-fixed-variant": "#3f465c", "surface-variant": "#e0e3e5",
+                        "surface-dim": "#d8dadc", "surface-container-high": "#e6e8ea", "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a", "tertiary": "#222a3e", "surface-container-low": "#f2f4f6",
+                        "on-primary-container": "#90a8ff", "inverse-surface": "#2d3133", "primary-fixed-dim": "#b6c4ff",
+                        "outline": "#757682", "on-primary": "#ffffff", "secondary-fixed-dim": "#b7c8e1",
+                        "on-secondary-fixed-variant": "#38485d", "primary": "#00236f", "on-error-container": "#93000a",
+                        "primary-fixed": "#dce1ff", "tertiary-fixed": "#dae2fd", "on-tertiary": "#ffffff",
+                        "tertiary-container": "#384055", "surface-container-highest": "#e0e3e5", "background": "#f7f9fb",
+                        "secondary-container": "#d0e1fb", "on-secondary-container": "#54647a", "on-tertiary-fixed": "#131b2e",
+                        "on-tertiary-container": "#a4acc5", "on-background": "#191c1e"
+                    },
+                    "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                    "spacing": {"base": "4px", "xl": "32px", "sidebar-width": "260px", "gutter": "24px", "container-max": "1440px", "xs": "4px", "md": "16px", "sm": "8px", "lg": "24px"},
+                    "fontFamily": {"headline-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"]},
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #f7f9fb; font-family: 'Inter', sans-serif; }
+        .step-active { position: relative; }
+        .step-active::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background-color: #00236f; border-radius: 0 4px 4px 0; }
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col">
+<div th:replace="~{fragments/eleve-wizard-sidebar :: topbar}"></div>
+<main class="flex flex-1 overflow-hidden">
+<div th:replace="~{fragments/eleve-wizard-sidebar :: sidebar(2)}"></div>
+<section class="flex-1 overflow-y-auto p-lg md:p-xl flex justify-center">
+<div class="w-full max-w-5xl">
+<div class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Coordonnees des Parents</h1>
+<p class="font-body-lg text-body-lg text-secondary">Veuillez renseigner les informations de contact pour le suivi academique et administratif.</p>
+</div>
+
+<form class="space-y-gutter" method="post" th:action="@{/secretariat/eleves/nouveau/etape-2}">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+
+<!-- Pere -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm space-y-md">
+<div class="flex items-center gap-sm border-b border-outline-variant pb-sm mb-md">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Informations du Pere</h3>
+</div>
+<div class="space-y-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Nom Complet</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="pereNom" placeholder="Ex: Jean Dupont" th:value="${donnees.pereNom}" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Telephone</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="pereTelephone" placeholder="+225 07 00 00 00 00" th:value="${donnees.pereTelephone}" type="tel"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Profession</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="pereProfession" placeholder="Ex: Ingenieur" th:value="${donnees.pereProfession}" type="text"/>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Email</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="pereEmail" placeholder="jean.dupont@email.com" th:value="${donnees.pereEmail}" type="email"/>
+</div>
+</div>
+<div class="pt-md border-t border-outline-variant space-y-sm">
+<label class="block font-label-md text-label-md text-on-surface-variant">Code d'acces Portail Parent</label>
+<div class="flex flex-col gap-sm">
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" id="code-pere" name="pereCodeAcces" placeholder="Code d'acces" th:value="${donnees.pereCodeAcces}" type="text"/>
+<div class="flex gap-sm">
+<button class="flex-1 py-sm px-md bg-primary text-on-primary font-label-sm text-label-sm rounded-lg hover:opacity-90 transition-opacity" onclick="genererCode('code-pere')" type="button">Generer automatiquement</button>
+<button class="flex-1 py-sm px-md border border-outline text-secondary font-label-sm text-label-sm rounded-lg hover:bg-surface-container transition-colors" onclick="attribuerManuel('code-pere')" type="button">Attribuer manuellement</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Mere -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm space-y-md">
+<div class="flex items-center gap-sm border-b border-outline-variant pb-sm mb-md">
+<span class="material-symbols-outlined text-primary">person_3</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Informations de la Mere</h3>
+</div>
+<div class="space-y-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Nom Complet</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="mereNom" placeholder="Ex: Marie Dupont" th:value="${donnees.mereNom}" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Telephone</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="mereTelephone" placeholder="+225 07 00 00 00 01" th:value="${donnees.mereTelephone}" type="tel"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Profession</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="mereProfession" placeholder="Ex: Medecin" th:value="${donnees.mereProfession}" type="text"/>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Email</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="mereEmail" placeholder="marie.dupont@email.com" th:value="${donnees.mereEmail}" type="email"/>
+</div>
+</div>
+<div class="pt-md border-t border-outline-variant space-y-sm">
+<label class="block font-label-md text-label-md text-on-surface-variant">Code d'acces Portail Parent</label>
+<div class="flex flex-col gap-sm">
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" id="code-mere" name="mereCodeAcces" placeholder="Code d'acces" th:value="${donnees.mereCodeAcces}" type="text"/>
+<div class="flex gap-sm">
+<button class="flex-1 py-sm px-md bg-primary text-on-primary font-label-sm text-label-sm rounded-lg hover:opacity-90 transition-opacity" onclick="genererCode('code-mere')" type="button">Generer automatiquement</button>
+<button class="flex-1 py-sm px-md border border-outline text-secondary font-label-sm text-label-sm rounded-lg hover:bg-surface-container transition-colors" onclick="attribuerManuel('code-mere')" type="button">Attribuer manuellement</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<p class="font-body-md text-body-md text-on-surface-variant -mt-sm">
+Le code d'acces permet a chaque parent de creer son propre compte sur le Portail Parent
+(page <a class="text-primary underline" th:href="@{/inscription-parent}">/inscription-parent</a>), independamment de l'autre parent.
+Laissez le champ vide si ce parent n'a pas besoin d'un acces separe.
+</p>
+
+<!-- Contact d'urgence -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm border-l-4 border-error">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-error">warning</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Contact d'Urgence Prioritaire</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Nom de la personne</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-error focus:ring-1 focus:ring-error outline-none transition-all font-body-md" name="contactUrgenceNom" placeholder="Nom et Prenom" th:value="${donnees.contactUrgenceNom}" type="text"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Relation</label>
+<select class="w-full px-md py-sm rounded-lg border border-outline focus:border-error focus:ring-1 focus:ring-error outline-none transition-all font-body-md bg-white" name="urgenceRelation">
+<option th:selected="${donnees.urgenceRelation == 'PERE'}" value="PERE">Pere</option>
+<option th:selected="${donnees.urgenceRelation == 'MERE'}" value="MERE">Mere</option>
+<option th:selected="${donnees.urgenceRelation == 'GRAND_PARENT'}" value="GRAND_PARENT">Grand-parent</option>
+<option th:selected="${donnees.urgenceRelation == 'AUTRE'}" value="AUTRE">Autre tuteur</option>
+</select>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Numero d'urgence 24h/24</label>
+<input class="w-full px-md py-sm rounded-lg border border-outline focus:border-error focus:ring-1 focus:ring-error outline-none transition-all font-body-md" name="contactUrgenceTelephone" placeholder="+225..." th:value="${donnees.contactUrgenceTelephone}" type="tel"/>
+</div>
+</div>
+</div>
+
+<div class="pt-xl flex flex-col sm:flex-row items-center justify-between gap-md border-t border-outline-variant">
+<a class="w-full sm:w-auto px-xl h-12 flex items-center justify-center gap-sm font-label-md text-label-md text-secondary border border-outline-variant rounded-lg hover:bg-surface-container transition-all active:scale-95" th:href="@{/secretariat/eleves/nouveau/etape-1}">
+<span class="material-symbols-outlined">arrow_back</span> Precedent
+</a>
+<button class="w-full sm:w-auto px-xl h-12 flex items-center justify-center gap-sm font-label-md text-label-md text-white bg-primary rounded-lg shadow-sm hover:opacity-90 transition-all active:scale-95" type="submit">
+Suivant <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</section>
+</main>
+<script>
+    function genererCode(inputId) {
+        var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        var code = '';
+        for (var i = 0; i < 8; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
+        document.getElementById(inputId).value = code;
+    }
+    function attribuerManuel(inputId) {
+        var input = document.getElementById(inputId);
+        input.value = '';
+        input.focus();
+    }
+</script>
+</body>
+</html>

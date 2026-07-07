@@ -1,0 +1,284 @@
+<!DOCTYPE html><html class="light" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EduSystem Pro | Inscription</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "error-container": "#ffdad6",
+                        "on-background": "#191c1e",
+                        "primary-fixed": "#dce1ff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#4059aa",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "outline-variant": "#c5c5d3",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "surface-container-high": "#e6e8ea",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#dae2fd",
+                        "surface": "#f7f9fb",
+                        "secondary": "#505f76",
+                        "primary": "#00236f",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "outline": "#757682",
+                        "on-secondary-fixed": "#0b1c30",
+                        "tertiary-container": "#384055",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-tertiary-fixed": "#131b2e",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary": "#222a3e",
+                        "inverse-primary": "#b6c4ff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-primary-fixed": "#00164e",
+                        "on-secondary-container": "#54647a",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-tertiary-container": "#a4acc5",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#90a8ff",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444651",
+                        "surface-container": "#eceef0",
+                        "on-surface": "#191c1e",
+                        "surface-container-low": "#f2f4f6",
+                        "primary-container": "#1e3a8a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "260px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "code": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- En-tete -->
+<header class="sticky top-0 w-full z-50 flex justify-between items-center px-md py-xs bg-surface shadow-sm dark:bg-surface-dim">
+<div class="flex items-center gap-sm">
+<span class="font-headline-sm text-headline-sm font-semibold text-primary dark:text-primary-fixed-dim">EduSystem Pro | Inscription</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-xs text-on-surface-variant hover:bg-surface-variant dark:hover:bg-on-surface-variant p-xs rounded transition-colors cursor-default">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-label-md text-label-md">Assistance</span>
+</button>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center py-xl px-md">
+<div class="w-full max-w-[800px]">
+<!-- Indicateur d'etapes -->
+<div class="flex items-center justify-between mb-xl px-lg">
+<div class="flex flex-col items-center gap-xs relative flex-1">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-md z-10 shadow-sm">1</div>
+<span class="font-label-sm text-label-sm text-primary font-bold">Informations generales</span>
+<div class="absolute top-5 left-1/2 w-full h-[2px] bg-outline-variant"></div>
+</div>
+<div class="flex flex-col items-center gap-xs relative flex-1">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-label-md z-10">2</div>
+<span class="font-label-sm text-label-sm text-secondary">Structure academique</span>
+<div class="absolute top-5 left-1/2 w-full h-[2px] bg-outline-variant"></div>
+</div>
+<div class="flex flex-col items-center gap-xs relative flex-1">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-label-md z-10">3</div>
+<span class="font-label-sm text-label-sm text-secondary">Administrateurs</span>
+<div class="absolute top-5 left-1/2 w-full h-[2px] bg-outline-variant"></div>
+</div>
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-label-md z-10">4</div>
+<span class="font-label-sm text-label-sm text-secondary">Revision</span>
+</div>
+</div>
+<!-- Carte de l'assistant -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-xl shadow-sm">
+<div class="mb-xl">
+<h1 class="font-headline-md text-headline-md text-primary mb-xs">Profil de l'etablissement</h1>
+<p class="font-body-md text-body-md text-secondary">Renseignez les informations fondamentales de votre etablissement. Ces informations apparaitront sur les documents academiques officiels et les communications systeme.</p>
+</div>
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-[#ffdad6] text-[#93000a] font-body-md text-body-md" th:text="${erreur}"></div>
+<form class="space-y-xl" th:action="@{/inscription-ecole}" method="post">
+<!-- Identite -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="school-name">Nom de l'etablissement</label>
+<input class="w-full h-12 px-md border border-outline-variant rounded bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md" id="school-name" name="nom" required="required" th:value="${donnees != null ? donnees.nom : ''}" placeholder="ex. Lycee Saint-Augustin" type="text">
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Type d'etablissement</label>
+<div class="flex gap-sm">
+<label class="flex-1 flex items-center justify-center gap-sm p-md border border-outline-variant rounded cursor-pointer hover:bg-surface-container-low transition-colors group">
+<input class="w-4 h-4 text-primary border-outline-variant focus:ring-primary" name="categorie" type="radio" value="Public">
+<span class="font-body-md text-body-md text-on-surface">Public</span>
+</label>
+<label class="flex-1 flex items-center justify-center gap-sm p-md border border-outline-variant rounded cursor-pointer hover:bg-surface-container-low transition-colors group">
+<input class="w-4 h-4 text-primary border-outline-variant focus:ring-primary" name="categorie" type="radio" value="Prive">
+<span class="font-body-md text-body-md text-on-surface">Prive</span>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Niveaux d'enseignement</label>
+<div class="flex flex-wrap gap-xs">
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="Primaire">
+<span class="font-label-sm text-label-sm">Primaire</span>
+</label>
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="Secondaire">
+<span class="font-label-sm text-label-sm">Secondaire</span>
+</label>
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="Superieur">
+<span class="font-label-sm text-label-sm">Superieur</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Separateur -->
+<div class="h-px bg-outline-variant"></div>
+<!-- Localisation et contact -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="address">Adresse complete de l'etablissement</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-3 text-outline" data-icon="location_on">location_on</span>
+<input class="w-full h-12 pl-xl pr-md border border-outline-variant rounded bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md" id="address" name="adresse" placeholder="Rue, ville, region, code postal" type="text">
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant" for="email">Email de l'etablissement</label>
+<input class="w-full h-12 px-md border border-outline-variant rounded bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md" id="email" name="email" placeholder="admin@etablissement.com" type="email">
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant" for="phone">Numero de telephone</label>
+<input class="w-full h-12 px-md border border-outline-variant rounded bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md" id="phone" name="telephone" placeholder="+33 1 23 45 67 89" type="tel">
+</div>
+</div>
+<!-- Actions -->
+<div class="flex justify-between items-center pt-xl">
+<button class="px-xl py-md font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant rounded transition-all border border-transparent" type="button" onclick="window.location.href='/'">
+                            Annuler la configuration
+                        </button>
+<div class="flex gap-md">
+<button class="px-xl py-md bg-primary text-on-primary font-label-md text-label-md rounded shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-sm" type="submit">
+                                Enregistrer et continuer
+                                <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</form>
+</div>
+<!-- Aide contextuelle -->
+<div class="mt-xl grid grid-cols-1 md:grid-cols-3 gap-lg opacity-80">
+<div class="flex gap-md items-start">
+<div class="p-sm bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-headline-sm" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-primary">Securite des donnees</p>
+<p class="font-label-sm text-label-sm text-secondary">Les informations sont chiffrees et stockees conformement aux normes academiques.</p>
+</div>
+</div>
+<div class="flex gap-md items-start">
+<div class="p-sm bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-headline-sm" data-icon="history">history</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-primary">Sauvegarde automatique active</p>
+<p class="font-label-sm text-label-sm text-secondary">La progression est enregistree automatiquement au fur et a mesure que vous completez chaque champ.</p>
+</div>
+</div>
+<div class="flex gap-md items-start">
+<div class="p-sm bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-headline-sm" data-icon="lightbulb">lightbulb</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-primary">Besoin d'aide ?</p>
+<p class="font-label-sm text-label-sm text-secondary">Survolez n'importe quel libelle pour afficher des infobulles detaillees et des guides de saisie.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Pied de page -->
+<footer class="w-full py-xl px-lg flex flex-col md:flex-row justify-between items-center gap-md bg-tertiary dark:bg-tertiary-container text-on-tertiary dark:text-on-tertiary-container">
+<div class="flex flex-col gap-xs">
+<span class="font-headline-sm text-headline-sm text-on-tertiary">EduSystem Pro</span>
+<p class="font-label-sm text-label-sm text-on-tertiary-container">© 2026 EduSystem Pro. Gestion academique agreee.</p>
+</div>
+<div class="flex flex-wrap gap-md">
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Politique de confidentialite</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Conditions d'utilisation</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Securite institutionnelle</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-white transition-colors" href="#">Contact</a>
+</div>
+</footer>
+<script>
+        // Micro-interaction au focus des champs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('scale-[1.01]');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('scale-[1.01]');
+            });
+        });
+    </script>
+</body></html>

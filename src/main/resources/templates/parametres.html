@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parametres | EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .settings-card { transition: all 0.2s ease-in-out; }
+    .settings-card:hover { border-color: #757682; }
+    input:focus, select:focus { outline: none; border-color: #00236f; box-shadow: 0 0 0 2px rgba(0, 35, 111, 0.1); }
+</style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#f7f9fb", "background": "#f7f9fb", "on-primary": "#ffffff",
+            "error": "#ba1a1a", "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5",
+            "error-container": "#ffdad6", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+            "outline": "#757682", "primary-fixed-dim": "#b6c4ff", "surface-container-lowest": "#ffffff",
+            "outline-variant": "#c5c5d3", "primary": "#00236f", "secondary-fixed-dim": "#b7c8e1",
+            "on-error": "#ffffff", "on-error-container": "#93000a", "on-secondary-container": "#54647a",
+            "surface-container": "#eceef0", "on-background": "#191c1e", "on-primary-container": "#90a8ff",
+            "on-surface-variant": "#444651", "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a",
+            "surface-container-high": "#e6e8ea", "tertiary": "#222a3e", "surface": "#f7f9fb",
+            "secondary": "#505f76", "secondary-fixed": "#d3e4fe", "surface-container-low": "#f2f4f6",
+            "surface-dim": "#d8dadc", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},
+          "fontFamily": {"headline-md": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "code": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"]},
+          "fontSize": {
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+</script>
+</head>
+<body class="bg-background text-on-background antialiased">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-headline-sm">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
+<p class="text-on-tertiary-container text-[10px] tracking-widest uppercase mt-1">Portail Admin</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-sm">
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span> Tableau de bord
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/secretariat">
+<span class="material-symbols-outlined">group</span> Eleves
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/personnel">
+<span class="material-symbols-outlined">school</span> Personnel
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_month</span> Emploi du temps
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/notes/saisie">
+<span class="material-symbols-outlined">grading</span> Notes
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/examens">
+<span class="material-symbols-outlined">quiz</span> Examens
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/messagerie">
+<span class="material-symbols-outlined">forum</span> Messagerie
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/parametres/signalements">
+<span class="material-symbols-outlined">flag</span> Signalements
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/finances">
+<span class="material-symbols-outlined">account_balance</span> Tresorerie
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/journal">
+<span class="material-symbols-outlined">assessment</span> Rapports
+</a>
+</nav>
+<div class="mt-auto border-t border-tertiary-container/30 pt-md px-sm">
+<a class="px-md py-sm flex items-center gap-md text-white border-l-4 border-primary-fixed bg-tertiary-container font-bold font-label-md text-label-md rounded-lg" href="/parametres">
+<span class="material-symbols-outlined">settings</span> Parametres
+</a>
+<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span> Deconnexion
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<!-- Barre superieure -->
+<header class="h-16 fixed top-0 right-0 left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg w-full z-40">
+<div class="flex items-center gap-md w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 py-2 font-body-md text-body-md focus:ring-2 focus:ring-primary-container transition-all" placeholder="Rechercher un reglage..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tight">Administrateur</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'A'}">A</div>
+</div>
+</div>
+</header>
+
+<main class="ml-sidebar-width pt-16 min-h-screen">
+<div class="max-w-container-max mx-auto p-lg">
+
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Configuration Globale</h2>
+<p class="text-body-md text-on-surface-variant">Gerez les preferences de votre etablissement et les acces administratifs.</p>
+</div>
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<form id="form-general" method="post" th:action="@{/parametres/update}">
+<input name="_tab" type="hidden" value="etablissement"/>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+
+<!-- Colonne gauche -->
+<section class="lg:col-span-2 space-y-lg">
+
+<!-- Configuration Generale -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="flex items-center gap-md mb-xl">
+<div class="bg-primary-container/10 p-3 rounded-lg text-primary">
+<span class="material-symbols-outlined">school</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Configuration Generale</h4>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Nom de l'etablissement</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="nomEtablissement" th:value="${etablissement != null ? etablissement.nom : ''}" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Annee Academique</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="anneeScolaire" placeholder="Ex: 2025-2026" th:value="${etablissement != null ? etablissement.anneeScolaire : ''}" type="text"/>
+</div>
+<div class="md:col-span-2 space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Adresse Postale</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="adresse" th:value="${etablissement != null ? etablissement.adresse : ''}" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Langue de l'interface</label>
+<select class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="langueSysteme">
+<option th:selected="${etablissement != null and etablissement.langueSysteme == 'Francais'}" value="Francais">Francais (FR)</option>
+<option th:selected="${etablissement != null and etablissement.langueSysteme == 'English'}" value="English">English (UK)</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Fuseau Horaire</label>
+<select class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="fuseauHoraire">
+<option th:selected="${etablissement != null and etablissement.fuseauHoraire == '(GMT+00:00) Abidjan'}" value="(GMT+00:00) Abidjan">(GMT+00:00) Abidjan</option>
+<option th:selected="${etablissement != null and etablissement.fuseauHoraire == '(GMT+01:00) Paris'}" value="(GMT+01:00) Paris">(GMT+01:00) Paris</option>
+</select>
+</div>
+</div>
+</div>
+
+<!-- Profil Administrateur -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="flex items-center gap-md mb-xl">
+<div class="bg-secondary-container/20 p-3 rounded-lg text-secondary">
+<span class="material-symbols-outlined">manage_accounts</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Profil Administrateur</h4>
+</div>
+<div class="flex flex-col md:flex-row gap-xl items-start">
+<div class="w-24 h-24 rounded-full border-4 border-surface-container bg-primary-fixed flex items-center justify-center text-primary font-bold text-headline-md shrink-0"
+     th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'A'}">A</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-lg w-full">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Nom Complet</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="nomComplet" th:value="${utilisateurConnecte != null ? utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom : ''}" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Email Professionnel</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="email" th:value="${utilisateurConnecte != null ? utilisateurConnecte.email : ''}" type="email"/>
+</div>
+<div class="md:col-span-2 mt-md">
+<h5 class="font-label-md text-label-md mb-md">Preferences de notification</h5>
+<div class="space-y-md">
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-body-md text-on-surface-variant">Rapports hebdomadaires par email</span>
+<input class="w-10 h-5 rounded-full bg-surface-variant border-none checked:bg-primary appearance-none relative transition-colors before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5.5 before:transition-all" name="RAPPORTS_HEBDO" th:checked="${p.get('RAPPORTS_HEBDO') == 'true'}" type="checkbox" value="true"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-body-md text-on-surface-variant">Alertes de securite critiques</span>
+<input class="w-10 h-5 rounded-full bg-surface-variant border-none checked:bg-primary appearance-none relative transition-colors before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5.5 before:transition-all" name="ALERTES_SECURITE" th:checked="${p.get('ALERTES_SECURITE') == 'true'}" type="checkbox" value="true"/>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Colonne droite -->
+<aside class="space-y-lg">
+
+<!-- Apparence -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-xl uppercase tracking-widest">Apparence</h4>
+<div class="space-y-xl">
+<div>
+<p class="text-body-md mb-md">Theme visuel</p>
+<div class="grid grid-cols-2 gap-md">
+<label class="p-4 border-2 rounded-xl bg-white flex flex-col items-center gap-2 cursor-pointer" th:classappend="${p.get('THEME') == 'sombre' ? 'border-outline-variant' : 'border-primary'}">
+<input class="hidden" name="THEME" th:checked="${p.get('THEME') != 'sombre'}" type="radio" value="clair"/>
+<span class="material-symbols-outlined text-primary">light_mode</span>
+<span class="font-label-sm text-label-sm">Clair</span>
+</label>
+<label class="p-4 border rounded-xl bg-inverse-surface flex flex-col items-center gap-2 text-white cursor-pointer" th:classappend="${p.get('THEME') == 'sombre' ? 'border-primary border-2' : 'border-outline-variant'}">
+<input class="hidden" name="THEME" th:checked="${p.get('THEME') == 'sombre'}" type="radio" value="sombre"/>
+<span class="material-symbols-outlined">dark_mode</span>
+<span class="font-label-sm text-label-sm">Sombre</span>
+</label>
+</div>
+<p class="text-label-sm text-on-surface-variant mt-sm">Preference enregistree — l'application de ce theme sur toutes les pages arrive dans une prochaine mise a jour.</p>
+</div>
+<div>
+<p class="text-body-md mb-md">Couleur d'accentuation</p>
+<div class="flex gap-sm">
+<label th:each="couleur : ${couleursAccent}">
+<input class="hidden peer" name="couleurPrimaire" th:checked="${etablissement != null and etablissement.couleurPrimaire == couleur}" th:value="${couleur}" type="radio"/>
+<span class="h-8 w-8 rounded-full cursor-pointer inline-block ring-offset-2 peer-checked:ring-2 peer-checked:ring-primary hover:scale-110 transition-transform" th:style="'background-color:' + ${couleur}"></span>
+</label>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Securite -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-xl uppercase tracking-widest">Securite</h4>
+<div class="space-y-md">
+<details>
+<summary class="w-full text-left p-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors flex items-center justify-between cursor-pointer list-none">
+<span class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline">key</span>
+<span class="text-body-md">Changer le mot de passe</span>
+</span>
+<span class="material-symbols-outlined text-outline-variant">expand_more</span>
+</summary>
+<div class="p-md border border-t-0 border-outline-variant rounded-b-lg space-y-md">
+<div th:if="${erreurMdp}" class="p-sm rounded-lg bg-error-container text-on-error-container text-label-sm" th:text="${erreurMdp}"></div>
+<div th:if="${successMdp}" class="p-sm rounded-lg bg-success-container text-on-success-container text-label-sm" th:text="${successMdp}"></div>
+<form method="post" th:action="@{/parametres/mot-de-passe}" class="space-y-sm">
+<input class="w-full p-sm border border-outline-variant rounded-lg text-body-md" name="motDePasseActuel" placeholder="Mot de passe actuel" required="required" type="password"/>
+<input class="w-full p-sm border border-outline-variant rounded-lg text-body-md" name="nouveauMotDePasse" placeholder="Nouveau mot de passe" required="required" type="password"/>
+<input class="w-full p-sm border border-outline-variant rounded-lg text-body-md" name="confirmationMotDePasse" placeholder="Confirmer le nouveau mot de passe" required="required" type="password"/>
+<button class="w-full bg-primary text-on-primary py-sm rounded-lg font-label-md" type="submit">Mettre a jour le mot de passe</button>
+</form>
+</div>
+</details>
+<div class="w-full text-left p-md border border-outline-variant rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline">security</span>
+<span class="text-body-md">Authentification 2FA</span>
+</div>
+<span class="bg-surface-container text-on-surface-variant text-[10px] px-2 py-0.5 rounded-full">BIENTOT DISPONIBLE</span>
+</div>
+<a class="w-full text-left p-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors flex items-center justify-between group" th:href="@{/parametres/roles}">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">admin_panel_settings</span>
+<span class="text-body-md">Gerer les roles</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</a>
+</div>
+</div>
+
+<!-- Mise a jour systeme -->
+<div class="bg-tertiary-container text-on-tertiary-container rounded-xl p-xl shadow-lg relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">update</span>
+</div>
+<h4 class="font-label-md text-label-md mb-1 uppercase tracking-widest opacity-80">Mise a jour systeme</h4>
+<div class="flex items-baseline gap-2 mb-md">
+<span class="font-headline-md text-headline-md text-white">v1.0.0</span>
+<span class="text-label-sm text-green-400 font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-green-400"></span> A jour
+</span>
+</div>
+<p class="text-body-md mb-xl opacity-80">EduSystem Pro — instance HolyFlame.</p>
+</div>
+</aside>
+</div>
+
+<!-- Barre d'actions -->
+<div class="mt-xl flex items-center justify-end gap-md pt-lg border-t border-outline-variant">
+<a class="px-xl py-md text-on-surface-variant font-label-md hover:bg-surface-container-low rounded-lg transition-colors" th:href="@{/parametres}">Annuler les modifications</a>
+<button class="px-xl py-md bg-primary text-on-primary font-label-md rounded-lg shadow-md hover:bg-primary/90 transition-all flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-sm">save</span> Enregistrer les modifications
+</button>
+</div>
+</form>
+
+</div>
+</main>
+</body>
+</html>

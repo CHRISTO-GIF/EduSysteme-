@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Journal d'activite - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff", "surface": "#f7f9fb",
+                    "on-tertiary-container": "#a4acc5", "on-primary": "#ffffff", "outline-variant": "#c5c5d3",
+                    "surface-bright": "#f7f9fb", "secondary-container": "#d0e1fb", "on-secondary-container": "#54647a",
+                    "secondary": "#505f76", "outline": "#757682", "error": "#ba1a1a",
+                    "surface-container-low": "#f2f4f6", "on-error": "#ffffff",
+                    "primary": "#00236f", "on-surface-variant": "#444651", "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#384055", "on-background": "#191c1e",
+                    "tertiary": "#222a3e", "on-secondary-container": "#54647a",
+                    "on-primary-container": "#90a8ff", "surface-container-highest": "#e0e3e5",
+                    "on-secondary": "#ffffff", "on-error-container": "#93000a", "background": "#f7f9fb",
+                    "primary-container": "#1e3a8a", "surface-container": "#eceef0",
+                    "on-surface": "#191c1e", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"gutter": "24px", "base": "4px", "container-max": "1440px", "xl": "32px", "lg": "24px", "md": "16px", "sidebar-width": "260px", "sm": "8px", "xs": "4px"},
+            "fontFamily": {"headline-md": ["Inter"], "headline-sm": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active { border-left: 4px solid #4059aa; background-color: rgba(56, 64, 85, 0.3); color: #dce1ff; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-surface-bright">EduSystem Pro</h1>
+<p class="text-label-sm text-on-tertiary-container">Administration</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/dashboard">
+<span class="material-symbols-outlined mr-3">dashboard</span> Tableau de bord
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/secretariat">
+<span class="material-symbols-outlined mr-3">group</span> Eleves
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/finances">
+<span class="material-symbols-outlined mr-3">account_balance</span> Tresorerie
+</a>
+<a class="flex items-center px-lg py-3 sidebar-active font-label-md text-label-md" href="/journal">
+<span class="material-symbols-outlined mr-3">assessment</span> Rapports
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/parametres">
+<span class="material-symbols-outlined mr-3">settings</span> Parametres
+</a>
+</nav>
+</aside>
+
+<main class="ml-sidebar-width p-xl">
+<div class="max-w-container-max mx-auto">
+
+<div class="mb-xl">
+<h2 class="font-headline-md text-headline-md text-on-surface">Journal d'activite</h2>
+<p class="text-on-surface-variant">Historique des actions realisees dans l'application.</p>
+</div>
+
+<div class="flex gap-sm mb-lg flex-wrap">
+<a class="px-md py-sm rounded-lg border border-outline-variant text-label-sm font-label-sm"
+   th:classappend="${module == null or module.isEmpty()} ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest'"
+   href="/journal">Tous</a>
+<a class="px-md py-sm rounded-lg border border-outline-variant text-label-sm font-label-sm"
+   th:classappend="${module == m} ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest'"
+   th:each="m : ${modules}" th:href="@{/journal(module=${m})}" th:text="${m}">Module</a>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container text-on-surface-variant font-label-sm uppercase">
+<tr>
+<th class="px-lg py-3 whitespace-nowrap">Date</th>
+<th class="px-lg py-3 whitespace-nowrap">Utilisateur</th>
+<th class="px-lg py-3 whitespace-nowrap">Module</th>
+<th class="px-lg py-3 whitespace-nowrap">Action</th>
+<th class="px-lg py-3">Detail</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:if="${actions.isEmpty()}">
+<td class="px-lg py-8 text-center text-on-surface-variant" colspan="5">Aucune action enregistree pour le moment.</td>
+</tr>
+<tr th:each="a : ${actions}">
+<td class="px-lg py-3 text-on-surface-variant whitespace-nowrap" th:text="${#temporals.format(a.date, 'dd/MM/yyyy HH:mm')}">--</td>
+<td class="px-lg py-3 whitespace-nowrap" th:text="${a.utilisateurNom != null ? a.utilisateurNom : a.utilisateurEmail}">Utilisateur</td>
+<td class="px-lg py-3 whitespace-nowrap">
+<span class="px-sm py-1 rounded bg-secondary-container text-on-secondary-container text-label-sm" th:text="${a.module}">Module</span>
+</td>
+<td class="px-lg py-3 font-label-md whitespace-nowrap" th:text="${a.action}">Action</td>
+<td class="px-lg py-3 text-on-surface-variant break-words min-w-[280px] max-w-[420px]" th:text="${a.detail}">Detail</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="flex flex-wrap items-center justify-between gap-md px-lg py-md border-t border-outline-variant" th:if="${totalActions > 0}">
+<p class="text-label-sm text-on-surface-variant" th:text="'Affichage de ' + ${premierElement} + ' a ' + ${dernierElement} + ' sur ' + ${totalActions} + ' action(s)'">Affichage</p>
+<div class="flex items-center gap-1" th:if="${totalPages > 1}">
+<a class="px-sm py-1 rounded border border-outline-variant text-label-sm"
+   th:classappend="${page == 0} ? 'opacity-40 pointer-events-none' : 'hover:bg-surface-container'"
+   th:href="@{/journal(module=${module},page=${page - 1})}">Precedent</a>
+<a class="px-md py-1 rounded border border-outline-variant text-label-sm"
+   th:classappend="${p == page} ? 'bg-primary text-on-primary border-primary' : 'hover:bg-surface-container'"
+   th:each="p : ${pagesAffichees}"
+   th:href="@{/journal(module=${module},page=${p})}"
+   th:text="${p + 1}">1</a>
+<a class="px-sm py-1 rounded border border-outline-variant text-label-sm"
+   th:classappend="${page >= totalPages - 1} ? 'opacity-40 pointer-events-none' : 'hover:bg-surface-container'"
+   th:href="@{/journal(module=${module},page=${page + 1})}">Suivant</a>
+</div>
+</div>
+</div>
+
+</div>
+</main>
+</body>
+</html>
