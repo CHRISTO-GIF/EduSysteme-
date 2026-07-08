@@ -109,7 +109,7 @@
 <p class="font-label-md text-label-md leading-none" th:if="${utilisateurConnecte != null}" th:text="'M. ' + ${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Enseignant</p>
 <p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Enseignant</p>
 </div>
-<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'U'}">U</div>
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'U'}">U</div>
 </div>
 </div>
 </header>

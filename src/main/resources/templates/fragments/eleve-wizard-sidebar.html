@@ -18,7 +18,7 @@
 <p class="font-label-md text-label-md text-on-surface leading-tight" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
 <p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tight">Administrateur</p>
 </div>
-<div class="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? #strings.substring(utilisateurConnecte.prenom,0,1) + #strings.substring(utilisateurConnecte.nom,0,1) : 'A'}">A</div>
+<div class="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'A'}">A</div>
 </div>
 </header>
 <aside th:fragment="sidebar(etapeActuelle)" class="hidden md:flex w-sidebar-width flex-col bg-tertiary border-r border-outline-variant py-lg shrink-0">

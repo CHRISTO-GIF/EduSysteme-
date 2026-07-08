@@ -108,7 +108,7 @@
    class="flex items-start gap-md p-lg border-b border-outline-variant hover:bg-surface-container-low transition-colors"
    th:classappend="${correspondantActif != null and #strings.equalsIgnoreCase(correspondantActif, conv.email)} ? 'bg-primary-fixed/30' : ''"
    th:href="@{/messagerie(avec=${conv.email})}">
-<div class="w-11 h-11 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold shrink-0" th:text="${#strings.substring(conv.nom,0,1)}">?</div>
+<div class="w-11 h-11 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold shrink-0" th:text="${#strings.isEmpty(conv.nom) ? '?' : #strings.substring(conv.nom,0,1)}">?</div>
 <div class="flex-1 min-w-0">
 <div class="flex justify-between items-center">
 <p class="font-label-md text-label-md text-on-surface truncate" th:text="${conv.nom}">Nom</p>
@@ -125,7 +125,7 @@
 <!-- Fil de discussion -->
 <div class="flex-1 flex flex-col bg-background" th:if="${correspondantActif != null}">
 <div class="p-lg border-b border-outline-variant bg-surface-container-lowest flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold" th:text="${contactActif != null ? #strings.substring(contactActif.nom,0,1) : '?'}">?</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold" th:text="${contactActif != null and !#strings.isEmpty(contactActif.nom) ? #strings.substring(contactActif.nom,0,1) : '?'}">?</div>
 <div class="flex-1 min-w-0">
 <p class="font-label-md text-label-md text-on-surface" th:text="${contactActif != null ? contactActif.nom : correspondantActif}">Nom</p>
 <p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${contactActif != null ? contactActif.role : correspondantActif}">Classe</p>
