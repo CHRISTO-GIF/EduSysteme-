@@ -195,6 +195,11 @@ public class InscriptionEcoleController {
             model.addAttribute("erreur", "Le nom et l'email de l'administrateur sont obligatoires.");
             return "inscription-ecole-utilisateurs";
         }
+        String adminNomCompletTrimmed = adminNomComplet.trim();
+        if (adminNomCompletTrimmed.isEmpty()) {
+            model.addAttribute("erreur", "Le nom et l'email de l'administrateur sont obligatoires.");
+            return "inscription-ecole-utilisateurs";
+        }
         if (utilisateurRepository.findByEmail(adminEmail.trim()).isPresent()) {
             model.addAttribute("erreur", "Un compte existe deja avec cet email.");
             return "inscription-ecole-utilisateurs";
@@ -207,7 +212,7 @@ public class InscriptionEcoleController {
         etab.setEmail(donnees.email);
         etab.setTelephone(donnees.telephone);
         etab.setTypeEtablissement(donnees.niveaux != null ? donnees.niveaux : donnees.categorie);
-        etab.setContact(adminNomComplet.trim());
+        etab.setContact(adminNomCompletTrimmed);
         etab.setAnneeScolaire(donnees.anneeScolaire != null ? donnees.anneeScolaire : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1)));
         etab.setStatut("ACTIF");
         etab.setDateCreation(LocalDate.now());
@@ -229,9 +234,9 @@ public class InscriptionEcoleController {
         etablissementRepository.save(etab);
 
         // Administrateur
-        String[] parts = adminNomComplet.trim().split("\\s+", 2);
-        String prenom = parts.length > 1 ? parts[0] : "";
-        String nomFamille = parts.length > 1 ? parts[1] : parts[0];
+        String[] parts = adminNomCompletTrimmed.split("\\s+", 2);
+        String prenom = (parts.length > 1) ? parts[0] : "";
+        String nomFamille = (parts.length > 1) ? parts[1] : (parts.length > 0 ? parts[0] : adminNomCompletTrimmed);
         String role = mapRole(adminRole);
         String motDePasseGenere = genererMotDePasse();
 
