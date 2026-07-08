@@ -3,70 +3,159 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Recu de paiement - EduSystem Pro</title>
+<title>Reçu de Paiement - EduSystem Pro</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined { vertical-align: middle; }
-        @media print { .no-print { display: none !important; } }
-    </style>
+    body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+    .material-symbols-outlined { vertical-align: middle; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    @media print {
+        body { background: white; }
+        .no-print { display: none !important; }
+        .print-area { box-shadow: none; margin: 0; width: 100%; max-width: none; }
+    }
+</style>
 </head>
-<body class="bg-gray-100">
-<div class="max-w-md mx-auto py-xl px-lg">
-<div class="no-print flex justify-between items-center mb-lg">
-<a class="flex items-center gap-xs text-blue-900 font-medium" href="/finances">
-<span class="material-symbols-outlined">arrow_back</span> Retour
+<body>
+<div class="max-w-[800px] mx-auto py-xl px-lg">
+
+<nav class="no-print mb-lg flex flex-wrap items-center justify-between gap-md bg-white p-md rounded-xl shadow-sm border border-gray-200">
+<a class="flex items-center gap-xs text-blue-900 font-medium" th:href="@{/finances}">
+<span class="material-symbols-outlined">arrow_back</span> Retour aux finances
 </a>
-<button class="px-lg py-2 bg-blue-900 text-white rounded-lg font-bold flex items-center gap-xs" onclick="window.print()" type="button">
-<span class="material-symbols-outlined">print</span> Imprimer
+<div class="flex items-center gap-sm">
+<form method="post" th:action="@{/finances/paiements/{id}/renvoyer-email(id=${paiement.id})}">
+<button class="flex items-center gap-xs px-md py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all font-medium text-sm" type="submit">
+<span class="material-symbols-outlined text-[18px]">mail</span> Renvoyer par email
+</button>
+</form>
+<button class="flex items-center gap-xs px-lg py-2 rounded-lg bg-blue-900 text-white font-bold shadow-md" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer / Export PDF
 </button>
 </div>
+</nav>
 
-<div class="bg-white rounded-xl border border-gray-200 p-xl">
-<div class="text-center mb-lg pb-lg border-b border-dashed border-gray-300">
-<img alt="Logo" class="h-12 mx-auto mb-2" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
-<h1 class="text-lg font-bold text-blue-900" th:text="${nomEtab}">EduSystem Pro</h1>
+<div th:if="${successMsg}" class="no-print mb-lg p-md rounded-lg bg-green-50 text-green-800 border border-green-200 text-sm" th:text="${successMsg}"></div>
+<div th:if="${erreurEmail}" class="no-print mb-lg p-md rounded-lg bg-red-50 text-red-800 border border-red-200 text-sm" th:text="${erreurEmail}"></div>
+
+<article class="print-area bg-white border border-gray-200 rounded-xl p-xl md:p-16 shadow-lg">
+
+<header class="flex flex-col md:flex-row justify-between items-start gap-lg border-b border-gray-200 pb-lg">
+<div class="flex items-center gap-md">
+<img alt="Logo" class="h-14 w-14 object-contain" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
+<div>
+<h1 class="text-lg font-bold text-blue-900 uppercase tracking-wider" th:text="${nomEtab}">EduSystem Pro</h1>
 <p class="text-xs text-gray-500" th:text="${adresseEtab}">Adresse</p>
 <p class="text-xs text-gray-500" th:text="${telEtab}">Telephone</p>
 </div>
-
-<div class="text-center mb-lg">
-<span class="material-symbols-outlined text-green-600 text-[40px]" style="font-variation-settings: 'FILL' 1">check_circle</span>
-<p class="font-bold text-lg mt-1">Recu de Paiement</p>
-<p class="text-xs text-gray-500" th:text="'N° ' + ${paiement.recuNumero}">N° --</p>
 </div>
+<div class="text-right flex flex-col gap-xs">
+<div class="bg-gray-50 px-md py-sm rounded">
+<p class="text-[10px] text-gray-400 uppercase tracking-tighter">REÇU N°</p>
+<p class="text-lg font-bold" th:text="${paiement.recuNumero}">--</p>
+</div>
+<div class="mt-sm">
+<p class="text-[10px] text-gray-400 uppercase tracking-tighter">DATE D'ÉMISSION</p>
+<p class="text-sm font-semibold" th:text="${#temporals.format(paiement.datePaiement, 'dd MMMM yyyy')}">--</p>
+</div>
+</div>
+</header>
 
-<table class="w-full text-sm mb-lg">
-<tr class="border-b border-gray-100">
-<td class="py-2 text-gray-500">Eleve</td>
-<td class="py-2 text-right font-medium" th:text="${paiement.eleve != null ? paiement.eleve.prenom + ' ' + paiement.eleve.nom : '?'}">Eleve</td>
+<section class="text-center py-sm">
+<h2 class="text-2xl font-bold text-blue-900 tracking-widest border-y-2 border-blue-900/10 py-md">REÇU DE PAIEMENT</h2>
+</section>
+
+<section class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="flex flex-col gap-sm">
+<h3 class="text-xs font-bold text-blue-900 uppercase border-b border-gray-200 pb-xs">Détails de l'élève</h3>
+<div class="flex flex-col gap-xs pt-xs text-sm">
+<div class="flex justify-between"><span class="text-gray-500">Nom de l'élève :</span><span class="font-semibold" th:text="${paiement.eleve.prenom + ' ' + paiement.eleve.nom}">--</span></div>
+<div class="flex justify-between"><span class="text-gray-500">Matricule :</span><span class="font-semibold" th:text="${paiement.eleve.matricule}">--</span></div>
+<div class="flex justify-between"><span class="text-gray-500">Classe :</span><span class="font-semibold" th:text="${paiement.eleve.classe != null ? paiement.eleve.classe.nom : '?'}">--</span></div>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<h3 class="text-xs font-bold text-blue-900 uppercase border-b border-gray-200 pb-xs">Informations de paiement</h3>
+<div class="flex flex-col gap-xs pt-xs text-sm">
+<div class="flex justify-between"><span class="text-gray-500">Méthode :</span><span class="font-semibold" th:text="${modePaiementLabel}">--</span></div>
+<div class="flex justify-between"><span class="text-gray-500">Année scolaire :</span><span class="font-semibold" th:text="${anneeScolaire}">--</span></div>
+<div class="flex justify-between items-center"><span class="text-gray-500">Statut :</span>
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> PAYÉ
+</span>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<table class="w-full border-collapse text-sm">
+<thead>
+<tr class="bg-gray-50 border-b-2 border-blue-900">
+<th class="p-md text-left text-xs font-bold text-gray-500 uppercase">Catégorie</th>
+<th class="p-md text-left text-xs font-bold text-gray-500 uppercase">Description</th>
+<th class="p-md text-right text-xs font-bold text-gray-500 uppercase">Montant</th>
 </tr>
-<tr class="border-b border-gray-100">
-<td class="py-2 text-gray-500">Type</td>
-<td class="py-2 text-right" th:text="${paiement.fraisScolarite != null ? paiement.fraisScolarite.designation : paiement.typePaiement}">Type</td>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr>
+<td class="p-md" th:text="${paiement.fraisScolarite != null ? paiement.fraisScolarite.designation : paiement.typePaiement}">Type</td>
+<td class="p-md text-gray-500" th:text="${paiement.description != null and !paiement.description.isEmpty() ? paiement.description : '--'}">Description</td>
+<td class="p-md text-right font-semibold" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' ' + ${monnaie}">0</td>
 </tr>
-<tr class="border-b border-gray-100">
-<td class="py-2 text-gray-500">Mode de paiement</td>
-<td class="py-2 text-right" th:text="${paiement.modePaiement}">Mode</td>
-</tr>
-<tr class="border-b border-gray-100">
-<td class="py-2 text-gray-500">Date</td>
-<td class="py-2 text-right" th:text="${#temporals.format(paiement.datePaiement, 'dd/MM/yyyy HH:mm')}">--</td>
-</tr>
-<tr class="border-b border-gray-100">
-<td class="py-2 text-gray-500">Annee scolaire</td>
-<td class="py-2 text-right" th:text="${anneeScolaire}">2025-2026</td>
-</tr>
+</tbody>
 </table>
+</section>
 
-<div class="bg-gray-50 rounded-lg p-4 flex justify-between items-center">
-<span class="font-bold">Montant verse</span>
-<span class="font-bold text-xl text-blue-900" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</span>
+<section class="flex flex-col gap-lg">
+<div class="flex justify-end">
+<div class="w-full md:w-1/2 flex flex-col gap-sm">
+<div class="flex justify-between items-center px-md py-md bg-blue-900 rounded-lg text-white shadow-lg">
+<span class="text-sm font-bold uppercase">Total général</span>
+<span class="text-xl font-bold" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' ' + ${monnaie}">0</span>
+</div>
+</div>
+</div>
+<div class="border-l-4 border-blue-900/20 bg-gray-50 p-md rounded-r-lg">
+<p class="text-[10px] text-gray-400 uppercase mb-1">La somme de (montant en lettres) :</p>
+<p class="text-sm font-semibold text-blue-900 italic" th:text="${montantEnLettres}">--</p>
+</div>
+</section>
+
+<section class="mt-xl grid grid-cols-2 gap-xl pt-xl border-t border-gray-200 text-center">
+<div>
+<div class="h-16 flex flex-col items-center justify-end">
+<span class="text-xs text-gray-300 italic" th:if="${enregistrePar == null}">(Signature)</span>
+<span class="font-semibold" th:if="${enregistrePar != null}" th:text="${enregistrePar.prenom + ' ' + enregistrePar.nom}">--</span>
+</div>
+<p class="text-[10px] text-gray-400 uppercase pt-2">Le Caissier / Trésorier</p>
+</div>
+<div>
+<div class="h-16 flex flex-col items-center justify-end">
+<span class="text-xs text-gray-300 italic" th:if="${chefEtablissement == null or chefEtablissement.isEmpty()}">(Signature)</span>
+<span class="font-semibold" th:if="${chefEtablissement != null and !chefEtablissement.isEmpty()}" th:text="${chefEtablissement}">--</span>
+</div>
+<p class="text-[10px] text-gray-400 uppercase pt-2">Le Chef d'Établissement</p>
+</div>
+</section>
+
+<footer class="mt-auto pt-xl border-t border-gray-200 text-center">
+<p class="text-[10px] text-gray-400 uppercase tracking-widest">Ce reçu a été généré automatiquement par EduSystem Pro.</p>
+</footer>
+</article>
+
+<div th:if="${emailDestinataire != null}" class="no-print mt-xl p-lg bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-md">
+<span class="material-symbols-outlined text-blue-900">info</span>
+<div class="flex-1">
+<p class="text-sm text-blue-900 font-medium">Une copie de ce reçu est envoyée par email à l'adresse enregistrée du parent.</p>
+<p class="text-sm text-gray-500" th:text="${emailDestinataire}">--</p>
+</div>
+</div>
+<div th:if="${emailDestinataire == null}" class="no-print mt-xl p-lg bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-md">
+<span class="material-symbols-outlined text-amber-700">warning</span>
+<p class="text-sm text-amber-800">Aucune adresse email n'est enregistrée pour les parents de cet élève — le reçu n'a pas pu être envoyé par email.</p>
 </div>
 
-<p class="text-[10px] text-gray-400 text-center mt-lg">Ce recu a ete genere automatiquement par EduSystem Pro.</p>
-</div>
 </div>
 </body>
 </html>

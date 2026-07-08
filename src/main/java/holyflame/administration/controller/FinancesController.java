@@ -9,8 +9,11 @@ import holyflame.administration.repository.FraisScolariteRepository;
 import holyflame.administration.repository.LigneBudgetRepository;
 import holyflame.administration.repository.PaiementRepository;
 import holyflame.administration.repository.ParametreRepository;
+import holyflame.administration.repository.UtilisateurRepository;
+import holyflame.administration.service.EmailService;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.JournalService;
+import holyflame.administration.service.NombreEnLettresService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,8 +38,11 @@ public class FinancesController {
     @Autowired private LigneBudgetRepository budgetRepository;
     @Autowired private ParametreRepository parametreRepository;
     @Autowired private FraisScolariteRepository fraisScolariteRepository;
+    @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private JournalService journalService;
+    @Autowired private EmailService emailService;
+    @Autowired private NombreEnLettresService nombreEnLettresService;
 
     @GetMapping
     public String index(@RequestParam(defaultValue = "2025-2026") String annee, Model model) {
@@ -259,9 +265,19 @@ public class FinancesController {
         if (fraisScolariteId != null && !fraisScolariteId.isBlank()) {
             fraisScolariteRepository.findById(Long.parseLong(fraisScolariteId)).ifPresent(p::setFraisScolarite);
         }
+        var utilisateur = etablissementService.getCurrentUtilisateur();
+        if (utilisateur != null) p.setEnregistreParId(utilisateur.getId());
         paiementRepository.save(p);
         journalService.log("PAIEMENT_ENREGISTRÉ", "FINANCES",
             eleve.getNom() + " " + eleve.getPrenom() + " — " + montantVerse + " F (" + typePaiement + ")");
+
+        boolean envoye = envoyerRecuParEmail(p);
+        String emailDestinataire = adresseParent(eleve);
+        if (envoye) {
+            ra.addFlashAttribute("successMsg", "Paiement enregistre. Une copie du recu a ete envoyee par email a " + emailDestinataire + ".");
+        } else if (emailDestinataire != null) {
+            ra.addFlashAttribute("erreurEmail", "Paiement enregistre, mais l'envoi du recu par email a echoue.");
+        }
         return "redirect:/finances/paiements/" + p.getId() + "/recu";
     }
 
@@ -280,13 +296,73 @@ public class FinancesController {
                 holyflame.administration.model.Parametre::getValeur,
                 (a, b) -> a));
 
+        String monnaie = params.getOrDefault("MONNAIE", "FCFA");
+        long montantEntier = p.getMontantVerse() != null ? Math.round(p.getMontantVerse()) : 0;
+
         model.addAttribute("paiement",   p);
         model.addAttribute("nomEtab",    params.getOrDefault("NOM_ETABLISSEMENT", "HolyFlame"));
         model.addAttribute("adresseEtab",params.getOrDefault("ADRESSE_ETABLISSEMENT", ""));
         model.addAttribute("telEtab",    params.getOrDefault("TEL_ETABLISSEMENT", ""));
         model.addAttribute("anneeScolaire", params.getOrDefault("ANNEE_SCOLAIRE", "2025-2026"));
         model.addAttribute("logoPath",   params.getOrDefault("LOGO_ETAB", null));
+        model.addAttribute("monnaie",    monnaie);
+        model.addAttribute("montantEnLettres", nombreEnLettresService.convertir(montantEntier, monnaie));
+        model.addAttribute("modePaiementLabel", libelleModePaiement(p.getModePaiement()));
+        model.addAttribute("chefEtablissement", params.get("CONTACT_PRINCIPAL"));
+        model.addAttribute("enregistrePar", p.getEnregistreParId() != null
+            ? utilisateurRepository.findById(p.getEnregistreParId()).orElse(null) : null);
+        model.addAttribute("emailDestinataire", adresseParent(p.getEleve()));
         return "recu-paiement";
+    }
+
+    @PostMapping("/paiements/{id}/renvoyer-email")
+    public String renvoyerEmail(@PathVariable Long id, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Paiement p = paiementRepository.findById(id).orElse(null);
+        if (p == null || p.getEleve() == null || !etabId.equals(p.getEleve().getEtablissementId())) {
+            ra.addFlashAttribute("erreur", "Paiement introuvable.");
+            return "redirect:/finances?tab=paiements";
+        }
+        String emailDestinataire = adresseParent(p.getEleve());
+        boolean envoye = envoyerRecuParEmail(p);
+        if (envoye) {
+            ra.addFlashAttribute("successMsg", "Recu renvoye par email a " + emailDestinataire + ".");
+        } else {
+            ra.addFlashAttribute("erreurEmail", "Impossible d'envoyer le recu par email (aucune adresse parent valide ou service email indisponible).");
+        }
+        return "redirect:/finances/paiements/" + id + "/recu";
+    }
+
+    private String adresseParent(Eleve eleve) {
+        if (eleve.getPereEmail() != null && !eleve.getPereEmail().isBlank()) return eleve.getPereEmail();
+        if (eleve.getMereEmail() != null && !eleve.getMereEmail().isBlank()) return eleve.getMereEmail();
+        return eleve.getEmailParent();
+    }
+
+    private boolean envoyerRecuParEmail(Paiement p) {
+        String destinataire = adresseParent(p.getEleve());
+        if (destinataire == null || destinataire.isBlank()) return false;
+        String corps = "<p>Bonjour,</p>"
+            + "<p>Nous confirmons la reception d'un paiement pour <strong>" + p.getEleve().getPrenom() + " " + p.getEleve().getNom() + "</strong>.</p>"
+            + "<table style=\"border-collapse:collapse;margin:16px 0;\">"
+            + "<tr><td style=\"padding:4px 12px 4px 0;color:#555;\">Reçu n°</td><td><strong>" + p.getRecuNumero() + "</strong></td></tr>"
+            + "<tr><td style=\"padding:4px 12px 4px 0;color:#555;\">Type</td><td>" + (p.getFraisScolarite() != null ? p.getFraisScolarite().getDesignation() : p.getTypePaiement()) + "</td></tr>"
+            + "<tr><td style=\"padding:4px 12px 4px 0;color:#555;\">Date</td><td>" + p.getDatePaiement().toLocalDate() + "</td></tr>"
+            + "<tr><td style=\"padding:4px 12px 4px 0;color:#555;\">Montant versé</td><td><strong>" + Math.round(p.getMontantVerse()) + " F</strong></td></tr>"
+            + "</table>"
+            + "<p>Merci de conserver cet email comme justificatif. Pour toute question, contactez le secrétariat.</p>";
+        return emailService.envoyer(destinataire, "Reçu de paiement " + p.getRecuNumero(), corps);
+    }
+
+    private String libelleModePaiement(String mode) {
+        if (mode == null) return "--";
+        return switch (mode) {
+            case "ESPECES" -> "Espèces";
+            case "VIREMENT" -> "Virement bancaire";
+            case "MOBILE_MONEY" -> "Mobile Money";
+            case "CHEQUE" -> "Chèque";
+            default -> mode;
+        };
     }
 
     @PostMapping("/paiements/{id}/supprimer")
