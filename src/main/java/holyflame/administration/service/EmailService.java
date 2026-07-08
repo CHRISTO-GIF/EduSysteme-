@@ -1,44 +1,69 @@
 package holyflame.administration.service;
 
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+/**
+ * Envoie des emails via l'API HTTP de Brevo (port 443) plutot que par SMTP direct :
+ * de nombreux hebergeurs cloud bloquent les connexions SMTP sortantes (port 587/465/25),
+ * l'API HTTP contourne ce probleme.
+ */
 @Service
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
-    @Autowired private JavaMailSender mailSender;
-
+    @Value("${app.mail.brevo-api-key:}") private String apiKey;
     @Value("${app.mail.from}") private String from;
     @Value("${app.mail.from-name}") private String fromName;
-    @Value("${spring.mail.host:}") private String host;
 
-    /** Envoie un email HTML. Retourne false si le SMTP n'est pas configure ou si l'envoi echoue. */
+    private final HttpClient httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(10))
+        .build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /** Envoie un email HTML. Retourne false si l'API Brevo n'est pas configuree ou si l'envoi echoue. */
     public boolean envoyer(String destinataire, String sujet, String corpsHtml) {
-        if (host == null || host.isBlank()) {
-            log.warn("SMTP non configure (SMTP_HOST vide) — email a {} non envoye.", destinataire);
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("Brevo API non configuree (BREVO_API_KEY vide) — email a {} non envoye.", destinataire);
             return false;
         }
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
-            helper.setFrom(from, fromName);
-            helper.setTo(destinataire);
-            helper.setSubject(sujet);
-            helper.setText(corpsHtml, true);
-            mailSender.send(message);
-            return true;
-        } catch (MailException | jakarta.mail.MessagingException | UnsupportedEncodingException e) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("sender", Map.of("name", fromName, "email", from));
+            body.put("to", List.of(Map.of("email", destinataire)));
+            body.put("subject", sujet);
+            body.put("htmlContent", corpsHtml);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BREVO_API_URL))
+                .header("accept", "application/json")
+                .header("content-type", "application/json")
+                .header("api-key", apiKey)
+                .timeout(Duration.ofSeconds(10))
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body)))
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                return true;
+            }
+            log.error("Echec de l'envoi d'email a {} : HTTP {} - {}", destinataire, response.statusCode(), response.body());
+            return false;
+        } catch (Exception e) {
             log.error("Echec de l'envoi d'email a {} : {}", destinataire, e.getMessage());
             return false;
         }
