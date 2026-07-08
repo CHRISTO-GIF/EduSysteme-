@@ -2,7 +2,9 @@ package holyflame.administration.controller;
 
 import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.UtilisateurRepository;
+import holyflame.administration.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,9 @@ public class PasswordResetController {
 
     @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private EmailService emailService;
+
+    @Value("${app.mail.base-url}") private String baseUrl;
 
     @GetMapping("/mot-de-passe-oublie")
     public String demandeForm() {
@@ -36,7 +41,17 @@ public class PasswordResetController {
             u.setResetToken(token);
             u.setResetTokenExpiration(LocalDateTime.now().plusHours(VALIDITE_HEURES));
             utilisateurRepository.save(u);
-            model.addAttribute("lienReinitialisation", "/reinitialiser-mot-de-passe?token=" + token);
+
+            String lien = baseUrl + "/reinitialiser-mot-de-passe?token=" + token;
+            String corpsHtml = "<p>Bonjour " + u.getPrenom() + ",</p>"
+                + "<p>Vous avez demande la reinitialisation de votre mot de passe EduSystem Pro.</p>"
+                + "<p><a href=\"" + lien + "\">Cliquez ici pour choisir un nouveau mot de passe</a></p>"
+                + "<p>Ce lien est valable " + VALIDITE_HEURES + " heures. Si vous n'etes pas a l'origine de cette demande, ignorez cet email.</p>";
+
+            boolean envoye = emailService.envoyer(u.getEmail(), "Reinitialisation de votre mot de passe", corpsHtml);
+            if (!envoye) {
+                model.addAttribute("lienReinitialisation", lien);
+            }
         });
 
         // Message générique dans tous les cas (on ne révèle pas si l'email existe ou non)
