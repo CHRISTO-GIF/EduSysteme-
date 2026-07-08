@@ -1,161 +1,235 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Reçu de Paiement - EduSystem Pro</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed": "#dce1ff", "surface-dim": "#d8dadc", "outline": "#757682",
+            "surface-container-low": "#f2f4f6", "surface-container-lowest": "#ffffff", "outline-variant": "#c5c5d3",
+            "on-tertiary-fixed-variant": "#3f465c", "on-primary-fixed-variant": "#264191", "tertiary-container": "#384055",
+            "surface-bright": "#f7f9fb", "primary": "#00236f", "on-tertiary-fixed": "#131b2e",
+            "inverse-on-surface": "#eff1f3", "on-surface": "#191c1e", "on-background": "#191c1e",
+            "on-tertiary": "#ffffff", "on-secondary-fixed": "#0b1c30", "surface-container-highest": "#e0e3e5",
+            "surface-variant": "#e0e3e5", "inverse-primary": "#b6c4ff", "on-secondary": "#ffffff",
+            "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
+            "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "tertiary": "#222a3e",
+            "surface-tint": "#4059aa", "background": "#f7f9fb", "inverse-surface": "#2d3133",
+            "on-tertiary-container": "#a4acc5", "on-surface-variant": "#444651", "tertiary-fixed": "#dae2fd",
+            "secondary-fixed-dim": "#b7c8e1", "on-secondary-fixed-variant": "#38485d", "tertiary-fixed-dim": "#bec6e0",
+            "error": "#ba1a1a", "primary-fixed-dim": "#b6c4ff", "primary-container": "#1e3a8a",
+            "on-primary-container": "#90a8ff", "secondary-fixed": "#d3e4fe", "secondary-container": "#d0e1fb",
+            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px", "sidebar-width": "260px"},
+          "fontFamily": {"headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+          "fontSize": {
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+</script>
 <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-    .material-symbols-outlined { vertical-align: middle; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .print-area { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
     @media print {
         body { background: white; }
-        .no-print { display: none !important; }
+        .no-print { display: none; }
         .print-area { box-shadow: none; margin: 0; width: 100%; max-width: none; }
     }
 </style>
 </head>
-<body>
-<div class="max-w-[800px] mx-auto py-xl px-lg">
+<body class="min-h-screen text-on-surface">
+<div class="flex min-h-screen">
+<main class="flex-1 flex flex-col items-center justify-start p-md md:p-xl">
 
-<nav class="no-print mb-lg flex flex-wrap items-center justify-between gap-md bg-white p-md rounded-xl shadow-sm border border-gray-200">
-<a class="flex items-center gap-xs text-blue-900 font-medium" th:href="@{/finances}">
+<nav class="no-print w-full max-w-[800px] mb-lg flex flex-wrap items-center justify-between gap-md bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant">
+<a class="flex items-center gap-xs text-secondary hover:text-primary transition-colors font-label-md text-label-md" th:href="@{/finances}">
 <span class="material-symbols-outlined">arrow_back</span> Retour aux finances
 </a>
 <div class="flex items-center gap-sm">
 <form method="post" th:action="@{/finances/paiements/{id}/renvoyer-email(id=${paiement.id})}">
-<button class="flex items-center gap-xs px-md py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all font-medium text-sm" type="submit">
-<span class="material-symbols-outlined text-[18px]">mail</span> Renvoyer par email
+<button class="flex items-center gap-xs px-md py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" type="submit">
+<span class="material-symbols-outlined">share</span> Partager par Email
 </button>
 </form>
-<button class="flex items-center gap-xs px-lg py-2 rounded-lg bg-blue-900 text-white font-bold shadow-md" onclick="window.print()" type="button">
-<span class="material-symbols-outlined">print</span> Imprimer / Export PDF
+<button class="flex items-center gap-xs px-md py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">download</span> Télécharger en PDF
+</button>
+<button class="flex items-center gap-xs px-lg py-sm rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-all shadow-md font-label-md text-label-md" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer le reçu
 </button>
 </div>
 </nav>
 
-<div th:if="${successMsg}" class="no-print mb-lg p-md rounded-lg bg-green-50 text-green-800 border border-green-200 text-sm" th:text="${successMsg}"></div>
-<div th:if="${erreurEmail}" class="no-print mb-lg p-md rounded-lg bg-red-50 text-red-800 border border-red-200 text-sm" th:text="${erreurEmail}"></div>
+<div th:if="${successMsg}" class="no-print w-full max-w-[800px] mb-lg p-md rounded-lg bg-success-container text-success font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurEmail}" class="no-print w-full max-w-[800px] mb-lg p-md rounded-lg bg-error-container text-error font-body-md text-body-md" th:text="${erreurEmail}"></div>
 
-<article class="print-area bg-white border border-gray-200 rounded-xl p-xl md:p-16 shadow-lg">
+<article class="print-area w-full max-w-[800px] bg-white border border-outline-variant p-xl md:p-16 flex flex-col gap-xl relative overflow-hidden">
+<div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+<span class="material-symbols-outlined text-[400px]" style="font-variation-settings: 'wght' 200;">school</span>
+</div>
 
-<header class="flex flex-col md:flex-row justify-between items-start gap-lg border-b border-gray-200 pb-lg">
+<header class="flex flex-col md:flex-row justify-between items-start gap-lg z-10 border-b border-outline-variant pb-lg">
 <div class="flex items-center gap-md">
-<img alt="Logo" class="h-14 w-14 object-contain" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
+<img alt="Logo" class="w-16 h-16 object-contain rounded-lg" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
+<div class="w-16 h-16 bg-primary-container flex items-center justify-center rounded-lg" th:if="${logoPath == null}">
+<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
 <div>
-<h1 class="text-lg font-bold text-blue-900 uppercase tracking-wider" th:text="${nomEtab}">EduSystem Pro</h1>
-<p class="text-xs text-gray-500" th:text="${adresseEtab}">Adresse</p>
-<p class="text-xs text-gray-500" th:text="${telEtab}">Telephone</p>
+<h1 class="font-headline-sm text-headline-sm text-primary uppercase tracking-wider" th:text="${nomEtab}">EduSystem Pro</h1>
+<p class="font-body-md text-body-md text-secondary italic" th:if="${devise != null and !devise.isEmpty()}" th:text="'&quot;' + ${devise} + '&quot;'">Devise</p>
+<div class="mt-xs text-xs text-outline font-label-sm">
+<span th:text="${adresseEtab}">Adresse</span><br/>
+<span th:if="${telEtab != null and !telEtab.isEmpty()}" th:text="'Tél: ' + ${telEtab}">Tél</span>
+<span th:if="${emailEtab != null and !emailEtab.isEmpty()}" th:text="' | ' + ${emailEtab}"> | email</span>
+</div>
 </div>
 </div>
 <div class="text-right flex flex-col gap-xs">
-<div class="bg-gray-50 px-md py-sm rounded">
-<p class="text-[10px] text-gray-400 uppercase tracking-tighter">REÇU N°</p>
-<p class="text-lg font-bold" th:text="${paiement.recuNumero}">--</p>
+<div class="bg-surface-container-low px-md py-sm rounded">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-tighter">REÇU Nº</p>
+<p class="font-headline-sm text-headline-sm text-on-surface" th:text="${paiement.recuNumero}">--</p>
 </div>
 <div class="mt-sm">
-<p class="text-[10px] text-gray-400 uppercase tracking-tighter">DATE D'ÉMISSION</p>
-<p class="text-sm font-semibold" th:text="${#temporals.format(paiement.datePaiement, 'dd MMMM yyyy')}">--</p>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-tighter">DATE D'ÉMISSION</p>
+<p class="font-body-md text-body-md font-semibold" th:text="${#temporals.format(paiement.datePaiement, 'dd MMMM yyyy')}">--</p>
 </div>
 </div>
 </header>
 
-<section class="text-center py-sm">
-<h2 class="text-2xl font-bold text-blue-900 tracking-widest border-y-2 border-blue-900/10 py-md">REÇU DE PAIEMENT</h2>
+<section class="text-center py-sm z-10">
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-widest border-y-2 border-primary/10 py-md">REÇU DE PAIEMENT</h2>
 </section>
 
-<section class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<section class="grid grid-cols-1 md:grid-cols-2 gap-xl z-10">
 <div class="flex flex-col gap-sm">
-<h3 class="text-xs font-bold text-blue-900 uppercase border-b border-gray-200 pb-xs">Détails de l'élève</h3>
-<div class="flex flex-col gap-xs pt-xs text-sm">
-<div class="flex justify-between"><span class="text-gray-500">Nom de l'élève :</span><span class="font-semibold" th:text="${paiement.eleve.prenom + ' ' + paiement.eleve.nom}">--</span></div>
-<div class="flex justify-between"><span class="text-gray-500">Matricule :</span><span class="font-semibold" th:text="${paiement.eleve.matricule}">--</span></div>
-<div class="flex justify-between"><span class="text-gray-500">Classe :</span><span class="font-semibold" th:text="${paiement.eleve.classe != null ? paiement.eleve.classe.nom : '?'}">--</span></div>
+<h3 class="font-label-md text-label-md text-primary uppercase border-b border-outline-variant pb-xs">DÉTAILS DE L'ÉLÈVE</h3>
+<div class="flex flex-col gap-xs pt-xs">
+<div class="flex justify-between">
+<span class="font-body-md text-secondary">Nom de l'élève:</span>
+<span class="font-body-md font-semibold text-on-surface" th:text="${paiement.eleve.prenom + ' ' + paiement.eleve.nom}">--</span>
+</div>
+<div class="flex justify-between">
+<span class="font-body-md text-secondary">Matricule:</span>
+<span class="font-body-md font-semibold text-on-surface" th:text="${paiement.eleve.matricule}">--</span>
+</div>
+<div class="flex justify-between">
+<span class="font-body-md text-secondary">Niveau / Classe:</span>
+<span class="font-body-md font-semibold text-on-surface" th:text="${paiement.eleve.classe != null ? (paiement.eleve.classe.niveau + ' - ' + paiement.eleve.classe.nom) : '?'}">--</span>
 </div>
 </div>
+</div>
 <div class="flex flex-col gap-sm">
-<h3 class="text-xs font-bold text-blue-900 uppercase border-b border-gray-200 pb-xs">Informations de paiement</h3>
-<div class="flex flex-col gap-xs pt-xs text-sm">
-<div class="flex justify-between"><span class="text-gray-500">Méthode :</span><span class="font-semibold" th:text="${modePaiementLabel}">--</span></div>
-<div class="flex justify-between"><span class="text-gray-500">Année scolaire :</span><span class="font-semibold" th:text="${anneeScolaire}">--</span></div>
-<div class="flex justify-between items-center"><span class="text-gray-500">Statut :</span>
-<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">check_circle</span> PAYÉ
+<h3 class="font-label-md text-label-md text-primary uppercase border-b border-outline-variant pb-xs">INFORMATIONS DE PAIEMENT</h3>
+<div class="flex flex-col gap-xs pt-xs">
+<div class="flex justify-between">
+<span class="font-body-md text-secondary">Méthode:</span>
+<span class="font-body-md font-semibold text-on-surface" th:text="${modePaiementLabel}">--</span>
+</div>
+<div class="flex justify-between">
+<span class="font-body-md text-secondary">Référence:</span>
+<span class="font-body-md font-semibold text-on-surface text-xs font-mono" th:text="${paiement.recuNumero}">--</span>
+</div>
+<div class="flex justify-between">
+<span class="font-body-md text-secondary">Statut:</span>
+<span class="bg-success-container text-success px-sm rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'wght' 700;">check_circle</span>
+PAYÉ
 </span>
 </div>
 </div>
 </div>
 </section>
 
-<section>
-<table class="w-full border-collapse text-sm">
+<section class="z-10">
+<table class="w-full border-collapse">
 <thead>
-<tr class="bg-gray-50 border-b-2 border-blue-900">
-<th class="p-md text-left text-xs font-bold text-gray-500 uppercase">Catégorie</th>
-<th class="p-md text-left text-xs font-bold text-gray-500 uppercase">Description</th>
-<th class="p-md text-right text-xs font-bold text-gray-500 uppercase">Montant</th>
+<tr class="bg-surface-container-low border-b-2 border-primary">
+<th class="p-md text-left font-label-md text-label-md text-on-surface-variant uppercase">CATÉGORIE</th>
+<th class="p-md text-left font-label-md text-label-md text-on-surface-variant uppercase">Description</th>
+<th class="p-md text-right font-label-md text-label-md text-on-surface-variant uppercase">MONTANT</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-gray-100">
+<tbody class="divide-y divide-outline-variant">
 <tr>
-<td class="p-md" th:text="${paiement.fraisScolarite != null ? paiement.fraisScolarite.designation : paiement.typePaiement}">Type</td>
-<td class="p-md text-gray-500" th:text="${paiement.description != null and !paiement.description.isEmpty() ? paiement.description : '--'}">Description</td>
-<td class="p-md text-right font-semibold" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' ' + ${monnaie}">0</td>
+<td class="p-md font-body-md text-on-surface" th:text="${paiement.fraisScolarite != null ? paiement.fraisScolarite.designation : paiement.typePaiement}">Catégorie</td>
+<td class="p-md font-body-md text-secondary" th:text="${paiement.description != null and !paiement.description.isEmpty() ? paiement.description : ('Année scolaire ' + anneeScolaire)}">Description</td>
+<td class="p-md text-right font-body-md font-semibold" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' ' + ${monnaie}">0</td>
 </tr>
 </tbody>
 </table>
 </section>
 
-<section class="flex flex-col gap-lg">
+<section class="flex flex-col gap-lg z-10">
 <div class="flex justify-end">
 <div class="w-full md:w-1/2 flex flex-col gap-sm">
-<div class="flex justify-between items-center px-md py-md bg-blue-900 rounded-lg text-white shadow-lg">
-<span class="text-sm font-bold uppercase">Total général</span>
-<span class="text-xl font-bold" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' ' + ${monnaie}">0</span>
+<div class="flex justify-between px-md py-md bg-primary rounded-lg text-on-primary shadow-lg mt-sm">
+<span class="font-headline-sm text-headline-sm uppercase">TOTAL GÉNÉRAL</span>
+<span class="font-headline-sm text-headline-sm" th:text="${#numbers.formatDecimal(paiement.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' ' + ${monnaie}">0</span>
 </div>
 </div>
 </div>
-<div class="border-l-4 border-blue-900/20 bg-gray-50 p-md rounded-r-lg">
-<p class="text-[10px] text-gray-400 uppercase mb-1">La somme de (montant en lettres) :</p>
-<p class="text-sm font-semibold text-blue-900 italic" th:text="${montantEnLettres}">--</p>
-</div>
-</section>
-
-<section class="mt-xl grid grid-cols-2 gap-xl pt-xl border-t border-gray-200 text-center">
-<div>
-<div class="h-16 flex flex-col items-center justify-end">
-<span class="text-xs text-gray-300 italic" th:if="${enregistrePar == null}">(Signature)</span>
-<span class="font-semibold" th:if="${enregistrePar != null}" th:text="${enregistrePar.prenom + ' ' + enregistrePar.nom}">--</span>
-</div>
-<p class="text-[10px] text-gray-400 uppercase pt-2">Le Caissier / Trésorier</p>
-</div>
-<div>
-<div class="h-16 flex flex-col items-center justify-end">
-<span class="text-xs text-gray-300 italic" th:if="${chefEtablissement == null or chefEtablissement.isEmpty()}">(Signature)</span>
-<span class="font-semibold" th:if="${chefEtablissement != null and !chefEtablissement.isEmpty()}" th:text="${chefEtablissement}">--</span>
-</div>
-<p class="text-[10px] text-gray-400 uppercase pt-2">Le Chef d'Établissement</p>
+<div class="border-l-4 border-primary/20 bg-surface-container-low p-md rounded-r-lg">
+<p class="font-label-sm text-label-sm text-outline uppercase mb-1">LA SOMME DE (MONTANT EN LETTRES) :</p>
+<p class="font-body-lg text-body-lg font-semibold text-primary italic" th:text="${montantEnLettres} + ' seulement.'">--</p>
 </div>
 </section>
 
-<footer class="mt-auto pt-xl border-t border-gray-200 text-center">
-<p class="text-[10px] text-gray-400 uppercase tracking-widest">Ce reçu a été généré automatiquement par EduSystem Pro.</p>
+<section class="mt-xl grid grid-cols-2 gap-xl z-10 pt-xl">
+<div class="flex flex-col items-center gap-lg">
+<div class="h-24 w-full border-b border-dashed border-outline flex flex-col items-center justify-end relative">
+<span class="text-xs text-outline-variant italic" th:if="${enregistrePar == null}">(Signature)</span>
+<span class="font-semibold text-on-surface mb-2" th:if="${enregistrePar != null}" th:text="${enregistrePar.prenom + ' ' + enregistrePar.nom}">--</span>
+<p class="font-label-sm text-label-sm text-outline uppercase pb-2 text-center">SIGNATURE COMPTABLE</p>
+</div>
+</div>
+<div class="flex flex-col items-center gap-lg">
+<div class="h-24 w-full border-b border-dashed border-outline flex flex-col items-center justify-end relative">
+<span class="text-xs text-outline-variant italic" th:if="${chefEtablissement == null or chefEtablissement.isEmpty()}">(Signature)</span>
+<span class="font-semibold text-on-surface mb-2" th:if="${chefEtablissement != null and !chefEtablissement.isEmpty()}" th:text="${chefEtablissement}">--</span>
+<p class="font-label-sm text-label-sm text-outline uppercase pb-2 text-center">CACHET / DIRECTION</p>
+</div>
+</div>
+</section>
+
+<footer class="mt-auto pt-xl border-t border-outline-variant text-center">
+<p class="text-xs text-outline font-label-sm uppercase tracking-widest">MERCI D'AVOIR CHOISI <span th:text="${nomEtab}">EduSystem Pro</span> POUR VOTRE GESTION ACADÉMIQUE.</p>
 </footer>
 </article>
 
-<div th:if="${emailDestinataire != null}" class="no-print mt-xl p-lg bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-md">
-<span class="material-symbols-outlined text-blue-900">info</span>
+<div class="no-print w-full max-w-[800px] mt-xl p-lg bg-primary-container/10 border border-primary/20 rounded-xl flex items-center gap-md" th:if="${emailDestinataire != null and !emailDestinataire.isEmpty()}">
+<div class="p-sm bg-primary rounded-full">
+<span class="material-symbols-outlined text-on-primary">info</span>
+</div>
 <div class="flex-1">
-<p class="text-sm text-blue-900 font-medium">Une copie de ce reçu est envoyée par email à l'adresse enregistrée du parent.</p>
-<p class="text-sm text-gray-500" th:text="${emailDestinataire}">--</p>
+<p class="font-label-md text-label-md text-primary">Besoin d'une copie pour vos dossiers ?</p>
+<p class="font-body-md text-body-md text-on-surface-variant" th:text="'Une copie numerique de ce recu a ete envoyee a l adresse email enregistree du parent (' + ${emailDestinataire} + ').'">--</p>
 </div>
+<a class="text-primary font-label-md hover:underline" th:href="@{/finances}">Voir l'historique</a>
 </div>
-<div th:if="${emailDestinataire == null}" class="no-print mt-xl p-lg bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-md">
-<span class="material-symbols-outlined text-amber-700">warning</span>
-<p class="text-sm text-amber-800">Aucune adresse email n'est enregistrée pour les parents de cet élève — le reçu n'a pas pu être envoyé par email.</p>
+<div class="no-print w-full max-w-[800px] mt-xl p-lg bg-error-container/40 border border-error/20 rounded-xl flex items-center gap-md" th:if="${emailDestinataire == null or emailDestinataire.isEmpty()}">
+<span class="material-symbols-outlined text-error">warning</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Aucune adresse email n'est enregistree pour les parents de cet eleve — le recu n'a pas pu etre envoye par email.</p>
 </div>
 
+</main>
 </div>
 </body>
 </html>

@@ -305,6 +305,8 @@ public class FinancesController {
         model.addAttribute("telEtab",    params.getOrDefault("TEL_ETABLISSEMENT", ""));
         model.addAttribute("anneeScolaire", params.getOrDefault("ANNEE_SCOLAIRE", "2025-2026"));
         model.addAttribute("logoPath",   params.getOrDefault("LOGO_ETAB", null));
+        model.addAttribute("devise",     params.getOrDefault("DEVISE", ""));
+        model.addAttribute("emailEtab",  params.getOrDefault("EMAIL_ECOLE", ""));
         model.addAttribute("monnaie",    monnaie);
         model.addAttribute("montantEnLettres", nombreEnLettresService.convertir(montantEntier, monnaie));
         model.addAttribute("modePaiementLabel", libelleModePaiement(p.getModePaiement()));
