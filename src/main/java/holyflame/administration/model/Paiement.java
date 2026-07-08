@@ -24,6 +24,7 @@ public class Paiement {
     private String typePaiement;
     private String modePaiement;
     private String recuNumero;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -82,6 +83,14 @@ public class Paiement {
 
     public void setRecuNumero(String recuNumero) {
         this.recuNumero = recuNumero;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Eleve getEleve() {

@@ -84,10 +84,10 @@
 </nav>
 </div>
 <div class="mt-auto p-lg border-t border-outline-variant/20">
-<button class="w-full bg-primary text-white py-sm rounded-lg font-label-md flex items-center justify-center gap-base active:scale-95 transition-all mb-lg" onclick="document.getElementById('modal-transaction').classList.remove('hidden')" type="button">
+<a class="w-full bg-primary text-white py-sm rounded-lg font-label-md flex items-center justify-center gap-base active:scale-95 transition-all mb-lg" th:href="@{/finances/nouvelle-transaction}">
 <span class="material-symbols-outlined text-[20px]">add</span>
 Nouvelle Transaction
-</button>
+</a>
 <div class="space-base">
 <a class="flex items-center px-md py-sm rounded text-on-tertiary-container/70 hover:text-on-tertiary transition-all duration-200" th:href="@{/parametres}">
 <span class="material-symbols-outlined mr-md">settings</span>
@@ -297,60 +297,5 @@ Envoyer Rappels Automatiques
 </main>
 </div>
 
-<!-- Modal Nouvelle Transaction -->
-<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-transaction">
-<div class="bg-white rounded-xl p-xl max-w-lg w-full">
-<div class="flex justify-between items-center mb-lg">
-<h3 class="font-headline-sm text-primary">Nouvelle Transaction</h3>
-<button onclick="document.getElementById('modal-transaction').classList.add('hidden')" type="button">
-<span class="material-symbols-outlined">close</span>
-</button>
-</div>
-<form class="space-y-md" method="post" th:action="@{/finances/paiements}">
-<div>
-<label class="text-label-sm text-secondary block mb-1">Eleve</label>
-<select class="w-full p-2 border border-outline-variant rounded-lg" name="eleveId" required="required">
-<option th:each="e : ${eleves}" th:text="${e.nom} + ' ' + ${e.prenom} + ' (' + ${e.matricule} + ')'" th:value="${e.id}"></option>
-</select>
-</div>
-<div class="grid grid-cols-2 gap-md">
-<div>
-<label class="text-label-sm text-secondary block mb-1">Montant</label>
-<input class="w-full p-2 border border-outline-variant rounded-lg" min="0" name="montantVerse" required="required" step="0.01" type="number"/>
-</div>
-<div>
-<label class="text-label-sm text-secondary block mb-1">Type</label>
-<select class="w-full p-2 border border-outline-variant rounded-lg" name="typePaiement">
-<option value="SCOLARITE">Scolarite</option>
-<option value="INSCRIPTION">Inscription</option>
-<option value="CANTINE">Cantine</option>
-<option value="TRANSPORT">Transport</option>
-<option value="AUTRE">Autre</option>
-</select>
-</div>
-</div>
-<div>
-<label class="text-label-sm text-secondary block mb-1">Mode de paiement</label>
-<select class="w-full p-2 border border-outline-variant rounded-lg" name="modePaiement">
-<option value="ESPECES">Especes</option>
-<option value="VIREMENT">Virement bancaire</option>
-<option value="MOBILE_MONEY">Mobile Money</option>
-<option value="CHEQUE">Cheque</option>
-</select>
-</div>
-<div>
-<label class="text-label-sm text-secondary block mb-1">Frais precis (optionnel)</label>
-<select class="w-full p-2 border border-outline-variant rounded-lg" name="fraisScolariteId">
-<option value="">-- Non lie a un frais precis --</option>
-<option th:each="f : ${tousLesFrais}" th:text="${f.designation} + ' (' + ${#numbers.formatDecimal(f.montant, 0, 'COMMA', 0, 'POINT')} + ' F)'" th:value="${f.id}"></option>
-</select>
-</div>
-<div class="flex justify-end gap-sm pt-md">
-<button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md" onclick="document.getElementById('modal-transaction').classList.add('hidden')" type="button">Annuler</button>
-<button class="px-lg py-2 bg-primary text-white rounded-lg font-label-md" type="submit">Enregistrer</button>
-</div>
-</form>
-</div>
-</div>
 </body>
 </html>

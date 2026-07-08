@@ -166,6 +166,33 @@ public class FinancesController {
         return "finances";
     }
 
+    @GetMapping("/nouvelle-transaction")
+    public String nouvelleTransaction(Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        List<Paiement> paiements = paiementRepository.findByEtablissementId(etabId);
+        double totalEncaisse = paiements.stream()
+            .mapToDouble(p -> p.getMontantVerse() != null ? p.getMontantVerse() : 0).sum();
+
+        String anneeCourante = "2025-2026";
+        List<LigneBudget> lignes = budgetRepository.findByEtablissementIdAndAnneeScolaireOrderByCategorieAscDesignationAsc(etabId, anneeCourante);
+        double totalRevenuPrevu = lignes.stream().filter(l -> "REVENU".equals(l.getCategorie()))
+            .mapToDouble(l -> l.getMontantPrevu() != null ? l.getMontantPrevu() : 0).sum();
+        double paiementsEnAttente = Math.max(totalRevenuPrevu - totalEncaisse, 0);
+
+        List<Paiement> dernieresTransactions = paiements.stream()
+            .sorted(Comparator.comparing(Paiement::getDatePaiement, Comparator.nullsLast(Comparator.reverseOrder())))
+            .limit(4)
+            .collect(Collectors.toList());
+
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        model.addAttribute("eleves", eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId));
+        model.addAttribute("tousLesFrais", fraisScolariteRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId));
+        model.addAttribute("totalEncaisse", totalEncaisse);
+        model.addAttribute("paiementsEnAttente", paiementsEnAttente);
+        model.addAttribute("dernieresTransactions", dernieresTransactions);
+        return "finances-nouvelle-transaction";
+    }
+
     @PostMapping("/rappels")
     public String envoyerRappels(RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
@@ -209,6 +236,8 @@ public class FinancesController {
             @RequestParam String modePaiement,
             @RequestParam(required = false) String recuNumero,
             @RequestParam(required = false) String fraisScolariteId,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate datePaiement,
+            @RequestParam(required = false) String description,
             RedirectAttributes ra) {
 
         Long etabIdCourant = etablissementService.getCurrentEtablissementId();
@@ -224,7 +253,8 @@ public class FinancesController {
         Paiement p = new Paiement();
         p.setEleve(eleve); p.setMontantVerse(montantVerse);
         p.setTypePaiement(typePaiement); p.setModePaiement(modePaiement);
-        p.setDatePaiement(LocalDateTime.now());
+        p.setDatePaiement(datePaiement != null ? datePaiement.atStartOfDay() : LocalDateTime.now());
+        p.setDescription(description);
         p.setRecuNumero(recuNumero != null && !recuNumero.isBlank() ? recuNumero : "HF-" + System.currentTimeMillis());
         if (fraisScolariteId != null && !fraisScolariteId.isBlank()) {
             fraisScolariteRepository.findById(Long.parseLong(fraisScolariteId)).ifPresent(p::setFraisScolarite);
