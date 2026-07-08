@@ -18,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -272,8 +271,12 @@ public class InscriptionEcoleController {
     }
 
     private String genererMotDePasse() {
+        // ThreadLocalRandom plutot que SecureRandom : ce mot de passe est temporaire et
+        // affiche immediatement a l'admin pour changement, pas besoin d'aleatoire cryptographique,
+        // et SecureRandom peut se bloquer plusieurs secondes en attendant de l'entropie sur certains
+        // conteneurs Linux (cause reelle d'un crash observe en production sur cette route).
         String caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
-        SecureRandom random = new SecureRandom();
+        var random = java.util.concurrent.ThreadLocalRandom.current();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 10; i++) {
             sb.append(caracteres.charAt(random.nextInt(caracteres.length())));
