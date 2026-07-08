@@ -19,6 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private EleveRepository eleveRepository;
     @Autowired private ParametreRepository parametreRepository;
     @Autowired private FraisScolariteRepository fraisRepository;
+    @Autowired private ZoneRepository zoneRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
     @Override
@@ -56,6 +57,8 @@ public class DataInitializer implements CommandLineRunner {
             saveUser("Leclerc", "Jean",      "enseignant@holyflame.com", "ens123",    "ENSEIGNANT", defEtab);
         if (utilisateurRepository.findByEmail("eleve@holyflame.com").isEmpty())
             saveUser("KONAN",   "Amara",     "eleve@holyflame.com",      "eleve123",  "ELEVE",      defEtab);
+        if (utilisateurRepository.findByEmail("surveillant@holyflame.com").isEmpty())
+            saveUser("Demba",   "Oumar",     "surveillant@holyflame.com","surv123",   "SURVEILLANT",defEtab);
 
         // 4. Classes
         if (classeRepository.count() == 0) {
@@ -128,7 +131,16 @@ public class DataInitializer implements CommandLineRunner {
             saveFrais("Transport scolaire",        "TRANSPORT",   30000.0, "Par trimestre",null, false, etabId);
         }
 
-        // 10. Lier compte élève KONAN Amara
+        // 10. Zones de l'école
+        if (zoneRepository.findByEtablissementIdOrderByNomAsc(etabId).isEmpty()) {
+            saveZone("Cour principale", false, etabId);
+            saveZone("Réfectoire", false, etabId);
+            saveZone("Gymnase", false, etabId);
+            saveZone("Bibliothèque", false, etabId);
+            saveZone("Terrasse technique (accès interdit)", true, etabId);
+        }
+
+        // 11. Lier compte élève KONAN Amara
         if (eleveRepository.findByCompteEmail("eleve@holyflame.com").isEmpty()) {
             eleveRepository.findAll().stream()
                 .filter(e -> "KONAN".equals(e.getNom()) && "Amara".equals(e.getPrenom()))
@@ -195,5 +207,12 @@ public class DataInitializer implements CommandLineRunner {
         f.setNiveauCible(niveau); f.setObligatoire(obligatoire);
         f.setEtablissementId(etabId);
         fraisRepository.save(f);
+    }
+
+    private void saveZone(String nom, boolean interdite, Long etabId) {
+        Zone z = new Zone();
+        z.setNom(nom); z.setZoneInterdite(interdite);
+        z.setEtablissementId(etabId);
+        zoneRepository.save(z);
     }
 }

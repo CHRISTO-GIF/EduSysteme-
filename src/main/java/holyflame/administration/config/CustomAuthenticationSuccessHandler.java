@@ -46,6 +46,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             case "SUPER_ADMIN" -> response.sendRedirect("/super-admin");
             case "ENSEIGNANT"  -> response.sendRedirect("/tableau-enseignant");
             case "SECRETAIRE"  -> response.sendRedirect("/secretariat");
+            case "SURVEILLANT" -> response.sendRedirect("/surveillant");
             case "TRESORIER"   -> response.sendRedirect("/finances");
             case "ELEVE"       -> response.sendRedirect("/portail");
             case "ADMIN" -> {

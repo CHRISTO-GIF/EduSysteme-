@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Surveillance - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#f2f4f6", "surface-container-high": "#e6e8ea",
+            "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
+            "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb",
+            "surface-dim": "#d8dadc", "surface-bright": "#f7f9fb", "primary-fixed": "#dce1ff",
+            "secondary-container": "#d0e1fb", "on-error": "#ffffff", "tertiary": "#222a3e",
+            "outline": "#757682", "on-primary-container": "#90a8ff", "on-secondary": "#ffffff",
+            "surface-variant": "#e0e3e5", "surface-container": "#eceef0",
+            "on-error-container": "#93000a", "outline-variant": "#c5c5d3",
+            "surface": "#f7f9fb", "secondary": "#505f76", "on-background": "#191c1e",
+            "on-surface": "#191c1e", "on-surface-variant": "#444651",
+            "success-container": "#c4f7d0", "on-success-container": "#0a3818",
+            "tertiary-fixed-dim": "#bec6e0"
+          },
+          borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+          spacing: { gutter: "24px", xs: "4px", lg: "24px", xl: "32px", sm: "8px", "sidebar-width": "260px", md: "16px", "container-max": "1440px" },
+          fontFamily: { "label-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"] },
+          fontSize: {
+            "label-md": ["14px", {lineHeight: "20px", fontWeight: "600"}],
+            "headline-sm": ["18px", {lineHeight: "28px", fontWeight: "600"}],
+            "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700"}],
+            "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+            "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500"}]
+          }
+        }
+      }
+    }
+</script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+<aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">shield_person</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduSystem Pro</h1>
+<p class="text-[10px] text-tertiary-fixed-dim uppercase tracking-widest">Module Surveillance</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs px-sm overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary border-l-4 border-primary-fixed bg-tertiary/50" th:href="@{/surveillant}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/presences}">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-md text-label-md">Présences</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/incidents}">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-md text-label-md">Incidents</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/retenues}">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-md text-label-md">Retenues</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/zones}">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-md text-label-md">Zones de l'école</span>
+</a>
+</nav>
+<div class="mt-auto px-sm pt-lg border-t border-outline/20">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Déconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="flex-1 flex flex-col min-w-0">
+<header class="w-full h-16 sticky top-0 z-40 bg-surface border-b border-surface-variant flex justify-between items-center px-lg py-md">
+<nav class="flex items-center gap-xs text-label-sm text-outline">
+<span>EduSystem Pro</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Surveillance</span>
+</nav>
+<div class="flex items-center gap-sm">
+<p class="font-label-md text-label-md leading-none" th:text="${utilisateurConnecte != null ? (utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom) : 'Surveillant'}">Surveillant</p>
+<span class="material-symbols-outlined text-outline">account_circle</span>
+</div>
+</header>
+
+<main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${alerteMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${alerteMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm">
+<span class="p-2 bg-secondary-container rounded-lg text-primary w-fit"><span class="material-symbols-outlined">groups</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Pointages aujourd'hui</p>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-xs" th:text="${pointagesAujourdHui}">0</h2>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm">
+<span class="p-2 bg-error-container rounded-lg text-error w-fit"><span class="material-symbols-outlined">warning</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Incidents du jour</p>
+<h2 class="font-headline-lg text-headline-lg text-error mt-xs" th:text="${incidentsAujourdHui}">0</h2>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm">
+<span class="p-2 bg-primary-fixed rounded-lg text-primary w-fit"><span class="material-symbols-outlined">map</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Zones enregistrées</p>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-xs" th:text="${#lists.size(zones)}">0</h2>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<section class="lg:col-span-2 flex flex-col gap-lg">
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">history</span>
+Derniers pointages
+</h3>
+<a class="text-primary font-label-md text-label-md hover:underline" th:href="@{/surveillant/presences}">Voir tout</a>
+</div>
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container text-label-sm text-on-surface-variant">
+<tr>
+<th class="px-lg py-3 font-semibold">Heure</th>
+<th class="px-lg py-3 font-semibold">Élève</th>
+<th class="px-lg py-3 font-semibold">Zone</th>
+<th class="px-lg py-3 font-semibold">Événement</th>
+<th class="px-lg py-3 font-semibold">Statut</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-variant">
+<tr th:each="p : ${pointagesRecents}" th:class="${p.alerte} ? 'bg-error-container/10' : ''">
+<td class="px-lg py-4 text-outline" th:text="${#temporals.format(p.dateHeure, 'HH:mm')}">10:42</td>
+<td class="px-lg py-4 font-label-md" th:text="${p.eleve.prenom + ' ' + p.eleve.nom}">Élève</td>
+<td class="px-lg py-4 text-on-surface-variant" th:text="${p.zone.nom}">Zone</td>
+<td class="px-lg py-4" th:text="${p.typeEvenement == 'ENTREE' ? 'Pointage Entrée' : 'Pointage Sortie'}">Événement</td>
+<td class="px-lg py-4">
+<span th:if="${p.alerte}" class="px-2 py-1 bg-error text-on-error rounded-full text-[10px] font-bold uppercase">Alerte</span>
+<span th:unless="${p.alerte}" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase">Autorisé</span>
+</td>
+</tr>
+<tr th:if="${#lists.isEmpty(pointagesRecents)}"><td class="px-lg py-6 text-center text-outline" colspan="5">Aucun pointage enregistré pour le moment.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">gavel</span>
+Incidents récents
+</h3>
+<a class="text-primary font-label-md text-label-md hover:underline" th:href="@{/surveillant/incidents}">Gérer</a>
+</div>
+<div class="space-y-md">
+<div th:each="inc : ${incidentsRecents}" class="p-md border border-outline-variant rounded-lg flex justify-between items-center">
+<div>
+<p class="font-label-md" th:text="${inc.eleve.prenom + ' ' + inc.eleve.nom + (inc.eleve.classe != null ? ' — ' + inc.eleve.classe.nom : '')}">Élève</p>
+<p class="text-body-md text-on-surface-variant italic" th:text="${inc.description}">Description</p>
+<div class="flex gap-sm mt-xs items-center">
+<span th:class="${inc.gravite == 'GRAVE'} ? 'px-2 py-0.5 bg-error-container text-error rounded text-[10px] font-bold' : 'px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold'" th:text="${inc.gravite}">DISCIPLINE</span>
+<span class="text-label-sm text-outline" th:text="${#temporals.format(inc.dateHeure, 'dd/MM HH:mm')}">date</span>
+<span class="text-label-sm text-outline" th:text="${inc.statut}">OUVERT</span>
+</div>
+</div>
+</div>
+<p th:if="${#lists.isEmpty(incidentsRecents)}" class="text-center text-outline py-4">Aucun incident enregistré.</p>
+</div>
+</div>
+</section>
+
+<aside class="flex flex-col gap-lg">
+<div class="flex flex-col gap-sm">
+<a th:href="@{/surveillant/incidents}" class="w-full bg-primary text-on-primary py-4 rounded-xl flex items-center justify-center gap-md font-headline-sm shadow-sm hover:shadow-md transition-all">
+<span class="material-symbols-outlined">add_alert</span>
+Signaler un Incident
+</a>
+<a th:href="@{/surveillant/presences}" class="w-full bg-surface-container-lowest border border-primary text-primary py-4 rounded-xl flex items-center justify-center gap-md font-headline-sm hover:bg-primary-fixed transition-all">
+<span class="material-symbols-outlined">how_to_reg</span>
+Enregistrer un Pointage
+</a>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low/50">
+<h3 class="font-label-md text-label-md">Retenues à venir</h3>
+<a class="text-primary text-label-sm hover:underline" th:href="@{/surveillant/retenues}">Voir tout</a>
+</div>
+<div class="divide-y divide-outline-variant">
+<div th:each="r : ${retenuesAVenir}" class="p-lg">
+<div class="flex justify-between items-start mb-xs">
+<span class="font-label-md" th:text="${#temporals.format(r.dateRetenue, 'dd/MM')} + ' - ' + ${r.heureRetenue} + ' - ' + ${r.salle}">date - heure - salle</span>
+</div>
+<p class="text-body-md font-semibold" th:text="${r.eleve.prenom + ' ' + r.eleve.nom}">Élève</p>
+<p class="text-[11px] text-outline" th:text="'Motif : ' + ${r.motif}">Motif</p>
+</div>
+<p th:if="${#lists.isEmpty(retenuesAVenir)}" class="p-lg text-center text-outline">Aucune retenue à venir.</p>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-label-md text-label-md">Zones de l'école</h3>
+<a class="text-primary text-label-sm hover:underline" th:href="@{/surveillant/zones}">Gérer</a>
+</div>
+<div class="space-y-xs">
+<div th:each="z : ${zones}" class="flex justify-between items-center text-[13px] py-1">
+<span class="flex items-center gap-xs">
+<span th:class="${z.zoneInterdite} ? 'w-2 h-2 rounded-full bg-error' : 'w-2 h-2 rounded-full bg-green-500'"></span>
+<span th:text="${z.nom}">Zone</span>
+</span>
+<span th:if="${z.zoneInterdite}" class="font-bold text-error">INTERDITE</span>
+<span th:unless="${z.zoneInterdite}" class="font-bold text-green-600">LIBRE</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</body>
+</html>

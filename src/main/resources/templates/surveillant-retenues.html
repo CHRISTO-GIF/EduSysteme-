@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Retenues - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }</style>
+<script id="tailwind-config">
+    tailwind.config = { theme: { extend: {
+      colors: {
+        "surface-container-low": "#f2f4f6", "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
+        "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb", "primary-fixed": "#dce1ff",
+        "on-error": "#ffffff", "tertiary": "#222a3e", "outline": "#757682", "surface-variant": "#e0e3e5",
+        "surface-container": "#eceef0", "surface": "#f7f9fb", "on-background": "#191c1e", "on-surface": "#191c1e",
+        "on-surface-variant": "#444651", "success-container": "#c4f7d0", "on-success-container": "#0a3818",
+        "tertiary-fixed-dim": "#bec6e0", "outline-variant": "#c5c5d3"
+      },
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      spacing: { gutter: "24px", xs: "4px", lg: "24px", xl: "32px", sm: "8px", "sidebar-width": "260px", md: "16px", "container-max": "1440px" },
+      fontFamily: { "label-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"] },
+      fontSize: {
+        "label-md": ["14px", {lineHeight: "20px", fontWeight: "600"}],
+        "headline-sm": ["18px", {lineHeight: "28px", fontWeight: "600"}],
+        "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+        "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500"}]
+      }
+    } } }
+</script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+<aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center"><span class="material-symbols-outlined text-primary">shield_person</span></div>
+<div><h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduSystem Pro</h1><p class="text-[10px] text-tertiary-fixed-dim uppercase tracking-widest">Module Surveillance</p></div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs px-sm overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant}"><span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Tableau de bord</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/presences}"><span class="material-symbols-outlined">event_available</span><span class="font-label-md text-label-md">Présences</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/incidents}"><span class="material-symbols-outlined">report_problem</span><span class="font-label-md text-label-md">Incidents</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary border-l-4 border-primary-fixed bg-tertiary/50" th:href="@{/surveillant/retenues}"><span class="material-symbols-outlined">gavel</span><span class="font-label-md text-label-md">Retenues</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/zones}"><span class="material-symbols-outlined">map</span><span class="font-label-md text-label-md">Zones de l'école</span></a>
+</nav>
+<div class="mt-auto px-sm pt-lg border-t border-outline/20">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;"><span class="material-symbols-outlined">logout</span><span class="font-label-md text-label-md">Déconnexion</span></a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="flex-1 flex flex-col min-w-0">
+<header class="w-full h-16 sticky top-0 z-40 bg-surface border-b border-surface-variant flex justify-between items-center px-lg py-md">
+<nav class="flex items-center gap-xs text-label-sm text-outline"><span>EduSystem Pro</span><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="text-primary font-semibold">Retenues</span></nav>
+</header>
+
+<main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<section class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant"><h3 class="font-headline-sm text-headline-sm">Retenues</h3></div>
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container text-label-sm text-on-surface-variant">
+<tr><th class="px-lg py-3 font-semibold">Date</th><th class="px-lg py-3 font-semibold">Élève</th><th class="px-lg py-3 font-semibold">Salle</th><th class="px-lg py-3 font-semibold">Motif</th><th class="px-lg py-3 font-semibold">Présence</th></tr>
+</thead>
+<tbody class="divide-y divide-surface-variant">
+<tr th:each="r : ${retenues}">
+<td class="px-lg py-4 text-outline" th:text="${#temporals.format(r.dateRetenue, 'dd/MM/yyyy')} + ' - ' + ${r.heureRetenue}">date</td>
+<td class="px-lg py-4 font-label-md" th:text="${r.eleve.prenom + ' ' + r.eleve.nom}">Élève</td>
+<td class="px-lg py-4 text-on-surface-variant" th:text="${r.salle}">Salle</td>
+<td class="px-lg py-4 text-on-surface-variant italic" th:text="${r.motif}">Motif</td>
+<td class="px-lg py-4">
+<form method="post" th:action="@{/surveillant/retenues/{id}/statut(id=${r.id})}" class="flex items-center gap-xs">
+<select class="border border-outline-variant rounded px-2 py-1 text-[12px]" name="statutPresence" onchange="this.form.submit()">
+<option value="EN_ATTENTE" th:selected="${r.statutPresence == 'EN_ATTENTE'}">En attente</option>
+<option value="PRESENT" th:selected="${r.statutPresence == 'PRESENT'}">Présent</option>
+<option value="ABSENT" th:selected="${r.statutPresence == 'ABSENT'}">Absent</option>
+</select>
+</form>
+</td>
+</tr>
+<tr th:if="${#lists.isEmpty(retenues)}"><td class="px-lg py-6 text-center text-outline" colspan="5">Aucune retenue enregistrée.</td></tr>
+</tbody>
+</table>
+</section>
+
+<aside class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg h-fit">
+<h3 class="font-headline-sm text-headline-sm mb-md">Nouvelle retenue</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/surveillant/retenues}">
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Élève</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2" name="eleveId" required="required">
+<option th:each="e : ${eleves}" th:value="${e.id}" th:text="${e.nom + ' ' + e.prenom}">Élève</option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Date</label>
+<input class="w-full border border-outline-variant rounded-lg px-3 py-2" name="dateRetenue" required="required" type="date"/>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Heure</label>
+<input class="w-full border border-outline-variant rounded-lg px-3 py-2" name="heureRetenue" placeholder="16:00" required="required" type="text"/>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Salle</label>
+<input class="w-full border border-outline-variant rounded-lg px-3 py-2" name="salle" placeholder="Salle de permanence" required="required" type="text"/>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Motif</label>
+<textarea class="w-full border border-outline-variant rounded-lg px-3 py-2" name="motif" required="required" rows="2"></textarea>
+</div>
+<button class="mt-2 bg-primary text-on-primary font-label-md py-3 rounded-lg hover:opacity-90 transition-all" type="submit">Enregistrer la retenue</button>
+</form>
+</aside>
+</div>
+</main>
+</div>
+</body>
+</html>

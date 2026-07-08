@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .requestMatchers("/personnel").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/personnel/**").hasRole("ADMIN")
                 .requestMatchers("/surveillance/**").hasAnyRole("ADMIN", "ENSEIGNANT")
+                .requestMatchers("/surveillant/**").hasAnyRole("ADMIN", "SURVEILLANT")
                 .requestMatchers("/notes/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
                 .requestMatchers("/examens/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
                 .requestMatchers("/bulletins/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "PARENT")
