@@ -6,6 +6,8 @@ import holyflame.administration.repository.EtablissementRepository;
 import holyflame.administration.repository.UtilisateurRepository;
 import holyflame.administration.service.FileStorageService;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,7 @@ import java.util.UUID;
 @Controller
 public class InscriptionEcoleController {
 
+    private static final Logger log = LoggerFactory.getLogger(InscriptionEcoleController.class);
     private static final String SESSION_KEY = "inscriptionEcoleDonnees";
 
     @Autowired private EtablissementRepository etablissementRepository;
@@ -191,7 +194,15 @@ public class InscriptionEcoleController {
         if (donnees == null) {
             return "redirect:/inscription-ecole";
         }
-        if (adminNomComplet == null || adminNomComplet.isBlank() || adminEmail == null || adminEmail.isBlank()) {
+
+        // Validate required fields
+        if (adminNomComplet == null || adminNomComplet.isBlank()) {
+            log.warn("finaliser() called with null or blank adminNomComplet");
+            model.addAttribute("erreur", "Le nom et l'email de l'administrateur sont obligatoires.");
+            return "inscription-ecole-utilisateurs";
+        }
+        if (adminEmail == null || adminEmail.isBlank()) {
+            log.warn("finaliser() called with null or blank adminEmail");
             model.addAttribute("erreur", "Le nom et l'email de l'administrateur sont obligatoires.");
             return "inscription-ecole-utilisateurs";
         }
@@ -200,53 +211,79 @@ public class InscriptionEcoleController {
             return "inscription-ecole-utilisateurs";
         }
 
-        // Etablissement
+        // Parse first name / last name safely
+        String prenom;
+        String nomFamille;
+        try {
+            String[] parts = adminNomComplet.trim().split("\\s+", 2);
+            prenom = parts.length > 1 ? parts[0] : "";
+            nomFamille = parts.length > 1 ? parts[1] : parts[0];
+        } catch (Exception e) {
+            log.error("Erreur lors du découpage du nom complet '{}': {}", adminNomComplet, e.getMessage(), e);
+            model.addAttribute("erreur", "Le nom de l'administrateur est invalide. Veuillez réessayer.");
+            return "inscription-ecole-utilisateurs";
+        }
+
+        // Build and persist Etablissement
         Etablissement etab = new Etablissement();
-        etab.setNom(donnees.nom);
-        etab.setAdresse(donnees.adresse);
-        etab.setEmail(donnees.email);
-        etab.setTelephone(donnees.telephone);
-        etab.setTypeEtablissement(donnees.niveaux != null ? donnees.niveaux : donnees.categorie);
-        etab.setContact(adminNomComplet.trim());
-        etab.setAnneeScolaire(donnees.anneeScolaire != null ? donnees.anneeScolaire : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1)));
-        etab.setStatut("ACTIF");
-        etab.setDateCreation(LocalDate.now());
-        String codeAcces = "HF-" + LocalDate.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        etab.setCodeAcces(codeAcces);
+        try {
+            etab.setNom(donnees.nom);
+            etab.setAdresse(donnees.adresse);
+            etab.setEmail(donnees.email);
+            etab.setTelephone(donnees.telephone);
+            etab.setTypeEtablissement(donnees.niveaux != null ? donnees.niveaux : donnees.categorie);
+            etab.setContact(adminNomComplet.trim());
+            etab.setAnneeScolaire(donnees.anneeScolaire != null ? donnees.anneeScolaire : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1)));
+            etab.setStatut("ACTIF");
+            etab.setDateCreation(LocalDate.now());
+            String codeAcces = "HF-" + LocalDate.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            etab.setCodeAcces(codeAcces);
 
-        etab.setDateDebutSession(donnees.dateDebutSession);
-        etab.setDateFinSession(donnees.dateFinSession);
-        etab.setSystemeNotation(donnees.systemeNotation != null ? donnees.systemeNotation : "NUMERIQUE");
-        etab.setSeuilAssiduite(donnees.seuilAssiduite != null ? donnees.seuilAssiduite : 75);
-        etab.setAlerteAbsences(donnees.alerteAbsences);
-        etab.setCalculRetard(donnees.calculRetard);
-        etab.setStatutsIncompletAbandon(donnees.statutsIncompletAbandon);
-        etab.setRangAutomatique(donnees.rangAutomatique);
-        etab.setLogoPath(donnees.logoPath);
-        etab.setCouleurPrimaire(donnees.couleurPrimaire != null ? donnees.couleurPrimaire : "#00236f");
-        etab.setLangueSysteme(donnees.langueSysteme != null ? donnees.langueSysteme : "Francais");
+            etab.setDateDebutSession(donnees.dateDebutSession);
+            etab.setDateFinSession(donnees.dateFinSession);
+            etab.setSystemeNotation(donnees.systemeNotation != null ? donnees.systemeNotation : "NUMERIQUE");
+            etab.setSeuilAssiduite(donnees.seuilAssiduite != null ? donnees.seuilAssiduite : 75);
+            etab.setAlerteAbsences(donnees.alerteAbsences);
+            etab.setCalculRetard(donnees.calculRetard);
+            etab.setStatutsIncompletAbandon(donnees.statutsIncompletAbandon);
+            etab.setRangAutomatique(donnees.rangAutomatique);
+            etab.setLogoPath(donnees.logoPath);
+            etab.setCouleurPrimaire(donnees.couleurPrimaire != null ? donnees.couleurPrimaire : "#00236f");
+            etab.setLangueSysteme(donnees.langueSysteme != null ? donnees.langueSysteme : "Francais");
 
-        etablissementRepository.save(etab);
+            log.debug("Enregistrement de l'établissement '{}'", donnees.nom);
+            etablissementRepository.save(etab);
+            log.info("Établissement '{}' créé avec l'id {}", etab.getNom(), etab.getId());
+        } catch (Exception e) {
+            log.error("Erreur lors de l'enregistrement de l'établissement '{}': {}", donnees.nom, e.getMessage(), e);
+            model.addAttribute("erreur", "Une erreur est survenue lors de la création de l'établissement. Veuillez réessayer.");
+            return "inscription-ecole-utilisateurs";
+        }
 
-        // Administrateur
-        String[] parts = adminNomComplet.trim().split("\\s+", 2);
-        String prenom = parts.length > 1 ? parts[0] : "";
-        String nomFamille = parts.length > 1 ? parts[1] : parts[0];
+        // Build and persist Utilisateur (admin)
         String role = mapRole(adminRole);
         String motDePasseGenere = genererMotDePasse();
-
         Utilisateur admin = new Utilisateur();
-        admin.setNom(nomFamille.toUpperCase());
-        admin.setPrenom(prenom);
-        admin.setEmail(adminEmail.trim());
-        admin.setMotDePasse(passwordEncoder.encode(motDePasseGenere));
-        admin.setRole(role);
-        admin.setEtablissement(etab);
-        utilisateurRepository.save(admin);
+        try {
+            admin.setNom(nomFamille.toUpperCase());
+            admin.setPrenom(prenom);
+            admin.setEmail(adminEmail.trim());
+            admin.setMotDePasse(passwordEncoder.encode(motDePasseGenere));
+            admin.setRole(role);
+            admin.setEtablissement(etab);
+
+            log.debug("Enregistrement de l'administrateur '{}'", adminEmail.trim());
+            utilisateurRepository.save(admin);
+            log.info("Administrateur '{}' créé pour l'établissement '{}'", admin.getEmail(), etab.getNom());
+        } catch (Exception e) {
+            log.error("Erreur lors de l'enregistrement de l'administrateur '{}': {}", adminEmail.trim(), e.getMessage(), e);
+            model.addAttribute("erreur", "Une erreur est survenue lors de la création du compte administrateur. Veuillez réessayer.");
+            return "inscription-ecole-utilisateurs";
+        }
 
         session.removeAttribute(SESSION_KEY);
 
-        ra.addFlashAttribute("codeAcces", codeAcces);
+        ra.addFlashAttribute("codeAcces", etab.getCodeAcces());
         ra.addFlashAttribute("motDePasse", motDePasseGenere);
         ra.addFlashAttribute("adminEmail", admin.getEmail());
         ra.addFlashAttribute("nomEcole", etab.getNom());
