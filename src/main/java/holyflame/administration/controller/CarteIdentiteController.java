@@ -65,9 +65,10 @@ public class CarteIdentiteController {
 
         String photoSelection = selection != null ? photosParEleve.get(selection.getId()) : null;
 
-        String nomEtab = parametre(etabId, "NOM_ETABLISSEMENT", "HolyFlame");
+        holyflame.administration.model.Etablissement etab = etablissementService.getCurrentEtablissement();
+        String nomEtab = etab != null && etab.getNom() != null && !etab.getNom().isBlank() ? etab.getNom() : "HolyFlame";
         String devise = parametre(etabId, "DEVISE", "");
-        String adresseEtab = parametre(etabId, "ADRESSE_ETABLISSEMENT", "");
+        String adresseEtab = etab != null && etab.getAdresse() != null ? etab.getAdresse() : "";
         String telEtab = parametre(etabId, "TELEPHONE_ECOLE", "");
         String emailEtab = parametre(etabId, "EMAIL_ECOLE", "");
         String logoPath = parametre(etabId, "LOGO_ETAB", null);

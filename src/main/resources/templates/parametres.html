@@ -191,6 +191,51 @@
 </div>
 </div>
 
+<!-- Identite de l'etablissement (pour bulletins, cartes, recus...) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="flex items-center gap-md mb-xl">
+<div class="bg-primary-container/10 p-3 rounded-lg text-primary">
+<span class="material-symbols-outlined">badge</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Identite de l'etablissement</h4>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="md:col-span-2 space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Devise / Credo</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="DEVISE" placeholder="Ex: Excellence, Discipline, Reussite" th:value="${p.get('DEVISE')}" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Telephone</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="TELEPHONE_ECOLE" th:value="${p.get('TELEPHONE_ECOLE')}" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Email institutionnel</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="EMAIL_ECOLE" th:value="${p.get('EMAIL_ECOLE')}" type="email"/>
+</div>
+<div class="md:col-span-2 space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Directeur / Contact principal</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="CONTACT_PRINCIPAL" th:value="${p.get('CONTACT_PRINCIPAL')}" type="text"/>
+</div>
+</div>
+</div>
+
+<!-- Logo (formulaire separe : upload de fichier) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="flex items-center gap-md mb-xl">
+<div class="bg-primary-container/10 p-3 rounded-lg text-primary">
+<span class="material-symbols-outlined">image</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Logo de l'etablissement</h4>
+</div>
+<div class="flex items-center gap-lg">
+<img alt="Logo actuel" class="w-16 h-16 object-contain border border-outline-variant rounded-lg" th:if="${p.get('LOGO_ETAB') != null}" th:src="@{'/uploads/' + ${p.get('LOGO_ETAB')}}"/>
+<form class="flex-1 flex items-center gap-md" enctype="multipart/form-data" method="post" th:action="@{/parametres/logo}">
+<input accept="image/*" class="flex-1 text-body-md" name="logo" required="required" type="file"/>
+<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md" type="submit">Televerser</button>
+</form>
+</div>
+</div>
+
 <!-- Profil Administrateur -->
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
 <div class="flex items-center gap-md mb-xl">

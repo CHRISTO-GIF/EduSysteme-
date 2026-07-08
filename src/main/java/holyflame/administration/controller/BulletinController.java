@@ -103,9 +103,9 @@ public class BulletinController {
             bulletins.get(i).put("effectif", bulletins.size());
         }
 
-        String nomEtab = parametreRepository
-            .findByCleAndEtablissementId("NOM_ETABLISSEMENT", etabId)
-            .map(p -> p.getValeur()).orElse("HolyFlame");
+        holyflame.administration.model.Etablissement etabListe = etablissementService.getCurrentEtablissement();
+        String nomEtab = etabListe != null && etabListe.getNom() != null && !etabListe.getNom().isBlank()
+            ? etabListe.getNom() : "HolyFlame";
         String classeNom = classeId != null
             ? classeRepository.findById(classeId).map(c -> c.getNom()).orElse("Toutes les classes")
             : "Toutes les classes";
@@ -269,10 +269,9 @@ public class BulletinController {
         // ── Chef d'etablissement (parametre reel) ──
         String chefEtablissement = parametreRepository.findByCleAndEtablissementId("CONTACT_PRINCIPAL", etabId)
             .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse(null);
-        String nomEtab = parametreRepository.findByCleAndEtablissementId("NOM_ETABLISSEMENT", etabId)
-            .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse("HolyFlame");
-        String adresseEtab = parametreRepository.findByCleAndEtablissementId("ADRESSE_ETABLISSEMENT", etabId)
-            .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse("");
+        holyflame.administration.model.Etablissement etab = etablissementService.getCurrentEtablissement();
+        String nomEtab = etab != null && etab.getNom() != null && !etab.getNom().isBlank() ? etab.getNom() : "HolyFlame";
+        String adresseEtab = etab != null && etab.getAdresse() != null ? etab.getAdresse() : "";
         String emailEtab = parametreRepository.findByCleAndEtablissementId("EMAIL_ECOLE", etabId)
             .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse("");
         String logoPath = parametreRepository.findByCleAndEtablissementId("LOGO_ETAB", etabId)

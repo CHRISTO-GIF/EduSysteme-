@@ -58,9 +58,9 @@ public class EmploiDuTempsController {
             parJour.add(liste);
         }
 
-        String nomEtab = parametreRepository
-            .findByCleAndEtablissementId("NOM_ETABLISSEMENT", etabId)
-            .map(p -> p.getValeur()).orElse("HolyFlame");
+        holyflame.administration.model.Etablissement etabEdt = etablissementService.getCurrentEtablissement();
+        String nomEtab = etabEdt != null && etabEdt.getNom() != null && !etabEdt.getNom().isBlank()
+            ? etabEdt.getNom() : "HolyFlame";
         String annee = parametreRepository
             .findByCleAndEtablissementId("ANNEE_SCOLAIRE", etabId)
             .map(p -> p.getValeur()).orElse("2025-2026");

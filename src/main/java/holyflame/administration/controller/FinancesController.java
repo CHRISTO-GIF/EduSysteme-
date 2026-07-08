@@ -296,13 +296,14 @@ public class FinancesController {
                 holyflame.administration.model.Parametre::getValeur,
                 (a, b) -> a));
 
+        holyflame.administration.model.Etablissement etab = etablissementService.getCurrentEtablissement();
         String monnaie = params.getOrDefault("MONNAIE", "FCFA");
         long montantEntier = p.getMontantVerse() != null ? Math.round(p.getMontantVerse()) : 0;
 
         model.addAttribute("paiement",   p);
-        model.addAttribute("nomEtab",    params.getOrDefault("NOM_ETABLISSEMENT", "HolyFlame"));
-        model.addAttribute("adresseEtab",params.getOrDefault("ADRESSE_ETABLISSEMENT", ""));
-        model.addAttribute("telEtab",    params.getOrDefault("TEL_ETABLISSEMENT", ""));
+        model.addAttribute("nomEtab",    etab != null && etab.getNom() != null && !etab.getNom().isBlank() ? etab.getNom() : "HolyFlame");
+        model.addAttribute("adresseEtab",etab != null && etab.getAdresse() != null ? etab.getAdresse() : "");
+        model.addAttribute("telEtab",    params.getOrDefault("TELEPHONE_ECOLE", ""));
         model.addAttribute("anneeScolaire", params.getOrDefault("ANNEE_SCOLAIRE", "2025-2026"));
         model.addAttribute("logoPath",   params.getOrDefault("LOGO_ETAB", null));
         model.addAttribute("devise",     params.getOrDefault("DEVISE", ""));
