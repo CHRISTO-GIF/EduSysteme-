@@ -19,6 +19,10 @@ public class Classe {
     private String anneeScolaire;
     private Long etablissementId;
     private Long professeurTitulaireId;
+    private Integer capacite;
+    private String salle;
+    @jakarta.persistence.Column(length = 2000)
+    private String notes;
 
     public Classe() {
     }
@@ -59,4 +63,10 @@ public class Classe {
     public void setEtablissementId(Long etablissementId) { this.etablissementId = etablissementId; }
     public Long getProfesseurTitulaireId() { return professeurTitulaireId; }
     public void setProfesseurTitulaireId(Long professeurTitulaireId) { this.professeurTitulaireId = professeurTitulaireId; }
+    public Integer getCapacite() { return capacite; }
+    public void setCapacite(Integer capacite) { this.capacite = capacite; }
+    public String getSalle() { return salle; }
+    public void setSalle(String salle) { this.salle = salle; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 }

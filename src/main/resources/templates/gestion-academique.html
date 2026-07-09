@@ -72,15 +72,16 @@
 <span class="text-xs text-[#45474b] font-semibold uppercase tracking-wider">Aperçu des sections</span>
 <span class="px-2.5 py-1 bg-[#dfdfe4] text-[#5d5e62] rounded-full text-xs" th:text="${nbClasses} + ' classe(s)'">0 classe(s)</span>
 </div>
-<button class="bg-[#00236f] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-opacity" onclick="document.getElementById('modal-classe').classList.remove('hidden')" type="button">
+<a class="bg-[#00236f] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-opacity" th:href="@{/gestion-classes/nouveau}">
 <span class="material-symbols-outlined text-[18px]">add</span> Nouvelle Classe
-</button>
+</a>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg" th:if="${nbClasses > 0}">
 <div class="bg-white border border-[#e0e3e5] p-lg rounded-xl hover:shadow-md transition-shadow group ligne-classe"
      th:data-annee="${row.classe.anneeScolaire}" th:data-id="${row.classe.id}" th:data-niveau="${row.classe.niveau}"
-     th:data-nom="${row.classe.nom}" th:data-titulaire="${row.classe.professeurTitulaireId}" th:each="row : ${classesVue}">
+     th:data-nom="${row.classe.nom}" th:data-titulaire="${row.classe.professeurTitulaireId}"
+     th:data-capacite="${row.classe.capacite}" th:data-salle="${row.classe.salle}" th:data-notes="${row.classe.notes}" th:each="row : ${classesVue}">
 <div class="flex justify-between items-start mb-md">
 <div class="h-12 w-12 bg-[#dfe2ed] flex items-center justify-center rounded-lg text-[#5a5e67]">
 <span class="material-symbols-outlined">groups</span>
@@ -103,7 +104,13 @@
 <div class="flex items-center gap-2 text-sm">
 <span class="material-symbols-outlined text-[#5a5e67] text-[18px]">group</span>
 <span class="text-[#45474b]">Effectif :</span>
-<span class="font-medium" th:text="${row.effectif} + ' élève(s)'">0 élève(s)</span>
+<span class="font-medium" th:if="${row.classe.capacite != null}" th:text="${row.effectif} + ' / ' + ${row.classe.capacite} + ' élèves'">0 / 0</span>
+<span class="font-medium" th:if="${row.classe.capacite == null}" th:text="${row.effectif} + ' élève(s)'">0 élève(s)</span>
+</div>
+<div class="flex items-center gap-2 text-sm" th:if="${row.classe.salle != null and !row.classe.salle.isEmpty()}">
+<span class="material-symbols-outlined text-[#5a5e67] text-[18px]">meeting_room</span>
+<span class="text-[#45474b]">Salle :</span>
+<span class="font-medium" th:text="${row.classe.salle}">--</span>
 </div>
 </div>
 </div>
@@ -191,6 +198,18 @@ Aucune matière enregistrée pour l'instant. Cliquez sur « Nouvelle Matière »
 <option th:each="e : ${enseignants}" th:text="${e.prenom} + ' ' + ${e.nom}" th:value="${e.id}"></option>
 </select>
 </div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Capacité maximale</label>
+<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-capacite-classe" min="1" name="capacite" type="number"/>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Salle attitrée</label>
+<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-salle-classe" name="salle" type="text"/>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Notes</label>
+<textarea class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-notes-classe" name="notes" rows="2"></textarea>
+</div>
 <div class="flex justify-end gap-2 pt-2">
 <button class="px-4 py-2 border border-[#c6c6cb] rounded-lg" onclick="fermerModalClasse()" type="button">Annuler</button>
 <button class="px-4 py-2 bg-[#00236f] text-white rounded-lg" type="submit">Enregistrer</button>
@@ -263,6 +282,9 @@ Aucune matière enregistrée pour l'instant. Cliquez sur « Nouvelle Matière »
             document.getElementById('input-niveau-classe').value = card.getAttribute('data-niveau') || '';
             document.getElementById('input-annee-classe').value = card.getAttribute('data-annee') || '';
             document.getElementById('input-titulaire-classe').value = card.getAttribute('data-titulaire') || '';
+            document.getElementById('input-capacite-classe').value = card.getAttribute('data-capacite') || '';
+            document.getElementById('input-salle-classe').value = card.getAttribute('data-salle') || '';
+            document.getElementById('input-notes-classe').value = card.getAttribute('data-notes') || '';
             document.getElementById('modal-classe').classList.remove('hidden');
         });
     });

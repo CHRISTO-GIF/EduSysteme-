@@ -17,9 +17,9 @@
 <h1 class="text-xl font-bold text-blue-900">Gestion des Classes</h1>
 <p class="text-gray-500 text-sm">Creer, modifier ou supprimer les classes de l'etablissement.</p>
 </div>
-<button class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" onclick="document.getElementById('modal-classe').classList.remove('hidden')" type="button">
+<a class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" th:href="@{/gestion-classes/nouveau}">
 <span class="material-symbols-outlined text-[18px]">add</span> Nouvelle classe
-</button>
+</a>
 </header>
 
 <main class="max-w-5xl mx-auto px-8 py-8">
@@ -36,7 +36,7 @@
 <tr th:if="${classes.isEmpty()}">
 <td class="px-5 py-8 text-center text-gray-500" colspan="5">Aucune classe creee.</td>
 </tr>
-<tr class="ligne-classe" th:data-annee="${c.anneeScolaire}" th:data-id="${c.id}" th:data-niveau="${c.niveau}" th:data-nom="${c.nom}" th:data-titulaire="${c.professeurTitulaireId}" th:each="c : ${classes}">
+<tr class="ligne-classe" th:data-annee="${c.anneeScolaire}" th:data-capacite="${c.capacite}" th:data-id="${c.id}" th:data-niveau="${c.niveau}" th:data-nom="${c.nom}" th:data-notes="${c.notes}" th:data-salle="${c.salle}" th:data-titulaire="${c.professeurTitulaireId}" th:each="c : ${classes}">
 <td class="px-5 py-3 font-medium" th:text="${c.nom}">Nom</td>
 <td class="px-5 py-3 text-gray-500" th:text="${c.niveau}">Niveau</td>
 <td class="px-5 py-3 text-gray-500" th:text="${c.anneeScolaire}">Annee</td>
@@ -83,6 +83,18 @@
 <option th:each="e : ${enseignants}" th:text="${e.prenom} + ' ' + ${e.nom}" th:value="${e.id}"></option>
 </select>
 </div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Capacité maximale</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" id="input-capacite" min="1" name="capacite" type="number"/>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Salle attitrée</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" id="input-salle" name="salle" type="text"/>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Notes</label>
+<textarea class="w-full p-2 border border-gray-300 rounded-lg" id="input-notes" name="notes" rows="2"></textarea>
+</div>
 <div class="flex justify-end gap-2 pt-2">
 <button class="px-4 py-2 border border-gray-300 rounded-lg" onclick="fermerModal()" type="button">Annuler</button>
 <button class="px-4 py-2 bg-blue-900 text-white rounded-lg" type="submit">Enregistrer</button>
@@ -102,6 +114,9 @@
             document.getElementById('input-niveau').value = row.getAttribute('data-niveau') || '';
             document.getElementById('input-annee').value = row.getAttribute('data-annee') || '';
             document.getElementById('input-titulaire').value = row.getAttribute('data-titulaire') || '';
+            document.getElementById('input-capacite').value = row.getAttribute('data-capacite') || '';
+            document.getElementById('input-salle').value = row.getAttribute('data-salle') || '';
+            document.getElementById('input-notes').value = row.getAttribute('data-notes') || '';
             document.getElementById('modal-classe').classList.remove('hidden');
         });
     });

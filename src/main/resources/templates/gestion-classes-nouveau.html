@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ajouter une Nouvelle Classe - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-[#fbf9f8] text-[#1b1c1c] min-h-screen flex">
+<aside class="w-[260px] h-screen sticky top-0 left-0 flex flex-col py-6 bg-[#5a5e67]">
+<div class="px-6 mb-8">
+<h1 class="text-lg font-bold text-white">EduSystem Pro</h1>
+<p class="text-sm text-white/80">Administration Scolaire</p>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 p-3 text-sm font-semibold text-white/80 hover:bg-white/10 transition-colors rounded" th:href="@{/dashboard}">
+<span class="material-symbols-outlined">dashboard</span> Tableau de bord
+</a>
+<a class="flex items-center gap-3 p-3 text-sm font-semibold text-white font-bold border-l-4 border-white bg-white/20 transition-colors rounded-r" th:href="@{/gestion-academique}">
+<span class="material-symbols-outlined">book</span> Matières &amp; Classes
+</a>
+<a class="flex items-center gap-3 p-3 text-sm font-semibold text-white/80 hover:bg-white/10 transition-colors rounded" th:href="@{/secretariat}">
+<span class="material-symbols-outlined">group</span> Élèves
+</a>
+</nav>
+</aside>
+
+<div class="flex-1 flex flex-col min-w-0">
+<header class="h-16 flex justify-end items-center w-full px-lg bg-white border-b border-[#c6c6cb] sticky top-0 z-10">
+<div class="flex items-center gap-md">
+<p class="text-sm font-semibold" th:text="${utilisateurConnecte != null ? (utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom) : ''}">Admin</p>
+</div>
+</header>
+
+<main class="p-lg max-w-[1200px] mx-auto w-full flex-1 space-y-lg">
+<div class="flex justify-between items-end mb-sm">
+<div>
+<div class="flex items-center gap-1 text-[#45474b] text-xs mb-1 uppercase tracking-wider">
+<a th:href="@{/gestion-academique}">Gestion</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Matières &amp; Classes</span>
+</div>
+<h2 class="text-2xl font-bold">Ajouter une Nouvelle Classe</h2>
+</div>
+</div>
+
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 font-medium" th:text="${erreur}"></div>
+
+<form class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start" method="post" th:action="@{/gestion-classes}">
+<div class="lg:col-span-8 space-y-lg">
+
+<div class="bg-white border border-[#c6c6cb] p-xl rounded-lg">
+<div class="flex items-center gap-md mb-lg">
+<span class="material-symbols-outlined text-[#5a5e67]">info</span>
+<h3 class="text-lg font-bold">Informations Générales</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="flex flex-col gap-1">
+<label class="text-sm text-[#45474b]">Nom de la classe</label>
+<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="nom" placeholder="ex: 6ème A" required="required" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-sm text-[#45474b]">Niveau</label>
+<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="niveau" placeholder="ex: Collège - Niveau 1" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-sm text-[#45474b]">Année Scolaire</label>
+<select class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="anneeScolaire">
+<option value="2024-2025">2024 - 2025</option>
+<option selected="selected" value="2025-2026">2025 - 2026</option>
+<option value="2026-2027">2026 - 2027</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-sm text-[#45474b]">Capacité maximale</label>
+<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" min="1" name="capacite" placeholder="30" type="number"/>
+</div>
+</div>
+</div>
+
+<div class="bg-white border border-[#c6c6cb] p-xl rounded-lg">
+<div class="flex items-center gap-md mb-lg">
+<span class="material-symbols-outlined text-[#5a5e67]">assignment_ind</span>
+<h3 class="text-lg font-bold">Affectation Administrative</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="flex flex-col gap-1">
+<label class="text-sm text-[#45474b]">Professeur Principal</label>
+<select class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="professeurTitulaireId">
+<option value="">-- Aucun --</option>
+<option th:each="e : ${enseignants}" th:text="${e.prenom + ' ' + e.nom}" th:value="${e.id}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-sm text-[#45474b]">Salle de classe attitrée</label>
+<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="salle" placeholder="ex: Salle 102" type="text"/>
+</div>
+</div>
+</div>
+
+<div class="bg-white border border-[#c6c6cb] p-xl rounded-lg">
+<div class="flex items-center gap-md mb-lg">
+<span class="material-symbols-outlined text-[#5a5e67]">description</span>
+<h3 class="text-lg font-bold">Description &amp; Objectifs</h3>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-sm text-[#45474b]">Notes internes ou objectifs de la classe</label>
+<textarea class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none resize-none" name="notes" placeholder="Saisissez ici les particularités de cette classe, les objectifs pédagogiques spécifiques ou des notes de gestion..." rows="4"></textarea>
+</div>
+</div>
+
+<div class="flex justify-end gap-md pt-md">
+<a class="px-xl py-3 border border-[#76777c] text-[#45474b] font-semibold rounded-lg hover:bg-[#eae7e7] transition-colors" th:href="@{/gestion-academique}">Annuler</a>
+<button class="px-xl py-3 bg-[#5a5e67] text-white font-semibold rounded-lg hover:opacity-90 shadow-sm transition-all active:scale-[0.98]" type="submit">Enregistrer la Classe</button>
+</div>
+</div>
+
+<div class="lg:col-span-4 space-y-lg">
+<div class="rounded-lg overflow-hidden border border-[#c6c6cb] relative h-32 bg-[#5a5e67] flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[64px] opacity-80">meeting_room</span>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-lg">
+<p class="text-white font-bold">Configuration de Classe</p>
+</div>
+</div>
+
+<div class="bg-[#f1e0cd]/40 border border-[#f1e0cd] p-lg rounded-lg">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-[#7f7363] mt-1">lightbulb</span>
+<div>
+<h4 class="text-sm font-bold text-[#504538]">Conseil Administratif</h4>
+<p class="text-sm text-[#504538] leading-relaxed mt-1">Veillez à ce que la capacité ne dépasse pas les normes de l'établissement pour garantir un environnement d'apprentissage optimal.</p>
+</div>
+</div>
+</div>
+<div class="bg-[#dfdfe4]/50 border border-[#c6c6cb] p-lg rounded-lg">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-[#5d5e62] mt-1">event_note</span>
+<div>
+<h4 class="text-sm font-bold text-[#45474a]">Emploi du temps</h4>
+<p class="text-sm text-[#45474a] leading-relaxed mt-1">La création de la classe permettra ensuite de définir son emploi du temps dédié et d'y affecter des matières.</p>
+</div>
+</div>
+</div>
+
+<div class="p-lg bg-[#eae7e7] rounded-lg border border-[#c6c6cb]">
+<h4 class="text-sm font-semibold mb-md">Statut de Configuration</h4>
+<div class="space-y-md">
+<div class="flex items-center justify-between">
+<span class="text-xs text-[#45474b]">Saisie des données</span>
+<span class="text-xs text-[#5a5e67] font-semibold" id="progress-label">En cours</span>
+</div>
+<div class="h-2 w-full bg-[#e4e2e2] rounded-full overflow-hidden">
+<div class="h-full bg-[#5a5e67] w-[30%] transition-all duration-700 ease-out" id="progress-bar"></div>
+</div>
+<p class="text-xs text-[#76777c] italic">Seul le nom de la classe est obligatoire.</p>
+</div>
+</div>
+</div>
+</form>
+</main>
+</div>
+
+<script>
+    const inputs = document.querySelectorAll('input, select, textarea');
+    const progressBar = document.getElementById('progress-bar');
+    const progressLabel = document.getElementById('progress-label');
+    inputs.forEach(function (input) {
+        input.addEventListener('input', function () {
+            let filled = 0;
+            inputs.forEach(function (i) { if (i.value) filled++; });
+            const percentage = Math.round((filled / inputs.length) * 100);
+            progressBar.style.width = Math.max(15, percentage) + '%';
+            if (percentage >= 90) progressLabel.textContent = 'Complet';
+        });
+    });
+</script>
+</body>
+</html>

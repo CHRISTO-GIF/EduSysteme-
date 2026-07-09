@@ -33,18 +33,31 @@ public class ClasseGestionController {
         return "gestion-classes";
     }
 
+    @GetMapping("/nouveau")
+    public String nouveauForm(Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        model.addAttribute("enseignants", utilisateurRepository.findByRoleAndEtablissementIdOrderByNomAsc("ENSEIGNANT", etabId));
+        return "gestion-classes-nouveau";
+    }
+
     @PostMapping
     public String ajouterClasse(
             @RequestParam String nom,
             @RequestParam(required = false) String niveau,
             @RequestParam(required = false) String anneeScolaire,
-            @RequestParam(required = false) Long professeurTitulaireId) {
+            @RequestParam(required = false) Long professeurTitulaireId,
+            @RequestParam(required = false) Integer capacite,
+            @RequestParam(required = false) String salle,
+            @RequestParam(required = false) String notes) {
 
         Classe classe = new Classe();
         classe.setNom(nom);
         classe.setNiveau(niveau);
         classe.setAnneeScolaire(anneeScolaire != null ? anneeScolaire : "2025-2026");
         classe.setProfesseurTitulaireId(professeurTitulaireId);
+        classe.setCapacite(capacite);
+        classe.setSalle(salle);
+        classe.setNotes(notes);
         classe.setEtablissementId(etablissementService.getCurrentEtablissementId());
         classeRepository.save(classe);
         return "redirect:/gestion-classes";
@@ -56,7 +69,10 @@ public class ClasseGestionController {
             @RequestParam String nom,
             @RequestParam(required = false) String niveau,
             @RequestParam(required = false) String anneeScolaire,
-            @RequestParam(required = false) Long professeurTitulaireId) {
+            @RequestParam(required = false) Long professeurTitulaireId,
+            @RequestParam(required = false) Integer capacite,
+            @RequestParam(required = false) String salle,
+            @RequestParam(required = false) String notes) {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
         Classe classe = classeRepository.findById(id).orElseThrow();
@@ -65,6 +81,9 @@ public class ClasseGestionController {
         classe.setNiveau(niveau);
         classe.setAnneeScolaire(anneeScolaire);
         classe.setProfesseurTitulaireId(professeurTitulaireId);
+        classe.setCapacite(capacite);
+        classe.setSalle(salle);
+        classe.setNotes(notes);
         classeRepository.save(classe);
         return "redirect:/gestion-classes";
     }
