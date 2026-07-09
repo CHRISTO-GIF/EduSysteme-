@@ -1,6 +1,7 @@
 package holyflame.administration.controller;
 
 import holyflame.administration.model.Classe;
+import holyflame.administration.model.Eleve;
 import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.CreneauHoraireRepository;
 import holyflame.administration.repository.EleveRepository;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/gestion-classes")
@@ -86,6 +89,58 @@ public class ClasseGestionController {
         classe.setNotes(notes);
         classeRepository.save(classe);
         return "redirect:/gestion-classes";
+    }
+
+    @GetMapping("/{id}/affectation")
+    public String affectationForm(@PathVariable Long id, @RequestParam(required = false) String q, Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Classe classe = classeRepository.findById(id).orElseThrow();
+        verifierProprietaire(classe, etabId);
+
+        List<Eleve> elevesClasse = eleveRepository.findByClasseIdOrderByNomAsc(id);
+
+        List<Eleve> autresEleves = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId).stream()
+            .filter(e -> e.getClasse() == null || !id.equals(e.getClasse().getId()))
+            .filter(e -> q == null || q.isBlank()
+                || e.getNom().toLowerCase().contains(q.toLowerCase())
+                || e.getPrenom().toLowerCase().contains(q.toLowerCase())
+                || (e.getMatricule() != null && e.getMatricule().toLowerCase().contains(q.toLowerCase())))
+            .toList();
+
+        long garcons = elevesClasse.stream().filter(e -> "MASCULIN".equals(e.getGenre())).count();
+        long filles = elevesClasse.stream().filter(e -> "FEMININ".equals(e.getGenre())).count();
+
+        model.addAttribute("classe", classe);
+        model.addAttribute("elevesClasse", elevesClasse);
+        model.addAttribute("autresEleves", autresEleves);
+        model.addAttribute("totalAutresEleves", autresEleves.size());
+        model.addAttribute("garcons", garcons);
+        model.addAttribute("filles", filles);
+        model.addAttribute("q", q);
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "affectation-eleves";
+    }
+
+    @PostMapping("/{id}/affectation")
+    public String affectationSave(@PathVariable Long id, @RequestParam(required = false) List<Long> eleveIds, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Classe classe = classeRepository.findById(id).orElseThrow();
+        verifierProprietaire(classe, etabId);
+
+        int nbAffectes = 0;
+        if (eleveIds != null) {
+            for (Long eleveId : eleveIds) {
+                Eleve eleve = eleveRepository.findById(eleveId).orElse(null);
+                if (eleve == null || !etabId.equals(eleve.getEtablissementId())) continue;
+                eleve.setClasse(classe);
+                eleveRepository.save(eleve);
+                nbAffectes++;
+            }
+        }
+        ra.addFlashAttribute("success", nbAffectes > 0
+            ? nbAffectes + " élève(s) affecté(s) à la classe " + classe.getNom() + "."
+            : "Aucun élève sélectionné.");
+        return "redirect:/gestion-classes/" + id + "/affectation";
     }
 
     @Transactional

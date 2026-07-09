@@ -113,6 +113,11 @@
 <span class="font-medium" th:text="${row.classe.salle}">--</span>
 </div>
 </div>
+<div class="mt-lg pt-md border-t border-[#e0e3e5]">
+<a class="text-[#00236f] text-sm font-semibold flex items-center gap-xs hover:underline" th:href="@{/gestion-classes/{id}/affectation(id=${row.classe.id})}">
+<span class="material-symbols-outlined text-[18px]">group_add</span> Affecter des élèves
+</a>
+</div>
 </div>
 </div>
 <div class="bg-white border border-dashed border-[#c6c6cb] rounded-xl p-xl text-center text-[#45474b]" th:if="${nbClasses == 0}">
