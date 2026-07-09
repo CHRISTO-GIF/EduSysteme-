@@ -1,7 +1,9 @@
 package holyflame.administration.controller;
 
+import holyflame.administration.model.Classe;
 import holyflame.administration.model.Etablissement;
 import holyflame.administration.model.Utilisateur;
+import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.EtablissementRepository;
 import holyflame.administration.repository.UtilisateurRepository;
 import holyflame.administration.service.FileStorageService;
@@ -29,13 +31,42 @@ public class InscriptionEcoleController {
 
     @Autowired private EtablissementRepository etablissementRepository;
     @Autowired private UtilisateurRepository utilisateurRepository;
+    @Autowired private ClasseRepository classeRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private FileStorageService fileStorageService;
+
+    /** Code de niveau -> [nom affiche, cycle]. Utilise pour generer une classe par defaut par niveau coche. */
+    private static final java.util.Map<String, String[]> NIVEAUX = new java.util.LinkedHashMap<>();
+    static {
+        NIVEAUX.put("MATERNELLE_PS", new String[]{"Petite Section", "Maternelle"});
+        NIVEAUX.put("MATERNELLE_MS", new String[]{"Moyenne Section", "Maternelle"});
+        NIVEAUX.put("MATERNELLE_GS", new String[]{"Grande Section", "Maternelle"});
+        NIVEAUX.put("PRIMAIRE_CP1", new String[]{"CP1", "Primaire"});
+        NIVEAUX.put("PRIMAIRE_CP2", new String[]{"CP2", "Primaire"});
+        NIVEAUX.put("PRIMAIRE_CE1", new String[]{"CE1", "Primaire"});
+        NIVEAUX.put("PRIMAIRE_CE2", new String[]{"CE2", "Primaire"});
+        NIVEAUX.put("PRIMAIRE_CM1", new String[]{"CM1", "Primaire"});
+        NIVEAUX.put("PRIMAIRE_CM2", new String[]{"CM2", "Primaire"});
+        NIVEAUX.put("COLLEGE_6E", new String[]{"6ème", "Collège"});
+        NIVEAUX.put("COLLEGE_5E", new String[]{"5ème", "Collège"});
+        NIVEAUX.put("COLLEGE_4E", new String[]{"4ème", "Collège"});
+        NIVEAUX.put("COLLEGE_3E", new String[]{"3ème", "Collège"});
+        NIVEAUX.put("LYCEE_SECONDE", new String[]{"Seconde", "Lycée"});
+        NIVEAUX.put("LYCEE_PREMIERE", new String[]{"Première", "Lycée"});
+        NIVEAUX.put("LYCEE_TERMINALE", new String[]{"Terminale", "Lycée"});
+        NIVEAUX.put("SUPERIEUR_L1", new String[]{"Licence 1", "Supérieur"});
+        NIVEAUX.put("SUPERIEUR_L2", new String[]{"Licence 2", "Supérieur"});
+        NIVEAUX.put("SUPERIEUR_L3", new String[]{"Licence 3", "Supérieur"});
+        NIVEAUX.put("SUPERIEUR_M1", new String[]{"Master 1", "Supérieur"});
+        NIVEAUX.put("SUPERIEUR_M2", new String[]{"Master 2", "Supérieur"});
+        NIVEAUX.put("SUPERIEUR_DOCTORAT", new String[]{"Doctorat", "Supérieur"});
+    }
 
     public static class DonneesInscription implements Serializable {
         public String nom;
         public String categorie;
         public String niveaux;
+        public List<String> niveauxSelectionnes;
         public String adresse;
         public String email;
         public String telephone;
@@ -78,7 +109,13 @@ public class InscriptionEcoleController {
         DonneesInscription donnees = new DonneesInscription();
         donnees.nom = nom.trim();
         donnees.categorie = categorie;
-        donnees.niveaux = niveaux != null ? String.join(", ", niveaux) : null;
+        donnees.niveauxSelectionnes = niveaux;
+        // Resume des cycles (ex: "Primaire, Collège") pour l'affichage/le type d'etablissement —
+        // la liste detaillee (niveauxSelectionnes) sert a generer les classes reelles dans finaliser().
+        donnees.niveaux = niveaux != null
+            ? niveaux.stream().map(code -> NIVEAUX.getOrDefault(code, new String[]{code, code})[1])
+                .distinct().collect(java.util.stream.Collectors.joining(", "))
+            : null;
         donnees.adresse = adresse;
         donnees.email = email;
         donnees.telephone = telephone;
@@ -226,6 +263,22 @@ public class InscriptionEcoleController {
         etab.setLangueSysteme(donnees.langueSysteme != null ? donnees.langueSysteme : "Francais");
 
         etablissementRepository.save(etab);
+
+        // Classes generees automatiquement a partir des niveaux coches a l'etape 1
+        // (une classe "A" par niveau ; l'etablissement pourra ajouter des sections
+        // ou des classes speciales ensuite depuis Gestion Academique).
+        if (donnees.niveauxSelectionnes != null) {
+            for (String code : donnees.niveauxSelectionnes) {
+                String[] info = NIVEAUX.get(code);
+                if (info == null) continue;
+                Classe classe = new Classe();
+                classe.setNom(info[0] + " A");
+                classe.setNiveau(info[0]);
+                classe.setAnneeScolaire(etab.getAnneeScolaire());
+                classe.setEtablissementId(etab.getId());
+                classeRepository.save(classe);
+            }
+        }
 
         // Administrateur
         String[] parts = adminNomComplet.trim().split("\\s+", 2);
