@@ -182,97 +182,112 @@
 <p class="font-label-sm text-label-sm text-secondary -mt-xs">Cochez chaque niveau enseigne : une classe sera automatiquement creee pour chacun (vous pourrez ajouter des sections ou classes speciales ensuite depuis Gestion Academique).</p>
 
 <div class="border border-outline-variant rounded-lg p-md">
-<p class="font-label-md text-label-md text-on-surface mb-sm">Maternelle</p>
-<div class="flex flex-wrap gap-xs">
+<label class="flex items-center gap-xs mb-sm cursor-pointer w-fit">
+<input class="case-groupe rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-maternelle" onchange="toggleGroupe(this)" type="checkbox">
+<span class="font-label-md text-label-md text-on-surface">Maternelle <span class="font-label-sm text-outline">(tout cocher)</span></span>
+</label>
+<div class="flex flex-wrap gap-xs groupe-maternelle">
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="MATERNELLE_PS"><span class="font-label-sm text-label-sm">Petite Section (PS)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-maternelle" name="niveaux" onchange="majGroupe('groupe-maternelle')" type="checkbox" value="MATERNELLE_PS"><span class="font-label-sm text-label-sm">Petite Section (PS)</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="MATERNELLE_MS"><span class="font-label-sm text-label-sm">Moyenne Section (MS)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-maternelle" name="niveaux" onchange="majGroupe('groupe-maternelle')" type="checkbox" value="MATERNELLE_MS"><span class="font-label-sm text-label-sm">Moyenne Section (MS)</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="MATERNELLE_GS"><span class="font-label-sm text-label-sm">Grande Section (GS)</span>
-</label>
-</div>
-</div>
-
-<div class="border border-outline-variant rounded-lg p-md">
-<p class="font-label-md text-label-md text-on-surface mb-sm">Primaire</p>
-<div class="flex flex-wrap gap-xs">
-<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="PRIMAIRE_CP1"><span class="font-label-sm text-label-sm">Cours Preparatoire 1 (CP1)</span>
-</label>
-<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="PRIMAIRE_CP2"><span class="font-label-sm text-label-sm">Cours Preparatoire 2 (CP2)</span>
-</label>
-<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="PRIMAIRE_CE1"><span class="font-label-sm text-label-sm">Cours Elementaire 1 (CE1)</span>
-</label>
-<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="PRIMAIRE_CE2"><span class="font-label-sm text-label-sm">Cours Elementaire 2 (CE2)</span>
-</label>
-<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="PRIMAIRE_CM1"><span class="font-label-sm text-label-sm">Cours Moyen 1 (CM1)</span>
-</label>
-<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="PRIMAIRE_CM2"><span class="font-label-sm text-label-sm">Cours Moyen 2 (CM2)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-maternelle" name="niveaux" onchange="majGroupe('groupe-maternelle')" type="checkbox" value="MATERNELLE_GS"><span class="font-label-sm text-label-sm">Grande Section (GS)</span>
 </label>
 </div>
 </div>
 
 <div class="border border-outline-variant rounded-lg p-md">
-<p class="font-label-md text-label-md text-on-surface mb-sm">College</p>
-<div class="flex flex-wrap gap-xs">
+<label class="flex items-center gap-xs mb-sm cursor-pointer w-fit">
+<input class="case-groupe rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-primaire" onchange="toggleGroupe(this)" type="checkbox">
+<span class="font-label-md text-label-md text-on-surface">Primaire <span class="font-label-sm text-outline">(tout cocher)</span></span>
+</label>
+<div class="flex flex-wrap gap-xs groupe-primaire">
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="COLLEGE_6E"><span class="font-label-sm text-label-sm">6eme</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-primaire" name="niveaux" onchange="majGroupe('groupe-primaire')" type="checkbox" value="PRIMAIRE_CP1"><span class="font-label-sm text-label-sm">Cours Preparatoire 1 (CP1)</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="COLLEGE_5E"><span class="font-label-sm text-label-sm">5eme</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-primaire" name="niveaux" onchange="majGroupe('groupe-primaire')" type="checkbox" value="PRIMAIRE_CP2"><span class="font-label-sm text-label-sm">Cours Preparatoire 2 (CP2)</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="COLLEGE_4E"><span class="font-label-sm text-label-sm">4eme</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-primaire" name="niveaux" onchange="majGroupe('groupe-primaire')" type="checkbox" value="PRIMAIRE_CE1"><span class="font-label-sm text-label-sm">Cours Elementaire 1 (CE1)</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="COLLEGE_3E"><span class="font-label-sm text-label-sm">3eme</span>
-</label>
-</div>
-</div>
-
-<div class="border border-outline-variant rounded-lg p-md">
-<p class="font-label-md text-label-md text-on-surface mb-sm">Secondaire (Lycee)</p>
-<div class="flex flex-wrap gap-xs">
-<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="LYCEE_SECONDE"><span class="font-label-sm text-label-sm">Seconde</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-primaire" name="niveaux" onchange="majGroupe('groupe-primaire')" type="checkbox" value="PRIMAIRE_CE2"><span class="font-label-sm text-label-sm">Cours Elementaire 2 (CE2)</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="LYCEE_PREMIERE"><span class="font-label-sm text-label-sm">Premiere</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-primaire" name="niveaux" onchange="majGroupe('groupe-primaire')" type="checkbox" value="PRIMAIRE_CM1"><span class="font-label-sm text-label-sm">Cours Moyen 1 (CM1)</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="LYCEE_TERMINALE"><span class="font-label-sm text-label-sm">Terminale</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-primaire" name="niveaux" onchange="majGroupe('groupe-primaire')" type="checkbox" value="PRIMAIRE_CM2"><span class="font-label-sm text-label-sm">Cours Moyen 2 (CM2)</span>
 </label>
 </div>
 </div>
 
 <div class="border border-outline-variant rounded-lg p-md">
-<p class="font-label-md text-label-md text-on-surface mb-sm">Superieur</p>
-<div class="flex flex-wrap gap-xs">
+<label class="flex items-center gap-xs mb-sm cursor-pointer w-fit">
+<input class="case-groupe rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-college" onchange="toggleGroupe(this)" type="checkbox">
+<span class="font-label-md text-label-md text-on-surface">Collège <span class="font-label-sm text-outline">(tout cocher)</span></span>
+</label>
+<div class="flex flex-wrap gap-xs groupe-college">
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="SUPERIEUR_L1"><span class="font-label-sm text-label-sm">Licence 1 (L1)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-college" name="niveaux" onchange="majGroupe('groupe-college')" type="checkbox" value="COLLEGE_6E"><span class="font-label-sm text-label-sm">6eme</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="SUPERIEUR_L2"><span class="font-label-sm text-label-sm">Licence 2 (L2)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-college" name="niveaux" onchange="majGroupe('groupe-college')" type="checkbox" value="COLLEGE_5E"><span class="font-label-sm text-label-sm">5eme</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="SUPERIEUR_L3"><span class="font-label-sm text-label-sm">Licence 3 (L3)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-college" name="niveaux" onchange="majGroupe('groupe-college')" type="checkbox" value="COLLEGE_4E"><span class="font-label-sm text-label-sm">4eme</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="SUPERIEUR_M1"><span class="font-label-sm text-label-sm">Master 1 (M1)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-college" name="niveaux" onchange="majGroupe('groupe-college')" type="checkbox" value="COLLEGE_3E"><span class="font-label-sm text-label-sm">3eme</span>
+</label>
+</div>
+</div>
+
+<div class="border border-outline-variant rounded-lg p-md">
+<label class="flex items-center gap-xs mb-sm cursor-pointer w-fit">
+<input class="case-groupe rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-lycee" onchange="toggleGroupe(this)" type="checkbox">
+<span class="font-label-md text-label-md text-on-surface">Secondaire (Lycée) <span class="font-label-sm text-outline">(tout cocher)</span></span>
+</label>
+<div class="flex flex-wrap gap-xs groupe-lycee">
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-lycee" name="niveaux" onchange="majGroupe('groupe-lycee')" type="checkbox" value="LYCEE_SECONDE"><span class="font-label-sm text-label-sm">Seconde</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="SUPERIEUR_M2"><span class="font-label-sm text-label-sm">Master 2 (M2)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-lycee" name="niveaux" onchange="majGroupe('groupe-lycee')" type="checkbox" value="LYCEE_PREMIERE"><span class="font-label-sm text-label-sm">Premiere</span>
 </label>
 <label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
-<input class="rounded text-primary focus:ring-primary w-4 h-4" name="niveaux" type="checkbox" value="SUPERIEUR_DOCTORAT"><span class="font-label-sm text-label-sm">Doctorat (PhD)</span>
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-lycee" name="niveaux" onchange="majGroupe('groupe-lycee')" type="checkbox" value="LYCEE_TERMINALE"><span class="font-label-sm text-label-sm">Terminale</span>
+</label>
+</div>
+</div>
+
+<div class="border border-outline-variant rounded-lg p-md">
+<label class="flex items-center gap-xs mb-sm cursor-pointer w-fit">
+<input class="case-groupe rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-superieur" onchange="toggleGroupe(this)" type="checkbox">
+<span class="font-label-md text-label-md text-on-surface">Supérieur <span class="font-label-sm text-outline">(tout cocher)</span></span>
+</label>
+<div class="flex flex-wrap gap-xs groupe-superieur">
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-superieur" name="niveaux" onchange="majGroupe('groupe-superieur')" type="checkbox" value="SUPERIEUR_L1"><span class="font-label-sm text-label-sm">Licence 1 (L1)</span>
+</label>
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-superieur" name="niveaux" onchange="majGroupe('groupe-superieur')" type="checkbox" value="SUPERIEUR_L2"><span class="font-label-sm text-label-sm">Licence 2 (L2)</span>
+</label>
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-superieur" name="niveaux" onchange="majGroupe('groupe-superieur')" type="checkbox" value="SUPERIEUR_L3"><span class="font-label-sm text-label-sm">Licence 3 (L3)</span>
+</label>
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-superieur" name="niveaux" onchange="majGroupe('groupe-superieur')" type="checkbox" value="SUPERIEUR_M1"><span class="font-label-sm text-label-sm">Master 1 (M1)</span>
+</label>
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-superieur" name="niveaux" onchange="majGroupe('groupe-superieur')" type="checkbox" value="SUPERIEUR_M2"><span class="font-label-sm text-label-sm">Master 2 (M2)</span>
+</label>
+<label class="flex items-center gap-xs px-md py-xs bg-surface-container rounded border border-outline-variant cursor-pointer hover:border-primary transition-all">
+<input class="case-niveau rounded text-primary focus:ring-primary w-4 h-4" data-groupe="groupe-superieur" name="niveaux" onchange="majGroupe('groupe-superieur')" type="checkbox" value="SUPERIEUR_DOCTORAT"><span class="font-label-sm text-label-sm">Doctorat (PhD)</span>
 </label>
 </div>
 </div>
@@ -357,6 +372,21 @@
 </div>
 </footer>
 <script>
+        // Coche/decoche toutes les cases d'un groupe de niveaux (ex: toute la Maternelle)
+        function toggleGroupe(caseGroupe) {
+            var groupe = caseGroupe.getAttribute('data-groupe');
+            document.querySelectorAll('.case-niveau[data-groupe="' + groupe + '"]').forEach(function (c) {
+                c.checked = caseGroupe.checked;
+            });
+        }
+        // Coche automatiquement la case "tout cocher" si toutes les cases du groupe sont cochees
+        function majGroupe(groupe) {
+            var cases = document.querySelectorAll('.case-niveau[data-groupe="' + groupe + '"]');
+            var toutesCochees = Array.prototype.every.call(cases, function (c) { return c.checked; });
+            var caseGroupe = document.querySelector('.case-groupe[data-groupe="' + groupe + '"]');
+            if (caseGroupe) caseGroupe.checked = toutesCochees;
+        }
+
         // Micro-interaction au focus des champs
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('focus', () => {
