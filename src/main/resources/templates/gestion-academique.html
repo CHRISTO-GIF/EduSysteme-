@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestion Académique - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .active-tab { border-bottom: 2px solid #00236f; color: #00236f; font-weight: 600; }
+</style>
+</head>
+<body class="bg-[#f7f9fb] text-[#191c1e]">
+<div class="flex min-h-screen">
+<aside class="w-[260px] h-screen sticky left-0 top-0 bg-[#222a3e] flex flex-col py-6 z-40">
+<div class="px-6 mb-8">
+<h1 class="text-lg font-bold text-white">EduSystem Pro</h1>
+<p class="text-[10px] text-[#a4acc5] uppercase tracking-widest mt-1">Admin Scolaire</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-3 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/dashboard}">
+<span class="material-symbols-outlined">dashboard</span><span class="text-sm font-semibold">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10 border-l-4 border-[#b6c4ff]" th:href="@{/gestion-academique}">
+<span class="material-symbols-outlined">school</span><span class="text-sm font-semibold">Gestion Académique</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/secretariat}">
+<span class="material-symbols-outlined">group</span><span class="text-sm font-semibold">Élèves</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/personnel}">
+<span class="material-symbols-outlined">person</span><span class="text-sm font-semibold">Personnel</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/emploi-du-temps}">
+<span class="material-symbols-outlined">calendar_today</span><span class="text-sm font-semibold">Emploi du temps</span>
+</a>
+</nav>
+<div class="mt-auto px-3 pt-4 border-t border-white/10">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span><span class="text-sm font-semibold">Déconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="flex-1 flex flex-col">
+<header class="sticky top-0 z-30 flex justify-end items-center px-8 py-3 bg-white border-b border-[#e0e3e5]">
+<div class="flex items-center gap-2">
+<p class="text-sm font-semibold leading-none" th:text="${utilisateurConnecte != null ? (utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom) : ''}">Admin</p>
+</div>
+</header>
+
+<main class="flex-1 p-8 max-w-[1200px] mx-auto w-full">
+<div class="mb-6">
+<h2 class="text-2xl font-bold tracking-tight">Gestion Académique</h2>
+<p class="text-[#45474b]">Organisez les classes et le programme scolaire de l'établissement.</p>
+</div>
+
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 font-medium" th:text="${erreur}"></div>
+<div th:if="${success}" class="mb-lg p-md rounded-lg bg-green-100 text-green-800 font-medium" th:text="${success}"></div>
+
+<div class="flex border-b border-[#c6c6cb] mb-6">
+<button class="px-6 py-3 text-sm font-semibold transition-all active-tab" id="tab-classes" onclick="switchTab('classes')" type="button">Classes</button>
+<button class="px-6 py-3 text-sm font-semibold text-[#45474b] hover:text-[#191c1e] transition-all" id="tab-matieres" onclick="switchTab('matieres')" type="button">Matières</button>
+</div>
+
+<!-- Onglet Classes -->
+<div id="content-classes">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-3">
+<span class="text-xs text-[#45474b] font-semibold uppercase tracking-wider">Aperçu des sections</span>
+<span class="px-2.5 py-1 bg-[#dfdfe4] text-[#5d5e62] rounded-full text-xs" th:text="${nbClasses} + ' classe(s)'">0 classe(s)</span>
+</div>
+<button class="bg-[#00236f] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-opacity" onclick="document.getElementById('modal-classe').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span> Nouvelle Classe
+</button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg" th:if="${nbClasses > 0}">
+<div class="bg-white border border-[#e0e3e5] p-lg rounded-xl hover:shadow-md transition-shadow group ligne-classe"
+     th:data-annee="${row.classe.anneeScolaire}" th:data-id="${row.classe.id}" th:data-niveau="${row.classe.niveau}"
+     th:data-nom="${row.classe.nom}" th:data-titulaire="${row.classe.professeurTitulaireId}" th:each="row : ${classesVue}">
+<div class="flex justify-between items-start mb-md">
+<div class="h-12 w-12 bg-[#dfe2ed] flex items-center justify-center rounded-lg text-[#5a5e67]">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<div class="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-xs text-[#45474b] hover:bg-[#eae7e7] rounded transition-colors bouton-modifier" type="button"><span class="material-symbols-outlined text-sm">edit</span></button>
+<form class="inline" method="post" th:action="@{/gestion-classes/{id}/supprimer(id=${row.classe.id})}" onsubmit="return confirm('Supprimer cette classe ?');">
+<button class="p-xs text-[#ba1a1a] hover:bg-red-50 rounded transition-colors" type="submit"><span class="material-symbols-outlined text-sm">delete</span></button>
+</form>
+</div>
+</div>
+<h3 class="text-lg font-bold mb-1" th:text="${row.classe.nom}">Nom</h3>
+<p class="text-sm text-[#45474b] mb-lg" th:text="${row.classe.niveau} + ' — ' + ${row.classe.anneeScolaire}">Niveau</p>
+<div class="space-y-sm">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-[#5a5e67] text-[18px]">person</span>
+<span class="text-[#45474b]">Prof. Principal :</span>
+<span class="font-medium" th:text="${row.nomTitulaire != null ? row.nomTitulaire : 'Non assigné'}">--</span>
+</div>
+<div class="flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-[#5a5e67] text-[18px]">group</span>
+<span class="text-[#45474b]">Effectif :</span>
+<span class="font-medium" th:text="${row.effectif} + ' élève(s)'">0 élève(s)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white border border-dashed border-[#c6c6cb] rounded-xl p-xl text-center text-[#45474b]" th:if="${nbClasses == 0}">
+Aucune classe créée pour l'instant. Cliquez sur « Nouvelle Classe » pour commencer.
+</div>
+</div>
+
+<!-- Onglet Matieres -->
+<div class="hidden" id="content-matieres">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-3">
+<span class="text-xs text-[#45474b] font-semibold uppercase tracking-wider">Catalogue des cours</span>
+<span class="px-2.5 py-1 bg-[#f1e0cd] text-[#665a4c] rounded-full text-xs" th:text="${nbMatieres} + ' matière(s)'">0 matière(s)</span>
+</div>
+<button class="bg-[#00236f] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-opacity" onclick="document.getElementById('modal-matiere').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">library_add</span> Nouvelle Matière
+</button>
+</div>
+
+<div class="bg-white border border-[#e0e3e5] rounded-xl overflow-hidden" th:if="${nbMatieres > 0}">
+<table class="w-full text-left border-collapse text-sm">
+<thead>
+<tr class="bg-[#f0eded] border-b border-[#e0e3e5]">
+<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Matière</th>
+<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Pôle</th>
+<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Coefficient</th>
+<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Enseignants</th>
+<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#e0e3e5]">
+<tr class="hover:bg-[#f6f3f3] transition-colors ligne-matiere"
+    th:data-coef="${row.matiere.coefficient}" th:data-description="${row.matiere.description}" th:data-id="${row.matiere.id}"
+    th:data-nom="${row.matiere.nom}" th:data-pole="${row.matiere.pole}" th:each="row : ${matieresVue}">
+<td class="px-lg py-3 font-medium" th:text="${row.matiere.nom}">Nom</td>
+<td class="px-lg py-3"><span class="px-2 py-0.5 rounded-full text-xs bg-[#dfe2ed] text-[#43474f]" th:text="${row.matiere.pole != null ? row.matiere.pole : 'AUTRE'}">Pôle</span></td>
+<td class="px-lg py-3" th:text="${row.matiere.coefficient}">1.0</td>
+<td class="px-lg py-3 text-[#45474b]" th:text="${row.nbEnseignants} + ' enseignant(s)'">0</td>
+<td class="px-lg py-3 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-xs text-[#45474b] hover:bg-[#eae7e7] rounded transition-colors bouton-modifier" type="button"><span class="material-symbols-outlined">edit</span></button>
+<form class="inline" method="post" th:action="@{/matieres/{id}/supprimer(id=${row.matiere.id})}" onsubmit="return confirm('Supprimer cette matiere ?');">
+<button class="p-xs text-[#ba1a1a] hover:bg-red-50 rounded transition-colors" type="submit"><span class="material-symbols-outlined">delete</span></button>
+</form>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-white border border-dashed border-[#c6c6cb] rounded-xl p-xl text-center text-[#45474b]" th:if="${nbMatieres == 0}">
+Aucune matière enregistrée pour l'instant. Cliquez sur « Nouvelle Matière » pour commencer.
+</div>
+</div>
+</main>
+</div>
+</div>
+
+<!-- Modal Classe -->
+<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-classe">
+<div class="bg-white rounded-xl p-xl max-w-md w-full">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-bold text-lg" id="modal-titre-classe">Nouvelle Classe</h3>
+<button onclick="fermerModalClasse()" type="button"><span class="material-symbols-outlined">close</span></button>
+</div>
+<form class="space-y-3" id="form-classe" method="post" th:action="@{/gestion-classes}">
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Nom</label>
+<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-nom-classe" name="nom" required="required" type="text"/>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Niveau</label>
+<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-niveau-classe" name="niveau" placeholder="Ex : 6eme, Terminale..." type="text"/>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Année scolaire</label>
+<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-annee-classe" name="anneeScolaire" placeholder="2025-2026" type="text"/>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Professeur Titulaire</label>
+<select class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-titulaire-classe" name="professeurTitulaireId">
+<option value="">-- Aucun --</option>
+<option th:each="e : ${enseignants}" th:text="${e.prenom} + ' ' + ${e.nom}" th:value="${e.id}"></option>
+</select>
+</div>
+<div class="flex justify-end gap-2 pt-2">
+<button class="px-4 py-2 border border-[#c6c6cb] rounded-lg" onclick="fermerModalClasse()" type="button">Annuler</button>
+<button class="px-4 py-2 bg-[#00236f] text-white rounded-lg" type="submit">Enregistrer</button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- Modal Matiere -->
+<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-matiere">
+<div class="bg-white rounded-xl p-xl max-w-md w-full">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-bold text-lg" id="modal-titre-matiere">Nouvelle Matière</h3>
+<button onclick="fermerModalMatiere()" type="button"><span class="material-symbols-outlined">close</span></button>
+</div>
+<form class="space-y-3" id="form-matiere" method="post" th:action="@{/matieres}">
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Nom</label>
+<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-nom-matiere" name="nom" required="required" type="text"/>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Pôle</label>
+<select class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-pole-matiere" name="pole">
+<option value="SCIENTIFIQUE">Scientifique</option>
+<option value="LITTERAIRE">Littéraire &amp; Langues</option>
+<option value="ARTS_SPORT">Arts &amp; Sport</option>
+<option value="AUTRE">Autre</option>
+</select>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Coefficient</label>
+<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-coef-matiere" min="0" name="coefficient" step="0.5" type="number" value="1"/>
+</div>
+<div>
+<label class="text-xs text-[#45474b] block mb-1">Description</label>
+<textarea class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-description-matiere" name="description" rows="2"></textarea>
+</div>
+<div class="flex justify-end gap-2 pt-2">
+<button class="px-4 py-2 border border-[#c6c6cb] rounded-lg" onclick="fermerModalMatiere()" type="button">Annuler</button>
+<button class="px-4 py-2 bg-[#00236f] text-white rounded-lg" type="submit">Enregistrer</button>
+</div>
+</form>
+</div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        const classesTab = document.getElementById('tab-classes');
+        const matieresTab = document.getElementById('tab-matieres');
+        const classesContent = document.getElementById('content-classes');
+        const matieresContent = document.getElementById('content-matieres');
+        if (tab === 'classes') {
+            classesTab.classList.add('active-tab'); matieresTab.classList.remove('active-tab');
+            classesContent.classList.remove('hidden'); matieresContent.classList.add('hidden');
+        } else {
+            matieresTab.classList.add('active-tab'); classesTab.classList.remove('active-tab');
+            matieresContent.classList.remove('hidden'); classesContent.classList.add('hidden');
+        }
+    }
+
+    function fermerModalClasse() { document.getElementById('modal-classe').classList.add('hidden'); }
+    function fermerModalMatiere() { document.getElementById('modal-matiere').classList.add('hidden'); }
+
+    document.querySelectorAll('.ligne-classe .bouton-modifier').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var card = btn.closest('.ligne-classe');
+            document.getElementById('modal-titre-classe').textContent = 'Modifier la classe';
+            document.getElementById('form-classe').action = '/gestion-classes/' + card.getAttribute('data-id') + '/modifier';
+            document.getElementById('input-nom-classe').value = card.getAttribute('data-nom') || '';
+            document.getElementById('input-niveau-classe').value = card.getAttribute('data-niveau') || '';
+            document.getElementById('input-annee-classe').value = card.getAttribute('data-annee') || '';
+            document.getElementById('input-titulaire-classe').value = card.getAttribute('data-titulaire') || '';
+            document.getElementById('modal-classe').classList.remove('hidden');
+        });
+    });
+    document.querySelectorAll('.ligne-matiere .bouton-modifier').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var row = btn.closest('.ligne-matiere');
+            document.getElementById('modal-titre-matiere').textContent = 'Modifier la matiere';
+            document.getElementById('form-matiere').action = '/matieres/' + row.getAttribute('data-id') + '/modifier';
+            document.getElementById('input-nom-matiere').value = row.getAttribute('data-nom') || '';
+            document.getElementById('input-pole-matiere').value = row.getAttribute('data-pole') || 'AUTRE';
+            document.getElementById('input-coef-matiere').value = row.getAttribute('data-coef') || '1';
+            document.getElementById('input-description-matiere').value = row.getAttribute('data-description') || '';
+            document.getElementById('modal-matiere').classList.remove('hidden');
+        });
+    });
+</script>
+</body>
+</html>

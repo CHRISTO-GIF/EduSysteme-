@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/secretariat/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 .requestMatchers("/tresorerie/**").hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/gestion-academique/**").hasRole("ADMIN")
                 .requestMatchers("/gestion-classes/**").hasRole("ADMIN")
                 .requestMatchers("/gestion-salles/**").hasRole("ADMIN")
                 .requestMatchers("/matieres/**").hasRole("ADMIN")
