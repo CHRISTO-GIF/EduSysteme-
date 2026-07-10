@@ -5,6 +5,7 @@ import holyflame.administration.model.EnseignantAutorisation;
 import holyflame.administration.model.Personnel;
 import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.*;
+import holyflame.administration.service.EmailService;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class PersonnelController {
     @Autowired private MatiereRepository matiereRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private EmailService emailService;
 
     @GetMapping
     public String liste(
@@ -218,6 +220,7 @@ public class PersonnelController {
         if (motDePasseGenere != null) {
             ra.addFlashAttribute("nomComplet", p.getPrenom() + " " + p.getNom());
             ra.addFlashAttribute("adminEmail", p.getEmail());
+            ra.addFlashAttribute("telephone", p.getTelephone());
             ra.addFlashAttribute("motDePasse", motDePasseGenere);
             ra.addFlashAttribute("codeAcces", p.getCodeAcces());
             return "redirect:/personnel/nouveau/confirmation";
@@ -233,6 +236,51 @@ public class PersonnelController {
             return "redirect:/personnel";
         }
         return "personnel-nouveau-confirmation";
+    }
+
+    @PostMapping("/nouveau/confirmation/envoyer")
+    public String envoyerIdentifiants(
+            @RequestParam String canal,
+            @RequestParam String nomComplet,
+            @RequestParam(required = false) String adminEmail,
+            @RequestParam(required = false) String telephone,
+            @RequestParam String motDePasse,
+            @RequestParam String codeAcces,
+            RedirectAttributes ra) {
+
+        boolean envoye = false;
+        String messageErreur = null;
+
+        if ("EMAIL".equals(canal)) {
+            if (adminEmail == null || adminEmail.isBlank()) {
+                messageErreur = "Aucune adresse email renseignee pour cet enseignant.";
+            } else {
+                String corps = "<p>Bonjour " + nomComplet + ",</p>"
+                    + "<p>Votre compte EduSystem Pro a ete cree. Voici vos identifiants de connexion :</p>"
+                    + "<table style=\"border-collapse:collapse;margin:16px 0;\">"
+                    + "<tr><td style=\"padding:4px 12px 4px 0;color:#555;\">Identifiant (email)</td><td><strong>" + adminEmail + "</strong></td></tr>"
+                    + "<tr><td style=\"padding:4px 12px 4px 0;color:#555;\">Mot de passe temporaire</td><td><strong>" + motDePasse + "</strong></td></tr>"
+                    + "<tr><td style=\"padding:4px 12px 4px 0;color:#555;\">ID employe</td><td>" + codeAcces + "</td></tr>"
+                    + "</table>"
+                    + "<p>Merci de vous connecter et de changer ce mot de passe des que possible.</p>";
+                envoye = emailService.envoyer(adminEmail, "Vos identifiants EduSystem Pro", corps);
+                if (!envoye) messageErreur = "L'envoi par email a echoue.";
+            }
+        } else {
+            messageErreur = "Le canal " + canal + " n'est pas encore configure sur cette installation.";
+        }
+
+        ra.addFlashAttribute("nomComplet", nomComplet);
+        ra.addFlashAttribute("adminEmail", adminEmail);
+        ra.addFlashAttribute("telephone", telephone);
+        ra.addFlashAttribute("motDePasse", motDePasse);
+        ra.addFlashAttribute("codeAcces", codeAcces);
+        if (envoye) {
+            ra.addFlashAttribute("successMsg", "Identifiants envoyes par email a " + adminEmail + ".");
+        } else {
+            ra.addFlashAttribute("erreurMsg", messageErreur);
+        }
+        return "redirect:/personnel/nouveau/confirmation";
     }
 
     private String genererMotDePasse() {
