@@ -11,7 +11,7 @@
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
         .schedule-grid-bg { background-size: 100% 64px; background-image: linear-gradient(to bottom, #f1f5f9 1px, transparent 1px); }
     </style>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
         tailwind.config = {
           darkMode: "class",
           theme: {
@@ -24,7 +24,7 @@
                       "primary": "#00236f", "on-error": "#ffffff", "on-error-container": "#93000a",
                       "on-secondary-container": "#54647a", "surface-container": "#eceef0", "on-background": "#191c1e",
                       "on-surface-variant": "#444651", "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a",
-                      "surface-container-high": "#e6e8ea", "tertiary": "#222a3e", "surface": "#f7f9fb",
+                      "surface-container-high": "#e6e8ea", "tertiary": [[${accentColor}]], "surface": "#f7f9fb",
                       "secondary": "#505f76", "secondary-fixed": "#d3e4fe", "on-secondary-fixed": "#0b1c30",
                       "on-secondary-fixed-variant": "#38485d", "on-primary-fixed-variant": "#264191",
                       "on-tertiary": "#ffffff", "on-tertiary-fixed": "#131b2e", "on-tertiary-fixed-variant": "#3f465c",

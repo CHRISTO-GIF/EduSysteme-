@@ -8,12 +8,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <style>.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }</style>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
     tailwind.config = { theme: { extend: {
       colors: {
         "surface-container-low": "#f2f4f6", "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
         "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb", "primary-fixed": "#dce1ff",
-        "on-error": "#ffffff", "tertiary": "#222a3e", "outline": "#757682", "surface-variant": "#e0e3e5",
+        "on-error": "#ffffff", "tertiary": [[${accentColor}]], "outline": "#757682", "surface-variant": "#e0e3e5",
         "surface-container": "#eceef0", "surface": "#f7f9fb", "on-background": "#191c1e", "on-surface": "#191c1e",
         "on-surface-variant": "#444651", "success-container": "#c4f7d0", "on-success-container": "#0a3818",
         "tertiary-fixed-dim": "#bec6e0", "outline-variant": "#c5c5d3"

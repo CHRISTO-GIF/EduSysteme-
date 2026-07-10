@@ -20,7 +20,7 @@
             gap: 24px;
         }
     </style>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
         tailwind.config = {
           darkMode: "class",
           theme: {
@@ -29,7 +29,7 @@
                 "tertiary-container": "#384055",
                 "on-background": "#191c1e",
                 "inverse-primary": "#b6c4ff",
-                "tertiary": "#222a3e",
+                "tertiary": [[${accentColor}]],
                 "surface-variant": "#e0e3e5",
                 "outline-variant": "#c5c5d3",
                 "tertiary-fixed-dim": "#bec6e0",

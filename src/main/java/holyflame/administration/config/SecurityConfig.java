@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -80,7 +81,8 @@ public class SecurityConfig {
                 .rememberMeParameter("remember-me")
             )
             .headers(h -> h.frameOptions(fo -> fo.sameOrigin()))
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+            .addFilterAfter(new CsrfTokenEagerLoadFilter(), CsrfFilter.class);
 
         return http.build();
     }

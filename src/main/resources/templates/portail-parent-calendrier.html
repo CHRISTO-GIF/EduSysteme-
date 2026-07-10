@@ -13,7 +13,7 @@
         .event-chip { backdrop-filter: blur(4px); }
         body { font-family: 'Inter', sans-serif; }
 </style>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -23,7 +23,7 @@
                         "tertiary-fixed-dim": "#bec6e0", "primary-container": "#1e3a8a", "surface-container-low": "#f2f4f6",
                         "surface-container": "#eceef0", "on-surface": "#191c1e", "on-surface-variant": "#444651",
                         "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "secondary-fixed-dim": "#b7c8e1",
-                        "tertiary": "#222a3e", "secondary-container": "#d0e1fb", "on-tertiary-fixed": "#131b2e",
+                        "tertiary": [[${accentColor}]], "secondary-container": "#d0e1fb", "on-tertiary-fixed": "#131b2e",
                         "surface-variant": "#e0e3e5", "on-tertiary-container": "#a4acc5", "on-secondary": "#ffffff",
                         "secondary-fixed": "#d3e4fe", "error": "#ba1a1a", "surface-container-high": "#e6e8ea",
                         "outline-variant": "#c5c5d3", "surface-container-lowest": "#ffffff", "tertiary-container": "#384055",

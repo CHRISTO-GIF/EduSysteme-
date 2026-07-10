@@ -6,7 +6,7 @@
 <title>Messagerie - EduSystem Pro</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -22,7 +22,7 @@
                     "on-tertiary-fixed-variant": "#3f465c", "surface-container-low": "#f2f4f6", "on-error": "#ffffff",
                     "primary": "#00236f", "on-surface-variant": "#444651", "surface-container-lowest": "#ffffff",
                     "tertiary-container": "#384055", "on-background": "#191c1e", "primary-fixed-dim": "#b6c4ff",
-                    "tertiary": "#222a3e", "on-secondary-fixed-variant": "#38485d", "on-secondary-container": "#54647a",
+                    "tertiary": [[${accentColor}]], "on-secondary-fixed-variant": "#38485d", "on-secondary-container": "#54647a",
                     "on-primary-container": "#90a8ff", "tertiary-fixed": "#dae2fd", "surface-container-highest": "#e0e3e5",
                     "on-secondary": "#ffffff", "on-error-container": "#93000a", "background": "#f7f9fb",
                     "primary-container": "#1e3a8a", "on-secondary-fixed": "#0b1c30", "surface-container": "#eceef0",

@@ -7,7 +7,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -17,7 +17,7 @@
                     "on-primary-container": "#90a8ff", "tertiary-container": "#384055", "surface": "#f7f9fb",
                     "primary-fixed": "#dce1ff", "on-surface-variant": "#444651", "surface-container-low": "#f2f4f6",
                     "error": "#ba1a1a", "tertiary-fixed-dim": "#bec6e0", "on-background": "#191c1e",
-                    "tertiary-fixed": "#dae2fd", "tertiary": "#222a3e", "surface-container-high": "#e6e8ea",
+                    "tertiary-fixed": "#dae2fd", "tertiary": [[${accentColor}]], "surface-container-high": "#e6e8ea",
                     "error-container": "#ffdad6", "surface-container": "#eceef0", "secondary": "#505f76",
                     "on-surface": "#191c1e", "on-secondary-container": "#54647a", "surface-container-highest": "#e0e3e5",
                     "outline": "#757682", "on-primary-fixed": "#00164e", "primary": "#00236f",

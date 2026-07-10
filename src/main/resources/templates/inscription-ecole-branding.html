@@ -6,7 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -41,7 +41,7 @@
                   "inverse-on-surface": "#eff1f3",
                   "on-tertiary-fixed": "#131b2e",
                   "secondary-container": "#d0e1fb",
-                  "tertiary": "#222a3e",
+                  "tertiary": [[${accentColor}]],
                   "inverse-primary": "#b6c4ff",
                   "secondary-fixed-dim": "#b7c8e1",
                   "on-primary-fixed": "#00164e",

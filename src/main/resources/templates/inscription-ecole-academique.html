@@ -27,7 +27,7 @@
       backdrop-filter: blur(8px);
     }
   </style>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -62,7 +62,7 @@
                   "inverse-on-surface": "#eff1f3",
                   "on-tertiary-fixed": "#131b2e",
                   "secondary-container": "#d0e1fb",
-                  "tertiary": "#222a3e",
+                  "tertiary": [[${accentColor}]],
                   "inverse-primary": "#b6c4ff",
                   "secondary-fixed-dim": "#b7c8e1",
                   "on-primary-fixed": "#00164e",

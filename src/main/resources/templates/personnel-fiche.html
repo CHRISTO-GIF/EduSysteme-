@@ -10,7 +10,7 @@
         body { font-family: 'Inter', sans-serif; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
         tailwind.config = {
           darkMode: "class",
           theme: {
@@ -23,7 +23,7 @@
                       "primary": "#00236f", "on-error-container": "#93000a", "on-secondary-container": "#54647a",
                       "surface-container": "#eceef0", "on-background": "#191c1e", "on-surface-variant": "#444651",
                       "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a", "surface-container-high": "#e6e8ea",
-                      "tertiary": "#222a3e", "surface": "#f7f9fb", "secondary": "#505f76", "surface-container-low": "#f2f4f6"
+                      "tertiary": [[${accentColor}]], "surface": "#f7f9fb", "secondary": "#505f76", "surface-container-low": "#f2f4f6"
               },
               "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
               "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},

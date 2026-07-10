@@ -5,7 +5,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -54,7 +54,7 @@
                     "on-tertiary-fixed": "#131b2e",
                     "on-tertiary-fixed-variant": "#3f465c",
                     "tertiary-fixed-dim": "#bec6e0",
-                    "tertiary": "#222a3e",
+                    "tertiary": [[${accentColor}]],
                     "surface": "#f7f9fb",
                     "secondary": "#505f76",
                     "surface-container-low": "#f2f4f6"

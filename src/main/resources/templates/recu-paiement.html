@@ -6,7 +6,7 @@
 <title>Reçu de Paiement - EduSystem Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -20,7 +20,7 @@
             "on-tertiary": "#ffffff", "on-secondary-fixed": "#0b1c30", "surface-container-highest": "#e0e3e5",
             "surface-variant": "#e0e3e5", "inverse-primary": "#b6c4ff", "on-secondary": "#ffffff",
             "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
-            "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "tertiary": "#222a3e",
+            "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "tertiary": [[${accentColor}]],
             "surface-tint": "#4059aa", "background": "#f7f9fb", "inverse-surface": "#2d3133",
             "on-tertiary-container": "#a4acc5", "on-surface-variant": "#444651", "tertiary-fixed": "#dae2fd",
             "secondary-fixed-dim": "#b7c8e1", "on-secondary-fixed-variant": "#38485d", "tertiary-fixed-dim": "#bec6e0",

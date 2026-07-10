@@ -11,7 +11,7 @@
     body { font-family: 'Inter', sans-serif; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 </style>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
     tailwind.config = {
         darkMode: "class",
         theme: {
@@ -26,7 +26,7 @@
                     "surface-container-high": "#e6e8ea", "surface-container": "#eceef0", "surface": "#f7f9fb",
                     "outline": "#757682", "on-surface": "#191c1e", "on-secondary": "#ffffff",
                     "surface-container-low": "#f2f4f6", "on-secondary-container": "#54647a", "surface-bright": "#f7f9fb",
-                    "tertiary-container": "#384055", "tertiary": "#222a3e",
+                    "tertiary-container": "#384055", "tertiary": [[${accentColor}]],
                     "surface-container-lowest": "#ffffff", "tertiary-fixed-dim": "#bec6e0",
                     "background": "#f7f9fb", "error": "#ba1a1a"
                 },

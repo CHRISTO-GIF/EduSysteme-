@@ -7,7 +7,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -25,7 +25,7 @@
                     "tertiary-fixed": "#dae2fd", "on-error": "#ffffff", "on-surface": "#191c1e",
                     "on-tertiary-container": "#a4acc5", "tertiary-fixed-dim": "#bec6e0", "on-surface-variant": "#444651",
                     "primary-container": "#1e3a8a", "outline": "#757682", "surface-dim": "#d8dadc",
-                    "surface-bright": "#f7f9fb", "tertiary": "#222a3e", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+                    "surface-bright": "#f7f9fb", "tertiary": [[${accentColor}]], "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
             },
             "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
             "spacing": {"base": "4px", "xl": "32px", "gutter": "24px", "container-max": "1440px", "sidebar-width": "260px", "lg": "24px", "md": "16px", "sm": "8px", "xs": "4px"},

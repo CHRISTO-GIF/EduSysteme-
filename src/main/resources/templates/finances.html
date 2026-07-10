@@ -7,7 +7,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<script id="tailwind-config" th:inline="javascript">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -22,7 +22,7 @@
                         "surface-container-high": "#e6e8ea", "surface-container": "#eceef0", "surface": "#f7f9fb",
                         "outline": "#757682", "on-surface": "#191c1e", "on-secondary": "#ffffff",
                         "surface-container-low": "#f2f4f6", "on-secondary-container": "#54647a", "surface-bright": "#f7f9fb",
-                        "tertiary-container": "#384055", "tertiary": "#222a3e", "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary-container": "#384055", "tertiary": [[${accentColor}]], "secondary-fixed-dim": "#b7c8e1",
                         "tertiary-fixed": "#dae2fd", "on-tertiary-fixed-variant": "#3f465c", "on-tertiary": "#ffffff",
                         "surface-container-lowest": "#ffffff", "on-tertiary-container": "#a4acc5", "tertiary-fixed-dim": "#bec6e0",
                         "background": "#f7f9fb", "on-primary-fixed-variant": "#264191", "error": "#ba1a1a",
