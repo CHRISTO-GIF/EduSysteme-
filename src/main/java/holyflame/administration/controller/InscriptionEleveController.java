@@ -3,6 +3,7 @@ package holyflame.administration.controller;
 import holyflame.administration.model.Classe;
 import holyflame.administration.model.DocumentEleve;
 import holyflame.administration.model.Eleve;
+import holyflame.administration.model.Etablissement;
 import holyflame.administration.model.FraisScolarite;
 import holyflame.administration.model.Paiement;
 import holyflame.administration.repository.ClasseRepository;
@@ -197,13 +198,15 @@ public class InscriptionEleveController {
             return "redirect:/secretariat/eleves/nouveau";
         }
         Long etabId = etablissementService.getCurrentEtablissementId();
+        Etablissement etab = etablissementService.getCurrentEtablissement();
+        String anneeScolaire = (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank())
+            ? etab.getAnneeScolaire()
+            : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1));
         model.addAttribute("donnees", donnees);
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         model.addAttribute("etapeActuelle", 3);
-        model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
-        model.addAttribute("anneeScolaire", parametreRepository
-            .findByCleAndEtablissementId("ANNEE_SCOLAIRE", etabId)
-            .map(p -> p.getValeur()).orElse("2025-2026"));
+        model.addAttribute("classes", classeRepository.findByAnneeScolaireAndEtablissementId(anneeScolaire, etabId));
+        model.addAttribute("anneeScolaire", anneeScolaire);
         return "eleve-nouveau-etape3";
     }
 

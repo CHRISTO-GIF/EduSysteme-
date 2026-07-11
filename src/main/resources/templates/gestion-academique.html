@@ -1,169 +1,266 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="fr">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Gestion Académique - EduSystem Pro</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-    body { font-family: 'Inter', sans-serif; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-    .active-tab { border-bottom: 2px solid #00236f; color: #00236f; font-weight: 600; }
-</style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .active-tab { border-bottom: 2px solid; }
+    </style>
+<script id="tailwind-config" th:inline="javascript">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#f7f9fb", "background": "#f7f9fb", "on-primary": "#ffffff",
+                      "error": "#ba1a1a", "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5",
+                      "error-container": "#ffdad6", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                      "outline": "#757682", "primary-fixed-dim": "#b6c4ff", "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c5c5d3", "primary": "#00236f", "on-error-container": "#93000a",
+                      "on-secondary-container": "#54647a", "surface-container": "#eceef0", "on-background": "#191c1e",
+                      "on-surface-variant": "#444651", "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a",
+                      "surface-container-high": "#e6e8ea", "tertiary": [[${accentColor}]], "surface": "#f7f9fb",
+                      "secondary": "#505f76", "surface-container-low": "#f2f4f6", "tertiary-fixed": "#dae2fd",
+                      "tertiary-fixed-dim": "#bec6e0", "secondary-fixed": "#d3e4fe"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},
+              "fontFamily": {"headline-md": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "code": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
 </head>
-<body class="bg-[#f7f9fb] text-[#191c1e]">
-<div class="flex min-h-screen">
-<aside class="w-[260px] h-screen sticky left-0 top-0 bg-[#222a3e] flex flex-col py-6 z-40">
-<div class="px-6 mb-8">
-<h1 class="text-lg font-bold text-white">EduSystem Pro</h1>
-<p class="text-[10px] text-[#a4acc5] uppercase tracking-widest mt-1">Admin Scolaire</p>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">school</span>
 </div>
-<nav class="flex-1 flex flex-col gap-1 px-3 overflow-y-auto">
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/dashboard}">
-<span class="material-symbols-outlined">dashboard</span><span class="text-sm font-semibold">Tableau de bord</span>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70">Portail Admin</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-xs px-sm overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span> Tableau de bord
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10 border-l-4 border-[#b6c4ff]" th:href="@{/gestion-academique}">
-<span class="material-symbols-outlined">school</span><span class="text-sm font-semibold">Gestion Académique</span>
+<a class="flex items-center gap-md px-md py-sm text-white border-l-4 border-primary-fixed bg-tertiary-container rounded-lg font-label-md text-label-md font-bold" href="/gestion-academique">
+<span class="material-symbols-outlined">school</span> Gestion Academique
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/matieres}">
-<span class="material-symbols-outlined">menu_book</span><span class="text-sm font-semibold">Matières</span>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/matieres">
+<span class="material-symbols-outlined">menu_book</span> Matieres
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/secretariat}">
-<span class="material-symbols-outlined">group</span><span class="text-sm font-semibold">Élèves</span>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat">
+<span class="material-symbols-outlined">group</span> Eleves
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/personnel}">
-<span class="material-symbols-outlined">person</span><span class="text-sm font-semibold">Personnel</span>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/personnel">
+<span class="material-symbols-outlined">person</span> Personnel
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white hover:bg-white/10 transition-colors" th:href="@{/emploi-du-temps}">
-<span class="material-symbols-outlined">calendar_today</span><span class="text-sm font-semibold">Emploi du temps</span>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_month</span> Emploi du temps
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/notes/saisie">
+<span class="material-symbols-outlined">grading</span> Notes
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/examens">
+<span class="material-symbols-outlined">quiz</span> Examens
 </a>
 </nav>
-<div class="mt-auto px-3 pt-4 border-t border-white/10">
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a4acc5] hover:text-white transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-<span class="material-symbols-outlined">logout</span><span class="text-sm font-semibold">Déconnexion</span>
+<div class="px-sm mt-auto space-y-xs pt-md border-t border-tertiary-container/30">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/parametres">
+<span class="material-symbols-outlined">settings</span> Parametres
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span> Deconnexion
 </a>
 <form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
 </div>
 </aside>
 
-<div class="flex-1 flex flex-col">
-<header class="sticky top-0 z-30 flex justify-end items-center px-8 py-3 bg-white border-b border-[#e0e3e5]">
-<div class="flex items-center gap-2">
-<p class="text-sm font-semibold leading-none" th:text="${utilisateurConnecte != null ? (utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom) : ''}">Admin</p>
+<!-- Barre superieure -->
+<header class="h-16 fixed top-0 right-0 left-[260px] bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-10 pr-4 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="recherche-academique" placeholder="Rechercher une classe ou une matiere..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md ml-lg">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrateur</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border-2 border-primary-fixed" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'A'}">A</div>
+</div>
 </div>
 </header>
 
-<main class="flex-1 p-8 max-w-[1200px] mx-auto w-full">
-<div class="mb-6">
-<h2 class="text-2xl font-bold tracking-tight">Gestion Académique</h2>
-<p class="text-[#45474b]">Organisez les classes et le programme scolaire de l'établissement.</p>
+<main class="ml-sidebar-width pt-24 px-lg pb-xl max-w-container-max mx-auto">
+
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
+<div th:if="${success}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${success}"></div>
+
+<!-- En-tete -->
+<div class="mb-xl">
+<nav class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant mb-xs">
+<span>EduSystem Pro</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Gestion Academique</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Gestion Academique</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Organisez les classes et le programme scolaire de l'etablissement.</p>
 </div>
 
-<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 font-medium" th:text="${erreur}"></div>
-<div th:if="${success}" class="mb-lg p-md rounded-lg bg-green-100 text-green-800 font-medium" th:text="${success}"></div>
-
-<div class="flex border-b border-[#c6c6cb] mb-6">
-<button class="px-6 py-3 text-sm font-semibold transition-all active-tab" id="tab-classes" onclick="switchTab('classes')" type="button">Classes</button>
-<button class="px-6 py-3 text-sm font-semibold text-[#45474b] hover:text-[#191c1e] transition-all" id="tab-matieres" onclick="switchTab('matieres')" type="button">Matières</button>
+<!-- Onglets -->
+<div class="flex border-b border-outline-variant mb-xl">
+<button class="px-lg py-md font-label-md text-label-md text-primary active-tab border-primary transition-all" id="tab-classes" onclick="switchTab('classes')" type="button">Classes</button>
+<button class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all" id="tab-matieres" onclick="switchTab('matieres')" type="button">Matieres</button>
 </div>
 
 <!-- Onglet Classes -->
 <div id="content-classes">
-<div class="flex justify-between items-center mb-6">
-<div class="flex items-center gap-3">
-<span class="text-xs text-[#45474b] font-semibold uppercase tracking-wider">Aperçu des sections</span>
-<span class="px-2.5 py-1 bg-[#dfdfe4] text-[#5d5e62] rounded-full text-xs" th:text="${nbClasses} + ' classe(s)'">0 classe(s)</span>
+<div class="flex justify-between items-center mb-lg">
+<div class="flex items-center gap-md">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Apercu des sections</span>
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container rounded-full font-label-sm text-label-sm" th:text="${nbClasses} + ' classe(s) active(s)'">0 classe(s)</span>
 </div>
-<a class="bg-[#00236f] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-opacity" th:href="@{/gestion-classes/nouveau}">
+<a class="bg-primary text-on-primary px-lg py-sm rounded-lg flex items-center gap-sm font-label-md text-label-md hover:opacity-90 transition-opacity" th:href="@{/gestion-classes/nouveau}">
 <span class="material-symbols-outlined text-[18px]">add</span> Nouvelle Classe
 </a>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg" th:if="${nbClasses > 0}">
-<div class="bg-white border border-[#e0e3e5] p-lg rounded-xl hover:shadow-md transition-shadow group ligne-classe"
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl hover:shadow-md transition-shadow group ligne-classe carte-recherche"
+     th:attr="data-recherche=${#strings.toLowerCase(row.classe.nom + ' ' + (row.classe.niveau != null ? row.classe.niveau : ''))}"
      th:data-annee="${row.classe.anneeScolaire}" th:data-id="${row.classe.id}" th:data-niveau="${row.classe.niveau}"
      th:data-nom="${row.classe.nom}" th:data-titulaire="${row.classe.professeurTitulaireId}"
-     th:data-capacite="${row.classe.capacite}" th:data-salle="${row.classe.salle}" th:data-notes="${row.classe.notes}" th:each="row : ${classesVue}">
+     th:data-capacite="${row.classe.capacite}" th:data-salle="${row.classe.salle}" th:data-notes="${row.classe.notes}"
+     th:each="row, iter : ${classesVue}">
 <div class="flex justify-between items-start mb-md">
-<div class="h-12 w-12 bg-[#dfe2ed] flex items-center justify-center rounded-lg text-[#5a5e67]">
+<div class="h-12 w-12 flex items-center justify-center rounded-lg"
+     th:classappend="${iter.index % 3 == 0 ? 'bg-primary-fixed text-primary' : (iter.index % 3 == 1 ? 'bg-secondary-fixed text-secondary' : 'bg-tertiary-fixed text-tertiary')}">
 <span class="material-symbols-outlined">groups</span>
 </div>
 <div class="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-<button class="p-xs text-[#45474b] hover:bg-[#eae7e7] rounded transition-colors bouton-modifier" type="button"><span class="material-symbols-outlined text-sm">edit</span></button>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-high rounded transition-colors bouton-modifier" type="button"><span class="material-symbols-outlined text-sm">edit</span></button>
 <form class="inline" method="post" th:action="@{/gestion-classes/{id}/supprimer(id=${row.classe.id})}" onsubmit="return confirm('Supprimer cette classe ?');">
-<button class="p-xs text-[#ba1a1a] hover:bg-red-50 rounded transition-colors" type="submit"><span class="material-symbols-outlined text-sm">delete</span></button>
+<button class="p-xs text-error hover:bg-error-container/20 rounded transition-colors" type="submit"><span class="material-symbols-outlined text-sm">delete</span></button>
 </form>
 </div>
 </div>
-<h3 class="text-lg font-bold mb-1" th:text="${row.classe.nom}">Nom</h3>
-<p class="text-sm text-[#45474b] mb-lg" th:text="${row.classe.niveau} + ' — ' + ${row.classe.anneeScolaire}">Niveau</p>
+<h3 class="font-headline-sm text-headline-sm mb-xs" th:text="${row.classe.nom}">Nom</h3>
+<p class="font-label-md text-label-md text-on-surface-variant mb-lg" th:text="${(row.classe.niveau != null ? row.classe.niveau : 'Niveau non defini')} + ' — ' + ${row.classe.anneeScolaire}">Niveau</p>
 <div class="space-y-sm">
-<div class="flex items-center gap-2 text-sm">
-<span class="material-symbols-outlined text-[#5a5e67] text-[18px]">person</span>
-<span class="text-[#45474b]">Prof. Principal :</span>
-<span class="font-medium" th:text="${row.nomTitulaire != null ? row.nomTitulaire : 'Non assigné'}">--</span>
+<div class="flex items-center gap-sm text-body-md">
+<span class="material-symbols-outlined text-primary text-[18px]">person</span>
+<span class="text-on-surface-variant">Prof. Principal :</span>
+<span class="font-medium" th:text="${row.nomTitulaire != null ? row.nomTitulaire : 'Non assigne'}">--</span>
 </div>
-<div class="flex items-center gap-2 text-sm">
-<span class="material-symbols-outlined text-[#5a5e67] text-[18px]">group</span>
-<span class="text-[#45474b]">Effectif :</span>
-<span class="font-medium" th:if="${row.classe.capacite != null}" th:text="${row.effectif} + ' / ' + ${row.classe.capacite} + ' élèves'">0 / 0</span>
-<span class="font-medium" th:if="${row.classe.capacite == null}" th:text="${row.effectif} + ' élève(s)'">0 élève(s)</span>
+<div class="flex items-center gap-sm text-body-md">
+<span class="material-symbols-outlined text-primary text-[18px]">group</span>
+<span class="text-on-surface-variant">Effectif :</span>
+<span class="font-medium" th:if="${row.classe.capacite != null}" th:text="${row.effectif} + ' / ' + ${row.classe.capacite} + ' eleves'">0 / 0</span>
+<span class="font-medium" th:if="${row.classe.capacite == null}" th:text="${row.effectif} + ' eleve(s)'">0 eleve(s)</span>
 </div>
-<div class="flex items-center gap-2 text-sm" th:if="${row.classe.salle != null and !row.classe.salle.isEmpty()}">
-<span class="material-symbols-outlined text-[#5a5e67] text-[18px]">meeting_room</span>
-<span class="text-[#45474b]">Salle :</span>
+<div class="flex items-center gap-sm text-body-md" th:if="${row.classe.salle != null and !row.classe.salle.isEmpty()}">
+<span class="material-symbols-outlined text-primary text-[18px]">meeting_room</span>
+<span class="text-on-surface-variant">Salle :</span>
 <span class="font-medium" th:text="${row.classe.salle}">--</span>
 </div>
 </div>
-<div class="mt-lg pt-md border-t border-[#e0e3e5]">
-<a class="text-[#00236f] text-sm font-semibold flex items-center gap-xs hover:underline" th:href="@{/gestion-classes/{id}/affectation(id=${row.classe.id})}">
-<span class="material-symbols-outlined text-[18px]">group_add</span> Affecter des élèves
+<div class="mt-lg pt-md border-t border-outline-variant">
+<a class="text-primary font-label-md text-label-md flex items-center gap-xs hover:underline" th:href="@{/gestion-classes/{id}/affectation(id=${row.classe.id})}">
+<span class="material-symbols-outlined text-[18px]">group_add</span> Affecter des eleves
 </a>
 </div>
 </div>
 </div>
-<div class="bg-white border border-dashed border-[#c6c6cb] rounded-xl p-xl text-center text-[#45474b]" th:if="${nbClasses == 0}">
-Aucune classe créée pour l'instant. Cliquez sur « Nouvelle Classe » pour commencer.
+<div class="bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-xl text-center text-on-surface-variant" th:if="${nbClasses == 0}">
+Aucune classe creee pour l'instant. Cliquez sur « Nouvelle Classe » pour commencer.
 </div>
+<p class="hidden text-center text-on-surface-variant py-xl font-body-md text-body-md" id="aucun-resultat-classes">Aucune classe ne correspond a votre recherche.</p>
 </div>
 
 <!-- Onglet Matieres -->
 <div class="hidden" id="content-matieres">
-<div class="flex justify-between items-center mb-6">
-<div class="flex items-center gap-3">
-<span class="text-xs text-[#45474b] font-semibold uppercase tracking-wider">Catalogue des cours</span>
-<span class="px-2.5 py-1 bg-[#f1e0cd] text-[#665a4c] rounded-full text-xs" th:text="${nbMatieres} + ' matière(s)'">0 matière(s)</span>
+<div class="flex justify-between items-center mb-lg">
+<div class="flex items-center gap-md">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Catalogue des cours</span>
+<span class="px-sm py-xs bg-tertiary-fixed text-tertiary rounded-full font-label-sm text-label-sm" th:text="${nbMatieres} + ' matiere(s) enregistree(s)'">0 matiere(s)</span>
 </div>
-<button class="bg-[#00236f] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-semibold hover:opacity-90 transition-opacity" onclick="document.getElementById('modal-matiere').classList.remove('hidden')" type="button">
-<span class="material-symbols-outlined text-[18px]">library_add</span> Nouvelle Matière
+<div class="flex items-center gap-sm">
+<a class="border border-outline text-primary px-lg py-sm rounded-lg flex items-center gap-sm font-label-md text-label-md hover:bg-surface-container transition-colors" th:href="@{/matieres}">
+<span class="material-symbols-outlined text-[18px]">upload_file</span> Import en masse
+</a>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg flex items-center gap-sm font-label-md text-label-md hover:opacity-90 transition-opacity" onclick="document.getElementById('modal-matiere').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">library_add</span> Nouvelle Matiere
 </button>
 </div>
+</div>
 
-<div class="bg-white border border-[#e0e3e5] rounded-xl overflow-hidden" th:if="${nbMatieres > 0}">
-<table class="w-full text-left border-collapse text-sm">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden" th:if="${nbMatieres > 0}">
+<table class="w-full text-left border-collapse">
 <thead>
-<tr class="bg-[#f0eded] border-b border-[#e0e3e5]">
-<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Matière</th>
-<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Pôle</th>
-<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Coefficient</th>
-<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider">Enseignants</th>
-<th class="px-lg py-3 text-xs text-[#45474b] uppercase tracking-wider text-right">Actions</th>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-lg py-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Matiere</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Pole</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Coefficient</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Enseignants</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-[#e0e3e5]">
-<tr class="hover:bg-[#f6f3f3] transition-colors ligne-matiere"
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors ligne-matiere carte-recherche"
+    th:attr="data-recherche=${#strings.toLowerCase(row.matiere.nom)}"
     th:data-coef="${row.matiere.coefficient}" th:data-description="${row.matiere.description}" th:data-id="${row.matiere.id}"
     th:data-nom="${row.matiere.nom}" th:data-pole="${row.matiere.pole}" th:each="row : ${matieresVue}">
-<td class="px-lg py-3 font-medium" th:text="${row.matiere.nom}">Nom</td>
-<td class="px-lg py-3"><span class="px-2 py-0.5 rounded-full text-xs bg-[#dfe2ed] text-[#43474f]" th:text="${row.matiere.pole != null ? row.matiere.pole : 'AUTRE'}">Pôle</span></td>
-<td class="px-lg py-3" th:text="${row.matiere.coefficient}">1.0</td>
-<td class="px-lg py-3 text-[#45474b]" th:text="${row.nbEnseignants} + ' enseignant(s)'">0</td>
-<td class="px-lg py-3 text-right">
-<div class="flex justify-end gap-2">
-<button class="p-xs text-[#45474b] hover:bg-[#eae7e7] rounded transition-colors bouton-modifier" type="button"><span class="material-symbols-outlined">edit</span></button>
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div th:switch="${row.matiere.pole}">
+<span class="material-symbols-outlined bg-primary-fixed text-primary rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="'SCIENTIFIQUE'">science</span>
+<span class="material-symbols-outlined bg-tertiary-fixed text-tertiary rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="'LITTERAIRE'">menu_book</span>
+<span class="material-symbols-outlined bg-secondary-fixed text-secondary rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="'ARTS_SPORT'">sports_soccer</span>
+<span class="material-symbols-outlined bg-surface-container-high text-on-surface-variant rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="*">school</span>
+</div>
+<span class="font-label-md text-label-md" th:text="${row.matiere.nom}">Nom</span>
+</div>
+</td>
+<td class="px-lg py-md"><span class="px-sm py-xs rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant" th:text="${row.matiere.pole != null ? row.matiere.pole : 'AUTRE'}">Pole</span></td>
+<td class="px-lg py-md font-medium text-on-surface" th:text="${row.matiere.coefficient}">1.0</td>
+<td class="px-lg py-md text-on-surface-variant" th:text="${row.nbEnseignants} + ' enseignant(s)'">0</td>
+<td class="px-lg py-md text-right">
+<div class="flex justify-end gap-sm">
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-high rounded transition-colors bouton-modifier" type="button"><span class="material-symbols-outlined">edit</span></button>
 <form class="inline" method="post" th:action="@{/matieres/{id}/supprimer(id=${row.matiere.id})}" onsubmit="return confirm('Supprimer cette matiere ?');">
-<button class="p-xs text-[#ba1a1a] hover:bg-red-50 rounded transition-colors" type="submit"><span class="material-symbols-outlined">delete</span></button>
+<button class="p-xs text-error hover:bg-error-container/20 rounded transition-colors" type="submit"><span class="material-symbols-outlined">delete</span></button>
 </form>
 </div>
 </td>
@@ -171,56 +268,55 @@ Aucune classe créée pour l'instant. Cliquez sur « Nouvelle Classe » pour com
 </tbody>
 </table>
 </div>
-<div class="bg-white border border-dashed border-[#c6c6cb] rounded-xl p-xl text-center text-[#45474b]" th:if="${nbMatieres == 0}">
-Aucune matière enregistrée pour l'instant. Cliquez sur « Nouvelle Matière » pour commencer.
+<div class="bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-xl text-center text-on-surface-variant" th:if="${nbMatieres == 0}">
+Aucune matiere enregistree pour l'instant. Cliquez sur « Nouvelle Matiere » pour commencer.
 </div>
+<p class="hidden text-center text-on-surface-variant py-xl font-body-md text-body-md" id="aucun-resultat-matieres">Aucune matiere ne correspond a votre recherche.</p>
 </div>
 </main>
-</div>
-</div>
 
 <!-- Modal Classe -->
 <div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-classe">
-<div class="bg-white rounded-xl p-xl max-w-md w-full">
+<div class="bg-surface-container-lowest rounded-xl p-xl max-w-md w-full">
 <div class="flex justify-between items-center mb-lg">
-<h3 class="font-bold text-lg" id="modal-titre-classe">Nouvelle Classe</h3>
+<h3 class="font-headline-sm text-headline-sm" id="modal-titre-classe">Nouvelle Classe</h3>
 <button onclick="fermerModalClasse()" type="button"><span class="material-symbols-outlined">close</span></button>
 </div>
 <form class="space-y-3" id="form-classe" method="post" th:action="@{/gestion-classes}">
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Nom</label>
-<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-nom-classe" name="nom" required="required" type="text"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Nom</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" id="input-nom-classe" name="nom" required="required" type="text"/>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Niveau</label>
-<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-niveau-classe" name="niveau" placeholder="Ex : 6eme, Terminale..." type="text"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Niveau</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" id="input-niveau-classe" name="niveau" placeholder="Ex : 6eme, Terminale..." type="text"/>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Année scolaire</label>
-<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-annee-classe" name="anneeScolaire" placeholder="2025-2026" type="text"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Annee scolaire</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" id="input-annee-classe" name="anneeScolaire" placeholder="2025-2026" type="text"/>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Professeur Titulaire</label>
-<select class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-titulaire-classe" name="professeurTitulaireId">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Professeur Titulaire</label>
+<select class="w-full p-2 border border-outline-variant rounded-lg" id="input-titulaire-classe" name="professeurTitulaireId">
 <option value="">-- Aucun --</option>
 <option th:each="e : ${enseignants}" th:text="${e.prenom} + ' ' + ${e.nom}" th:value="${e.id}"></option>
 </select>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Capacité maximale</label>
-<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-capacite-classe" min="1" name="capacite" type="number"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Capacite maximale</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" id="input-capacite-classe" min="1" name="capacite" type="number"/>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Salle attitrée</label>
-<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-salle-classe" name="salle" type="text"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Salle attitree</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" id="input-salle-classe" name="salle" type="text"/>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Notes</label>
-<textarea class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-notes-classe" name="notes" rows="2"></textarea>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Notes</label>
+<textarea class="w-full p-2 border border-outline-variant rounded-lg" id="input-notes-classe" name="notes" rows="2"></textarea>
 </div>
 <div class="flex justify-end gap-2 pt-2">
-<button class="px-4 py-2 border border-[#c6c6cb] rounded-lg" onclick="fermerModalClasse()" type="button">Annuler</button>
-<button class="px-4 py-2 bg-[#00236f] text-white rounded-lg" type="submit">Enregistrer</button>
+<button class="px-4 py-2 border border-outline-variant rounded-lg" onclick="fermerModalClasse()" type="button">Annuler</button>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-lg" type="submit">Enregistrer</button>
 </div>
 </form>
 </div>
@@ -228,36 +324,36 @@ Aucune matière enregistrée pour l'instant. Cliquez sur « Nouvelle Matière »
 
 <!-- Modal Matiere -->
 <div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-matiere">
-<div class="bg-white rounded-xl p-xl max-w-md w-full">
+<div class="bg-surface-container-lowest rounded-xl p-xl max-w-md w-full">
 <div class="flex justify-between items-center mb-lg">
-<h3 class="font-bold text-lg" id="modal-titre-matiere">Nouvelle Matière</h3>
+<h3 class="font-headline-sm text-headline-sm" id="modal-titre-matiere">Nouvelle Matiere</h3>
 <button onclick="fermerModalMatiere()" type="button"><span class="material-symbols-outlined">close</span></button>
 </div>
 <form class="space-y-3" id="form-matiere" method="post" th:action="@{/matieres}">
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Nom</label>
-<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-nom-matiere" name="nom" required="required" type="text"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Nom</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" id="input-nom-matiere" name="nom" required="required" type="text"/>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Pôle</label>
-<select class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-pole-matiere" name="pole">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Pole</label>
+<select class="w-full p-2 border border-outline-variant rounded-lg" id="input-pole-matiere" name="pole">
 <option value="SCIENTIFIQUE">Scientifique</option>
-<option value="LITTERAIRE">Littéraire &amp; Langues</option>
+<option value="LITTERAIRE">Litteraire &amp; Langues</option>
 <option value="ARTS_SPORT">Arts &amp; Sport</option>
 <option value="AUTRE">Autre</option>
 </select>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Coefficient</label>
-<input class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-coef-matiere" min="0" name="coefficient" step="0.5" type="number" value="1"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Coefficient</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" id="input-coef-matiere" min="0" name="coefficient" step="0.5" type="number" value="1"/>
 </div>
 <div>
-<label class="text-xs text-[#45474b] block mb-1">Description</label>
-<textarea class="w-full p-2 border border-[#c6c6cb] rounded-lg" id="input-description-matiere" name="description" rows="2"></textarea>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Description</label>
+<textarea class="w-full p-2 border border-outline-variant rounded-lg" id="input-description-matiere" name="description" rows="2"></textarea>
 </div>
 <div class="flex justify-end gap-2 pt-2">
-<button class="px-4 py-2 border border-[#c6c6cb] rounded-lg" onclick="fermerModalMatiere()" type="button">Annuler</button>
-<button class="px-4 py-2 bg-[#00236f] text-white rounded-lg" type="submit">Enregistrer</button>
+<button class="px-4 py-2 border border-outline-variant rounded-lg" onclick="fermerModalMatiere()" type="button">Annuler</button>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-lg" type="submit">Enregistrer</button>
 </div>
 </form>
 </div>
@@ -270,10 +366,12 @@ Aucune matière enregistrée pour l'instant. Cliquez sur « Nouvelle Matière »
         const classesContent = document.getElementById('content-classes');
         const matieresContent = document.getElementById('content-matieres');
         if (tab === 'classes') {
-            classesTab.classList.add('active-tab'); matieresTab.classList.remove('active-tab');
+            classesTab.classList.add('active-tab', 'text-primary'); classesTab.classList.remove('text-on-surface-variant');
+            matieresTab.classList.remove('active-tab', 'text-primary'); matieresTab.classList.add('text-on-surface-variant');
             classesContent.classList.remove('hidden'); matieresContent.classList.add('hidden');
         } else {
-            matieresTab.classList.add('active-tab'); classesTab.classList.remove('active-tab');
+            matieresTab.classList.add('active-tab', 'text-primary'); matieresTab.classList.remove('text-on-surface-variant');
+            classesTab.classList.remove('active-tab', 'text-primary'); classesTab.classList.add('text-on-surface-variant');
             matieresContent.classList.remove('hidden'); classesContent.classList.add('hidden');
         }
     }
@@ -307,6 +405,27 @@ Aucune matière enregistrée pour l'instant. Cliquez sur « Nouvelle Matière »
             document.getElementById('input-description-matiere').value = row.getAttribute('data-description') || '';
             document.getElementById('modal-matiere').classList.remove('hidden');
         });
+    });
+
+    // Recherche client-cote sur les classes et matieres visibles dans l'onglet actif
+    document.getElementById('recherche-academique').addEventListener('input', function (e) {
+        var terme = e.target.value.trim().toLowerCase();
+        var cartesClasses = document.querySelectorAll('#content-classes .carte-recherche');
+        var lignesMatieres = document.querySelectorAll('#content-matieres .carte-recherche');
+        var visiblesClasses = 0;
+        cartesClasses.forEach(function (el) {
+            var visible = el.getAttribute('data-recherche').indexOf(terme) !== -1;
+            el.classList.toggle('hidden', !visible);
+            if (visible) visiblesClasses++;
+        });
+        document.getElementById('aucun-resultat-classes').classList.toggle('hidden', !(terme && visiblesClasses === 0 && cartesClasses.length > 0));
+        var visiblesMatieres = 0;
+        lignesMatieres.forEach(function (el) {
+            var visible = el.getAttribute('data-recherche').indexOf(terme) !== -1;
+            el.classList.toggle('hidden', !visible);
+            if (visible) visiblesMatieres++;
+        });
+        document.getElementById('aucun-resultat-matieres').classList.toggle('hidden', !(terme && visiblesMatieres === 0 && lignesMatieres.length > 0));
     });
 </script>
 </body>

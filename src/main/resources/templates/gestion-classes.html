@@ -13,9 +13,14 @@
 </head>
 <body class="bg-gray-50 text-gray-900">
 <header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<a class="p-2 hover:bg-gray-100 rounded-full transition-colors" th:href="@{/gestion-academique}" title="Retour">
+<span class="material-symbols-outlined text-blue-900">arrow_back</span>
+</a>
 <div>
 <h1 class="text-xl font-bold text-blue-900">Gestion des Classes</h1>
 <p class="text-gray-500 text-sm">Creer, modifier ou supprimer les classes de l'etablissement.</p>
+</div>
 </div>
 <a class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" th:href="@{/gestion-classes/nouveau}">
 <span class="material-symbols-outlined text-[18px]">add</span> Nouvelle classe

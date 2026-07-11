@@ -121,6 +121,7 @@
 
 <main class="mt-16 p-lg max-w-container-max mx-auto w-full flex-1">
 <div th:if="${success}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${success}"></div>
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
 
 <!-- En-tete -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md mb-xl">
@@ -214,32 +215,30 @@
 </div>
 </div>
 
-<!-- Alertes de conflits reelles -->
-<div class="mt-lg space-y-md">
-<div class="flex items-center gap-md bg-error-container/40 border border-error/20 p-md rounded-xl" th:each="conflit : ${conflits}">
-<div class="w-10 h-10 rounded-full bg-error flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-on-error">warning</span>
-</div>
-<div>
-<p class="font-label-md text-label-md text-on-error-container">Conflit de salle detecte</p>
-<p class="text-xs text-on-error-container/80" th:text="${conflit}">Detail</p>
-</div>
-</div>
-<div class="flex items-center gap-md bg-secondary-container/40 border border-outline-variant p-md rounded-xl" th:if="${#lists.isEmpty(conflits)}">
-<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-on-primary">check_circle</span>
-</div>
-<div>
-<p class="font-label-md text-label-md text-on-surface">Aucun conflit detecte</p>
-<p class="text-xs text-on-surface-variant">Toutes les salles sont correctement planifiees.</p>
-</div>
-</div>
-</div>
 </main>
 
-<footer class="p-lg text-center text-[10px] text-on-surface-variant uppercase tracking-widest opacity-50 ml-sidebar-width">
-            EduSystem Pro — <span th:text="${nomEtab}">Etablissement</span>
-        </footer>
+<!-- Pied de page : notifications reelles (conflits d'emploi du temps) -->
+<footer class="border-t border-outline-variant bg-surface-container-lowest ml-sidebar-width">
+<div class="max-w-container-max mx-auto px-lg py-md">
+<div class="flex items-center justify-between flex-wrap gap-sm">
+<span class="text-[10px] text-on-surface-variant uppercase tracking-widest opacity-50">EduSystem Pro — <span th:text="${nomEtab}">Etablissement</span></span>
+<div class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant" th:if="${#lists.isEmpty(conflits)}">
+<span class="material-symbols-outlined text-primary text-[16px]">check_circle</span>
+<span>Aucune notification — toutes les salles sont correctement planifiees.</span>
+</div>
+<div class="flex items-center gap-xs font-label-sm text-label-sm text-error font-semibold" th:unless="${#lists.isEmpty(conflits)}">
+<span class="material-symbols-outlined text-[16px]">notifications_active</span>
+<span th:text="${conflits.size()} + ' notification(s) — conflit(s) de salle detecte(s)'">0 notification(s)</span>
+</div>
+</div>
+<div class="mt-sm space-y-xs" th:unless="${#lists.isEmpty(conflits)}">
+<div class="flex items-center gap-sm px-md py-sm rounded-lg bg-error-container/40 border border-error/20" th:each="conflit : ${conflits}">
+<span class="material-symbols-outlined text-error text-[16px]">warning</span>
+<span class="font-body-md text-body-md text-on-error-container" th:text="${conflit}">Detail</span>
+</div>
+</div>
+</div>
+</footer>
 </div>
 
 <!-- Modale d'ajout de creneau -->
@@ -474,6 +473,16 @@
     }
     brancherAutre('select-enseignant', 'input-enseignant-autre', 'hidden-enseignant');
     brancherAutre('select-salle', 'input-salle-autre', 'hidden-salle');
+
+    // Validation client : l'heure de fin doit etre posterieure a l'heure de debut
+    document.getElementById('form-ajout-creneau').addEventListener('submit', (e) => {
+        const debut = document.getElementById('input-heure-debut').value;
+        const fin = document.getElementById('input-heure-fin').value;
+        if (debut && fin && debut >= fin) {
+            e.preventDefault();
+            alert('L\'heure de fin doit être postérieure à l\'heure de début.');
+        }
+    });
 
     // Verification reelle des conflits (salle + enseignant) avant import, via l'API du serveur
     const btnVerifier = document.getElementById('btn-verifier');

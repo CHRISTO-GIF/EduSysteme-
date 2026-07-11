@@ -206,7 +206,7 @@
 </div>
 <div class="space-y-1">
 <label class="font-label-sm text-on-surface-variant uppercase">Coefficient</label>
-<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2 text-body-md focus:ring-primary focus:border-primary outline-none" min="0.5" name="coefficient" step="0.5" th:value="${selectedCoefficient}" type="number"/>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2 text-body-md focus:ring-primary focus:border-primary outline-none" min="0.5" name="coefficient" required="required" step="0.5" th:value="${selectedCoefficient != null ? selectedCoefficient : 1}" type="number"/>
 </div>
 <div class="space-y-1">
 <label class="font-label-sm text-on-surface-variant uppercase">Date</label>
@@ -328,14 +328,14 @@ Choisissez une classe, une matiere, un trimestre et un type d'evaluation, puis c
 
 <!-- Modale d'apercu d'importation -->
 <div class="fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(255,255,255,0.4); backdrop-filter: blur(8px);" th:if="${importApercu != null}">
-<div class="w-full max-w-3xl bg-surface-container-lowest shadow-xl border border-outline-variant rounded-xl flex flex-col max-h-[870px]">
+<div class="w-full max-w-4xl bg-surface-container-lowest shadow-xl border border-outline-variant rounded-xl flex flex-col max-h-[90vh]">
 <div class="px-lg py-md border-b border-outline-variant flex items-center justify-between">
 <div class="flex items-center gap-sm">
 <div class="p-2 bg-secondary-container rounded-lg">
 <span class="material-symbols-outlined text-on-secondary-container">upload_file</span>
 </div>
 <div>
-<h3 class="font-headline-sm text-headline-sm text-primary">Apercu de l'importation</h3>
+<h3 class="font-headline-sm text-headline-sm text-primary">Importation des Notes</h3>
 <p class="font-label-sm text-label-sm text-on-surface-variant" th:text="'Fichier : ' + ${importFichierNom}">Fichier</p>
 </div>
 </div>
@@ -343,72 +343,70 @@ Choisissez une classe, une matiere, un trimestre et un type d'evaluation, puis c
 <span class="material-symbols-outlined">close</span>
 </a>
 </div>
-<div class="px-lg py-md grid grid-cols-3 gap-md bg-surface-container-low">
+<div class="px-lg py-md grid grid-cols-2 md:grid-cols-4 gap-md bg-surface-container-low">
 <div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">analytics</span>
-</div>
-<div>
-<p class="text-on-surface-variant font-label-sm text-label-sm">Total Detecte</p>
-<p class="font-headline-md text-headline-md text-primary" th:text="${importTotal}">0</p>
-</div>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary">list_alt</span></div>
+<div><p class="text-on-surface-variant font-label-sm text-label-sm">Total a importer</p><p class="font-headline-md text-headline-md text-primary" th:text="${importTotal}">0</p></div>
 </div>
 <div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
-<span class="material-symbols-outlined text-green-600">check_circle</span>
-</div>
-<div>
-<p class="text-on-surface-variant font-label-sm text-label-sm">Pret</p>
-<p class="font-headline-md text-headline-md text-green-600" th:text="${importPret}">0</p>
-</div>
+<div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center"><span class="material-symbols-outlined text-green-600">check_circle</span></div>
+<div><p class="text-on-surface-variant font-label-sm text-label-sm">Pret</p><p class="font-headline-md text-headline-md text-green-600" th:text="${importPret}">0</p></div>
 </div>
 <div class="bg-surface-container-lowest p-md rounded-lg border border-error-container flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center">
-<span class="material-symbols-outlined text-error">error</span>
+<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center"><span class="material-symbols-outlined text-error">error_outline</span></div>
+<div><p class="text-on-surface-variant font-label-sm text-label-sm">Erreurs detectees</p><p class="font-headline-md text-headline-md text-error" th:text="${importErreurs}">0</p></div>
 </div>
-<div>
-<p class="text-on-surface-variant font-label-sm text-label-sm">Erreurs</p>
-<p class="font-headline-md text-headline-md text-error" th:text="${importErreurs}">0</p>
-</div>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center"><span class="material-symbols-outlined text-tertiary">calculate</span></div>
+<div><p class="text-on-surface-variant font-label-sm text-label-sm">Moyenne (lignes pretes)</p><p class="font-headline-md text-headline-md text-on-surface" th:text="${importMoyenne} + ' / 20'">0 / 20</p></div>
 </div>
 </div>
 <div class="flex-1 overflow-auto">
 <table class="w-full text-left border-collapse">
 <thead class="sticky top-0 bg-surface-container-lowest z-10">
 <tr>
-<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Nom de l'eleve</th>
 <th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Matricule</th>
-<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Note</th>
+<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Nom de l'eleve</th>
+<th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Note /20</th>
 <th class="px-lg py-sm border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">Statut</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-outline-variant">
-<tr class="hover:bg-surface-container-low transition-colors" th:classappend="${!ligne.valide} ? 'bg-error-container/5'" th:each="ligne : ${importApercu}">
+<tbody class="divide-y divide-outline-variant" id="corps-import">
+<tr class="ligne-import hover:bg-surface-container-low transition-colors" th:classappend="${!ligne.valide} ? 'bg-error-container/5'" th:each="ligne : ${importApercu}">
+<td class="px-lg py-md font-code text-code text-on-surface-variant" th:classappend="${ligne.statut == 'ELEVE_INCONNU'} ? 'text-error font-bold'" th:text="${ligne.matricule}">ID</td>
 <td class="px-lg py-md font-label-md text-label-md" th:text="${ligne.nomComplet}">Nom</td>
-<td class="px-lg py-md font-code text-code text-on-surface-variant" th:classappend="${ligne.statut == 'ELEVE_INCONNU'} ? 'text-error'" th:text="${ligne.matricule}">ID</td>
-<td class="px-lg py-md font-bold" th:classappend="${ligne.statut == 'NOTE_INVALIDE'} ? 'text-error'" th:text="${ligne.valeur != null ? ligne.valeur : '—'}">0</td>
+<td class="px-lg py-md font-bold" th:classappend="${ligne.statut == 'NOTE_INVALIDE'} ? 'text-error'" th:text="${ligne.valeur != null ? ligne.valeur : '?'}">0</td>
 <td class="px-lg py-md">
-<span class="inline-flex items-center gap-1 bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'VALIDE'}">
-<span class="material-symbols-outlined text-[14px]">check</span> Valide
+<span class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-sm py-xs rounded-full font-label-sm text-label-sm uppercase font-bold" th:if="${ligne.statut == 'VALIDE'}">
+<span class="w-1.5 h-1.5 bg-green-600 rounded-full"></span> Pret
 </span>
-<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'ELEVE_INCONNU'}">
-<span class="material-symbols-outlined text-[14px]">error</span> Eleve inconnu
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-sm py-xs rounded-full font-label-sm text-label-sm uppercase font-bold" th:if="${ligne.statut == 'ELEVE_INCONNU'}">
+<span class="w-1.5 h-1.5 bg-error rounded-full"></span> Eleve inconnu
 </span>
-<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-label-sm" th:if="${ligne.statut == 'NOTE_INVALIDE'}">
-<span class="material-symbols-outlined text-[14px]">warning</span> Note invalide
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-sm py-xs rounded-full font-label-sm text-label-sm uppercase font-bold" th:if="${ligne.statut == 'NOTE_INVALIDE'}">
+<span class="w-1.5 h-1.5 bg-error rounded-full"></span> Note invalide
 </span>
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="px-lg py-lg bg-surface-container border-t border-outline-variant flex items-center justify-between">
-<div class="flex items-center gap-sm text-on-surface-variant">
-<span class="material-symbols-outlined text-[20px]">info</span>
-<p class="text-label-sm font-label-sm">Les lignes contenant des erreurs ne seront pas importees.</p>
+<div class="px-lg py-sm border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between gap-sm" id="pagination-import">
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="pagination-label">Affichage de <span class="font-bold text-on-surface">1</span>-<span class="font-bold text-on-surface" th:text="${importTotal}">0</span> sur <span class="font-bold text-on-surface" th:text="${importTotal}">0</span> ligne(s)</p>
+<div class="flex items-center gap-xs" id="pagination-boutons"></div>
 </div>
-<div class="flex items-center gap-md">
-<a class="px-lg py-sm rounded-lg border border-outline text-secondary font-label-md hover:bg-surface-container-highest transition-colors" th:href="@{/notes/saisie(matiereId=${selectedMatiereId},classeId=${selectedClasseId},trimestre=${selectedTrimestre},type=${selectedType},coefficient=${selectedCoefficient},dateEvaluation=${selectedDate})}">
+<div class="p-lg bg-tertiary-fixed border-t border-outline-variant flex items-start gap-md">
+<span class="material-symbols-outlined text-tertiary">info</span>
+<div>
+<h4 class="font-label-md text-label-md text-tertiary">Note importante</h4>
+<p class="font-body-md text-body-md text-on-tertiary-fixed-variant">Les lignes marquees d'une erreur ne seront pas importees. Corrigez le fichier Excel source puis cliquez sur "Modifier le fichier" pour re-televerser, ou validez l'importation partielle des lignes pretes.</p>
+</div>
+</div>
+<div class="px-lg py-lg bg-surface-container border-t border-outline-variant flex items-center justify-end gap-md">
+<a class="px-lg py-sm rounded-lg border border-outline text-secondary font-label-md hover:bg-surface-container-highest transition-colors flex items-center gap-xs" th:href="@{/notes/saisie(matiereId=${selectedMatiereId},classeId=${selectedClasseId},trimestre=${selectedTrimestre},type=${selectedType},coefficient=${selectedCoefficient},dateEvaluation=${selectedDate})}">
+<span class="material-symbols-outlined text-[18px]">edit</span> Modifier le fichier
+</a>
+<a class="px-lg py-sm rounded-lg border border-error text-error font-label-md hover:bg-error-container/10 transition-colors" th:href="@{/notes/saisie(matiereId=${selectedMatiereId},classeId=${selectedClasseId},trimestre=${selectedTrimestre},type=${selectedType},coefficient=${selectedCoefficient},dateEvaluation=${selectedDate})}">
 Annuler
 </a>
 <form method="post" th:action="@{/notes/saisie/import/confirmer}">
@@ -419,12 +417,50 @@ Annuler
 <input name="coefficient" th:value="${selectedCoefficient}" type="hidden"/>
 <input name="dateEvaluation" th:value="${selectedDate}" type="hidden"/>
 <button class="px-xl py-sm rounded-lg bg-primary text-on-primary font-label-md shadow-lg hover:bg-primary-container transition-colors flex items-center gap-sm" th:disabled="${importPret == 0}" type="submit">
-<span class="material-symbols-outlined text-[18px]">publish</span> Confirmer l'importation
+<span class="material-symbols-outlined text-[18px]">check_circle</span> Valider l'importation
 </button>
 </form>
 </div>
 </div>
 </div>
+<script th:if="${importApercu != null}">
+(function () {
+    var lignes = Array.prototype.slice.call(document.querySelectorAll('#corps-import .ligne-import'));
+    var parPage = 10;
+    var pageActuelle = 1;
+    var nbPages = Math.max(1, Math.ceil(lignes.length / parPage));
+
+    function afficherPage(page) {
+        pageActuelle = Math.min(Math.max(1, page), nbPages);
+        lignes.forEach(function (ligne, i) {
+            ligne.style.display = (i >= (pageActuelle - 1) * parPage && i < pageActuelle * parPage) ? '' : 'none';
+        });
+        var debut = lignes.length === 0 ? 0 : (pageActuelle - 1) * parPage + 1;
+        var fin = Math.min(pageActuelle * parPage, lignes.length);
+        document.getElementById('pagination-label').innerHTML =
+            'Affichage de <span class="font-bold text-on-surface">' + debut + '</span>-<span class="font-bold text-on-surface">' + fin
+            + '</span> sur <span class="font-bold text-on-surface">' + lignes.length + '</span> ligne(s)';
+        dessinerBoutons();
+    }
+
+    function dessinerBoutons() {
+        var conteneur = document.getElementById('pagination-boutons');
+        conteneur.innerHTML = '';
+        if (nbPages <= 1) return;
+        for (var p = 1; p <= nbPages; p++) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = p;
+            btn.className = 'w-8 h-8 flex items-center justify-center font-label-md text-label-md rounded '
+                + (p === pageActuelle ? 'bg-primary-container text-on-primary' : 'text-secondary hover:bg-surface-container-high');
+            btn.addEventListener('click', function () { afficherPage(parseInt(this.textContent, 10)); });
+            conteneur.appendChild(btn);
+        }
+    }
+
+    if (lignes.length > 0) afficherPage(1);
+})();
+</script>
 </div>
 <script>
         function updateBadge(row) {

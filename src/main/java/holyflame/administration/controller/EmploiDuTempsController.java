@@ -217,6 +217,10 @@ public class EmploiDuTempsController {
             throw new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.FORBIDDEN, "Classe ou matière introuvable dans cet établissement.");
         }
+        if (heureDebut.compareTo(heureFin) >= 0) {
+            ra.addFlashAttribute("erreur", "L'heure de fin doit être postérieure à l'heure de début.");
+            return "redirect:/emploi-du-temps?classeId=" + classeId;
+        }
         CreneauHoraire c = new CreneauHoraire();
         c.setJour(jour);
         c.setHeureDebut(heureDebut);
@@ -243,6 +247,10 @@ public class EmploiDuTempsController {
             @RequestParam(required = false) String salle,
             RedirectAttributes ra) {
 
+        if (heureDebut.compareTo(heureFin) >= 0) {
+            ra.addFlashAttribute("erreur", "L'heure de fin doit être postérieure à l'heure de début.");
+            return "redirect:/emploi-du-temps" + (classeId != 0 ? "?classeId=" + classeId : "");
+        }
         Long etabId = etablissementService.getCurrentEtablissementId();
         creneauRepository.findById(id)
             .filter(c -> etabId != null && etabId.equals(c.getEtablissementId()))

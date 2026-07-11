@@ -1,169 +1,249 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="fr">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Ajouter une Nouvelle Classe - EduSystem Pro</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-    body { font-family: 'Inter', sans-serif; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-</style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+<script id="tailwind-config" th:inline="javascript">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#f7f9fb", "background": "#f7f9fb", "on-primary": "#ffffff",
+                      "error": "#ba1a1a", "tertiary-container": "#384055", "on-tertiary-container": "#a4acc5",
+                      "error-container": "#ffdad6", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                      "outline": "#757682", "primary-fixed-dim": "#b6c4ff", "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c5c5d3", "primary": "#00236f", "on-error-container": "#93000a",
+                      "on-secondary-container": "#54647a", "surface-container": "#eceef0", "on-background": "#191c1e",
+                      "on-surface-variant": "#444651", "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a",
+                      "surface-container-high": "#e6e8ea", "tertiary": [[${accentColor}]], "surface": "#f7f9fb",
+                      "secondary": "#505f76", "surface-container-low": "#f2f4f6", "tertiary-fixed": "#dae2fd",
+                      "tertiary-fixed-dim": "#bec6e0"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "gutter": "24px", "xl": "32px", "lg": "24px", "sm": "8px", "md": "16px", "base": "4px", "sidebar-width": "260px", "container-max": "1440px"},
+              "fontFamily": {"headline-md": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"]},
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
 </head>
-<body class="bg-[#fbf9f8] text-[#1b1c1c] min-h-screen flex">
-<aside class="w-[260px] h-screen sticky top-0 left-0 flex flex-col py-6 bg-[#5a5e67]">
-<div class="px-6 mb-8">
-<h1 class="text-lg font-bold text-white">EduSystem Pro</h1>
-<p class="text-sm text-white/80">Administration Scolaire</p>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Menu lateral -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">school</span>
 </div>
-<nav class="flex-1 space-y-1 px-3">
-<a class="flex items-center gap-3 p-3 text-sm font-semibold text-white/80 hover:bg-white/10 transition-colors rounded" th:href="@{/dashboard}">
+<div>
+<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70">Portail Admin</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-xs px-sm overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/dashboard">
 <span class="material-symbols-outlined">dashboard</span> Tableau de bord
 </a>
-<a class="flex items-center gap-3 p-3 text-sm font-semibold text-white font-bold border-l-4 border-white bg-white/20 transition-colors rounded-r" th:href="@{/gestion-academique}">
-<span class="material-symbols-outlined">book</span> Matières &amp; Classes
+<a class="flex items-center gap-md px-md py-sm text-white border-l-4 border-primary-fixed bg-tertiary-container rounded-lg font-label-md text-label-md font-bold" href="/gestion-academique">
+<span class="material-symbols-outlined">school</span> Gestion Academique
 </a>
-<a class="flex items-center gap-3 p-3 text-sm font-semibold text-white/80 hover:bg-white/10 transition-colors rounded" th:href="@{/secretariat}">
-<span class="material-symbols-outlined">group</span> Élèves
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/matieres">
+<span class="material-symbols-outlined">menu_book</span> Matieres
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat">
+<span class="material-symbols-outlined">group</span> Eleves
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/personnel">
+<span class="material-symbols-outlined">person</span> Personnel
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_month</span> Emploi du temps
 </a>
 </nav>
+<div class="px-sm mt-auto space-y-xs pt-md border-t border-tertiary-container/30">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/parametres">
+<span class="material-symbols-outlined">settings</span> Parametres
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span> Deconnexion
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
 </aside>
 
-<div class="flex-1 flex flex-col min-w-0">
-<header class="h-16 flex justify-end items-center w-full px-lg bg-white border-b border-[#c6c6cb] sticky top-0 z-10">
-<div class="flex items-center gap-md">
-<p class="text-sm font-semibold" th:text="${utilisateurConnecte != null ? (utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom) : ''}">Admin</p>
+<!-- Barre superieure -->
+<header class="h-16 fixed top-0 right-0 left-[260px] bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-10 pr-4 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" placeholder="Rechercher une classe, un eleve..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md ml-lg">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrateur</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border-2 border-primary-fixed" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'A'}">A</div>
+</div>
 </div>
 </header>
 
-<main class="p-lg max-w-[1200px] mx-auto w-full flex-1 space-y-lg">
-<div class="flex justify-between items-end mb-sm">
+<main class="ml-sidebar-width pt-24 px-lg pb-xl max-w-container-max mx-auto">
+
+<!-- En-tete -->
+<div class="flex justify-between items-end mb-lg">
 <div>
-<div class="flex items-center gap-1 text-[#45474b] text-xs mb-1 uppercase tracking-wider">
-<a th:href="@{/gestion-academique}">Gestion</a>
+<nav class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">
+<a class="hover:text-primary" th:href="@{/gestion-academique}">Gestion</a>
 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span>Matières &amp; Classes</span>
-</div>
-<h2 class="text-2xl font-bold">Ajouter une Nouvelle Classe</h2>
+<span>Matieres &amp; Classes</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Ajouter une Nouvelle Classe</h2>
 </div>
 </div>
 
-<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 font-medium" th:text="${erreur}"></div>
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
 
+<!-- Formulaire -->
 <form class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start" method="post" th:action="@{/gestion-classes}">
 <div class="lg:col-span-8 space-y-lg">
 
-<div class="bg-white border border-[#c6c6cb] p-xl rounded-lg">
+<!-- Informations Generales -->
+<div class="bg-surface-container-lowest border border-outline-variant p-xl rounded-lg">
 <div class="flex items-center gap-md mb-lg">
-<span class="material-symbols-outlined text-[#5a5e67]">info</span>
-<h3 class="text-lg font-bold">Informations Générales</h3>
+<span class="material-symbols-outlined text-primary">info</span>
+<h3 class="font-headline-sm text-headline-sm">Informations Generales</h3>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
-<div class="flex flex-col gap-1">
-<label class="text-sm text-[#45474b]">Nom de la classe</label>
-<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="nom" placeholder="ex: 6ème A" required="required" type="text"/>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Nom de la classe</label>
+<input class="border border-outline-variant p-md rounded-lg bg-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md" name="nom" placeholder="ex: 6eme A" required="required" type="text"/>
 </div>
-<div class="flex flex-col gap-1">
-<label class="text-sm text-[#45474b]">Niveau</label>
-<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="niveau" placeholder="ex: Collège - Niveau 1" type="text"/>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Niveau</label>
+<input class="border border-outline-variant p-md rounded-lg bg-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md" name="niveau" placeholder="ex: College - Niveau 1" type="text"/>
 </div>
-<div class="flex flex-col gap-1">
-<label class="text-sm text-[#45474b]">Année Scolaire</label>
-<select class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="anneeScolaire">
-<option value="2024-2025">2024 - 2025</option>
-<option selected="selected" value="2025-2026">2025 - 2026</option>
-<option value="2026-2027">2026 - 2027</option>
-</select>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Annee Scolaire</label>
+<input class="border border-outline-variant p-md rounded-lg bg-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md" name="anneeScolaire" placeholder="2025-2026" th:value="${anneeScolaire}" type="text"/>
 </div>
-<div class="flex flex-col gap-1">
-<label class="text-sm text-[#45474b]">Capacité maximale</label>
-<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" min="1" name="capacite" placeholder="30" type="number"/>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Capacite maximale</label>
+<input class="border border-outline-variant p-md rounded-lg bg-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md" min="1" name="capacite" placeholder="30" type="number"/>
 </div>
 </div>
 </div>
 
-<div class="bg-white border border-[#c6c6cb] p-xl rounded-lg">
+<!-- Affectation Administrative -->
+<div class="bg-surface-container-lowest border border-outline-variant p-xl rounded-lg">
 <div class="flex items-center gap-md mb-lg">
-<span class="material-symbols-outlined text-[#5a5e67]">assignment_ind</span>
-<h3 class="text-lg font-bold">Affectation Administrative</h3>
+<span class="material-symbols-outlined text-primary">assignment_ind</span>
+<h3 class="font-headline-sm text-headline-sm">Affectation Administrative</h3>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
-<div class="flex flex-col gap-1">
-<label class="text-sm text-[#45474b]">Professeur Principal</label>
-<select class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="professeurTitulaireId">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Professeur Principal</label>
+<select class="border border-outline-variant p-md rounded-lg bg-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md" name="professeurTitulaireId">
 <option value="">-- Aucun --</option>
 <option th:each="e : ${enseignants}" th:text="${e.prenom + ' ' + e.nom}" th:value="${e.id}"></option>
 </select>
 </div>
-<div class="flex flex-col gap-1">
-<label class="text-sm text-[#45474b]">Salle de classe attitrée</label>
-<input class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none" name="salle" placeholder="ex: Salle 102" type="text"/>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Salle de classe attitree</label>
+<input class="border border-outline-variant p-md rounded-lg bg-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md" name="salle" placeholder="ex: Salle 102" type="text"/>
 </div>
 </div>
 </div>
 
-<div class="bg-white border border-[#c6c6cb] p-xl rounded-lg">
+<!-- Description -->
+<div class="bg-surface-container-lowest border border-outline-variant p-xl rounded-lg">
 <div class="flex items-center gap-md mb-lg">
-<span class="material-symbols-outlined text-[#5a5e67]">description</span>
-<h3 class="text-lg font-bold">Description &amp; Objectifs</h3>
+<span class="material-symbols-outlined text-primary">description</span>
+<h3 class="font-headline-sm text-headline-sm">Description &amp; Objectifs</h3>
 </div>
-<div class="flex flex-col gap-1">
-<label class="text-sm text-[#45474b]">Notes internes ou objectifs de la classe</label>
-<textarea class="border border-[#c6c6cb] p-3 rounded bg-white focus:ring-1 focus:ring-[#5a5e67] focus:border-[#5a5e67] outline-none resize-none" name="notes" placeholder="Saisissez ici les particularités de cette classe, les objectifs pédagogiques spécifiques ou des notes de gestion..." rows="4"></textarea>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Notes internes ou objectifs de la classe</label>
+<textarea class="border border-outline-variant p-md rounded-lg bg-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md resize-none" name="notes" placeholder="Saisissez ici les particularites de cette classe, les objectifs pedagogiques specifiques ou des notes de gestion..." rows="4"></textarea>
 </div>
 </div>
 
+<!-- Actions -->
 <div class="flex justify-end gap-md pt-md">
-<a class="px-xl py-3 border border-[#76777c] text-[#45474b] font-semibold rounded-lg hover:bg-[#eae7e7] transition-colors" th:href="@{/gestion-academique}">Annuler</a>
-<button class="px-xl py-3 bg-[#5a5e67] text-white font-semibold rounded-lg hover:opacity-90 shadow-sm transition-all active:scale-[0.98]" type="submit">Enregistrer la Classe</button>
+<a class="px-xl py-md border border-outline text-on-surface-variant font-label-md text-label-md rounded-lg hover:bg-surface-container-high transition-colors" th:href="@{/gestion-academique}">Annuler</a>
+<button class="px-xl py-md bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:opacity-90 shadow-sm transition-all active:scale-[0.98]" type="submit">Enregistrer la Classe</button>
 </div>
 </div>
 
+<!-- Colonne conseils -->
 <div class="lg:col-span-4 space-y-lg">
-<div class="rounded-lg overflow-hidden border border-[#c6c6cb] relative h-32 bg-[#5a5e67] flex items-center justify-center">
+<div class="rounded-lg overflow-hidden border border-outline-variant relative h-32 bg-tertiary flex items-center justify-center">
 <span class="material-symbols-outlined text-white text-[64px] opacity-80">meeting_room</span>
 <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-lg">
-<p class="text-white font-bold">Configuration de Classe</p>
+<p class="text-white font-headline-sm text-headline-sm">Configuration de Classe</p>
 </div>
 </div>
 
-<div class="bg-[#f1e0cd]/40 border border-[#f1e0cd] p-lg rounded-lg">
+<div class="bg-tertiary-fixed-dim/30 border border-tertiary-fixed p-lg rounded-lg">
 <div class="flex items-start gap-md">
-<span class="material-symbols-outlined text-[#7f7363] mt-1">lightbulb</span>
+<span class="material-symbols-outlined text-tertiary mt-1">lightbulb</span>
 <div>
-<h4 class="text-sm font-bold text-[#504538]">Conseil Administratif</h4>
-<p class="text-sm text-[#504538] leading-relaxed mt-1">Veillez à ce que la capacité ne dépasse pas les normes de l'établissement pour garantir un environnement d'apprentissage optimal.</p>
+<h4 class="font-label-md text-label-md font-bold">Conseil Administratif</h4>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mt-1">Veillez a ce que la capacite ne depasse pas les normes de l'etablissement pour garantir un environnement d'apprentissage optimal.</p>
 </div>
 </div>
 </div>
-<div class="bg-[#dfdfe4]/50 border border-[#c6c6cb] p-lg rounded-lg">
+<div class="bg-secondary-container/50 border border-outline-variant p-lg rounded-lg">
 <div class="flex items-start gap-md">
-<span class="material-symbols-outlined text-[#5d5e62] mt-1">event_note</span>
+<span class="material-symbols-outlined text-secondary mt-1">event_note</span>
 <div>
-<h4 class="text-sm font-bold text-[#45474a]">Emploi du temps</h4>
-<p class="text-sm text-[#45474a] leading-relaxed mt-1">La création de la classe permettra ensuite de définir son emploi du temps dédié et d'y affecter des matières.</p>
+<h4 class="font-label-md text-label-md font-bold">Emploi du temps</h4>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mt-1">La creation de la classe permettra ensuite de definir son emploi du temps dedie et d'y affecter des matieres.</p>
 </div>
 </div>
 </div>
 
-<div class="p-lg bg-[#eae7e7] rounded-lg border border-[#c6c6cb]">
-<h4 class="text-sm font-semibold mb-md">Statut de Configuration</h4>
+<div class="p-lg bg-surface-container-high rounded-lg border border-outline-variant">
+<h4 class="font-label-md text-label-md mb-md">Statut de Configuration</h4>
 <div class="space-y-md">
 <div class="flex items-center justify-between">
-<span class="text-xs text-[#45474b]">Saisie des données</span>
-<span class="text-xs text-[#5a5e67] font-semibold" id="progress-label">En cours</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Saisie des donnees</span>
+<span class="font-label-sm text-label-sm text-primary" id="progress-label">En cours</span>
 </div>
-<div class="h-2 w-full bg-[#e4e2e2] rounded-full overflow-hidden">
-<div class="h-full bg-[#5a5e67] w-[30%] transition-all duration-700 ease-out" id="progress-bar"></div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[30%] transition-all duration-700 ease-out" id="progress-bar"></div>
 </div>
-<p class="text-xs text-[#76777c] italic">Seul le nom de la classe est obligatoire.</p>
+<p class="font-label-sm text-label-sm text-outline italic">Seul le nom de la classe est obligatoire.</p>
 </div>
 </div>
 </div>
 </form>
 </main>
-</div>
 
 <script>
     const inputs = document.querySelectorAll('input, select, textarea');
@@ -175,7 +255,7 @@
             inputs.forEach(function (i) { if (i.value) filled++; });
             const percentage = Math.round((filled / inputs.length) * 100);
             progressBar.style.width = Math.max(15, percentage) + '%';
-            if (percentage >= 90) progressLabel.textContent = 'Complet';
+            progressLabel.textContent = percentage >= 90 ? 'Complet' : 'En cours';
         });
     });
 </script>

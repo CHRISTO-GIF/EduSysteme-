@@ -265,7 +265,7 @@ public class NoteController {
             @RequestParam Integer trimestre,
             @RequestParam String type,
             @RequestParam(required = false) String titre,
-            @RequestParam Double coefficient,
+            @RequestParam(required = false, defaultValue = "1") Double coefficient,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEvaluation,
             @RequestParam(defaultValue = "PUBLIE") String statut,
             @RequestParam Map<String, String> allParams,
@@ -345,7 +345,7 @@ public class NoteController {
             @RequestParam Integer trimestre,
             @RequestParam String type,
             @RequestParam(required = false) String titre,
-            @RequestParam Double coefficient,
+            @RequestParam(required = false, defaultValue = "1") Double coefficient,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEvaluation,
             HttpSession session,
             Model model) {
@@ -408,11 +408,15 @@ public class NoteController {
         List<LigneImport> validesUniquement = apercu.stream().filter(l -> l.valide).collect(Collectors.toList());
         session.setAttribute(SESSION_IMPORT_KEY, validesUniquement);
 
+        double moyenne = validesUniquement.stream()
+            .mapToDouble(l -> l.valeur).average().orElse(0.0);
+
         model.addAttribute("importFichierNom", fichier != null ? fichier.getOriginalFilename() : null);
         model.addAttribute("importApercu", apercu);
         model.addAttribute("importTotal", apercu.size());
         model.addAttribute("importPret", validesUniquement.size());
         model.addAttribute("importErreurs", apercu.size() - validesUniquement.size());
+        model.addAttribute("importMoyenne", Math.round(moyenne * 100.0) / 100.0);
 
         populerContexteSaisie(model, matiereId, classeId, trimestre, type, titre, coefficient, dateEvaluation);
         return vue;
@@ -424,7 +428,7 @@ public class NoteController {
             @RequestParam Long classeId,
             @RequestParam Integer trimestre,
             @RequestParam String type,
-            @RequestParam Double coefficient,
+            @RequestParam(required = false, defaultValue = "1") Double coefficient,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEvaluation,
             HttpSession session,
             RedirectAttributes ra) {

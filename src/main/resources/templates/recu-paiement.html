@@ -50,8 +50,26 @@
     .print-area { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
     @media print {
         body { background: white; }
-        .no-print { display: none; }
-        .print-area { box-shadow: none; margin: 0; width: 100%; max-width: none; }
+        .no-print, .no-print * { display: none !important; }
+        .print-area {
+            box-shadow: none; margin: 0; width: 100%; max-width: none;
+            padding: 20px !important;
+            gap: 10px !important;
+        }
+        .print-area header { padding-bottom: 8px !important; gap: 8px !important; }
+        .print-area section { gap: 8px !important; }
+        .print-area h1 { font-size: 16px !important; }
+        .print-area h2 { padding-top: 4px !important; padding-bottom: 4px !important; font-size: 20px !important; }
+        .print-area h3 { font-size: 12px !important; }
+        .print-area table th, .print-area table td { padding: 6px !important; }
+        .print-area .h-24 { height: 48px !important; }
+        .print-area .h-16 { height: 44px !important; width: 44px !important; }
+        .print-area .mt-xl { margin-top: 10px !important; }
+        .print-area .pt-xl { padding-top: 10px !important; }
+        .print-area .gap-xl { gap: 10px !important; }
+        .print-area .gap-lg { gap: 8px !important; }
+        .print-area footer { padding-top: 8px !important; }
+        @page { size: A4; margin: 10mm; }
     }
 </style>
 </head>

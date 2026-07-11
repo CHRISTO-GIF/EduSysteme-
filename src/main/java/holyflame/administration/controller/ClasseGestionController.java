@@ -2,6 +2,7 @@ package holyflame.administration.controller;
 
 import holyflame.administration.model.Classe;
 import holyflame.administration.model.Eleve;
+import holyflame.administration.model.Etablissement;
 import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.CreneauHoraireRepository;
 import holyflame.administration.repository.EleveRepository;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -39,7 +41,13 @@ public class ClasseGestionController {
     @GetMapping("/nouveau")
     public String nouveauForm(Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
+        Etablissement etab = etablissementService.getCurrentEtablissement();
+        String anneeScolaire = (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank())
+            ? etab.getAnneeScolaire()
+            : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1));
         model.addAttribute("enseignants", utilisateurRepository.findByRoleAndEtablissementIdOrderByNomAsc("ENSEIGNANT", etabId));
+        model.addAttribute("anneeScolaire", anneeScolaire);
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         return "gestion-classes-nouveau";
     }
 
