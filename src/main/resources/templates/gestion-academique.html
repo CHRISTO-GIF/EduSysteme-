@@ -67,9 +67,6 @@
 <a class="flex items-center gap-md px-md py-sm text-white border-l-4 border-primary-fixed bg-tertiary-container rounded-lg font-label-md text-label-md font-bold" href="/gestion-academique">
 <span class="material-symbols-outlined">school</span> Gestion Academique
 </a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/matieres">
-<span class="material-symbols-outlined">menu_book</span> Matieres
-</a>
 <a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat">
 <span class="material-symbols-outlined">group</span> Eleves
 </a>
@@ -84,6 +81,9 @@
 </a>
 <a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/examens">
 <span class="material-symbols-outlined">quiz</span> Examens
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/bulletins/options">
+<span class="material-symbols-outlined">description</span> Bulletins
 </a>
 </nav>
 <div class="px-sm mt-auto space-y-xs pt-md border-t border-tertiary-container/30">
@@ -140,9 +140,19 @@
 </div>
 
 <!-- Onglets -->
-<div class="flex border-b border-outline-variant mb-xl">
+<div class="flex items-center justify-between border-b border-outline-variant mb-xl">
+<div class="flex">
 <button class="px-lg py-md font-label-md text-label-md text-primary active-tab border-primary transition-all" id="tab-classes" onclick="switchTab('classes')" type="button">Classes</button>
 <button class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all" id="tab-matieres" onclick="switchTab('matieres')" type="button">Matieres</button>
+</div>
+<div class="flex items-center">
+<a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/notes/saisie}">
+<span class="material-symbols-outlined text-[18px]">grading</span> Notes
+</a>
+<a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/bulletins/options}">
+<span class="material-symbols-outlined text-[18px]">description</span> Bulletins
+</a>
+</div>
 </div>
 
 <!-- Onglet Classes -->

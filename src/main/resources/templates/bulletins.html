@@ -32,6 +32,11 @@
 <option th:each="c : ${classes}" th:selected="${classeId != null and classeId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
 </select>
 </div>
+<div class="flex-1">
+<label class="text-xs text-gray-500 block mb-1">Nom ou matricule</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" name="q" placeholder="Rechercher un eleve..." th:value="${q}" type="text"/>
+</div>
+<button class="px-4 py-2 bg-blue-900 text-white rounded-lg font-medium" type="submit">Rechercher</button>
 </form>
 
 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
