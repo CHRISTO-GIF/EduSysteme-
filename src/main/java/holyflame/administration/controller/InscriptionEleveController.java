@@ -74,6 +74,7 @@ public class InscriptionEleveController {
         public String contactUrgenceTelephone;
         // Etape 3 : Informations Academiques
         public Long classeId;
+        public String anneeScolaire;
         public LocalDate dateInscription;
         public String ecoleProvenance;
         public String langueVivante1;
@@ -199,13 +200,18 @@ public class InscriptionEleveController {
         }
         Long etabId = etablissementService.getCurrentEtablissementId();
         Etablissement etab = etablissementService.getCurrentEtablissement();
-        String anneeScolaire = (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank())
-            ? etab.getAnneeScolaire()
-            : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1));
+        String anneeScolaire;
+        if (donnees.anneeScolaire != null && !donnees.anneeScolaire.isBlank()) {
+            anneeScolaire = donnees.anneeScolaire;
+        } else if (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank()) {
+            anneeScolaire = etab.getAnneeScolaire();
+        } else {
+            anneeScolaire = LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1);
+        }
         model.addAttribute("donnees", donnees);
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         model.addAttribute("etapeActuelle", 3);
-        model.addAttribute("classes", classeRepository.findByAnneeScolaireAndEtablissementId(anneeScolaire, etabId));
+        model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
         model.addAttribute("anneeScolaire", anneeScolaire);
         return "eleve-nouveau-etape3";
     }
@@ -213,6 +219,7 @@ public class InscriptionEleveController {
     @PostMapping("/etape-3")
     public String enregistrerEtape3(
             @RequestParam Long classeId,
+            @RequestParam(required = false) String anneeScolaire,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateInscription,
             @RequestParam(required = false) String ecoleProvenance,
             @RequestParam(required = false) String langueVivante1,
@@ -225,6 +232,7 @@ public class InscriptionEleveController {
             return "redirect:/secretariat/eleves/nouveau";
         }
         donnees.classeId = classeId;
+        donnees.anneeScolaire = anneeScolaire;
         donnees.dateInscription = dateInscription != null ? dateInscription : LocalDate.now();
         donnees.ecoleProvenance = ecoleProvenance;
         donnees.langueVivante1 = langueVivante1;
@@ -360,6 +368,7 @@ public class InscriptionEleveController {
         eleveRepository.save(eleve);
         journalService.log("ÉLÈVE_AJOUTÉ", "ELEVES", eleve.getNom() + " " + eleve.getPrenom() + " — " + eleve.getMatricule());
 
+        Long paiementId = null;
         if (donnees.paiementMontant != null && donnees.paiementMontant > 0) {
             Paiement paiement = new Paiement();
             paiement.setEleve(eleve);
@@ -373,6 +382,7 @@ public class InscriptionEleveController {
                 .findFirst()
                 .ifPresent(paiement::setFraisScolarite);
             paiementRepository.save(paiement);
+            paiementId = paiement.getId();
             journalService.log("PAIEMENT_ENREGISTRÉ", "FINANCES",
                 eleve.getNom() + " " + eleve.getPrenom() + " — " + donnees.paiementMontant + " F (INSCRIPTION)");
         }
@@ -390,6 +400,9 @@ public class InscriptionEleveController {
 
         ra.addFlashAttribute("successMsg", eleve.getPrenom() + " " + eleve.getNom()
             + " a été inscrit(e) avec succès (matricule " + eleve.getMatricule() + ").");
+        if (paiementId != null) {
+            ra.addFlashAttribute("paiementRecuId", paiementId);
+        }
         return "redirect:/secretariat";
     }
 

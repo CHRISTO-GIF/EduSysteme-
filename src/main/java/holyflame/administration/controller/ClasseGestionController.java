@@ -59,17 +59,37 @@ public class ClasseGestionController {
             @RequestParam(required = false) Long professeurTitulaireId,
             @RequestParam(required = false) Integer capacite,
             @RequestParam(required = false) String salle,
-            @RequestParam(required = false) String notes) {
+            @RequestParam(required = false) String notes,
+            RedirectAttributes ra) {
+
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Etablissement etab = etablissementService.getCurrentEtablissement();
+        String anneeResolue = (anneeScolaire != null && !anneeScolaire.isBlank())
+            ? anneeScolaire
+            : (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank()
+                ? etab.getAnneeScolaire()
+                : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1)));
+
+        if (classeRepository.findByNomIgnoreCaseAndAnneeScolaireAndEtablissementId(nom.trim(), anneeResolue, etabId).isPresent()) {
+            ra.addFlashAttribute("erreur", "Une classe nommée \"" + nom.trim() + "\" existe déjà pour l'année " + anneeResolue + ".");
+            return "redirect:/gestion-classes/nouveau";
+        }
+        String salleSaisie = salle != null ? salle.trim() : "";
+        if (!salleSaisie.isEmpty()
+            && classeRepository.findBySalleIgnoreCaseAndAnneeScolaireAndEtablissementId(salleSaisie, anneeResolue, etabId).isPresent()) {
+            ra.addFlashAttribute("erreur", "La salle \"" + salleSaisie + "\" est déjà attribuée à une autre classe pour l'année " + anneeResolue + ".");
+            return "redirect:/gestion-classes/nouveau";
+        }
 
         Classe classe = new Classe();
         classe.setNom(nom);
         classe.setNiveau(niveau);
-        classe.setAnneeScolaire(anneeScolaire != null ? anneeScolaire : "2025-2026");
+        classe.setAnneeScolaire(anneeResolue);
         classe.setProfesseurTitulaireId(professeurTitulaireId);
         classe.setCapacite(capacite);
         classe.setSalle(salle);
         classe.setNotes(notes);
-        classe.setEtablissementId(etablissementService.getCurrentEtablissementId());
+        classe.setEtablissementId(etabId);
         classeRepository.save(classe);
         return "redirect:/gestion-classes";
     }
@@ -83,11 +103,30 @@ public class ClasseGestionController {
             @RequestParam(required = false) Long professeurTitulaireId,
             @RequestParam(required = false) Integer capacite,
             @RequestParam(required = false) String salle,
-            @RequestParam(required = false) String notes) {
+            @RequestParam(required = false) String notes,
+            RedirectAttributes ra) {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
         Classe classe = classeRepository.findById(id).orElseThrow();
         verifierProprietaire(classe, etabId);
+
+        boolean nomDejaPris = classeRepository.findByNomIgnoreCaseAndAnneeScolaireAndEtablissementId(nom.trim(), anneeScolaire, etabId)
+            .map(autre -> !autre.getId().equals(id))
+            .orElse(false);
+        if (nomDejaPris) {
+            ra.addFlashAttribute("erreur", "Une classe nommée \"" + nom.trim() + "\" existe déjà pour l'année " + anneeScolaire + ".");
+            return "redirect:/gestion-classes";
+        }
+        String salleSaisie = salle != null ? salle.trim() : "";
+        boolean salleDejaPrise = !salleSaisie.isEmpty()
+            && classeRepository.findBySalleIgnoreCaseAndAnneeScolaireAndEtablissementId(salleSaisie, anneeScolaire, etabId)
+                .map(autre -> !autre.getId().equals(id))
+                .orElse(false);
+        if (salleDejaPrise) {
+            ra.addFlashAttribute("erreur", "La salle \"" + salleSaisie + "\" est déjà attribuée à une autre classe pour l'année " + anneeScolaire + ".");
+            return "redirect:/gestion-classes";
+        }
+
         classe.setNom(nom);
         classe.setNiveau(niveau);
         classe.setAnneeScolaire(anneeScolaire);

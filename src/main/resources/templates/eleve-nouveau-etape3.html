@@ -76,9 +76,9 @@
 Classe / Niveau <span class="text-error">*</span>
 </label>
 <div class="relative">
-<select class="w-full h-12 px-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none font-body-md text-on-surface" name="classeId" required="required">
+<select class="w-full h-12 px-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none font-body-md text-on-surface" id="select-classe" name="classeId" required="required">
 <option disabled="disabled" th:selected="${donnees.classeId == null}" value="">Selectionnez un niveau</option>
-<option th:each="c : ${classes}" th:selected="${donnees.classeId != null and donnees.classeId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
+<option th:attr="data-annee=${c.anneeScolaire}" th:each="c : ${classes}" th:selected="${donnees.classeId != null and donnees.classeId == c.id}" th:text="${c.nom} + (${c.anneeScolaire} != null ? ' (' + ${c.anneeScolaire} + ')' : '')" th:value="${c.id}"></option>
 </select>
 <span class="material-symbols-outlined absolute right-3 top-3 text-secondary pointer-events-none">expand_more</span>
 </div>
@@ -87,7 +87,7 @@ Classe / Niveau <span class="text-error">*</span>
 <label class="font-label-md text-label-md text-on-surface flex items-center gap-xs">
 Annee Scolaire <span class="text-error">*</span>
 </label>
-<input class="w-full h-12 px-md bg-surface-container-highest/50 border border-outline-variant rounded-lg font-body-md text-secondary cursor-not-allowed" readonly="readonly" th:value="${anneeScolaire}" type="text"/>
+<input class="w-full h-12 px-md bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-body-md text-on-surface" id="input-annee-scolaire" name="anneeScolaire" required="required" th:value="${anneeScolaire}" type="text"/>
 </div>
 </div>
 
@@ -184,5 +184,16 @@ Suivant <span class="material-symbols-outlined">arrow_forward</span>
 </div>
 </section>
 </main>
+<script>
+    var selectClasse = document.getElementById('select-classe');
+    var inputAnnee = document.getElementById('input-annee-scolaire');
+    if (selectClasse && inputAnnee) {
+        selectClasse.addEventListener('change', function () {
+            var option = selectClasse.options[selectClasse.selectedIndex];
+            var annee = option ? option.getAttribute('data-annee') : null;
+            if (annee) inputAnnee.value = annee;
+        });
+    }
+</script>
 </body>
 </html>

@@ -66,7 +66,10 @@
 <p class="font-body-md text-body-md text-secondary">Veuillez televerser les documents originaux pour finaliser l'inscription de l'eleve.</p>
 </div>
 
-<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
+<div class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md flex items-center gap-sm" id="erreur-finalisation" th:if="${erreur}">
+<span class="material-symbols-outlined">error</span>
+<span th:text="${erreur}"></span>
+</div>
 
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg md:p-xl">
 <form class="space-y-xl" enctype="multipart/form-data" method="post" th:action="@{/secretariat/eleves/nouveau/etape-5/finaliser}">
@@ -81,7 +84,7 @@
 <p class="font-label-sm text-outline">ou glisser-depose</p>
 </div>
 </label>
-<input accept=".pdf,.jpg,.jpeg,.png" class="hidden" id="acteNaissance" name="acteNaissance" required="required" type="file"/>
+<input accept=".pdf,.jpg,.jpeg,.png" class="hidden" id="acteNaissance" name="acteNaissance" type="file"/>
 </div>
 
 <div class="flex flex-col gap-sm">
@@ -163,6 +166,11 @@ Enregistrer l'inscription <span class="material-symbols-outlined text-body-md">c
                 zone.classList.toggle('has-file', input.files.length > 0);
             });
         });
+
+        var erreurFinalisation = document.getElementById('erreur-finalisation');
+        if (erreurFinalisation) {
+            erreurFinalisation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     </script>
 </body>
 </html>

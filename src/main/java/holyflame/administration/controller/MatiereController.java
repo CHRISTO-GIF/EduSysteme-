@@ -65,6 +65,11 @@ public class MatiereController {
             ra.addFlashAttribute("erreur", "Le coefficient doit être supérieur à 0.");
             return "redirect:/matieres";
         }
+        Long etabIdAjout = etablissementService.getCurrentEtablissementId();
+        if (matiereRepository.findByNomIgnoreCaseAndEtablissementId(nom.trim(), etabIdAjout).isPresent()) {
+            ra.addFlashAttribute("erreur", "Une matière nommée \"" + nom.trim() + "\" existe déjà.");
+            return "redirect:/matieres";
+        }
         Matiere matiere = new Matiere();
         matiere.setNom(nom);
         matiere.setCoefficient(coefficient != null ? coefficient : 1.0);
@@ -89,6 +94,13 @@ public class MatiereController {
         if (matiere.getEtablissementId() != null) verifierProprietaire(matiere, etabId);
         if (coefficient == null || coefficient <= 0) {
             ra.addFlashAttribute("erreur", "Le coefficient doit être supérieur à 0.");
+            return "redirect:/matieres";
+        }
+        boolean nomDejaPris = matiereRepository.findByNomIgnoreCaseAndEtablissementId(nom.trim(), etabId)
+            .map(autre -> !autre.getId().equals(id))
+            .orElse(false);
+        if (nomDejaPris) {
+            ra.addFlashAttribute("erreur", "Une matière nommée \"" + nom.trim() + "\" existe déjà.");
             return "redirect:/matieres";
         }
         matiere.setNom(nom);

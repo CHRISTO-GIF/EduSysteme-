@@ -8,10 +8,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MatiereRepository extends JpaRepository<Matiere, Long> {
     List<Matiere> findAllByOrderByNomAsc();
     List<Matiere> findByEtablissementIdOrderByNomAsc(Long etablissementId);
+    Optional<Matiere> findByNomIgnoreCaseAndEtablissementId(String nom, Long etablissementId);
 
     @Query("SELECT m FROM Matiere m WHERE m.etablissementId = :etabId OR m.etablissementId IS NULL ORDER BY m.nom ASC")
     List<Matiere> findByEtabIdOrNull(@Param("etabId") Long etabId);
