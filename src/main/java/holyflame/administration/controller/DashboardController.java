@@ -84,6 +84,11 @@ public class DashboardController {
         for (int i = 1; i <= 12; i++) { pLabels.add(moisNoms[i-1]); pData.add(pParMois.getOrDefault(i, 0.0)); }
         model.addAttribute("paiementsLabels", pLabels);
         model.addAttribute("paiementsData",   pData);
+        double maxPaiementMois = pData.stream().mapToDouble(Double::doubleValue).max().orElse(0.0);
+        model.addAttribute("maxPaiementMois", Math.max(1.0, maxPaiementMois));
+        int moisCourantIndex = LocalDateTime.now().getMonthValue() - 1;
+        model.addAttribute("moisCourantIndex", moisCourantIndex);
+        model.addAttribute("totalEncaisseMois", pData.get(moisCourantIndex));
 
         // Graphique absences par mois — filtrées par établissement
         List<holyflame.administration.model.Absence> absences = etabId != null

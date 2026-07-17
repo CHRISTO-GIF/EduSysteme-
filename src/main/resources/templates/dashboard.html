@@ -115,6 +115,122 @@
     </style>
 </head>
 <body class="bg-surface-bright text-on-surface">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden min-h-screen bg-background pb-20">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">school</span>
+<h1 class="font-headline-sm text-headline-sm text-primary font-bold" th:text="${nomEtablissement}">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant font-bold text-label-sm border border-outline-variant" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'U'}">U</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<section>
+<h2 class="font-headline-md text-headline-md text-primary">Tableau de bord</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" th:text="${(utilisateurConnecte != null ? 'Bienvenue, ' + utilisateurConnecte.prenom : 'Bienvenue') + '. Voici l''etat actuel.'}">Bienvenue.</p>
+</section>
+<!-- Cartes KPI -->
+<section class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant flex flex-col gap-sm">
+<span class="material-symbols-outlined text-primary">group</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Effectifs</p>
+<p class="font-headline-sm text-headline-sm text-primary" th:text="${totalEleves}">0</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${totalClasses + ' classe(s)'}">0 classes</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant flex flex-col gap-sm">
+<span class="material-symbols-outlined text-primary">school</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Personnel</p>
+<p class="font-headline-sm text-headline-sm text-primary" th:text="${totalPersonnels}">0</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Personnel actif</p>
+</div>
+</div>
+<div class="col-span-2 bg-primary-container p-md rounded-xl flex items-center justify-between overflow-hidden relative">
+<div class="relative z-10">
+<p class="font-label-sm text-label-sm text-on-primary-container">Finances du mois</p>
+<p class="font-headline-md text-headline-md text-on-primary" th:text="${#numbers.formatDecimal(totalEncaisseMois,0,'COMMA',0,'POINT')} + ' FCFA'">0</p>
+</div>
+<div class="relative z-10 bg-white/10 p-sm rounded-lg">
+<span class="material-symbols-outlined text-white text-[32px]">payments</span>
+</div>
+</div>
+</section>
+<!-- Graphique revenus -->
+<section class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-primary">Revenus</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant" th:text="${anneeScolaire}">Annee</span>
+</div>
+<div class="flex items-end gap-xs">
+<div class="flex flex-col items-center flex-1 gap-xs" th:each="mois, iStat : ${paiementsLabels}">
+<div class="w-full h-24 flex items-end">
+<div class="w-full bg-primary-fixed-dim/40 rounded-t" th:classappend="${iStat.index == moisCourantIndex} ? ' bg-primary' : ''" th:style="'height:' + (5 + (${paiementsData[iStat.index]} * 90 / ${maxPaiementMois})) + '%'"></div>
+</div>
+<span class="font-label-sm text-label-sm text-outline" th:text="${mois}">Mois</span>
+</div>
+</div>
+</section>
+<!-- Activites recentes (alertes reelles) -->
+<section class="space-y-sm">
+<div class="flex justify-between items-center px-xs">
+<h3 class="font-headline-sm text-headline-sm text-primary">Activites recentes</h3>
+<a class="font-label-md text-label-md text-primary" href="/journal">Voir tout</a>
+</div>
+<div class="space-y-sm">
+<div class="bg-surface-container-low p-md rounded-xl flex items-center gap-md" th:each="alerte : ${alertes}">
+<div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" th:classappend="${alerte.niveau == 'danger'} ? 'bg-error-container' : (${alerte.niveau == 'warning'} ? 'bg-secondary-container' : 'bg-tertiary-container')">
+<span class="material-symbols-outlined text-[20px]" th:classappend="${alerte.niveau == 'danger'} ? 'text-on-error-container' : (${alerte.niveau == 'warning'} ? 'text-on-secondary-container' : 'text-on-tertiary-container')" th:text="${alerte.niveau == 'danger'} ? 'warning' : (${alerte.niveau == 'warning'} ? 'schedule' : 'notifications')">notifications</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-primary font-semibold" th:text="${alerte.message}">Message</p>
+</div>
+<a th:href="${alerte.lien}" class="material-symbols-outlined text-outline">chevron_right</a>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant px-xs" th:if="${#lists.isEmpty(alertes)}">Aucune alerte pour le moment. Tout va bien !</p>
+</div>
+</section>
+<!-- Actions rapides -->
+<section class="space-y-sm pb-lg">
+<h3 class="font-headline-sm text-headline-sm text-primary px-xs">Actions rapides</h3>
+<div class="flex gap-sm overflow-x-auto hide-scrollbar -mx-md px-md">
+<a class="flex-none w-24 aspect-square bg-surface-container-lowest border border-outline-variant rounded-xl flex flex-col items-center justify-center gap-xs" href="/finances/nouvelle-transaction">
+<span class="material-symbols-outlined text-primary">add_card</span>
+<span class="font-label-sm text-label-sm text-center px-xs">Facturer</span>
+</a>
+<a class="flex-none w-24 aspect-square bg-surface-container-lowest border border-outline-variant rounded-xl flex flex-col items-center justify-center gap-xs" href="/emploi-du-temps">
+<span class="material-symbols-outlined text-primary">calendar_add_on</span>
+<span class="font-label-sm text-label-sm text-center px-xs">Emploi du temps</span>
+</a>
+<a class="flex-none w-24 aspect-square bg-surface-container-lowest border border-outline-variant rounded-xl flex flex-col items-center justify-center gap-xs" href="/messagerie">
+<span class="material-symbols-outlined text-primary">mail</span>
+<span class="font-label-sm text-label-sm text-center px-xs">Message</span>
+</a>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-primary font-semibold" href="/dashboard">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="/secretariat">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-sm text-label-sm">Eleves</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="/personnel">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-sm text-label-sm">Personnel</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Planning</span>
+</a>
+</nav>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <!-- Menu lateral persistant -->
 <aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary dark:bg-tertiary-container flex flex-col py-lg z-50">
 <div class="px-lg mb-xl">
@@ -397,4 +513,5 @@ Gerer les notes
             });
         });
     </script>
+</div>
 </body></html>

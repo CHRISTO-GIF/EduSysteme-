@@ -46,6 +46,93 @@
     </script>
 </head>
 <body class="bg-background text-on-background min-h-screen">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden min-h-screen bg-background pb-20">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">school</span>
+<h1 class="font-headline-sm text-headline-sm text-primary font-bold">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-label-sm border border-outline-variant" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'A'}">A</div>
+</header>
+<main class="p-md flex flex-col gap-lg">
+<section class="flex flex-col gap-sm">
+<h2 class="font-headline-md text-headline-md text-primary">Gestion du Personnel</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" th:text="${totalActifs} + ' membre(s) actif(s) sur ' + ${totalPersonnels}">0 membres</p>
+<div class="mt-sm relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md text-body-md" id="recherche-personnel-mobile" placeholder="Rechercher un membre..." type="text"/>
+</div>
+</section>
+<!-- Statistiques reelles -->
+<section class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex flex-col gap-sm">
+<span class="material-symbols-outlined text-tertiary">badge</span>
+<span class="font-headline-sm text-headline-sm text-primary" th:text="${totalPersonnels}">0</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Personnel</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex flex-col gap-sm">
+<span class="material-symbols-outlined text-tertiary">school</span>
+<span class="font-headline-sm text-headline-sm text-primary" th:text="${totalEnseignants}">0</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Enseignants</span>
+</div>
+</section>
+<!-- Liste reelle du personnel -->
+<section class="flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-primary">Liste du Personnel</h3>
+<a class="text-primary font-label-md text-label-md flex items-center gap-xs" href="/personnel">
+Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
+</a>
+</div>
+<div class="flex flex-col gap-sm" id="grille-personnel-mobile">
+<a class="personnel-card-mobile bg-surface border border-outline-variant p-md rounded-xl flex items-center gap-md active:bg-surface-container-high transition-colors" th:attr="data-nom=${p.nom + ' ' + p.prenom}" th:each="p : ${personnels}" th:href="@{/personnel/{id}(id=${p.id})}">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold flex-shrink-0" th:text="${#strings.isEmpty(p.prenom) ? '' : #strings.substring(p.prenom,0,1)} + ${#strings.isEmpty(p.nom) ? '' : #strings.substring(p.nom,0,1)}">--</div>
+<div class="flex-1 overflow-hidden">
+<h4 class="font-headline-sm text-headline-sm text-primary truncate" th:text="${p.prenom} + ' ' + ${p.nom}">Nom</h4>
+<div class="flex items-center gap-sm mt-xs">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full" th:switch="${p.fonction}">
+<span th:case="'ENSEIGNANT'">Enseignant</span>
+<span th:case="'DIRECTEUR'">Directeur</span>
+<span th:case="'SECRETAIRE'">Secretaire</span>
+<span th:case="'SURVEILLANT'">Surveillant</span>
+<span th:case="'COMPTABLE'">Comptable</span>
+<span th:case="*">Autre</span>
+</span>
+<span class="font-body-md text-body-md text-on-surface-variant truncate" th:if="${p.matiereEnseignee != null and !#strings.isEmpty(p.matiereEnseignee)}" th:text="${p.matiereEnseignee}">Matiere</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline flex-shrink-0">chevron_right</span>
+</a>
+<p class="text-center text-on-surface-variant py-lg" id="aucun-resultat-mobile" style="display:none">Aucun membre ne correspond a cette recherche.</p>
+<p class="text-center text-on-surface-variant py-lg" th:if="${#lists.isEmpty(personnels)}">Aucun membre du personnel pour le moment.</p>
+</div>
+</section>
+</main>
+<a class="fixed right-lg bottom-20 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all z-40" href="/personnel/nouveau">
+<span class="material-symbols-outlined">person_add</span>
+</a>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-secondary" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="/secretariat">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-sm text-label-sm">Eleves</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" href="/personnel">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-sm text-label-sm">Personnel</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Planning</span>
+</a>
+</nav>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <!-- Menu lateral -->
 <aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
 <div class="px-lg mb-xl">
@@ -292,6 +379,27 @@ Aucun membre du personnel ne correspond a ces filtres.
     if (recherche) recherche.addEventListener('input', () => { pageActuelle = 1; render(); });
     render();
     /*]]>*/
+</script>
+</div>
+<!-- Recherche mobile -->
+<script>
+    (function() {
+        const recherche = document.getElementById('recherche-personnel-mobile');
+        const grille = document.getElementById('grille-personnel-mobile');
+        if (!recherche || !grille) return;
+        const cartes = Array.from(grille.querySelectorAll('.personnel-card-mobile'));
+        const aucunResultat = document.getElementById('aucun-resultat-mobile');
+        recherche.addEventListener('input', () => {
+            const q = recherche.value.toLowerCase().trim();
+            let visibleCount = 0;
+            cartes.forEach(c => {
+                const match = c.getAttribute('data-nom').toLowerCase().includes(q);
+                c.style.display = match ? '' : 'none';
+                if (match) visibleCount++;
+            });
+            if (aucunResultat) aucunResultat.style.display = (visibleCount === 0 && cartes.length > 0) ? '' : 'none';
+        });
+    })();
 </script>
 </body>
 </html>
