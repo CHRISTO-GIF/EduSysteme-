@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mes Enfants - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config" th:inline="javascript">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed": "#dce1ff", "secondary-container": "#d0e1fb", "error-container": "#ffdad6",
+                      "surface-dim": "#d9d9e6", "surface-variant": "#e1e1ef", "surface-container-highest": "#e1e1ef",
+                      "on-background": "#191b25", "tertiary-fixed": "#dae2fd", "tertiary-container": "#222a3e",
+                      "surface-container": "#eceef0", "on-primary-fixed": "#00164e", "surface": "#fbf8ff",
+                      "on-tertiary": "#ffffff", "surface-container-high": "#e7e7f5", "primary": "#00236f",
+                      "primary-container": "#1e3a8a", "tertiary": [[${accentColor}]], "on-secondary-container": "#56657c",
+                      "on-secondary-fixed": "#0c1c30", "surface-container-lowest": "#ffffff", "success": "#1e824c",
+                      "on-surface-variant": "#444651", "outline": "#757682", "on-error": "#ffffff",
+                      "inverse-primary": "#b5c4ff", "error": "#ba1a1a", "on-tertiary-fixed": "#131b2e",
+                      "surface-tint": "#425aa6", "on-primary-container": "#90a8ff", "secondary": "#505f76",
+                      "on-secondary": "#ffffff", "background": "#f7f9fb", "inverse-surface": "#2e303a",
+                      "on-error-container": "#93000a", "surface-bright": "#fbf8ff", "outline-variant": "#c5c5d3",
+                      "on-secondary-fixed-variant": "#39485e", "secondary-fixed": "#d4e3ff", "on-surface": "#191b25",
+                      "on-primary-fixed-variant": "#29428c", "inverse-on-surface": "#f0effd", "secondary-fixed-dim": "#b8c7e2"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xl": "32px", "lg": "24px", "gutter": "24px", "sm": "8px", "md": "16px", "xs": "4px", "container-max": "1440px", "sidebar-width": "260px"},
+              "fontFamily": {"headline-sm": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"], "headline-lg": ["Inter"], "headline-lg-mobile": ["Inter"]},
+              "fontSize": {
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="bg-surface border-b border-outline-variant w-full top-0 sticky z-40">
+<div class="flex justify-between items-center px-gutter h-16 w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">school</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary">EduSystem Pro</h1>
+</div>
+<a class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary active:opacity-80" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined">notifications</span>
+</a>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-gutter py-lg">
+<section class="mb-lg">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-background">Mes Enfants</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Suivez les progrès académiques de votre famille</p>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-xl flex items-center gap-2 active:scale-95 transition-all shadow-sm" onclick="document.getElementById('modal-profil').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-md">person_add</span>
+<span class="font-label-md text-label-md hidden md:inline">Ajouter</span>
+</button>
+</div>
+</section>
+<!-- Children List -->
+<div class="space-y-6" th:if="${!enfants.isEmpty()}">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden hover:shadow-md transition-all group" th:each="carte : ${enfants}">
+<div class="p-lg">
+<div class="flex flex-col md:flex-row gap-6">
+<!-- Avatar & Basic Info -->
+<div class="flex items-center gap-4 min-w-max">
+<div class="w-24 h-24 rounded-full border-2 border-primary-fixed bg-primary-fixed flex items-center justify-center text-primary font-bold text-3xl shrink-0" th:text="${#strings.isEmpty(carte.eleve.prenom) ? '' : #strings.substring(carte.eleve.prenom,0,1)} + ${#strings.isEmpty(carte.eleve.nom) ? '' : #strings.substring(carte.eleve.nom,0,1)}">--</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary" th:text="${carte.eleve.prenom} + ' ' + ${carte.eleve.nom}">Nom</h3>
+<p class="font-label-md text-label-md text-secondary" th:text="${carte.classe != null ? 'Classe de ' + carte.classe.nom : 'Aucune classe'}">Classe</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="px-2 py-0.5 bg-surface-container-high rounded text-[10px] font-bold uppercase tracking-wider text-on-surface-variant" th:text="'Matricule : ' + ${carte.eleve.matricule}">ID</span>
+</div>
+</div>
+</div>
+<!-- Stats Grid -->
+<div class="flex-grow grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="p-4 bg-surface-container-low rounded-xl border border-transparent hover:border-primary-fixed transition-colors">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Moyenne</p>
+<p class="font-headline-sm text-headline-sm text-primary mt-1" th:text="${carte.moyenneGenerale} + '/20'">0/20</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl border border-transparent hover:border-primary-fixed transition-colors">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Absences</p>
+<p class="font-headline-sm text-headline-sm text-on-surface mt-1" th:text="${carte.totalAbsences} + (${carte.totalAbsences > 1} ? ' jours' : ' jour')">0 jour</p>
+<span class="text-[10px] font-bold" th:classappend="${carte.nbAbsencesNonJustifiees > 0} ? 'text-error' : 'text-success'" th:text="${carte.nbAbsencesNonJustifiees > 0} ? (${carte.nbAbsencesNonJustifiees} + ' non justifiée(s)') : (${carte.totalAbsences > 0} ? 'Toutes justifiées' : 'Aucune absence')">—</span>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl border border-transparent hover:border-primary-fixed transition-colors">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Devoirs (7j)</p>
+<p class="font-headline-sm text-headline-sm text-on-surface mt-1" th:text="${carte.nbDevoirsRecents}">0</p>
+<span class="text-[10px] text-on-surface-variant">Evalués récemment</span>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl border border-transparent hover:border-primary-fixed transition-colors">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Comportement</p>
+<p class="font-headline-sm text-headline-sm mt-1"
+   th:classappend="${carte.derniereConduite == null} ? 'text-on-surface-variant' : (${carte.derniereConduite.evaluation == 'EXCELLENTE' or carte.derniereConduite.evaluation == 'BONNE'} ? 'text-success' : (${carte.derniereConduite.evaluation == 'A_AMELIORER'} ? 'text-error' : 'text-on-surface'))"
+   th:switch="${carte.derniereConduite != null ? carte.derniereConduite.evaluation : null}">
+<span th:case="'EXCELLENTE'">Excellente</span>
+<span th:case="'BONNE'">Bonne</span>
+<span th:case="'MOYENNE'">Moyenne</span>
+<span th:case="'A_AMELIORER'">À améliorer</span>
+<span th:case="*">Non évalué</span>
+</p>
+<span class="text-[10px] text-on-surface-variant" th:if="${carte.derniereConduite != null}" th:text="'Trimestre ' + ${carte.derniereConduite.trimestre}">—</span>
+</div>
+</div>
+</div>
+<!-- Prochain examen -->
+<div class="mt-md flex items-center text-on-surface-variant" th:if="${carte.prochainExamen != null}">
+<span class="material-symbols-outlined text-md mr-sm">event_available</span>
+<span class="font-label-md text-label-md mr-xs">Prochain examen :</span>
+<span class="font-body-md text-body-md text-on-surface" th:text="(${carte.prochainExamen.matiere != null ? carte.prochainExamen.matiere.nom : '?'}) + ' (' + ${#temporals.format(carte.prochainExamen.dateExamen, 'dd MMM')} + ')'">Examen</span>
+</div>
+</div>
+<div class="px-lg py-3 bg-surface-container flex justify-between items-center group-hover:bg-primary-container transition-colors">
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-primary-container" th:text="${carte.eleve.compteEmail != null ? 'Portail élève actif' : 'Aucun compte portail élève'}">—</span>
+<a class="flex items-center gap-1 text-primary group-hover:text-on-primary-container font-bold text-sm" th:href="@{/bulletins/{id}(id=${carte.eleve.id})}">
+<span>Bulletin</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</a>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center text-on-surface-variant" th:if="${enfants.isEmpty()}">
+<span class="material-symbols-outlined text-[48px] text-outline mb-md">family_restroom</span>
+<p class="font-body-lg text-body-lg mb-md">Aucun enfant n'est encore rattaché à votre compte.</p>
+<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md" onclick="document.getElementById('modal-profil').classList.remove('hidden')" type="button">Ajouter un profil</button>
+</div>
+<!-- Quick Actions -->
+<section class="mt-xl grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<a class="bg-secondary-container rounded-xl p-lg flex items-center gap-4" th:href="@{/portail-parent/messages}">
+<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined">contact_support</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-secondary-fixed">Besoin d'aide ?</h4>
+<p class="font-body-md text-body-md text-on-secondary-fixed-variant">Contactez l'administration de l'école directement.</p>
+</div>
+</a>
+<a class="bg-primary-container rounded-xl p-lg flex items-center gap-4" th:href="@{/portail-parent/paiements}">
+<div class="w-12 h-12 bg-on-primary-container rounded-full flex items-center justify-center text-primary-container shadow-sm">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-primary">Paiements</h4>
+<p class="font-body-md text-body-md text-on-primary-container">Suivez et réglez les frais de scolarité.</p>
+</div>
+</a>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-2 pb-2 px-2 bg-surface border-t border-outline-variant shadow-sm">
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container-high transition-all p-2 rounded-xl" th:href="@{/portail-parent}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-95 duration-150" th:href="@{/portail-parent/enfants}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">family_restroom</span>
+<span class="font-label-sm text-label-sm">Mes Enfants</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container-high transition-all p-2 rounded-xl" th:href="@{/portail-parent/calendrier}">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendrier</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container-high transition-all p-2 rounded-xl" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined">mail</span>
+<span class="font-label-sm text-label-sm">Messagerie</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container-high transition-all p-2 rounded-xl" th:href="@{/portail-parent/paiements}">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-sm text-label-sm">Paiements</span>
+</a>
+</nav>
+<!-- Modal Ajouter un profil -->
+<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-profil">
+<div class="bg-white rounded-xl p-xl max-w-md w-full">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-primary">Ajouter un profil</h3>
+<button onclick="document.getElementById('modal-profil').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<p class="text-body-md text-on-surface-variant mb-lg">Renseignez le matricule et la date de naissance de votre enfant pour rattacher son dossier à votre compte.</p>
+<form class="space-y-md" method="post" th:action="@{/portail-parent/ajouter-profil}">
+<div>
+<label class="text-label-sm text-secondary block mb-1">Matricule de l'élève</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" name="matricule" placeholder="Ex: HF-2026-012" required="required" type="text"/>
+</div>
+<div>
+<label class="text-label-sm text-secondary block mb-1">Date de naissance de l'élève</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" name="dateNaissance" required="required" type="date"/>
+</div>
+<div class="flex justify-end gap-sm pt-md">
+<button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md" onclick="document.getElementById('modal-profil').classList.add('hidden')" type="button">Annuler</button>
+<button class="px-lg py-2 bg-primary text-white rounded-lg font-label-md" type="submit">Rattacher</button>
+</div>
+</form>
+</div>
+</div>
+</body>
+</html>

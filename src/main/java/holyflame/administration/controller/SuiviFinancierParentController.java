@@ -9,6 +9,7 @@ import holyflame.administration.repository.FraisScolariteRepository;
 import holyflame.administration.repository.PaiementRepository;
 import holyflame.administration.repository.UtilisateurRepository;
 import holyflame.administration.service.EtablissementService;
+import holyflame.administration.service.FinanceParentService;
 import holyflame.administration.service.MessagerieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,9 +25,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Controller
@@ -39,13 +38,7 @@ public class SuiviFinancierParentController {
     @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private MessagerieService messagerieService;
-
-    private static final Map<String, Integer> MOIS_FR = Map.ofEntries(
-        Map.entry("janvier", 1), Map.entry("fevrier", 2), Map.entry("février", 2), Map.entry("mars", 3),
-        Map.entry("avril", 4), Map.entry("mai", 5), Map.entry("juin", 6), Map.entry("juillet", 7),
-        Map.entry("aout", 8), Map.entry("août", 8), Map.entry("septembre", 9), Map.entry("octobre", 10),
-        Map.entry("novembre", 11), Map.entry("decembre", 12), Map.entry("décembre", 12)
-    );
+    @Autowired private FinanceParentService financeParentService;
 
     @GetMapping
     public String index(Authentication auth, Model model) {
@@ -54,81 +47,28 @@ public class SuiviFinancierParentController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         if (etabId == null && !enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
 
-        List<FraisScolarite> tousFrais = etabId != null
-            ? fraisScolariteRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId)
-            : List.of();
+        FinanceParentService.ResumeSolde resume = financeParentService.calculerResume(enfants, etabId);
 
         List<Paiement> tousPaiements = new ArrayList<>();
         for (Eleve e : enfants) tousPaiements.addAll(paiementRepository.findByEleveId(e.getId()));
-
-        LocalDate aujourdHui = LocalDate.now();
-        List<Map<String, Object>> lignes = new ArrayList<>();
-        double soldeTotalARegler = 0;
-        int nbEnRetard = 0;
-        LocalDate prochaineEcheance = null;
-
-        for (Eleve enfant : enfants) {
-            if (enfant.getClasse() == null) continue;
-            String niveau = enfant.getClasse().getNiveau();
-            List<FraisScolarite> applicables = tousFrais.stream()
-                .filter(f -> f.getNiveauCible() == null || f.getNiveauCible().isBlank()
-                    || f.getNiveauCible().equalsIgnoreCase(niveau))
-                .toList();
-
-            for (FraisScolarite f : applicables) {
-                double montant = f.getMontant() != null ? f.getMontant() : 0;
-                double verse = tousPaiements.stream()
-                    .filter(p -> p.getEleve() != null && p.getEleve().getId().equals(enfant.getId())
-                        && p.getFraisScolarite() != null && p.getFraisScolarite().getId().equals(f.getId()))
-                    .mapToDouble(p -> p.getMontantVerse() != null ? p.getMontantVerse() : 0)
-                    .sum();
-                LocalDate echeanceDate = calculerEcheance(f.getEcheance(), enfant.getClasse().getAnneeScolaire());
-
-                String statut;
-                if (montant > 0 && verse >= montant) statut = "PAYE";
-                else if (echeanceDate != null && echeanceDate.isBefore(aujourdHui)) statut = "EN_RETARD";
-                else statut = "EN_ATTENTE";
-
-                if (!"PAYE".equals(statut)) {
-                    soldeTotalARegler += (montant - verse);
-                    if ("EN_RETARD".equals(statut)) nbEnRetard++;
-                    if (echeanceDate != null && (prochaineEcheance == null || echeanceDate.isBefore(prochaineEcheance))) {
-                        prochaineEcheance = echeanceDate;
-                    }
-                }
-
-                Map<String, Object> ligne = new LinkedHashMap<>();
-                ligne.put("designation", f.getDesignation());
-                ligne.put("categorie", f.getTypeFrais());
-                ligne.put("enfant", enfant);
-                ligne.put("montant", montant);
-                ligne.put("resteAPayer", Math.max(0, montant - verse));
-                ligne.put("echeanceDate", echeanceDate);
-                ligne.put("statut", statut);
-                ligne.put("fraisId", f.getId());
-                ligne.put("eleveId", enfant.getId());
-                lignes.add(ligne);
-            }
-        }
-
-        lignes.sort(Comparator.comparing(
-            (Map<String, Object> l) -> "PAYE".equals(l.get("statut")) ? 1 : 0
-        ).thenComparing(l -> (LocalDate) l.get("echeanceDate"), Comparator.nullsLast(Comparator.naturalOrder())));
 
         List<Paiement> derniersPaiements = tousPaiements.stream()
             .sorted(Comparator.comparing(Paiement::getDatePaiement, Comparator.nullsLast(Comparator.reverseOrder())))
             .limit(5)
             .toList();
 
+        List<FraisScolarite> tousFrais = etabId != null
+            ? fraisScolariteRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId)
+            : List.of();
         List<String> categories = tousFrais.stream().map(FraisScolarite::getTypeFrais)
             .filter(Objects::nonNull).distinct().toList();
 
         model.addAttribute("enfants", enfants);
-        model.addAttribute("lignes", lignes);
+        model.addAttribute("lignes", resume.lignes);
         model.addAttribute("derniersPaiements", derniersPaiements);
-        model.addAttribute("soldeTotalARegler", soldeTotalARegler);
-        model.addAttribute("nbEnRetard", nbEnRetard);
-        model.addAttribute("prochaineEcheance", prochaineEcheance);
+        model.addAttribute("soldeTotalARegler", resume.soldeTotalARegler);
+        model.addAttribute("nbEnRetard", resume.nbEnRetard);
+        model.addAttribute("prochaineEcheance", resume.prochaineEcheance);
         model.addAttribute("categories", categories);
         model.addAttribute("adminEmail", trouverEmailAdministration(etabId));
         model.addAttribute("emailParent", email);
@@ -189,19 +129,5 @@ public class SuiviFinancierParentController {
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(null);
-    }
-
-    private LocalDate calculerEcheance(String echeance, String anneeScolaire) {
-        if (echeance == null || anneeScolaire == null) return null;
-        Integer mois = MOIS_FR.get(echeance.trim().toLowerCase());
-        if (mois == null) return null;
-        int anneeDebut;
-        try {
-            anneeDebut = Integer.parseInt(anneeScolaire.split("-")[0].trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
-        int annee = mois >= 9 ? anneeDebut : anneeDebut + 1;
-        return LocalDate.of(annee, mois, 5);
     }
 }

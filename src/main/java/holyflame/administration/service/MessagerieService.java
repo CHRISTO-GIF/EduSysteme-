@@ -1,7 +1,14 @@
 package holyflame.administration.service;
 
+import holyflame.administration.model.Eleve;
+import holyflame.administration.model.EnseignantAutorisation;
+import holyflame.administration.model.Matiere;
 import holyflame.administration.model.MessagePrive;
+import holyflame.administration.model.Utilisateur;
+import holyflame.administration.repository.EnseignantAutorisationRepository;
+import holyflame.administration.repository.MatiereRepository;
 import holyflame.administration.repository.MessagePriveRepository;
+import holyflame.administration.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +29,9 @@ public class MessagerieService {
 
     @Autowired private MessagePriveRepository messagePriveRepository;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private EnseignantAutorisationRepository enseignantAutorisationRepository;
+    @Autowired private MatiereRepository matiereRepository;
+    @Autowired private UtilisateurRepository utilisateurRepository;
 
     public Map<String, Object> creerContact(String email, String nom, String role) {
         Map<String, Object> c = new LinkedHashMap<>();
@@ -30,6 +40,46 @@ public class MessagerieService {
         c.put("role", role);
         c.put("matieres", new ArrayList<String>());
         return c;
+    }
+
+    /**
+     * Construit les contacts reels d'un parent : enseignants des classes de ses enfants
+     * + un contact Administration. Partage entre la messagerie et le resume du tableau de bord.
+     */
+    public Map<String, Map<String, Object>> construireContactsParent(List<Eleve> enfants, Long etabId) {
+        Map<String, Map<String, Object>> contactsParEmail = new LinkedHashMap<>();
+        if (etabId == null) return contactsParEmail;
+
+        List<Long> classeIds = enfants.stream()
+            .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).distinct().toList();
+
+        List<EnseignantAutorisation> autorisations = enseignantAutorisationRepository.findByEtablissementId(etabId).stream()
+            .filter(a -> classeIds.contains(a.getClasseId())).toList();
+
+        for (EnseignantAutorisation autorisation : autorisations) {
+            Utilisateur enseignant = utilisateurRepository.findById(autorisation.getEnseignantId()).orElse(null);
+            if (enseignant == null || enseignant.getEmail() == null) continue;
+            Matiere matiere = matiereRepository.findById(autorisation.getMatiereId()).orElse(null);
+            Map<String, Object> contact = contactsParEmail.computeIfAbsent(enseignant.getEmail(), k -> creerContact(
+                enseignant.getEmail(),
+                (enseignant.getPrenom() != null ? enseignant.getPrenom() + " " : "") + (enseignant.getNom() != null ? enseignant.getNom() : enseignant.getEmail()),
+                "Enseignant"));
+            if (matiere != null) {
+                @SuppressWarnings("unchecked")
+                List<String> matieres = (List<String>) contact.get("matieres");
+                if (!matieres.contains(matiere.getNom())) matieres.add(matiere.getNom());
+            }
+        }
+
+        for (Utilisateur admin : utilisateurRepository.findByEtablissementId(etabId)) {
+            if (("ADMIN".equals(admin.getRole()) || "SECRETAIRE".equals(admin.getRole())) && admin.getEmail() != null
+                    && !contactsParEmail.containsKey(admin.getEmail())) {
+                contactsParEmail.put(admin.getEmail(), creerContact(admin.getEmail(), "Administration", "Secretariat"));
+                break;
+            }
+        }
+
+        return contactsParEmail;
     }
 
     public List<Map<String, Object>> construireConversations(String monEmail, Map<String, Map<String, Object>> contactsParEmail) {

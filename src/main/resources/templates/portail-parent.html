@@ -37,9 +37,140 @@
 <style>
         body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-background text-on-background">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduSystem Pro</h1>
+</div>
+<a class="relative flex items-center justify-center w-11 h-11 rounded-full hover:bg-surface-container-high transition-colors" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface" th:if="${totalMessagesNonLus > 0}"></span>
+</a>
+</header>
+<main class="px-md">
+<!-- Bienvenue -->
+<section class="py-lg">
+<h2 class="font-headline-md text-headline-md text-primary" th:text="'Bonjour, ' + ${nomParent}">Bonjour</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Voici un aperçu de la journée scolaire de vos enfants.</p>
+</section>
+<!-- Cartes enfants -->
+<section class="mb-lg" th:if="${!enfants.isEmpty()}">
+<div class="flex gap-md overflow-x-auto pb-md snap-x hide-scrollbar">
+<div class="min-w-[260px] snap-center bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex flex-col gap-md" th:each="carte : ${enfants}">
+<div class="flex items-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold shrink-0" th:text="${#strings.isEmpty(carte.eleve.prenom) ? '' : #strings.substring(carte.eleve.prenom,0,1)} + ${#strings.isEmpty(carte.eleve.nom) ? '' : #strings.substring(carte.eleve.nom,0,1)}">--</div>
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface" th:text="${carte.eleve.prenom}">Enfant</p>
+<p class="font-label-md text-label-md text-on-surface-variant" th:text="${carte.classe != null ? carte.classe.nom : '—'}">Classe</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded-lg text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Moyenne</p>
+<p class="font-headline-sm text-headline-sm text-primary" th:text="${carte.moyenneGenerale} + '/20'">0/20</p>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Assiduité</p>
+<p class="font-headline-sm text-headline-sm text-primary" th:text="${carte.tauxAssiduite} + '%'">0%</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg text-center text-on-surface-variant mb-lg" th:if="${enfants.isEmpty()}">
+<span class="material-symbols-outlined text-[40px] text-outline mb-sm">family_restroom</span>
+<p class="font-body-md text-body-md">Aucun enfant n'est encore rattaché à votre compte.</p>
+<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md" onclick="document.getElementById('modal-profil').classList.remove('hidden')" type="button">Ajouter un profil</button>
+</div>
+<!-- A venir -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md mb-lg">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">À venir</h3>
+<a class="text-primary font-label-md text-label-md" th:href="@{/portail-parent/calendrier}">Voir tout</a>
+</div>
+<div class="space-y-sm">
+<a class="flex items-start gap-md p-sm rounded-lg hover:bg-surface-container-high transition-colors" th:each="evt : ${prochainsEvenements}" th:href="@{/portail-parent/calendrier}">
+<div class="flex flex-col items-center bg-primary-container text-on-primary p-sm rounded min-w-[48px]">
+<span class="font-label-sm" th:text="${#temporals.format(evt.date, 'MMM')}">MOI</span>
+<span class="font-headline-sm text-headline-sm" th:text="${#temporals.day(evt.date)}">0</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md font-semibold text-primary" th:text="${evt.titre}">Titre</p>
+<p class="font-label-md text-label-md text-on-surface-variant" th:text="${evt.enfantNom != null ? evt.enfantNom + ' • ' : ''} + (${evt.salle != null ? evt.salle : (evt.heureDebut != null ? evt.heureDebut : '')})">Details</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</a>
+<p class="font-body-md text-body-md text-on-surface-variant text-center py-sm" th:if="${#lists.isEmpty(prochainsEvenements)}">Rien de prévu pour le moment.</p>
+</div>
+</section>
+<!-- Messagerie -->
+<a class="bg-primary text-on-primary p-md rounded-xl flex items-center justify-between shadow-md mb-lg" th:href="@{/portail-parent/messages}">
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined text-[28px]">chat</span>
+<span class="absolute -top-1 -right-1 flex h-4 w-4" th:if="${totalMessagesNonLus > 0}">
+<span class="relative inline-flex rounded-full h-4 w-4 bg-error text-[9px] items-center justify-center font-bold" th:text="${totalMessagesNonLus}">0</span>
+</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold" th:text="${totalMessagesNonLus > 0} ? 'Nouveaux messages' : 'Messagerie'">Messages</p>
+<p class="font-label-md text-label-md opacity-80" th:text="${totalMessagesNonLus > 0} ? ('Dernier message de ' + ${dernierMessageNonLuNom}) : 'Aucun nouveau message'">—</p>
+</div>
+</div>
+<span class="material-symbols-outlined">arrow_forward_ios</span>
+</a>
+<!-- Paiements -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md mb-lg">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">Paiements</h3>
+<span class="material-symbols-outlined text-primary">payments</span>
+</div>
+<div class="flex items-center justify-between p-sm bg-error-container rounded-lg" th:if="${soldeTotalARegler > 0}">
+<div>
+<p class="font-label-sm text-label-sm text-on-error-container uppercase font-bold">En attente</p>
+<p class="font-headline-sm text-headline-sm text-on-error-container" th:text="${#numbers.formatDecimal(soldeTotalARegler,0,'COMMA',0,'POINT')} + ' FCFA'">0</p>
+<p class="font-label-md text-label-md text-on-error-container" th:if="${prochaineLignePaiement != null}" th:text="${prochaineLignePaiement.designation}">—</p>
+</div>
+<a class="bg-primary text-on-primary px-md py-sm rounded font-label-md text-label-md active:scale-95 transition-transform" th:href="@{/portail-parent/paiements}">Régler</a>
+</div>
+<div class="flex items-center gap-sm p-sm bg-secondary-container/30 rounded-lg" th:if="${soldeTotalARegler <= 0}">
+<span class="material-symbols-outlined text-on-secondary-container">check_circle</span>
+<p class="font-label-md text-label-md text-on-secondary-container">Aucun paiement en attente.</p>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/portail-parent}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/enfants}">
+<span class="material-symbols-outlined">family_restroom</span>
+<span class="font-label-sm text-label-sm">Mes Enfants</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/calendrier}">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendrier</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-label-sm text-label-sm">Messagerie</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/paiements}">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-sm text-label-sm">Paiements</span>
+</a>
+</nav>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex flex-col py-lg border-r border-outline-variant z-50">
 <div class="px-lg mb-xl">
 <h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
@@ -194,6 +325,7 @@ Ajouter un profil
 </footer>
 </div>
 </main>
+</div>
 
 <!-- Modal Ajouter un profil -->
 <div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-profil">

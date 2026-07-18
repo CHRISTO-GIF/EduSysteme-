@@ -2,19 +2,25 @@ package holyflame.administration.controller;
 
 import holyflame.administration.model.Absence;
 import holyflame.administration.model.Classe;
+import holyflame.administration.model.Conduite;
 import holyflame.administration.model.Eleve;
 import holyflame.administration.model.Etablissement;
 import holyflame.administration.model.EvenementEcole;
 import holyflame.administration.model.Examen;
 import holyflame.administration.model.Note;
 import holyflame.administration.model.RappelParent;
+import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.AbsenceRepository;
+import holyflame.administration.repository.ConduiteRepository;
 import holyflame.administration.repository.EleveRepository;
 import holyflame.administration.repository.EvenementEcoleRepository;
 import holyflame.administration.repository.ExamenRepository;
 import holyflame.administration.repository.NoteRepository;
 import holyflame.administration.repository.RappelParentRepository;
+import holyflame.administration.repository.UtilisateurRepository;
 import holyflame.administration.service.EtablissementService;
+import holyflame.administration.service.FinanceParentService;
+import holyflame.administration.service.MessagerieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
@@ -42,12 +48,16 @@ import java.util.stream.Collectors;
 public class PortailParentController {
 
     @Autowired private EleveRepository eleveRepository;
+    @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private NoteRepository noteRepository;
     @Autowired private AbsenceRepository absenceRepository;
     @Autowired private ExamenRepository examenRepository;
     @Autowired private EvenementEcoleRepository evenementEcoleRepository;
     @Autowired private RappelParentRepository rappelParentRepository;
+    @Autowired private ConduiteRepository conduiteRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private FinanceParentService financeParentService;
+    @Autowired private MessagerieService messagerieService;
 
     private static final String[] COULEURS_ENFANTS = {"blue", "pink", "green", "orange", "purple", "teal"};
 
@@ -55,73 +65,168 @@ public class PortailParentController {
     public String index(Authentication auth, Model model) {
         String email = auth != null ? auth.getName() : "";
         List<Eleve> enfants = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email);
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (etabId == null && !enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
 
-        List<Map<String, Object>> cartesEnfants = new java.util.ArrayList<>();
+        List<Map<String, Object>> cartesEnfants = new ArrayList<>();
         int totalDevoirsRecents = 0;
         int totalExamensAVenir = 0;
 
         for (Eleve enfant : enfants) {
-            Classe classe = enfant.getClasse();
-
-            List<Note> notesPubliees = noteRepository.findByEleveOrderByDateEvaluationDesc(enfant).stream()
-                .filter(n -> "PUBLIE".equals(n.getStatut()))
-                .toList();
-            double moyenne = 0;
-            double somme = 0, totalCoef = 0;
-            for (Note n : notesPubliees) {
-                if (n.getValeur() != null && n.getCoefficient() != null) {
-                    somme += n.getValeur() * n.getCoefficient();
-                    totalCoef += n.getCoefficient();
-                }
-            }
-            if (totalCoef > 0) moyenne = Math.round((somme / totalCoef) * 100.0) / 100.0;
-
-            long nbDevoirsRecents = notesPubliees.stream()
-                .filter(n -> "DEVOIR".equals(n.getType()) && n.getDateEvaluation() != null
-                    && n.getDateEvaluation().isAfter(LocalDate.now().minusDays(7)))
-                .count();
-            totalDevoirsRecents += nbDevoirsRecents;
-
-            List<Absence> absences = absenceRepository.findByEleveIdOrderByDateDesc(enfant.getId());
-            long nbAbsencesNonJustifiees = absences.stream().filter(a -> !a.isEstJustifiee()).count();
-            Absence derniereAbsenceNonJustifiee = absences.stream()
-                .filter(a -> !a.isEstJustifiee()).findFirst().orElse(null);
-
-            long joursOuvres = compterJoursOuvres(
-                enfant.getDateInscription() != null ? enfant.getDateInscription() : LocalDate.now().minusMonths(3),
-                LocalDate.now());
-            double tauxAssiduite = joursOuvres > 0
-                ? Math.max(0, Math.min(100, Math.round((100.0 - (nbAbsencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
-                : 100;
-
-            Examen prochainExamen = null;
-            if (classe != null) {
-                prochainExamen = examenRepository.findByEtablissementIdAndClasseIdOrderByDateExamenAscHeureDebutAsc(
-                        enfant.getEtablissementId(), classe.getId()).stream()
-                    .filter(ex -> ex.getDateExamen() != null && !ex.getDateExamen().isBefore(LocalDate.now()))
-                    .findFirst().orElse(null);
-                if (prochainExamen != null) totalExamensAVenir++;
-            }
-
-            Map<String, Object> carte = new LinkedHashMap<>();
-            carte.put("eleve", enfant);
-            carte.put("classe", classe);
-            carte.put("moyenneGenerale", moyenne);
-            carte.put("tauxAssiduite", tauxAssiduite);
-            carte.put("nbAbsencesNonJustifiees", nbAbsencesNonJustifiees);
-            carte.put("derniereAbsenceNonJustifiee", derniereAbsenceNonJustifiee);
-            carte.put("prochainExamen", prochainExamen);
+            Map<String, Object> carte = construireCarteEnfant(enfant);
             cartesEnfants.add(carte);
+            totalDevoirsRecents += ((Long) carte.get("nbDevoirsRecents")).intValue();
+            if (carte.get("prochainExamen") != null) totalExamensAVenir++;
         }
 
+        // Evenements a venir (examens) toutes classes confondues, pour l'aperçu "A venir" du tableau de bord
+        List<Map<String, Object>> prochainsEvenements = new ArrayList<>();
+        for (Eleve enfant : enfants) {
+            if (enfant.getClasse() == null) continue;
+            examenRepository.findByEtablissementIdAndClasseIdOrderByDateExamenAscHeureDebutAsc(
+                    enfant.getEtablissementId(), enfant.getClasse().getId()).stream()
+                .filter(ex -> ex.getDateExamen() != null && !ex.getDateExamen().isBefore(LocalDate.now()))
+                .findFirst()
+                .ifPresent(ex -> {
+                    Map<String, Object> evt = new LinkedHashMap<>();
+                    evt.put("date", ex.getDateExamen());
+                    evt.put("titre", ex.getMatiere() != null ? "Examen de " + ex.getMatiere().getNom() : "Examen");
+                    evt.put("enfantNom", enfant.getPrenom());
+                    evt.put("heureDebut", ex.getHeureDebut());
+                    evt.put("heureFin", ex.getHeureFin());
+                    evt.put("salle", ex.getSalle());
+                    prochainsEvenements.add(evt);
+                });
+        }
+        if (etabId != null) {
+            for (EvenementEcole ev : evenementEcoleRepository.findByEtablissementIdOrderByDateEvenementAsc(etabId)) {
+                if (ev.getDateEvenement() == null || ev.getDateEvenement().isBefore(LocalDate.now())) continue;
+                List<Long> classesEnfants = enfants.stream()
+                    .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).toList();
+                if (ev.getClasse() != null && !classesEnfants.contains(ev.getClasse().getId())) continue;
+                Map<String, Object> evt = new LinkedHashMap<>();
+                evt.put("date", ev.getDateEvenement());
+                evt.put("titre", ev.getTitre());
+                evt.put("enfantNom", ev.getClasse() != null ? ev.getClasse().getNom() : null);
+                evt.put("heureDebut", ev.getHeureDebut());
+                evt.put("heureFin", null);
+                evt.put("salle", ev.getLieu());
+                prochainsEvenements.add(evt);
+            }
+        }
+        prochainsEvenements.sort(Comparator.comparing(e -> (LocalDate) e.get("date")));
+        List<Map<String, Object>> prochainsEvenementsApercu = prochainsEvenements.stream().limit(3).toList();
+
+        // Solde de scolarite en attente (logique partagee avec /portail-parent/paiements)
+        FinanceParentService.ResumeSolde resumeSolde = financeParentService.calculerResume(enfants, etabId);
+
+        // Messages non lus (logique partagee avec /portail-parent/messages)
+        Map<String, Map<String, Object>> contactsParEmail = messagerieService.construireContactsParent(enfants, etabId);
+        List<Map<String, Object>> conversations = messagerieService.construireConversations(email, contactsParEmail);
+        long totalMessagesNonLus = conversations.stream().mapToLong(c -> (Long) c.get("nonLus")).sum();
+        Map<String, Object> derniereConvNonLue = conversations.stream()
+            .filter(c -> ((Long) c.get("nonLus")) > 0)
+            .findFirst().orElse(null);
+
         Etablissement etablissement = etablissementService.getCurrentEtablissement();
+        String nomParent = nomAffichageParent(email);
 
         model.addAttribute("enfants", cartesEnfants);
         model.addAttribute("totalDevoirsRecents", totalDevoirsRecents);
         model.addAttribute("totalExamensAVenir", totalExamensAVenir);
+        model.addAttribute("prochainsEvenements", prochainsEvenementsApercu);
+        model.addAttribute("soldeTotalARegler", resumeSolde.soldeTotalARegler);
+        model.addAttribute("prochaineLignePaiement", resumeSolde.prochaineLigne);
+        model.addAttribute("totalMessagesNonLus", totalMessagesNonLus);
+        model.addAttribute("dernierMessageNonLuNom", derniereConvNonLue != null ? derniereConvNonLue.get("nom") : null);
         model.addAttribute("emailParent", email);
+        model.addAttribute("nomParent", nomParent);
         model.addAttribute("etablissement", etablissement);
         return "portail-parent";
+    }
+
+    // ── Liste detaillee des enfants (fiche complete par enfant) ──────────────
+    @GetMapping("/enfants")
+    public String enfants(Authentication auth, Model model) {
+        String email = auth != null ? auth.getName() : "";
+        List<Eleve> enfants = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email);
+
+        List<Map<String, Object>> cartesEnfants = new ArrayList<>();
+        for (Eleve enfant : enfants) {
+            cartesEnfants.add(construireCarteEnfant(enfant));
+        }
+
+        model.addAttribute("enfants", cartesEnfants);
+        model.addAttribute("emailParent", email);
+        model.addAttribute("nomParent", nomAffichageParent(email));
+        model.addAttribute("etablissement", etablissementService.getCurrentEtablissement());
+        return "portail-parent-enfants";
+    }
+
+    /** Construit la fiche de synthese reelle d'un enfant : notes, absences, prochain examen, conduite. */
+    private Map<String, Object> construireCarteEnfant(Eleve enfant) {
+        Classe classe = enfant.getClasse();
+
+        List<Note> notesPubliees = noteRepository.findByEleveOrderByDateEvaluationDesc(enfant).stream()
+            .filter(n -> "PUBLIE".equals(n.getStatut()))
+            .toList();
+        double moyenne = 0;
+        double somme = 0, totalCoef = 0;
+        for (Note n : notesPubliees) {
+            if (n.getValeur() != null && n.getCoefficient() != null) {
+                somme += n.getValeur() * n.getCoefficient();
+                totalCoef += n.getCoefficient();
+            }
+        }
+        if (totalCoef > 0) moyenne = Math.round((somme / totalCoef) * 100.0) / 100.0;
+
+        long nbDevoirsRecents = notesPubliees.stream()
+            .filter(n -> "DEVOIR".equals(n.getType()) && n.getDateEvaluation() != null
+                && n.getDateEvaluation().isAfter(LocalDate.now().minusDays(7)))
+            .count();
+
+        List<Absence> absences = absenceRepository.findByEleveIdOrderByDateDesc(enfant.getId());
+        long nbAbsencesNonJustifiees = absences.stream().filter(a -> !a.isEstJustifiee()).count();
+        Absence derniereAbsenceNonJustifiee = absences.stream()
+            .filter(a -> !a.isEstJustifiee()).findFirst().orElse(null);
+
+        long joursOuvres = compterJoursOuvres(
+            enfant.getDateInscription() != null ? enfant.getDateInscription() : LocalDate.now().minusMonths(3),
+            LocalDate.now());
+        double tauxAssiduite = joursOuvres > 0
+            ? Math.max(0, Math.min(100, Math.round((100.0 - (nbAbsencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
+            : 100;
+
+        Examen prochainExamen = null;
+        if (classe != null) {
+            prochainExamen = examenRepository.findByEtablissementIdAndClasseIdOrderByDateExamenAscHeureDebutAsc(
+                    enfant.getEtablissementId(), classe.getId()).stream()
+                .filter(ex -> ex.getDateExamen() != null && !ex.getDateExamen().isBefore(LocalDate.now()))
+                .findFirst().orElse(null);
+        }
+
+        Conduite derniereConduite = conduiteRepository.findByEleveOrderBySaisieAtDesc(enfant).stream()
+            .findFirst().orElse(null);
+
+        Map<String, Object> carte = new LinkedHashMap<>();
+        carte.put("eleve", enfant);
+        carte.put("classe", classe);
+        carte.put("moyenneGenerale", moyenne);
+        carte.put("tauxAssiduite", tauxAssiduite);
+        carte.put("totalAbsences", (long) absences.size());
+        carte.put("nbAbsencesNonJustifiees", nbAbsencesNonJustifiees);
+        carte.put("derniereAbsenceNonJustifiee", derniereAbsenceNonJustifiee);
+        carte.put("nbDevoirsRecents", nbDevoirsRecents);
+        carte.put("prochainExamen", prochainExamen);
+        carte.put("derniereConduite", derniereConduite);
+        return carte;
+    }
+
+    private String nomAffichageParent(String email) {
+        Utilisateur compteParent = utilisateurRepository.findByEmail(email).orElse(null);
+        return compteParent != null && compteParent.getPrenom() != null && !compteParent.getPrenom().isBlank()
+            ? compteParent.getPrenom() + (compteParent.getNom() != null ? " " + compteParent.getNom() : "")
+            : email;
     }
 
     // ── Rattacher un enfant existant a ce compte parent (self-service) ──────

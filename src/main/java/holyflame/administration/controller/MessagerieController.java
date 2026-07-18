@@ -1,14 +1,10 @@
 package holyflame.administration.controller;
 
 import holyflame.administration.model.Eleve;
-import holyflame.administration.model.EnseignantAutorisation;
-import holyflame.administration.model.Matiere;
 import holyflame.administration.model.MessagePrive;
 import holyflame.administration.model.SignalementMessagerie;
 import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.EleveRepository;
-import holyflame.administration.repository.EnseignantAutorisationRepository;
-import holyflame.administration.repository.MatiereRepository;
 import holyflame.administration.repository.SignalementMessagerieRepository;
 import holyflame.administration.repository.UtilisateurRepository;
 import holyflame.administration.service.EtablissementService;
@@ -26,7 +22,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,8 +30,6 @@ import java.util.Map;
 public class MessagerieController {
 
     @Autowired private EleveRepository eleveRepository;
-    @Autowired private EnseignantAutorisationRepository enseignantAutorisationRepository;
-    @Autowired private MatiereRepository matiereRepository;
     @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private MessagerieService messagerieService;
@@ -50,38 +43,7 @@ public class MessagerieController {
         if (etabId == null && !enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
 
         // Contacts reels : enseignants des classes de mes enfants + Administration de l'etablissement
-        Map<String, Map<String, Object>> contactsParEmail = new LinkedHashMap<>();
-
-        if (etabId != null) {
-            List<Long> classeIds = enfants.stream()
-                .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).distinct().toList();
-
-            List<EnseignantAutorisation> autorisations = enseignantAutorisationRepository.findByEtablissementId(etabId).stream()
-                .filter(a -> classeIds.contains(a.getClasseId())).toList();
-
-            for (EnseignantAutorisation autorisation : autorisations) {
-                Utilisateur enseignant = utilisateurRepository.findById(autorisation.getEnseignantId()).orElse(null);
-                if (enseignant == null || enseignant.getEmail() == null) continue;
-                Matiere matiere = matiereRepository.findById(autorisation.getMatiereId()).orElse(null);
-                Map<String, Object> contact = contactsParEmail.computeIfAbsent(enseignant.getEmail(), k -> messagerieService.creerContact(
-                    enseignant.getEmail(),
-                    (enseignant.getPrenom() != null ? enseignant.getPrenom() + " " : "") + (enseignant.getNom() != null ? enseignant.getNom() : enseignant.getEmail()),
-                    "Enseignant"));
-                if (matiere != null) {
-                    @SuppressWarnings("unchecked")
-                    List<String> matieres = (List<String>) contact.get("matieres");
-                    if (!matieres.contains(matiere.getNom())) matieres.add(matiere.getNom());
-                }
-            }
-
-            for (Utilisateur admin : utilisateurRepository.findByEtablissementId(etabId)) {
-                if (("ADMIN".equals(admin.getRole()) || "SECRETAIRE".equals(admin.getRole())) && admin.getEmail() != null
-                        && !contactsParEmail.containsKey(admin.getEmail())) {
-                    contactsParEmail.put(admin.getEmail(), messagerieService.creerContact(admin.getEmail(), "Administration", "Secretariat"));
-                    break;
-                }
-            }
-        }
+        Map<String, Map<String, Object>> contactsParEmail = messagerieService.construireContactsParent(enfants, etabId);
 
         List<Map<String, Object>> conversations = messagerieService.construireConversations(email, contactsParEmail);
 

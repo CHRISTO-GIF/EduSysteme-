@@ -51,6 +51,9 @@ public class SecretariatController {
         model.addAttribute("totalEleves",   eleves.size());
         model.addAttribute("totalClasses",  classes.size());
         model.addAttribute("totalAvecCompte", eleves.stream().filter(e -> e.getCompteEmail() != null).count());
+        long totalInscrits = eleves.stream().filter(e -> "INSCRIT".equals(e.getStatutInscription())).count();
+        model.addAttribute("totalInscrits",  totalInscrits);
+        model.addAttribute("totalEnAttente", eleves.size() - totalInscrits);
         return "secretariat";
     }
 

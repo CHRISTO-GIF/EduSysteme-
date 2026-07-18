@@ -130,6 +130,165 @@
     </script>
 </head>
 <body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden">
+<nav class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-md py-sm h-16">
+<span class="font-headline-md text-headline-md font-bold text-primary">EduSystem Pro</span>
+<button class="p-xs text-primary transition-all duration-200 active:opacity-80" id="menu-toggle-mobile" type="button">
+<span class="material-symbols-outlined text-[32px]">menu</span>
+</button>
+</nav>
+<div class="fixed inset-0 z-40 bg-surface translate-x-full transition-transform duration-300 pt-24 px-lg flex flex-col gap-lg" id="mobile-menu-landing">
+<a class="font-label-md text-label-md text-secondary hover:text-primary" href="#">Solutions</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary" href="#">Tarifs</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary" href="#">Ressources</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary" href="#">Acces Etablissement</a>
+<hr class="border-outline-variant"/>
+<button class="w-full bg-primary text-on-primary py-md rounded-lg font-label-md" onclick="window.location.href='/inscription-ecole'">Inscrire mon etablissement</button>
+<button class="w-full border border-primary text-primary py-md rounded-lg font-label-md" onclick="window.location.href='/login'">Connexion</button>
+</div>
+<main class="pt-16">
+<!-- Section Hero -->
+<section class="px-lg py-xl flex flex-col items-center text-center bg-gradient-to-b from-surface-container-low to-background">
+<div class="inline-flex items-center gap-xs bg-primary-fixed text-on-primary-fixed-variant px-md py-xs rounded-full font-label-sm text-label-sm mb-md uppercase">
+<span class="material-symbols-outlined text-[16px]">school</span>
+Approuve par plus de 2 000 etablissements
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-md">
+Digitalisez votre etablissement avec une precision systematique.
+</h1>
+<p class="font-body-md text-body-md text-secondary mb-xl max-w-md">
+Autonomisez votre personnel, impliquez les parents et securisez les donnees de votre etablissement avec la plateforme de gestion academique la plus fiable au monde.
+</p>
+<div class="flex flex-col w-full gap-sm mb-xl">
+<button class="bg-primary text-on-primary py-md px-lg rounded-xl font-label-md shadow-sm transition-all active:scale-95" onclick="window.location.href='/inscription-ecole'">
+Inscrire mon etablissement
+</button>
+<button class="bg-surface border border-outline-variant text-primary py-md px-lg rounded-xl font-label-md transition-all active:scale-95" onclick="window.location.href='/login'">
+Connexion
+</button>
+</div>
+<div class="w-full max-w-sm bg-white p-sm rounded-xl overflow-hidden mt-md border border-outline-variant shadow-sm transform rotate-1">
+<img class="rounded-lg w-full h-auto object-cover" alt="Capture d'ecran d'un tableau de bord de gestion scolaire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7fLwh7p12uTBuZT3_7rg7_Ghenwy35_Eih_9RL8u4OW_scEloDfD4-ev7u4N1yse8rfZLfIlIw_GJOKCAMux7ZJQmoySiqM1hAM573pCvOrkvJSDrYILxU56ltAcgA2ln-JweDXJ7PyZLIrrZnzUcF1KyLfLNCtW60uJl5C4LDXmrpjvoGvhnZGHyqrC6qxZWdtgj696nUq7piPhBU5ZRjBLNyIyWuYGRimQz8cgrf_QWbZlqdPeB"/>
+</div>
+</section>
+<!-- Grille des avantages -->
+<section class="px-lg py-xl bg-surface">
+<div class="flex flex-col items-center mb-xl text-center">
+<h2 class="font-headline-md text-headline-md text-primary mb-sm">Concu pour l'excellence</h2>
+<p class="font-body-md text-body-md text-secondary max-w-xs mx-auto">Notre systeme est concu pour gerer la complexite de la gestion institutionnelle grace a une interface raffinee et moderne.</p>
+</div>
+<div class="flex flex-col gap-md">
+<!-- Efficacite -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg flex flex-col gap-sm">
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">bolt</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Une efficacite administrative inegalee</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Automatisez les presences, les notes et les emplois du temps. Reduisez la charge administrative de 40% des la premiere annee.</p>
+<div class="mt-sm h-32 bg-surface-container rounded-lg overflow-hidden relative border border-outline-variant">
+<img class="absolute inset-0 w-full h-full object-cover opacity-60" alt="Illustration d'un tableau de bord de metriques scolaires" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmOKYC-kzZ8aozo3Fs98c_th4Tr2U4AwQl_PqEEdMWzy0bMYxASohY7la2U5BCeIfKupGm3e1zUb2EjJxWWb1Yjb4QhXUtehHwA2Lhly_oUT9pn2izkOqU5MzEDGIPznEEypPWA-g9UdEmiJ8GPtrLMrBdkGON5hnbFm6df4g7zVl5rClrRunsGMufIMYw2h4XmwsNeuUqI1gMN0z469FriBDHrHJgpozWHK2bIojYzz1tiEyvBumD"/>
+</div>
+</div>
+<!-- Securite -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg flex flex-col gap-sm text-center items-center">
+<div class="w-12 h-12 bg-on-tertiary-container text-tertiary-fixed rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Securite de niveau bancaire</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Vos donnees institutionnelles sont protegees par un chiffrement AES-256 et une authentification multi-facteurs.</p>
+<div class="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center border-4 border-white shadow-inner relative mt-sm">
+<span class="material-symbols-outlined text-primary text-[32px]">lock</span>
+</div>
+</div>
+<!-- Engagement des parents -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg flex flex-col gap-sm">
+<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">family_restroom</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Engagement des parents</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Un portail dedie permettant aux parents de suivre en temps reel les progres academiques, les frais et les actualites de l'etablissement.</p>
+<div class="mt-sm space-y-xs opacity-60">
+<div class="flex items-center gap-sm p-xs bg-surface rounded border border-outline-variant">
+<div class="w-6 h-6 rounded-full bg-primary-fixed"></div>
+<div class="flex-1 h-1 bg-outline-variant rounded-full"></div>
+</div>
+<div class="flex items-center gap-sm p-xs bg-surface rounded border border-outline-variant">
+<div class="w-6 h-6 rounded-full bg-secondary-fixed"></div>
+<div class="flex-1 h-1 bg-outline-variant rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Infrastructure fiable -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg flex flex-col gap-sm relative overflow-hidden">
+<div class="w-12 h-12 bg-tertiary text-on-tertiary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">dns</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Une infrastructure fiable</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Une disponibilite garantie de 99,9% grace a des serveurs distribues pour que votre etablissement soit toujours en ligne.</p>
+<div class="absolute -right-4 -bottom-4 opacity-5">
+<span class="material-symbols-outlined text-[80px]">hub</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Temoignages -->
+<section class="px-lg py-xl bg-background">
+<div class="mb-xl">
+<h2 class="font-headline-md text-headline-md text-primary text-center">La voix des dirigeants</h2>
+</div>
+<div class="flex flex-col gap-lg">
+<div class="bg-white p-lg rounded-xl border border-outline-variant hover:border-primary transition-colors">
+<div class="flex items-center gap-md mb-md">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" alt="Portrait d'une directrice d'etablissement" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0WXVr-eA5EuzSLjpLZbl_elikqssuXSYO2GRCi50is8izX5l9xYehu8_bd98iIL37JfCs-WhyrfIBtlKwetHL_DzYz7O4zIMZP-Prkf592Mc3KQmmA3KCd9b1PbDhyC3kXryemhd6vXrBVHZYemlxUbXFjb43b4XhhvEVLSo_XkqM3wW4pl_hBHF-Pm1SR1wo6uNOjWGVZeIZMGO5u9EmAdfYK_HE6cvW1HgS65QHSYd2c5wDdowY"/>
+</div>
+<div>
+<div class="font-label-md text-primary">Dr. Eleonore Vance</div>
+<div class="font-label-sm text-secondary">Academie St. Andrews</div>
+</div>
+</div>
+<p class="font-body-md italic text-on-surface-variant leading-relaxed">"La transition vers EduSystem Pro s'est faite sans accroc. L'approche systematique de la gestion des donnees a transforme la maniere dont notre conseil prend ses decisions."</p>
+</div>
+<div class="bg-white p-lg rounded-xl border border-outline-variant hover:border-primary transition-colors">
+<div class="flex items-center gap-md mb-md">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" alt="Portrait d'un administrateur scolaire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr1C8Tdz4uILB_ouwfYgzBCpF-6Ihv6gDtX_8y73slW94O5Xfgd857pYQIMMK8_MTj6fTxx00rcMemuPh2BNxW5I8w7qTcrWXNrNxdKi8SC5MmF4tDb1c7xFBwpSo269-o38k0F5qnC4nhympocrLG5oenOkckEKS7Pn7T4DVCqHhvCLO0wfHmvr1gaz_HwYd6zviM2QK-rCDmSDZ9IgUsUEO5patLV7iFnepV1555vTT3ty7e4Q1-"/>
+</div>
+<div>
+<div class="font-label-md text-primary">Marcus Sterling</div>
+<div class="font-label-sm text-secondary">Oakwood International</div>
+</div>
+</div>
+<p class="font-body-md italic text-on-surface-variant leading-relaxed">"La satisfaction des parents a augmente de 60% depuis la mise en place du portail. La transparence a renforce notre communaute scolaire."</p>
+</div>
+<div class="bg-white p-lg rounded-xl border border-outline-variant hover:border-primary transition-colors">
+<div class="flex items-center gap-md mb-md">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" alt="Portrait d'une directrice d'etablissement avec lunettes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCejGVTdZqo5U-jh1XQPdRChgBBxew0pKIP63osnqiaz9OEp47ZHjTLEmsPTJF35VkgplL9T-GzlpsJA14lTkQ6nUYYFky23Ch77yX91ipPa_PWfmCAckgC1Z0IIJPCGPSGCMx1yPZX9Ap6qP0cb0KGae-opt1icOmxweTKLl2Gtmup7ZmPf0kltY8lq4WAnRbhiCJjKQb3UQW-cqp6fQpGDgOB7tHaoxkcG7ne_UUj1CNIhsAvYNNY"/>
+</div>
+<div>
+<div class="font-label-md text-primary">Sarah Jenkins</div>
+<div class="font-label-sm text-secondary">Beacon Heights Prep</div>
+</div>
+</div>
+<p class="font-body-md italic text-on-surface-variant leading-relaxed">"La securite etait notre priorite absolue. Savoir que les dossiers de nos eleves sont proteges par un chiffrement de pointe nous apporte une tranquillite d'esprit."</p>
+</div>
+</div>
+</section>
+<!-- CTA finale -->
+<section class="px-lg py-xl bg-primary text-center">
+<h2 class="font-headline-md text-headline-md text-on-primary mb-md">Pret a moderniser votre etablissement ?</h2>
+<p class="font-body-md text-primary-fixed mb-xl opacity-90">Rejoignez plus de 2 000 etablissements avant-gardistes qui ont deja standardise leurs operations avec EduSystem Pro.</p>
+<button class="w-full bg-surface-container-lowest text-primary py-lg rounded-xl font-label-md font-bold shadow-lg active:scale-95 transition-transform" onclick="window.location.href='/inscription-ecole'">
+Inscrire mon etablissement maintenant
+</button>
+<p class="mt-md font-label-sm text-primary-fixed opacity-70">Aucune carte bancaire requise. Assistant d'integration inclus.</p>
+</section>
+</main>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <!-- Barre de navigation -->
 <nav class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg py-sm max-w-full mx-auto h-16">
 <div class="flex items-center gap-xl">
@@ -312,6 +471,7 @@
 </div>
 </section>
 </main>
+</div>
 <!-- Pied de page -->
 <footer class="w-full py-xl px-lg flex flex-col md:flex-row justify-between items-center gap-md bg-tertiary text-on-tertiary border-t border-tertiary-container">
 <div class="flex flex-col items-center md:items-start gap-xs">
@@ -350,4 +510,30 @@
             });
         });
     </script>
+<!-- Menu mobile -->
+<script>
+    (function() {
+        const menuToggle = document.getElementById('menu-toggle-mobile');
+        const mobileMenu = document.getElementById('mobile-menu-landing');
+        if (!menuToggle || !mobileMenu) return;
+        let isMenuOpen = false;
+        menuToggle.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                mobileMenu.classList.remove('translate-x-full');
+                menuToggle.innerHTML = '<span class="material-symbols-outlined text-[32px]">close</span>';
+            } else {
+                mobileMenu.classList.add('translate-x-full');
+                menuToggle.innerHTML = '<span class="material-symbols-outlined text-[32px]">menu</span>';
+            }
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+                isMenuOpen = false;
+                menuToggle.innerHTML = '<span class="material-symbols-outlined text-[32px]">menu</span>';
+            });
+        });
+    })();
+</script>
 </body></html>
