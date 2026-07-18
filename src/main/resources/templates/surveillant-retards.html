@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Incidents - EduSystem Pro</title>
+<title>Retards - EduSystem Pro</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -14,7 +14,6 @@
         "surface-container-low": "#f2f4f6", "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
         "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb", "primary-fixed": "#dce1ff",
         "on-error": "#ffffff", "tertiary": [[${accentColor}]], "outline": "#757682", "surface-variant": "#e0e3e5",
-        "secondary-container": "#d0e1fb", "on-secondary-container": "#54647a",
         "surface-container": "#eceef0", "surface": "#f7f9fb", "on-background": "#191c1e", "on-surface": "#191c1e",
         "on-surface-variant": "#444651", "success-container": "#c4f7d0", "on-success-container": "#0a3818",
         "tertiary-fixed-dim": "#bec6e0", "outline-variant": "#c5c5d3"
@@ -42,8 +41,8 @@
 <nav class="flex-1 flex flex-col gap-xs px-sm overflow-y-auto">
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant}"><span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Tableau de bord</span></a>
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/presences}"><span class="material-symbols-outlined">event_available</span><span class="font-label-md text-label-md">Présences</span></a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/retards}"><span class="material-symbols-outlined">schedule</span><span class="font-label-md text-label-md">Retards</span></a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary border-l-4 border-primary-fixed bg-tertiary/50" th:href="@{/surveillant/incidents}"><span class="material-symbols-outlined">report_problem</span><span class="font-label-md text-label-md">Incidents</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary border-l-4 border-primary-fixed bg-tertiary/50" th:href="@{/surveillant/retards}"><span class="material-symbols-outlined">schedule</span><span class="font-label-md text-label-md">Retards</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/incidents}"><span class="material-symbols-outlined">report_problem</span><span class="font-label-md text-label-md">Incidents</span></a>
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/retenues}"><span class="material-symbols-outlined">gavel</span><span class="font-label-md text-label-md">Retenues</span></a>
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/zones}"><span class="material-symbols-outlined">map</span><span class="font-label-md text-label-md">Zones de l'école</span></a>
 </nav>
@@ -55,49 +54,41 @@
 
 <div class="flex-1 flex flex-col min-w-0">
 <header class="w-full h-16 sticky top-0 z-40 bg-surface border-b border-surface-variant flex justify-between items-center px-lg py-md">
-<nav class="flex items-center gap-xs text-label-sm text-outline"><span>EduSystem Pro</span><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="text-primary font-semibold">Incidents</span></nav>
+<nav class="flex items-center gap-xs text-label-sm text-outline"><span>EduSystem Pro</span><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="text-primary font-semibold">Retards</span></nav>
 </header>
 
 <main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
 <div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
-<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
-<section class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
-<h3 class="font-headline-sm text-headline-sm mb-lg">Incidents enregistrés</h3>
-<div class="space-y-md">
-<div th:each="inc : ${incidents}" class="p-md border border-outline-variant rounded-lg">
-<div class="flex justify-between items-start">
-<div>
-<p class="font-label-md" th:text="${inc.eleve.prenom + ' ' + inc.eleve.nom + (inc.eleve.classe != null ? ' — ' + inc.eleve.classe.nom : '')}">Élève</p>
-<p class="text-body-md text-on-surface-variant italic" th:text="${inc.description}">Description</p>
-<div class="flex gap-sm mt-xs items-center flex-wrap">
-<span th:class="${inc.gravite == 'GRAVE'} ? 'px-2 py-0.5 bg-error-container text-error rounded text-[10px] font-bold' : 'px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold'" th:text="${inc.gravite}">DISCIPLINE</span>
-<span class="text-label-sm text-outline" th:text="${#temporals.format(inc.dateHeure, 'dd/MM/yyyy HH:mm')}">date</span>
-<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant rounded text-[10px] font-bold uppercase" th:text="${inc.statut}">OUVERT</span>
+<section class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm">Historique des retards</h3>
 </div>
-</div>
-<div class="flex items-center gap-sm flex-shrink-0">
-<form method="post" th:action="@{/surveillant/incidents/{id}/retenue(id=${inc.id})}">
-<button class="flex items-center gap-xs px-md py-2 bg-primary text-on-primary rounded font-label-md hover:bg-primary/90 transition-colors text-[13px]" type="submit">
-<span class="material-symbols-outlined text-[16px]">add</span> Retenue
-</button>
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container text-label-sm text-on-surface-variant">
+<tr><th class="px-lg py-3 font-semibold">Date</th><th class="px-lg py-3 font-semibold">Élève</th><th class="px-lg py-3 font-semibold">Heure d'arrivée</th><th class="px-lg py-3 font-semibold">Motif</th><th class="px-lg py-3 font-semibold"></th></tr>
+</thead>
+<tbody class="divide-y divide-surface-variant">
+<tr th:each="r : ${retards}">
+<td class="px-lg py-4 text-outline" th:text="${#temporals.format(r.date, 'dd/MM/yyyy')}">date</td>
+<td class="px-lg py-4 font-label-md" th:text="${r.eleve.prenom + ' ' + r.eleve.nom}">Élève</td>
+<td class="px-lg py-4 text-on-surface-variant" th:text="${r.heureArrivee != null ? #temporals.format(r.heureArrivee, 'HH:mm') : '—'}">Heure</td>
+<td class="px-lg py-4 text-on-surface-variant" th:text="${r.motif != null ? r.motif : '—'}">Motif</td>
+<td class="px-lg py-4 text-right">
+<form method="post" th:action="@{/surveillant/retards/{id}/supprimer(id=${r.id})}" onsubmit="return confirm('Supprimer ce retard ?');">
+<button class="text-outline hover:text-error transition-colors" title="Supprimer" type="submit"><span class="material-symbols-outlined text-[18px]">delete</span></button>
 </form>
-<form method="post" th:action="@{/surveillant/incidents/{id}/convoquer(id=${inc.id})}">
-<button class="flex items-center gap-xs px-md py-2 border border-primary text-primary rounded font-label-md hover:bg-primary-fixed transition-colors text-[13px]" type="submit">
-Convoquer
-</button>
-</form>
-</div>
-</div>
-</div>
-<p th:if="${#lists.isEmpty(incidents)}" class="text-center text-outline py-6">Aucun incident enregistré.</p>
-</div>
+</td>
+</tr>
+<tr th:if="${#lists.isEmpty(retards)}"><td class="px-lg py-6 text-center text-outline" colspan="5">Aucun retard enregistré.</td></tr>
+</tbody>
+</table>
 </section>
 
 <aside class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg h-fit">
-<h3 class="font-headline-sm text-headline-sm mb-md">Signaler un incident</h3>
-<form class="flex flex-col gap-md" method="post" th:action="@{/surveillant/incidents}">
+<h3 class="font-headline-sm text-headline-sm mb-md">Nouveau retard</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/surveillant/retards}">
 <div>
 <label class="text-label-sm text-on-surface-variant block mb-1">Élève</label>
 <select class="w-full border border-outline-variant rounded-lg px-3 py-2" name="eleveId" required="required">
@@ -105,17 +96,18 @@ Convoquer
 </select>
 </div>
 <div>
-<label class="text-label-sm text-on-surface-variant block mb-1">Description</label>
-<textarea class="w-full border border-outline-variant rounded-lg px-3 py-2" name="description" required="required" rows="3"></textarea>
+<label class="text-label-sm text-on-surface-variant block mb-1">Date</label>
+<input class="w-full border border-outline-variant rounded-lg px-3 py-2" name="date" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" type="date"/>
 </div>
 <div>
-<label class="text-label-sm text-on-surface-variant block mb-1">Gravité</label>
-<select class="w-full border border-outline-variant rounded-lg px-3 py-2" name="gravite" required="required">
-<option value="DISCIPLINE">Discipline (mineur)</option>
-<option value="GRAVE">Grave</option>
-</select>
+<label class="text-label-sm text-on-surface-variant block mb-1">Heure d'arrivée</label>
+<input class="w-full border border-outline-variant rounded-lg px-3 py-2" name="heureArrivee" type="time"/>
 </div>
-<button class="mt-2 bg-primary text-on-primary font-label-md py-3 rounded-lg hover:opacity-90 transition-all" type="submit">Enregistrer l'incident</button>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Motif (optionnel)</label>
+<input class="w-full border border-outline-variant rounded-lg px-3 py-2" name="motif" placeholder="Ex: Transport" type="text"/>
+</div>
+<button class="mt-2 bg-primary text-on-primary font-label-md py-3 rounded-lg hover:opacity-90 transition-all" type="submit">Enregistrer le retard</button>
 </form>
 </aside>
 </div>

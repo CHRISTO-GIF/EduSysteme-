@@ -3,12 +3,14 @@ package holyflame.administration.controller;
 import holyflame.administration.model.Eleve;
 import holyflame.administration.model.Incident;
 import holyflame.administration.model.Pointage;
+import holyflame.administration.model.Retard;
 import holyflame.administration.model.Retenue;
 import holyflame.administration.model.Zone;
 import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.EleveRepository;
 import holyflame.administration.repository.IncidentRepository;
 import holyflame.administration.repository.PointageRepository;
+import holyflame.administration.repository.RetardRepository;
 import holyflame.administration.repository.RetenueRepository;
 import holyflame.administration.repository.ZoneRepository;
 import holyflame.administration.service.EmailService;
@@ -35,6 +37,7 @@ public class SurveillantController {
     @Autowired private PointageRepository pointageRepository;
     @Autowired private IncidentRepository incidentRepository;
     @Autowired private RetenueRepository retenueRepository;
+    @Autowired private RetardRepository retardRepository;
     @Autowired private EleveRepository eleveRepository;
     @Autowired private ClasseRepository classeRepository;
     @Autowired private EtablissementService etablissementService;
@@ -104,6 +107,53 @@ public class SurveillantController {
             ra.addFlashAttribute("successMsg", "Pointage enregistre pour " + eleve.getPrenom() + " " + eleve.getNom() + ".");
         }
         return "redirect:/surveillant/presences";
+    }
+
+
+    // ── Retards (arrivées tardives) ─────────────────────────────────────────
+    @GetMapping("/retards")
+    public String retards(Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        model.addAttribute("retards", retardRepository.findByEtablissementIdOrderByDateDesc(etabId));
+        model.addAttribute("eleves", eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId));
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "surveillant-retards";
+    }
+
+    @PostMapping("/retards")
+    public String ajouterRetard(@RequestParam Long eleveId,
+                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                 @RequestParam(required = false) @DateTimeFormat(pattern = "HH:mm") LocalTime heureArrivee,
+                                 @RequestParam(required = false) String motif,
+                                 RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Eleve eleve = eleveRepository.findById(eleveId).orElseThrow();
+        if (etabId == null || !etabId.equals(eleve.getEtablissementId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Élève introuvable dans cet établissement.");
+        }
+        Retard r = new Retard();
+        r.setEleve(eleve);
+        r.setDate(date != null ? date : LocalDate.now());
+        r.setHeureArrivee(heureArrivee);
+        r.setMotif(motif);
+        r.setSaisieAt(LocalDateTime.now());
+        var utilisateur = etablissementService.getCurrentUtilisateur();
+        if (utilisateur != null) r.setSaisieParId(utilisateur.getId());
+        retardRepository.save(r);
+        ra.addFlashAttribute("successMsg", "Retard enregistre pour " + eleve.getPrenom() + " " + eleve.getNom() + ".");
+        return "redirect:/surveillant/retards";
+    }
+
+    @PostMapping("/retards/{id}/supprimer")
+    public String supprimerRetard(@PathVariable Long id, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Retard r = retardRepository.findById(id).orElseThrow();
+        if (etabId == null || r.getEleve() == null || !etabId.equals(r.getEleve().getEtablissementId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Retard introuvable dans cet établissement.");
+        }
+        retardRepository.deleteById(id);
+        ra.addFlashAttribute("successMsg", "Retard supprime.");
+        return "redirect:/surveillant/retards";
     }
 
     // ── Incidents ────────────────────────────────────────────────────────

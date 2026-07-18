@@ -5,6 +5,7 @@ import holyflame.administration.model.Classe;
 import holyflame.administration.model.Eleve;
 import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.AbsenceRepository;
+import holyflame.administration.repository.RetardRepository;
 import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.EleveRepository;
 import holyflame.administration.repository.NoteRepository;
@@ -29,6 +30,7 @@ public class SecretariatController {
 
     @Autowired private EleveRepository eleveRepository;
     @Autowired private AbsenceRepository absenceRepository;
+    @Autowired private RetardRepository retardRepository;
     @Autowired private NoteRepository noteRepository;
     @Autowired private PaiementRepository paiementRepository;
     @Autowired private ClasseRepository classeRepository;
@@ -54,6 +56,15 @@ public class SecretariatController {
         long totalInscrits = eleves.stream().filter(e -> "INSCRIT".equals(e.getStatutInscription())).count();
         model.addAttribute("totalInscrits",  totalInscrits);
         model.addAttribute("totalEnAttente", eleves.size() - totalInscrits);
+        java.util.Set<Long> eleveIdsAbsentsAujourdHui = absences.stream()
+            .filter(a -> java.time.LocalDate.now().equals(a.getDate()))
+            .map(a -> a.getEleve().getId())
+            .collect(java.util.stream.Collectors.toSet());
+        java.util.Set<Long> eleveIdsRetardAujourdHui = retardRepository.findByEtablissementIdAndDate(etabId, java.time.LocalDate.now()).stream()
+            .map(r -> r.getEleve().getId())
+            .collect(java.util.stream.Collectors.toSet());
+        model.addAttribute("eleveIdsAbsentsAujourdHui", eleveIdsAbsentsAujourdHui);
+        model.addAttribute("eleveIdsRetardAujourdHui", eleveIdsRetardAujourdHui);
         return "secretariat";
     }
 
@@ -146,6 +157,7 @@ public class SecretariatController {
         noteRepository.deleteByEleveId(id);
         absenceRepository.deleteByEleveId(id);
         paiementRepository.deleteByEleveId(id);
+        retardRepository.deleteByEleveId(id);
         eleveRepository.deleteById(id);
         return "redirect:/secretariat";
     }
