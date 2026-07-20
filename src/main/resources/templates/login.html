@@ -109,10 +109,9 @@
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         vertical-align: middle;
       }
-      .form-ring:focus-within {
+      .form-pill:focus-within {
         outline: none;
-        box-shadow: 0 0 0 2px rgba(0, 35, 111, 0.2);
-        border-color: #00236f;
+        box-shadow: 0 0 0 2px rgba(0, 35, 111, 0.25);
       }
     </style>
 </head>
@@ -120,7 +119,7 @@
 <!-- Corps principal -->
 <main class="flex-grow flex items-center justify-center p-md md:p-xl">
 <div class="max-w-container-max w-full grid grid-cols-1 md:grid-cols-12 gap-gutter items-stretch min-h-[600px]">
-<!-- Colonne gauche : presentation -->
+<!-- Colonne gauche : presentation (desktop uniquement) -->
 <section class="md:col-span-7 lg:col-span-8 flex flex-col justify-center p-lg bg-surface-container-low rounded-xl relative overflow-hidden hidden md:flex border border-outline-variant">
 <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
 <div class="absolute inset-0" style="background-image: radial-gradient(#00236f 1px, transparent 1px); background-size: 32px 32px;"></div>
@@ -155,27 +154,29 @@
 </section>
 <!-- Colonne droite : formulaire de connexion -->
 <section class="md:col-span-5 lg:col-span-4 flex flex-col justify-center">
-<div class="bg-surface-container-lowest p-lg md:p-xl rounded-xl border border-outline-variant shadow-sm space-y-lg">
-<div class="md:hidden flex flex-col items-center mb-xl">
-<span class="material-symbols-outlined text-primary text-5xl mb-sm" style="font-variation-settings: 'FILL' 1;">school</span>
-<h1 class="font-headline-sm text-headline-sm text-primary font-bold">EduSystem Pro</h1>
-<p class="text-on-surface-variant text-label-md mt-sm">Portail Academique</p>
+<div class="bg-surface-container-lowest p-lg md:p-xl rounded-2xl md:rounded-xl border border-outline-variant shadow-sm space-y-lg">
+<div class="md:hidden flex flex-col items-center mb-md">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">school</span>
 </div>
-<div class="space-y-sm text-center md:text-left">
+<h1 class="font-headline-sm text-headline-sm text-primary font-bold">EduSystem Pro</h1>
+<p class="text-on-surface-variant text-label-md mt-xs">Portail Academique</p>
+</div>
+<div class="space-y-xs text-center md:text-left">
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Connexion</h3>
 <p class="font-body-md text-on-surface-variant">Veuillez entrer vos identifiants pour continuer.</p>
 </div>
 
-<div class="p-3 rounded-lg bg-error-container text-on-error-container text-sm" th:if="${param.error}">
+<div class="p-3 rounded-xl bg-error-container text-on-error-container text-sm" th:if="${param.error}">
     Identifiant ou mot de passe incorrect.
 </div>
-<div class="p-3 rounded-lg bg-error-container text-on-error-container text-sm" th:if="${param.locked}">
+<div class="p-3 rounded-xl bg-error-container text-on-error-container text-sm" th:if="${param.locked}">
     Compte temporairement verrouille suite a plusieurs echecs de connexion. Reessayez dans 15 minutes.
 </div>
-<div class="p-3 rounded-lg bg-secondary-container text-on-secondary-container text-sm" th:if="${param.logout}">
+<div class="p-3 rounded-xl bg-secondary-container text-on-secondary-container text-sm" th:if="${param.logout}">
     Vous avez ete deconnecte avec succes.
 </div>
-<div class="p-3 rounded-lg bg-secondary-container text-on-secondary-container text-sm" th:if="${motDePasseReinitialise}">
+<div class="p-3 rounded-xl bg-secondary-container text-on-secondary-container text-sm" th:if="${motDePasseReinitialise}">
     Votre mot de passe a ete reinitialise avec succes. Vous pouvez vous connecter.
 </div>
 
@@ -183,21 +184,21 @@
 <!-- Identifiant -->
 <div class="space-y-xs">
 <label class="font-label-md text-label-md text-on-surface" for="username">Identifiant ou Email</label>
-<div class="flex items-center gap-sm bg-surface border border-outline-variant rounded-lg form-ring transition-all">
+<div class="form-pill flex items-center gap-sm bg-surface-container-low rounded-full transition-all">
 <span class="material-symbols-outlined pl-md text-outline">alternate_email</span>
-<input class="w-full py-md pr-md bg-transparent border-none outline-none font-body-md text-on-surface" id="username" name="username" placeholder="nom@etablissement.fr" required="required" type="text"/>
+<input class="w-full py-md pr-md bg-transparent border-none outline-none focus:ring-0 font-body-md text-on-surface" id="username" name="username" placeholder="nom@etablissement.fr" required="required" type="text"/>
 </div>
 </div>
 <!-- Mot de passe -->
 <div class="space-y-xs">
 <label class="font-label-md text-label-md text-on-surface" for="password">Mot de passe</label>
-<div class="flex items-center gap-sm bg-surface border border-outline-variant rounded-lg form-ring transition-all">
+<div class="form-pill flex items-center gap-sm bg-surface-container-low rounded-full transition-all">
 <span class="material-symbols-outlined pl-md text-outline">lock</span>
-<input class="w-full py-md pr-md bg-transparent border-none outline-none font-body-md text-on-surface" id="password" name="password" placeholder="••••••••" required="required" type="password"/>
+<input class="w-full py-md pr-md bg-transparent border-none outline-none focus:ring-0 font-body-md text-on-surface" id="password" name="password" placeholder="••••••••" required="required" type="password"/>
 </div>
 </div>
 <!-- Actions -->
-<div class="flex items-center justify-between text-label-md">
+<div class="flex items-center justify-between text-label-md flex-wrap gap-sm">
 <label class="flex items-center space-x-sm cursor-pointer group">
 <input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" name="remember-me" type="checkbox"/>
 <span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Se souvenir de moi</span>
@@ -205,7 +206,7 @@
 <a class="text-primary hover:underline font-semibold" href="/mot-de-passe-oublie">Mot de passe oublie ?</a>
 </div>
 <!-- Bouton de connexion -->
-<button class="w-full bg-primary text-on-primary font-headline-sm py-md rounded-lg hover:bg-primary-container transition-colors shadow-sm active:scale-[0.98] duration-150" type="submit">
+<button class="w-full bg-primary text-on-primary font-headline-sm py-md rounded-full hover:bg-primary-container transition-colors shadow-sm active:scale-[0.98] duration-150" type="submit">
               Se connecter
             </button>
 </form>
