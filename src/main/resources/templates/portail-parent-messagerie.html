@@ -45,6 +45,230 @@
     </style>
 </head>
 <body class="bg-background font-body-md text-on-surface antialiased overflow-hidden">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen flex flex-col" id="messagerie-mobile-section" style="height:100dvh;">
+
+<!-- Vue liste des conversations -->
+<div class="flex-1 flex flex-col min-h-0" th:if="${correspondantActif == null}">
+<header class="w-full flex justify-between items-center h-14 px-md bg-surface/80 backdrop-blur-md border-b border-outline-variant shrink-0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Messagerie</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-sm" th:text="${#strings.substring(emailParent,0,1)}">P</div>
+</header>
+<div class="p-md shrink-0">
+<div class="flex items-center gap-sm bg-surface-container-low rounded-full px-md py-2 border border-outline-variant">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-body-md font-body-md" id="recherche-conversation-mobile" placeholder="Rechercher une conversation..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto pb-20" id="liste-conversations-mobile">
+<div th:if="${conversations.isEmpty()}" class="p-lg text-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[36px] text-outline mb-sm">forum</span>
+<p class="font-body-md text-body-md">Aucun contact disponible pour le moment.</p>
+</div>
+<a th:each="conv : ${conversations}"
+   class="p-md border-b border-outline-variant flex items-center gap-md conversation-item-mobile active:bg-surface-container-low transition-colors"
+   th:data-nom="${#strings.toLowerCase(conv.nom)}"
+   th:href="@{/portail-parent/messages(avec=${conv.email})}">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-secondary-container" th:text="${conv.role == 'Secretariat'} ? 'account_balance' : 'person'">person</span>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-md text-label-md text-on-surface truncate" th:text="${conv.nom}">Nom</h3>
+<span class="text-[10px] text-outline font-medium shrink-0 ml-xs" th:if="${conv.dernierDate != null}" th:text="${#temporals.format(conv.dernierDate, 'dd/MM')}">--</span>
+</div>
+<p class="text-body-md text-label-sm text-on-surface-variant truncate" th:text="${conv.dernierMessage != null ? conv.dernierMessage : 'Démarrer la conversation...'}">Dernier message</p>
+</div>
+<span class="w-2.5 h-2.5 bg-primary rounded-full shrink-0" th:if="${conv.nonLus > 0}"></span>
+</a>
+</div>
+</div>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50" th:if="${correspondantActif == null}">
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/enfants}">
+<span class="material-symbols-outlined">family_restroom</span>
+<span class="font-label-sm text-label-sm">Mes Enfants</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/calendrier}">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendrier</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">forum</span>
+<span class="font-label-sm text-label-sm">Messagerie</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/paiements}">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-sm text-label-sm">Paiements</span>
+</a>
+</nav>
+
+<!-- Vue fil de discussion -->
+<div class="flex-1 flex flex-col min-h-0" th:if="${correspondantActif != null}">
+<header class="h-14 border-b border-outline-variant flex items-center gap-sm px-md shrink-0 bg-surface">
+<a class="p-1 -ml-1" th:href="@{/portail-parent/messages}"><span class="material-symbols-outlined">arrow_back</span></a>
+<div class="w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center border border-outline-variant shrink-0">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]" th:text="${contactActif != null and contactActif.role == 'Secretariat'} ? 'account_balance' : 'person'">person</span>
+</div>
+<div class="min-w-0 flex-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate" th:text="${contactActif != null ? contactActif.nom : correspondantActif}">Nom</h2>
+<p class="text-[11px] text-on-surface-variant truncate" th:if="${contactActif != null and contactActif.role == 'Secretariat'}">Secrétariat</p>
+<p class="text-[11px] text-on-surface-variant truncate" th:if="${contactActif != null and contactActif.role == 'Enseignant' and !#lists.isEmpty(contactActif.matieres)}" th:text="${T(java.lang.String).join(', ', contactActif.matieres)}">Matieres</p>
+</div>
+</header>
+
+<div class="flex-1 overflow-y-auto p-md flex flex-col gap-md bg-surface-container-low/20" id="message-container-mobile">
+<div th:if="${fil.isEmpty()}" class="text-center text-on-surface-variant mt-xl">
+<p class="font-body-md text-body-md">Aucun message. Envoyez le premier message ci-dessous.</p>
+</div>
+<th:block th:each="ligne : ${filAvecSeparateurs}">
+<div class="flex justify-center" th:if="${ligne.separateur != null}">
+<span class="text-[11px] text-outline bg-surface-container px-3 py-1 rounded-full font-medium" th:text="${ligne.separateur}">AUJOURD'HUI</span>
+</div>
+<div class="flex items-center justify-center my-xs"
+     th:if="${#strings.isEmpty(ligne.message.contenu) and ligne.message.pieceJointeChemin != null}"
+     th:with="etesExpediteur=${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent)}, nomContact=${contactActif != null ? contactActif.nom : correspondantActif}">
+<div class="bg-secondary-container/30 border border-secondary-container text-on-secondary-container px-md py-xs rounded-lg flex items-center gap-sm text-[13px]">
+<span class="material-symbols-outlined text-[16px]">attachment</span>
+<span th:text="${etesExpediteur ? ('Vous avez partagé &quot;' + ligne.message.pieceJointeNom + '&quot;') : (nomContact + ' a partagé &quot;' + ligne.message.pieceJointeNom + '&quot;')}">Partage</span>
+<a class="text-primary font-bold hover:underline" th:href="@{'/uploads/' + ${ligne.message.pieceJointeChemin}}" target="_blank">Ouvrir</a>
+</div>
+</div>
+<div th:if="${!#strings.isEmpty(ligne.message.contenu)}" class="flex gap-sm max-w-[85%]"
+     th:classappend="${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent)} ? 'self-end flex-row-reverse' : ''">
+<div class="flex flex-col gap-xs" th:classappend="${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent)} ? 'items-end' : ''">
+<div class="p-md rounded-xl shadow-sm"
+     th:classappend="${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent)} ? 'bg-primary text-on-primary rounded-br-none' : 'bg-white border border-outline-variant text-on-surface rounded-bl-none'">
+<p class="text-body-md leading-relaxed" th:text="${ligne.message.contenu}">Message</p>
+<a th:if="${ligne.message.pieceJointeChemin != null}" th:href="@{'/uploads/' + ${ligne.message.pieceJointeChemin}}" target="_blank"
+   class="flex items-center gap-sm mt-xs p-sm bg-white/10 rounded-lg">
+<span class="material-symbols-outlined">attach_file</span>
+<span class="font-label-sm text-label-sm truncate" th:text="${ligne.message.pieceJointeNom}">fichier.pdf</span>
+</a>
+</div>
+<span class="text-[10px] text-outline" th:text="${#temporals.format(ligne.message.dateEnvoi, 'HH:mm')}">--</span>
+</div>
+</div>
+</th:block>
+</div>
+
+<details class="border-t border-outline-variant bg-surface-container-lowest shrink-0">
+<summary class="px-md py-sm text-label-sm text-on-surface-variant cursor-pointer select-none">Infos de la conversation</summary>
+<div class="px-md pb-md space-y-md">
+<div th:if="${!mediasPartages.isEmpty()}">
+<h4 class="text-[10px] font-bold text-outline uppercase tracking-widest mb-sm">Médias partagés</h4>
+<div class="grid grid-cols-4 gap-xs">
+<a th:each="media, iter : ${mediasPartages}" th:if="${iter.index < 4}" th:href="@{'/uploads/' + ${media.pieceJointeChemin}}" target="_blank"
+   class="aspect-square bg-surface-container-high rounded-lg overflow-hidden border border-outline-variant flex items-center justify-center">
+<img th:if="${media.pieceJointeType != null and #strings.startsWith(media.pieceJointeType,'image/')}" class="w-full h-full object-cover" th:src="@{'/uploads/' + ${media.pieceJointeChemin}}"/>
+<span th:unless="${media.pieceJointeType != null and #strings.startsWith(media.pieceJointeType,'image/')}" class="material-symbols-outlined text-outline">description</span>
+</a>
+</div>
+</div>
+<div th:if="${!membresGroupe.isEmpty()}">
+<h4 class="text-[10px] font-bold text-outline uppercase tracking-widest mb-sm">Membres du groupe</h4>
+<div class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm" th:each="membre : ${membresGroupe}">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">person</span>
+<span class="text-label-sm text-on-surface" th:text="${membre.prenom + ' ' + membre.nom}">Nom</span>
+</div>
+</div>
+</div>
+<button class="w-full py-2 border border-error/50 text-error rounded-lg flex items-center justify-center gap-sm font-label-md text-sm" onclick="document.getElementById('modal-signaler-mobile').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[16px]">report</span> Signaler un problème
+</button>
+</div>
+</details>
+
+<div class="p-md border-t border-outline-variant bg-surface-container-lowest shrink-0" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+<div class="mb-sm" id="piece-jointe-chip-mobile" style="display:none;">
+<span class="inline-flex items-center gap-xs bg-surface-container-low border border-outline-variant rounded-lg px-sm py-1 text-label-sm">
+<span class="material-symbols-outlined text-[16px]">description</span>
+<span id="piece-jointe-nom-mobile"></span>
+<button onclick="document.getElementById('input-fichier-mobile').value=''; document.getElementById('piece-jointe-chip-mobile').style.display='none';" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+</div>
+<form enctype="multipart/form-data" id="form-envoyer-mobile" method="post" th:action="@{/portail-parent/messages/envoyer}">
+<input name="destinataire" th:value="${correspondantActif}" type="hidden"/>
+<div class="flex items-end gap-sm">
+<button class="p-2 text-outline shrink-0" onclick="document.getElementById('input-fichier-mobile').click()" type="button">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="hidden" id="input-fichier-mobile" name="pieceJointe" onchange="afficherPieceJointeMobile(this)" type="file"/>
+<div class="relative shrink-0">
+<button class="p-2 text-outline" onclick="document.getElementById('emoji-picker-mobile').classList.toggle('hidden')" type="button">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</button>
+<div class="hidden absolute bottom-12 left-0 bg-white border border-outline-variant rounded-lg shadow-lg p-sm grid grid-cols-4 gap-1 z-10" id="emoji-picker-mobile">
+<button class="text-xl p-1" onclick="insererTexteMobile('😀')" type="button">😀</button>
+<button class="text-xl p-1" onclick="insererTexteMobile('👍')" type="button">👍</button>
+<button class="text-xl p-1" onclick="insererTexteMobile('🙏')" type="button">🙏</button>
+<button class="text-xl p-1" onclick="insererTexteMobile('❤️')" type="button">❤️</button>
+<button class="text-xl p-1" onclick="insererTexteMobile('😊')" type="button">😊</button>
+<button class="text-xl p-1" onclick="insererTexteMobile('👏')" type="button">👏</button>
+<button class="text-xl p-1" onclick="insererTexteMobile('📎')" type="button">📎</button>
+<button class="text-xl p-1" onclick="insererTexteMobile('✅')" type="button">✅</button>
+</div>
+</div>
+<div class="flex-grow bg-surface-container-low rounded-xl border border-outline-variant p-1 flex items-center">
+<textarea class="bg-transparent border-none focus:ring-0 w-full text-body-md font-body-md resize-none py-2 px-md min-h-[40px] max-h-28" id="zone-message-mobile" name="contenu" placeholder="Écrivez votre message..." rows="1"></textarea>
+</div>
+<button class="w-10 h-10 bg-primary text-on-primary rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition-transform" type="submit">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</form>
+<div class="mt-sm flex gap-xs overflow-x-auto hide-scrollbar">
+<button class="text-[10px] bg-surface-container border border-outline-variant px-2 py-1 rounded text-on-surface-variant font-medium whitespace-nowrap" onclick="insererTexteMobile('@professeur ')" type="button">@professeur</button>
+<button class="text-[10px] bg-surface-container border border-outline-variant px-2 py-1 rounded text-on-surface-variant font-medium whitespace-nowrap" onclick="insererTexteMobile('#absence ')" type="button">#absence</button>
+<button class="text-[10px] bg-surface-container border border-outline-variant px-2 py-1 rounded text-on-surface-variant font-medium whitespace-nowrap" onclick="insererTexteMobile('#notes ')" type="button">#notes</button>
+</div>
+</div>
+</div>
+
+<!-- Modal Signaler (mobile) -->
+<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-signaler-mobile">
+<div class="bg-white rounded-xl p-lg max-w-md w-full">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-error">Signaler un problème</h3>
+<button onclick="document.getElementById('modal-signaler-mobile').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<p class="text-body-md text-on-surface-variant mb-lg">Ce signalement sera transmis à l'administration de l'établissement pour examen.</p>
+<form class="space-y-md" method="post" th:action="@{/portail-parent/messages/signaler}">
+<input name="concernant" th:value="${correspondantActif}" type="hidden"/>
+<div>
+<label class="text-label-sm text-secondary block mb-1">Motif</label>
+<select class="w-full p-2 border border-outline-variant rounded-lg" name="motif" required="required">
+<option value="Contenu inapproprie">Contenu inapproprié</option>
+<option value="Harcelement">Harcèlement</option>
+<option value="Absence de reponse">Absence de réponse</option>
+<option value="Autre">Autre</option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-secondary block mb-1">Description</label>
+<textarea class="w-full p-2 border border-outline-variant rounded-lg" name="description" placeholder="Décrivez le problème rencontré..." rows="4"></textarea>
+</div>
+<div class="flex justify-end gap-sm pt-md">
+<button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md" onclick="document.getElementById('modal-signaler-mobile').classList.add('hidden')" type="button">Annuler</button>
+<button class="px-lg py-2 bg-error text-white rounded-lg font-label-md" type="submit">Envoyer le signalement</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex flex-col py-lg border-r border-outline-variant z-50">
 <div class="px-lg mb-xl">
 <h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
@@ -376,6 +600,58 @@ Signaler un probleme
             });
         });
     }
+</script>
+</div>
+<!-- Interactions version mobile -->
+<script>
+    (function() {
+        var messageContainer = document.getElementById('message-container-mobile');
+        if (messageContainer) { messageContainer.scrollTop = messageContainer.scrollHeight; }
+
+        var zoneMessage = document.getElementById('zone-message-mobile');
+        if (zoneMessage) {
+            zoneMessage.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+            zoneMessage.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('form-envoyer-mobile').submit();
+                }
+            });
+        }
+
+        window.insererTexteMobile = function(texte) {
+            if (!zoneMessage) return;
+            zoneMessage.value += texte;
+            zoneMessage.focus();
+            var picker = document.getElementById('emoji-picker-mobile');
+            if (picker) picker.classList.add('hidden');
+        };
+
+        window.afficherPieceJointeMobile = function(input) {
+            var chip = document.getElementById('piece-jointe-chip-mobile');
+            var nom = document.getElementById('piece-jointe-nom-mobile');
+            if (input.files && input.files.length > 0) {
+                nom.textContent = input.files[0].name;
+                chip.style.display = 'block';
+            } else {
+                chip.style.display = 'none';
+            }
+        };
+
+        var rechercheInput = document.getElementById('recherche-conversation-mobile');
+        if (rechercheInput) {
+            rechercheInput.addEventListener('input', function () {
+                var q = this.value.toLowerCase();
+                document.querySelectorAll('.conversation-item-mobile').forEach(function (item) {
+                    var nom = item.getAttribute('data-nom') || '';
+                    item.style.display = nom.indexOf(q) !== -1 ? '' : 'none';
+                });
+            });
+        }
+    })();
 </script>
 </body>
 </html>

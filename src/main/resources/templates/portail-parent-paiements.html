@@ -40,6 +40,175 @@
     </style>
 </head>
 <body class="bg-background text-on-surface">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="paiements-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-sm" th:text="${#strings.substring(emailParent,0,1)}">P</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<section>
+<h2 class="font-headline-md text-headline-md text-primary">Suivi Financier</h2>
+<p class="text-on-surface-variant font-body-md text-sm">Gérez les règlements et l'historique des frais.</p>
+</section>
+
+<!-- Solde -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Solde total à régler</span>
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<div class="text-headline-lg text-primary font-bold" th:text="${#numbers.formatDecimal(soldeTotalARegler, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</div>
+<p class="text-on-surface-variant mt-2 text-sm" th:if="${prochaineEcheance != null}" th:text="'Échéance la plus proche : ' + ${#temporals.format(prochaineEcheance, 'dd MMMM yyyy')}">Echeance</p>
+<p class="text-on-surface-variant mt-2 text-sm" th:if="${prochaineEcheance == null}">Aucune échéance connue pour le moment.</p>
+<div class="mt-md pt-md border-t border-outline-variant flex items-center justify-between">
+<span class="text-sm font-medium" th:classappend="${nbEnRetard > 0} ? 'text-error' : 'text-on-surface-variant'" th:text="${nbEnRetard} + ' facture(s) en retard'">0 facture en retard</span>
+<a class="text-primary font-label-md text-sm" href="#factures-mobile">Voir le détail</a>
+</div>
+</section>
+
+<a class="w-full bg-primary text-on-primary py-3 rounded-xl font-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-all" th:href="@{/portail-parent/paiements/releve}" target="_blank">
+<span class="material-symbols-outlined text-sm">download</span> Télécharger relevé annuel
+</a>
+
+<!-- Derniers paiements -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl">
+<div class="flex items-center justify-between mb-md">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Derniers paiements</span>
+<span class="material-symbols-outlined text-on-surface-variant">history</span>
+</div>
+<div class="space-y-sm" th:if="${!derniersPaiements.isEmpty()}">
+<div class="flex items-center justify-between p-sm bg-surface-container-low rounded-lg" th:each="p : ${derniersPaiements}">
+<div class="flex items-center gap-sm min-w-0">
+<div class="w-10 h-10 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined"
+      th:text="${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'CANTINE' ? 'restaurant' : ((${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'TRANSPORT') ? 'directions_bus' : ((${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'INSCRIPTION') ? 'app_registration' : ((${p.fraisScolarite != null ? p.fraisScolarite.typeFrais : p.typePaiement} == 'SCOLARITE') ? 'school' : 'receipt_long')))">receipt_long</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-md text-on-surface text-sm truncate" th:text="(${p.fraisScolarite != null ? p.fraisScolarite.designation : p.typePaiement}) + ' - ' + (${p.eleve != null ? p.eleve.prenom : '?'})">Designation</p>
+<p class="text-xs text-on-surface-variant" th:text="${#temporals.format(p.datePaiement, 'dd MMM yyyy')}">Date</p>
+</div>
+</div>
+<span class="font-label-md text-primary text-sm shrink-0" th:text="${#numbers.formatDecimal(p.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm" th:if="${derniersPaiements.isEmpty()}">Aucun paiement enregistré pour le moment.</p>
+</section>
+
+<!-- Factures -->
+<section class="space-y-sm" id="factures-mobile">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Factures &amp; Frais</h3>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm" id="recherche-facture-mobile" placeholder="Rechercher une facture..." type="text"/>
+</div>
+<select class="w-full text-sm border border-outline-variant rounded-xl px-3 py-2.5 bg-surface-container-lowest text-on-surface-variant" id="filtre-categorie-mobile">
+<option value="">Toutes les catégories</option>
+<option th:each="cat : ${categories}" th:text="${cat}" th:value="${cat}"></option>
+</select>
+<p class="text-on-surface-variant text-sm py-md text-center" th:if="${lignes.isEmpty()}">Aucun frais applicable pour le moment.</p>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md ligne-facture-mobile" th:data-categorie="${l.categorie}" th:each="l : ${lignes}">
+<div class="flex justify-between items-start mb-sm gap-sm">
+<div class="min-w-0">
+<p class="font-label-md text-on-surface text-sm" th:text="${l.designation}">Designation</p>
+<p class="text-xs text-on-surface-variant" th:text="${l.enfant.prenom} + ' ' + ${l.enfant.nom}">Enfant</p>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium shrink-0"
+      th:classappend="${l.statut == 'PAYE'} ? 'bg-surface-container-high text-on-surface-variant' : (${l.statut == 'EN_RETARD'} ? 'bg-error-container text-on-error-container' : 'bg-secondary-container text-on-secondary-container')"
+      th:text="${l.statut == 'PAYE'} ? 'Payé' : (${l.statut == 'EN_RETARD'} ? 'En retard' : 'En attente')">Statut</span>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-label-md text-on-surface text-sm" th:text="${#numbers.formatDecimal(l.montant, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</p>
+<p class="text-xs" th:classappend="${l.statut == 'EN_RETARD'} ? 'text-error font-medium' : 'text-on-surface-variant'" th:text="${l.echeanceDate != null} ? ${#temporals.format(l.echeanceDate, 'dd MMM yyyy')} : '--'">Date</p>
+</div>
+<form th:if="${l.statut != 'PAYE'}" method="post" th:action="@{/portail-parent/paiements/demander}">
+<input name="fraisId" th:value="${l.fraisId}" type="hidden"/>
+<input name="eleveId" th:value="${l.eleveId}" type="hidden"/>
+<button class="bg-primary text-on-primary text-xs px-4 py-2 rounded-lg font-label-md active:scale-95 transition-all" type="submit">Payer maintenant</button>
+</form>
+<span class="text-on-surface-variant" th:if="${l.statut == 'PAYE'}">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1">check_circle</span>
+</span>
+</div>
+</div>
+</section>
+
+<!-- Infos -->
+<section class="space-y-sm">
+<div class="bg-primary-container/5 rounded-xl p-md border border-primary/10 flex items-center gap-md">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</div>
+<div>
+<h4 class="font-label-md text-primary text-sm">Comment fonctionne "Payer maintenant" ?</h4>
+<p class="text-xs text-on-surface-variant">Une demande réelle est transmise à l'administration via la messagerie.</p>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl p-md flex items-center gap-md border border-outline-variant">
+<div class="w-10 h-10 bg-on-surface-variant rounded-full flex items-center justify-center text-surface shrink-0">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-label-md text-on-surface text-sm">Besoin d'assistance ?</h4>
+</div>
+<a class="bg-surface-container-lowest border border-outline text-on-surface-variant px-3 py-1.5 rounded-lg text-xs font-label-md shrink-0"
+   th:if="${adminEmail != null}" th:href="@{/portail-parent/messages(avec=${adminEmail})}">Message</a>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/enfants}">
+<span class="material-symbols-outlined">family_restroom</span>
+<span class="font-label-sm text-label-sm">Mes Enfants</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/calendrier}">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendrier</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-label-sm text-label-sm">Messagerie</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/portail-parent/paiements}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-label-sm text-label-sm">Paiements</span>
+</a>
+</nav>
+</div>
+<!-- Interactions version mobile -->
+<script>
+    (function() {
+        var rechercheInput = document.getElementById('recherche-facture-mobile');
+        var filtreCategorie = document.getElementById('filtre-categorie-mobile');
+        function appliquerFiltresMobile() {
+            var q = rechercheInput ? rechercheInput.value.toLowerCase() : '';
+            var cat = filtreCategorie ? filtreCategorie.value : '';
+            document.querySelectorAll('.ligne-facture-mobile').forEach(function (row) {
+                var texte = row.textContent.toLowerCase();
+                var matchTexte = (q === '' || texte.indexOf(q) !== -1);
+                var matchCat = (cat === '' || row.getAttribute('data-categorie') === cat);
+                row.style.display = (matchTexte && matchCat) ? '' : 'none';
+            });
+        }
+        if (rechercheInput) rechercheInput.addEventListener('input', appliquerFiltresMobile);
+        if (filtreCategorie) filtreCategorie.addEventListener('change', appliquerFiltresMobile);
+    })();
+</script>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex flex-col py-lg border-r border-outline-variant z-50">
 <div class="px-lg mb-xl">
 <h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
@@ -222,6 +391,7 @@ Telecharger Releve Annuel
 
 </div>
 </main>
+</div>
 <script>
     var rechercheInput = document.getElementById('recherche-facture');
     var filtreCategorie = document.getElementById('filtre-categorie');

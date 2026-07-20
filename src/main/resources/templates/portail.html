@@ -37,9 +37,124 @@
 <style>
         body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-background text-on-background">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-8" id="portail-eleve-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-sm">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${pasDeCompte}" class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg text-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[40px] text-outline mb-sm">person_off</span>
+<p class="font-body-md text-body-md">Aucun dossier élève n'est associé à ce compte. Contactez le secrétariat.</p>
+</div>
+
+<div th:if="${pasDeCompte == null or pasDeCompte == false}" class="space-y-lg">
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface" th:text="'Bonjour, ' + ${eleve.prenom}">Bonjour</h2>
+<p class="text-on-surface-variant text-sm" th:text="${eleve.classe != null ? 'Classe de ' + eleve.classe.nom : ''}">Classe</p>
+</section>
+
+<div class="flex gap-xs overflow-x-auto hide-scrollbar">
+<a class="px-4 py-2 border border-outline-variant rounded-full font-label-md text-label-md whitespace-nowrap" th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface-variant'" th:href="@{/portail(trimestre=1)}">Trimestre 1</a>
+<a class="px-4 py-2 border border-outline-variant rounded-full font-label-md text-label-md whitespace-nowrap" th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface-variant'" th:href="@{/portail(trimestre=2)}">Trimestre 2</a>
+<a class="px-4 py-2 border border-outline-variant rounded-full font-label-md text-label-md whitespace-nowrap" th:classappend="${trimestre == 3} ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface-variant'" th:href="@{/portail(trimestre=3)}">Trimestre 3</a>
+</div>
+
+<div class="grid grid-cols-3 gap-sm">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Moyenne</p>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-sm text-headline-sm text-primary" th:text="${moyenneGenerale}">0</span>
+<span class="text-on-surface-variant text-xs">/20</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Absences</p>
+<div class="font-headline-sm text-headline-sm text-primary" th:text="${absences.size()}">0</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Annonces</p>
+<div class="font-headline-sm text-headline-sm text-primary" th:text="${publications.size()}">0</div>
+</div>
+</div>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Mes Notes</h3>
+</div>
+<div th:if="${notes.isEmpty()}" class="p-lg text-center text-on-surface-variant text-sm">Aucune note publiée pour ce trimestre.</div>
+<div class="divide-y divide-outline-variant" th:if="${!notes.isEmpty()}">
+<div class="px-md py-sm flex justify-between items-center" th:each="n : ${notes}">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${n.matiere != null ? n.matiere.nom : '?'}">Matiere</p>
+<p class="text-xs text-on-surface-variant" th:text="${n.type} + (${n.dateEvaluation != null} ? ' • ' + ${#temporals.format(n.dateEvaluation, 'dd/MM/yyyy')} : '')">Type</p>
+</div>
+<span class="font-bold text-primary text-sm shrink-0" th:text="${n.valeur} + '/20'">--</span>
+</div>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Absences</h3>
+</div>
+<div th:if="${absences.isEmpty()}" class="p-lg text-center text-on-surface-variant text-sm">Aucune absence enregistrée.</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-md py-sm flex justify-between items-center gap-sm" th:each="a : ${absences}">
+<div class="min-w-0">
+<p class="font-label-md text-sm" th:text="${#temporals.format(a.date, 'dd/MM/yyyy')} + ' - ' + ${a.periode}">Date</p>
+<p class="text-xs text-on-surface-variant truncate" th:text="${a.motif}">Motif</p>
+</div>
+<span class="px-2 py-1 rounded-full text-[10px] font-medium shrink-0" th:classappend="${a.estJustifiee} ? 'bg-success-container text-on-success-container' : 'bg-error-container text-on-error-container'" th:text="${a.estJustifiee} ? 'Justifiée' : 'Non justifiée'">Statut</span>
+</div>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Annonces</h3>
+</div>
+<div th:if="${publications.isEmpty()}" class="p-lg text-center text-on-surface-variant text-sm">Aucune annonce pour le moment.</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-md py-sm" th:each="p : ${publications}">
+<p class="font-label-md text-sm" th:text="${p.titre}">Titre</p>
+<p class="text-xs text-on-surface-variant mt-xs" th:text="${p.contenu}">Contenu</p>
+<p class="text-[10px] text-outline mt-xs" th:text="${#temporals.format(p.datePublication, 'dd/MM/yyyy')}">--</p>
+</div>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Historique des Paiements</h3>
+</div>
+<div th:if="${paiements.isEmpty()}" class="p-lg text-center text-on-surface-variant text-sm">Aucun paiement enregistré.</div>
+<div class="divide-y divide-outline-variant" th:if="${!paiements.isEmpty()}">
+<div class="px-md py-sm flex justify-between items-center" th:each="p : ${paiements}">
+<div class="min-w-0">
+<p class="font-label-md text-sm" th:text="${p.typePaiement}">Type</p>
+<p class="text-xs text-on-surface-variant" th:text="${#temporals.format(p.datePaiement, 'dd/MM/yyyy')} + ' • ' + ${p.modePaiement}">Date</p>
+</div>
+<span class="font-bold text-primary text-sm shrink-0" th:text="${#numbers.formatDecimal(p.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex flex-col py-lg border-r border-outline-variant z-50">
 <div class="px-lg mb-xl">
 <h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
@@ -181,5 +296,6 @@
 </div>
 </div>
 </main>
+</div>
 </body>
 </html>
