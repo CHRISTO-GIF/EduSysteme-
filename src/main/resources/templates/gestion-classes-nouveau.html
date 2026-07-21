@@ -44,6 +44,64 @@
     </script>
 </head>
 <body class="bg-background text-on-background min-h-screen">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-8" id="gcn-mobile-section">
+<header class="w-full top-0 sticky flex items-center gap-sm h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<a class="p-1 -ml-1" th:href="@{/gestion-academique}"><span class="material-symbols-outlined text-primary">arrow_back</span></a>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary truncate">Nouvelle Classe</h1>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${erreur}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${erreur}"></div>
+<form class="space-y-lg" method="post" th:action="@{/gestion-classes}">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-lg space-y-md">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm"><span class="material-symbols-outlined text-primary text-[20px]">info</span>Informations Générales</h3>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Nom de la classe</label>
+<input class="border border-outline-variant p-2.5 rounded-lg bg-surface text-sm" name="nom" placeholder="ex: 6eme A" required="required" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Niveau</label>
+<input class="border border-outline-variant p-2.5 rounded-lg bg-surface text-sm" name="niveau" placeholder="ex: Collège - Niveau 1" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Année Scolaire</label>
+<input class="border border-outline-variant p-2.5 rounded-lg bg-surface text-sm" name="anneeScolaire" placeholder="2025-2026" th:value="${anneeScolaire}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Capacité maximale</label>
+<input class="border border-outline-variant p-2.5 rounded-lg bg-surface text-sm" min="1" name="capacite" placeholder="30" type="number"/>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-lg space-y-md">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm"><span class="material-symbols-outlined text-primary text-[20px]">assignment_ind</span>Affectation</h3>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Professeur Principal</label>
+<select class="border border-outline-variant p-2.5 rounded-lg bg-surface text-sm" name="professeurTitulaireId">
+<option value="">-- Aucun --</option>
+<option th:each="e : ${enseignants}" th:text="${e.prenom + ' ' + e.nom}" th:value="${e.id}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Salle attitrée</label>
+<input class="border border-outline-variant p-2.5 rounded-lg bg-surface text-sm" name="salle" placeholder="ex: Salle 102" type="text"/>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-lg space-y-md">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm"><span class="material-symbols-outlined text-primary text-[20px]">description</span>Description</h3>
+<textarea class="w-full border border-outline-variant p-2.5 rounded-lg bg-surface text-sm resize-none" name="notes" placeholder="Particularités, objectifs pédagogiques..." rows="4"></textarea>
+</div>
+
+<div class="flex gap-md">
+<a class="flex-1 text-center py-3 border border-outline text-on-surface-variant font-label-md rounded-lg" th:href="@{/gestion-academique}">Annuler</a>
+<button class="flex-1 bg-primary text-on-primary font-label-md rounded-lg" type="submit">Enregistrer</button>
+</div>
+</form>
+</main>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <!-- Menu lateral -->
 <aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
 <div class="px-lg mb-xl">
@@ -244,6 +302,7 @@
 </div>
 </form>
 </main>
+</div>
 
 <script>
     const inputs = document.querySelectorAll('input, select, textarea');

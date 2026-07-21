@@ -12,6 +12,48 @@
 </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-8" id="gestion-classes-mobile-section">
+<header class="w-full top-0 sticky flex items-center gap-sm h-14 px-md z-50 bg-white border-b border-gray-200">
+<a class="p-1 -ml-1" th:href="@{/gestion-academique}"><span class="material-symbols-outlined text-blue-900">arrow_back</span></a>
+<h1 class="text-lg font-bold text-blue-900 flex-1 truncate">Gestion des Classes</h1>
+<a class="bg-blue-900 text-white p-2 rounded-lg" th:href="@{/gestion-classes/nouveau}">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</a>
+</header>
+<main class="px-md pt-md space-y-sm">
+<div th:if="${erreur}" class="p-md rounded-lg bg-red-100 text-red-800 text-sm" th:text="${erreur}"></div>
+<div th:if="${success}" class="p-md rounded-lg bg-green-100 text-green-800 text-sm" th:text="${success}"></div>
+
+<div class="bg-white border border-gray-200 rounded-xl p-lg text-center text-gray-500 text-sm" th:if="${classes.isEmpty()}">
+Aucune classe créée.
+</div>
+<div class="ligne-classe bg-white border border-gray-200 rounded-xl p-md"
+     th:data-annee="${c.anneeScolaire}" th:data-capacite="${c.capacite}" th:data-id="${c.id}" th:data-niveau="${c.niveau}"
+     th:data-nom="${c.nom}" th:data-notes="${c.notes}" th:data-salle="${c.salle}" th:data-titulaire="${c.professeurTitulaireId}"
+     th:each="c : ${classes}">
+<div class="flex justify-between items-start mb-xs">
+<div>
+<p class="font-medium text-sm" th:text="${c.nom}">Nom</p>
+<p class="text-xs text-gray-500" th:text="${c.niveau} + ' • ' + ${c.anneeScolaire}">Niveau</p>
+</div>
+<div class="flex gap-xs">
+<button class="text-blue-900 text-xs bouton-modifier px-2 py-1" type="button">Modifier</button>
+<form method="post" th:action="@{/gestion-classes/{id}/supprimer(id=${c.id})}" onsubmit="return confirm('Supprimer cette classe ?');">
+<button class="text-red-600 text-xs px-2 py-1" type="submit">Suppr.</button>
+</form>
+</div>
+</div>
+<p class="text-xs text-gray-500">
+Titulaire :
+<span th:each="e : ${enseignants}" th:if="${c.professeurTitulaireId != null and c.professeurTitulaireId == e.id}" th:text="${e.prenom} + ' ' + ${e.nom}">--</span>
+<span th:if="${c.professeurTitulaireId == null}">--</span>
+</p>
+</div>
+</main>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
 <div class="flex items-center gap-3">
 <a class="p-2 hover:bg-gray-100 rounded-full transition-colors" th:href="@{/gestion-academique}" title="Retour">
@@ -61,6 +103,7 @@
 </div>
 
 </main>
+</div>
 
 <div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-classe">
 <div class="bg-white rounded-xl p-xl max-w-md w-full">

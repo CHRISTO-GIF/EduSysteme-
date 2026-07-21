@@ -48,7 +48,7 @@
 </head>
 <body class="bg-background text-on-background min-h-screen">
 <!-- Menu lateral -->
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">
 <div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center">
@@ -92,7 +92,7 @@
 </aside>
 
 <!-- Barre superieure -->
-<header class="h-16 fixed top-0 right-0 left-[260px] bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg z-40">
+<header class="h-16 fixed top-0 right-0 left-0 md:left-[260px] bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-md md:px-lg z-40">
 <div class="flex items-center flex-1 max-w-xl">
 <div class="relative w-full">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
@@ -117,7 +117,7 @@
 </div>
 </header>
 
-<main class="ml-sidebar-width pt-24 px-lg pb-xl max-w-container-max mx-auto">
+<main class="ml-0 md:ml-sidebar-width pt-24 px-md md:px-lg pb-xl max-w-container-max mx-auto">
 <div class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-md">
 <div>
 <nav class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant mb-xs uppercase tracking-wider">
@@ -168,7 +168,7 @@
 <p class="font-label-sm text-label-sm text-on-surface-variant" th:text="'Matricule : ' + ${e.matricule} + (${e.classe != null} ? ' — ' + ${e.classe.nom} : '')">--</p>
 </div>
 </div>
-<button class="bouton-ajouter w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" type="button">
+<button class="bouton-ajouter w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0 flex items-center justify-center" type="button">
 <span class="material-symbols-outlined text-[20px]">chevron_right</span>
 </button>
 </div>

@@ -48,7 +48,7 @@
 </head>
 <body class="bg-background text-on-background min-h-screen">
 <!-- Menu lateral -->
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">
 <div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center">
@@ -101,8 +101,9 @@
 </aside>
 
 <!-- Barre superieure -->
-<header class="h-16 fixed top-0 right-0 left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg z-40">
-<div class="flex items-center flex-1 max-w-xl">
+<header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-md md:px-lg z-40">
+<span class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">Matières</span>
+<div class="hidden md:flex items-center flex-1 max-w-xl">
 <div class="relative w-full">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-10 pr-4 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" placeholder="Rechercher une matiere..." type="text"/>
@@ -123,7 +124,7 @@
 </div>
 </header>
 
-<main class="ml-sidebar-width pt-16 min-h-screen">
+<main class="ml-0 md:ml-sidebar-width pt-16 min-h-screen px-md md:px-0">
 <div class="max-w-container-max mx-auto p-lg">
 
 <nav class="flex items-center gap-xs text-outline mb-sm font-label-sm text-label-sm">
@@ -209,7 +210,7 @@
 <div class="px-lg py-md border-b border-outline-variant">
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Matières enregistrées</h3>
 </div>
-<table class="w-full text-left">
+<table class="w-full text-left hidden md:table">
 <thead class="bg-surface-container text-label-sm text-on-surface-variant">
 <tr><th class="px-lg py-3 font-semibold">Nom</th><th class="px-lg py-3 font-semibold">Catégorie</th><th class="px-lg py-3 font-semibold">Coefficient</th><th class="px-lg py-3 font-semibold">Description</th><th class="px-lg py-3 font-semibold text-right">Actions</th></tr>
 </thead>
@@ -233,6 +234,22 @@
 </tr>
 </tbody>
 </table>
+<div class="md:hidden divide-y divide-outline-variant">
+<p class="p-lg text-center text-on-surface-variant text-sm" th:if="${matieres.isEmpty()}">Aucune matière enregistrée.</p>
+<div class="ligne-matiere p-md" th:data-coef="${m.coefficient}" th:data-description="${m.description}" th:data-id="${m.id}" th:data-nom="${m.nom}" th:data-pole="${m.pole}" th:each="m : ${matieres}">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-label-md text-sm" th:text="${m.nom}">Nom</p>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary-container text-on-secondary-container shrink-0" th:text="${m.pole != null ? m.pole : 'AUTRE'}">Pole</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-sm" th:text="'Coef. ' + ${m.coefficient} + (${m.description != null and !#strings.isEmpty(m.description)} ? ' — ' + m.description : '')">Description</p>
+<div class="flex gap-md">
+<button class="text-primary font-label-md text-xs bouton-modifier" type="button">Modifier</button>
+<form method="post" th:action="@{/matieres/{id}/supprimer(id=${m.id})}" onsubmit="return confirm('Supprimer cette matière ?');">
+<button class="text-error font-label-md text-xs" type="submit">Supprimer</button>
+</form>
+</div>
+</div>
+</div>
 </div>
 </div>
 
@@ -240,7 +257,7 @@
 <div th:if="${activeTab == 'import'}">
 <div th:if="${erreurImport}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurImport}"></div>
 
-<div class="grid grid-cols-12 gap-lg" th:if="${importApercu == null}">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg" th:if="${importApercu == null}">
 <!-- Gauche : etapes & instructions -->
 <div class="col-span-12 lg:col-span-4 space-y-lg">
 <div class="bg-surface-container-low p-lg border border-outline-variant rounded-xl">
@@ -318,7 +335,7 @@
 
 <!-- Apercu / validation apres televersement -->
 <div th:if="${importApercu != null}">
-<div class="grid grid-cols-3 gap-lg mb-lg">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-lg mb-lg">
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg text-center">
 <p class="font-headline-md text-headline-md text-on-surface" th:text="${importTotal}">0</p>
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Lignes lues</p>
@@ -333,11 +350,11 @@
 </div>
 </div>
 
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden mb-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-x-auto mb-lg">
 <div class="px-lg py-md border-b border-outline-variant flex items-center justify-between">
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Aperçu — <span th:text="${importFichierNom}">fichier.xlsx</span></h3>
 </div>
-<table class="w-full text-left">
+<table class="w-full text-left min-w-[520px]">
 <thead class="bg-surface-container text-label-sm text-on-surface-variant">
 <tr><th class="px-lg py-3 font-semibold">Nom</th><th class="px-lg py-3 font-semibold">Coefficient</th><th class="px-lg py-3 font-semibold">Pôle</th><th class="px-lg py-3 font-semibold">Statut</th></tr>
 </thead>

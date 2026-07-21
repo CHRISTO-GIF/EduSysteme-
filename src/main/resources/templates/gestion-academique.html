@@ -47,6 +47,135 @@
     </script>
 </head>
 <body class="bg-background text-on-background min-h-screen">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-8" id="gestion-academique-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-sm" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'A'}">A</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${erreur}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${erreur}"></div>
+<div th:if="${success}" class="p-md rounded-lg bg-success-container text-on-success-container text-sm" th:text="${success}"></div>
+
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface">Gestion Académique</h2>
+<p class="text-on-surface-variant text-sm">Classes et programme scolaire.</p>
+</section>
+
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm" id="recherche-academique-mobile" placeholder="Rechercher une classe ou une matière..." type="text"/>
+</div>
+
+<div class="flex bg-surface-container-low rounded-xl p-1 border border-outline-variant">
+<button class="flex-1 py-2 rounded-lg font-label-md text-label-md text-on-primary bg-primary" id="tab-classes-mobile" onclick="switchTabMobile('classes')" type="button">Classes</button>
+<button class="flex-1 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant" id="tab-matieres-mobile" onclick="switchTabMobile('matieres')" type="button">Matières</button>
+</div>
+
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs" th:href="@{/notes/saisie}"><span class="material-symbols-outlined text-[18px]">grading</span> Saisie des notes</a>
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs -mt-sm" th:href="@{/bulletins/options}"><span class="material-symbols-outlined text-[18px]">description</span> Bulletins</a>
+
+<!-- Onglet Classes -->
+<div id="content-classes-mobile">
+<div class="flex items-center justify-between mb-sm">
+<span class="px-sm py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-sm text-label-sm" th:text="${nbClasses} + ' classe(s)'">0</span>
+<a class="bg-primary text-on-primary px-md py-2 rounded-lg flex items-center gap-xs font-label-md text-sm" th:href="@{/gestion-classes/nouveau}">
+<span class="material-symbols-outlined text-[18px]">add</span> Nouvelle
+</a>
+</div>
+<div class="space-y-sm" th:if="${nbClasses > 0}">
+<div class="ligne-classe carte-recherche bg-surface-container-lowest border border-outline-variant rounded-xl p-md"
+     th:attr="data-recherche=${#strings.toLowerCase(row.classe.nom + ' ' + (row.classe.niveau != null ? row.classe.niveau : ''))}"
+     th:data-annee="${row.classe.anneeScolaire}" th:data-id="${row.classe.id}" th:data-niveau="${row.classe.niveau}"
+     th:data-nom="${row.classe.nom}" th:data-titulaire="${row.classe.professeurTitulaireId}"
+     th:data-capacite="${row.classe.capacite}" th:data-salle="${row.classe.salle}" th:data-notes="${row.classe.notes}"
+     th:each="row : ${classesVue}">
+<div class="flex justify-between items-start mb-sm">
+<div>
+<h3 class="font-headline-sm text-headline-sm" th:text="${row.classe.nom}">Nom</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${(row.classe.niveau != null ? row.classe.niveau : 'Niveau non défini')} + ' — ' + ${row.classe.anneeScolaire}">Niveau</p>
+</div>
+<div class="flex gap-xs">
+<button class="p-xs text-on-surface-variant bouton-modifier" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<form method="post" th:action="@{/gestion-classes/{id}/supprimer(id=${row.classe.id})}" onsubmit="return confirm('Supprimer cette classe ?');">
+<button class="p-xs text-error" type="submit"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</form>
+</div>
+</div>
+<div class="space-y-xs text-sm">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[16px]">person</span>
+Prof. : <span class="font-medium text-on-surface" th:text="${row.nomTitulaire != null ? row.nomTitulaire : 'Non assigné'}">--</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[16px]">group</span>
+Effectif : <span class="font-medium text-on-surface" th:if="${row.classe.capacite != null}" th:text="${row.effectif} + ' / ' + ${row.classe.capacite}">0/0</span>
+<span class="font-medium text-on-surface" th:if="${row.classe.capacite == null}" th:text="${row.effectif}">0</span>
+</div>
+</div>
+<a class="mt-sm inline-flex items-center gap-xs text-primary font-label-md text-sm pt-sm border-t border-outline-variant w-full" th:href="@{/gestion-classes/{id}/affectation(id=${row.classe.id})}">
+<span class="material-symbols-outlined text-[16px]">group_add</span> Affecter des élèves
+</a>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-lg text-center text-on-surface-variant text-sm" th:if="${nbClasses == 0}">
+Aucune classe créée. Cliquez sur « Nouvelle » pour commencer.
+</div>
+<p class="hidden text-center text-on-surface-variant py-lg text-sm" id="aucun-resultat-classes-mobile">Aucune classe ne correspond à votre recherche.</p>
+</div>
+
+<!-- Onglet Matieres -->
+<div class="hidden" id="content-matieres-mobile">
+<div class="flex items-center justify-between mb-sm">
+<span class="px-sm py-1 bg-tertiary-fixed text-tertiary rounded-full font-label-sm text-label-sm" th:text="${nbMatieres} + ' matière(s)'">0</span>
+<div class="flex gap-xs">
+<a class="border border-outline text-primary px-md py-2 rounded-lg flex items-center gap-xs font-label-md text-sm" th:href="@{/matieres}">
+<span class="material-symbols-outlined text-[18px]">upload_file</span>
+</a>
+<button class="bg-primary text-on-primary px-md py-2 rounded-lg flex items-center gap-xs font-label-md text-sm" onclick="document.getElementById('modal-matiere').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">library_add</span> Nouvelle
+</button>
+</div>
+</div>
+<div class="space-y-sm" th:if="${nbMatieres > 0}">
+<div class="ligne-matiere carte-recherche bg-surface-container-lowest border border-outline-variant rounded-xl p-md"
+    th:attr="data-recherche=${#strings.toLowerCase(row.matiere.nom)}"
+    th:data-coef="${row.matiere.coefficient}" th:data-description="${row.matiere.description}" th:data-id="${row.matiere.id}"
+    th:data-nom="${row.matiere.nom}" th:data-pole="${row.matiere.pole}" th:each="row : ${matieresVue}">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm min-w-0">
+<div th:switch="${row.matiere.pole}" class="shrink-0">
+<span class="material-symbols-outlined bg-primary-fixed text-primary rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="'SCIENTIFIQUE'">science</span>
+<span class="material-symbols-outlined bg-tertiary-fixed text-tertiary rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="'LITTERAIRE'">menu_book</span>
+<span class="material-symbols-outlined bg-secondary-fixed text-secondary rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="'ARTS_SPORT'">sports_soccer</span>
+<span class="material-symbols-outlined bg-surface-container-high text-on-surface-variant rounded-lg h-8 w-8 flex items-center justify-center text-[18px]" th:case="*">school</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${row.matiere.nom}">Nom</p>
+<p class="text-xs text-on-surface-variant" th:text="'Coef. ' + ${row.matiere.coefficient} + ' • ' + ${row.nbEnseignants} + ' enseignant(s)'">Coef</p>
+</div>
+</div>
+<div class="flex gap-xs shrink-0">
+<button class="p-xs text-on-surface-variant bouton-modifier" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<form method="post" th:action="@{/matieres/{id}/supprimer(id=${row.matiere.id})}" onsubmit="return confirm('Supprimer cette matière ?');">
+<button class="p-xs text-error" type="submit"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</form>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-lg text-center text-on-surface-variant text-sm" th:if="${nbMatieres == 0}">
+Aucune matière enregistrée. Cliquez sur « Nouvelle » pour commencer.
+</div>
+<p class="hidden text-center text-on-surface-variant py-lg text-sm" id="aucun-resultat-matieres-mobile">Aucune matière ne correspond à votre recherche.</p>
+</div>
+</main>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <!-- Menu lateral -->
 <aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
 <div class="px-lg mb-xl">
@@ -284,6 +413,7 @@ Aucune matiere enregistree pour l'instant. Cliquez sur « Nouvelle Matiere » po
 <p class="hidden text-center text-on-surface-variant py-xl font-body-md text-body-md" id="aucun-resultat-matieres">Aucune matiere ne correspond a votre recherche.</p>
 </div>
 </main>
+</div>
 
 <!-- Modal Classe -->
 <div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-classe">
@@ -417,11 +547,27 @@ Aucune matiere enregistree pour l'instant. Cliquez sur « Nouvelle Matiere » po
         });
     });
 
-    // Recherche client-cote sur les classes et matieres visibles dans l'onglet actif
-    document.getElementById('recherche-academique').addEventListener('input', function (e) {
-        var terme = e.target.value.trim().toLowerCase();
-        var cartesClasses = document.querySelectorAll('#content-classes .carte-recherche');
-        var lignesMatieres = document.querySelectorAll('#content-matieres .carte-recherche');
+    function switchTabMobile(tab) {
+        const ct = document.getElementById('tab-classes-mobile');
+        const mt = document.getElementById('tab-matieres-mobile');
+        const cc = document.getElementById('content-classes-mobile');
+        const mc = document.getElementById('content-matieres-mobile');
+        if (tab === 'classes') {
+            ct.classList.add('bg-primary', 'text-on-primary'); ct.classList.remove('text-on-surface-variant');
+            mt.classList.remove('bg-primary', 'text-on-primary'); mt.classList.add('text-on-surface-variant');
+            cc.classList.remove('hidden'); mc.classList.add('hidden');
+        } else {
+            mt.classList.add('bg-primary', 'text-on-primary'); mt.classList.remove('text-on-surface-variant');
+            ct.classList.remove('bg-primary', 'text-on-primary'); ct.classList.add('text-on-surface-variant');
+            mc.classList.remove('hidden'); cc.classList.add('hidden');
+        }
+    }
+
+    // Recherche client-cote sur les classes et matieres visibles (mobile + desktop)
+    function appliquerRechercheAcademique(terme) {
+        terme = terme.trim().toLowerCase();
+        var cartesClasses = document.querySelectorAll('#content-classes .carte-recherche, #content-classes-mobile .carte-recherche');
+        var lignesMatieres = document.querySelectorAll('#content-matieres .carte-recherche, #content-matieres-mobile .carte-recherche');
         var visiblesClasses = 0;
         cartesClasses.forEach(function (el) {
             var visible = el.getAttribute('data-recherche').indexOf(terme) !== -1;
@@ -429,6 +575,7 @@ Aucune matiere enregistree pour l'instant. Cliquez sur « Nouvelle Matiere » po
             if (visible) visiblesClasses++;
         });
         document.getElementById('aucun-resultat-classes').classList.toggle('hidden', !(terme && visiblesClasses === 0 && cartesClasses.length > 0));
+        document.getElementById('aucun-resultat-classes-mobile').classList.toggle('hidden', !(terme && visiblesClasses === 0 && cartesClasses.length > 0));
         var visiblesMatieres = 0;
         lignesMatieres.forEach(function (el) {
             var visible = el.getAttribute('data-recherche').indexOf(terme) !== -1;
@@ -436,7 +583,10 @@ Aucune matiere enregistree pour l'instant. Cliquez sur « Nouvelle Matiere » po
             if (visible) visiblesMatieres++;
         });
         document.getElementById('aucun-resultat-matieres').classList.toggle('hidden', !(terme && visiblesMatieres === 0 && lignesMatieres.length > 0));
-    });
+        document.getElementById('aucun-resultat-matieres-mobile').classList.toggle('hidden', !(terme && visiblesMatieres === 0 && lignesMatieres.length > 0));
+    }
+    document.getElementById('recherche-academique').addEventListener('input', function (e) { appliquerRechercheAcademique(e.target.value); });
+    document.getElementById('recherche-academique-mobile').addEventListener('input', function (e) { appliquerRechercheAcademique(e.target.value); });
 </script>
 </body>
 </html>
