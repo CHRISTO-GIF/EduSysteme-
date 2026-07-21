@@ -60,7 +60,7 @@
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen">
 <!-- Menu lateral -->
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">
 <span class="material-symbols-outlined text-on-primary-fixed text-headline-sm" style="font-variation-settings: 'FILL' 1;">school</span>
@@ -110,8 +110,9 @@
 </div>
 </aside>
 <!-- Barre superieure -->
-<header class="h-16 fixed top-0 right-0 left-[260px] bg-surface-container-lowest flex justify-between items-center px-lg border-b border-outline-variant z-40">
-<form action="/recherche" class="flex items-center flex-1 max-w-xl" method="get">
+<header class="h-16 fixed top-0 right-0 left-0 md:left-[260px] bg-surface-container-lowest flex justify-between items-center px-md md:px-lg border-b border-outline-variant z-40">
+<span class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">Notes</span>
+<form action="/recherche" class="hidden md:flex items-center flex-1 max-w-xl" method="get">
 <div class="relative w-full">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-full pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200 text-body-md" name="q" placeholder="Rechercher des eleves, classes ou rapports..." type="text"/>
@@ -134,7 +135,7 @@
 </div>
 </header>
 <!-- Contenu principal -->
-<main class="ml-[260px] pt-16 p-lg">
+<main class="ml-0 md:ml-[260px] pt-16 p-md md:p-lg">
 <div class="max-w-[1440px] mx-auto">
 <div class="mb-lg">
 <nav class="flex text-label-sm text-on-surface-variant mb-xs gap-1 items-center">
@@ -146,7 +147,7 @@
 </nav>
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
 <h1 class="font-headline-lg text-headline-lg text-on-surface">Gestion des Notes</h1>
-<div class="flex items-center gap-sm" th:if="${eleves != null}">
+<div class="flex items-center gap-sm flex-wrap" th:if="${eleves != null}">
 <button class="flex items-center gap-xs px-md py-2 border border-outline text-on-surface hover:bg-surface-container-high transition-all rounded-lg font-label-md" type="button">
 <span class="material-symbols-outlined text-[20px]">download</span> Exporter le bulletin
 </button>
@@ -268,7 +269,7 @@
 <input name="coefficient" th:value="${selectedCoefficient}" type="hidden"/>
 <input name="dateEvaluation" th:value="${selectedDate}" type="hidden"/>
 <div class="overflow-x-auto">
-<table class="w-full text-left zebra-table">
+<table class="w-full min-w-[560px] text-left zebra-table">
 <thead class="bg-surface-container-high sticky top-0 z-10">
 <tr>
 <th class="px-lg py-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Eleve</th>
@@ -309,7 +310,7 @@
 </form>
 </div>
 <div class="h-24" th:if="${eleves != null}"></div>
-<div class="fixed bottom-0 right-0 left-[260px] z-30 bg-surface-container-lowest border-t border-outline-variant shadow-lg px-lg py-md flex items-center justify-between flex-wrap gap-md" th:if="${eleves != null}">
+<div class="fixed bottom-0 right-0 left-0 md:left-[260px] z-30 bg-surface-container-lowest border-t border-outline-variant shadow-lg px-md md:px-lg py-md flex items-center justify-between flex-wrap gap-md" th:if="${eleves != null}">
 <p class="text-label-sm font-label-sm text-on-surface-variant" th:text="${nbNotesSaisies} + ' / ' + ${eleves.size()} + ' notes saisies'">0 / 0 notes saisies</p>
 <div class="flex items-center gap-sm">
 <button class="flex items-center gap-xs px-md py-2 border border-outline text-on-surface hover:bg-surface-container-high transition-all rounded-lg font-label-md" form="grades-form" name="statut" type="submit" value="BROUILLON">
