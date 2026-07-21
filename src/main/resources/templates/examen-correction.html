@@ -41,29 +41,29 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-surface text-on-surface font-body-md h-screen flex flex-col overflow-hidden">
-<header class="bg-surface border-b border-outline-variant w-full h-16 flex justify-between items-center px-lg z-50">
-<div class="flex items-center gap-md">
-<span class="font-headline-md text-headline-md font-bold text-primary">EduSystem Pro</span>
-<div class="h-6 w-px bg-outline-variant mx-sm"></div>
-<div class="flex flex-col">
-<span class="font-label-md text-label-md text-on-surface">Correction de l'Examen</span>
+<body class="bg-surface text-on-surface font-body-md flex flex-col md:h-screen overflow-y-auto md:overflow-hidden">
+<header class="bg-surface border-b border-outline-variant w-full h-16 flex justify-between items-center px-md md:px-lg z-50">
+<div class="flex items-center gap-md min-w-0">
+<span class="hidden md:inline font-headline-md text-headline-md font-bold text-primary">EduSystem Pro</span>
+<div class="hidden md:block h-6 w-px bg-outline-variant mx-sm"></div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Correction de l'Examen</span>
 <span class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold" th:text="'Trimestre ' + ${examen.trimestre}">Trimestre</span>
 </div>
 </div>
-<div class="flex items-center gap-lg">
-<div class="flex items-center gap-sm bg-surface-container-low px-md py-xs rounded-full border border-outline-variant">
+<div class="flex items-center gap-md md:gap-lg shrink-0">
+<div class="hidden sm:flex items-center gap-sm bg-surface-container-low px-md py-xs rounded-full border border-outline-variant">
 <span class="material-symbols-outlined text-[20px] text-primary">person</span>
 <span class="font-label-sm text-label-sm" th:text="${utilisateurConnecte != null ? utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom : ''}">Utilisateur</span>
 </div>
 <a class="flex items-center gap-xs px-md py-sm border border-outline-variant rounded font-label-md text-label-md hover:bg-surface-container-low transition-all" th:href="@{/examens}">
-<span class="material-symbols-outlined text-[18px]">close</span> Fermer
+<span class="material-symbols-outlined text-[18px]">close</span> <span class="hidden sm:inline">Fermer</span>
 </a>
 </div>
 </header>
-<div class="flex flex-1 overflow-hidden">
+<div class="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
 <main class="flex-1 flex flex-col min-w-0 bg-surface-container-low">
-<div class="px-xl py-md bg-surface border-b border-outline-variant flex justify-between items-center flex-wrap gap-md">
+<div class="px-md md:px-xl py-md bg-surface border-b border-outline-variant flex justify-between items-center flex-wrap gap-md">
 <div class="flex items-center gap-xl flex-wrap">
 <div class="flex flex-col">
 <h1 class="font-headline-sm text-headline-sm text-primary" th:text="${eleveActuel.prenom} + ' ' + ${eleveActuel.nom}">Eleve</h1>
@@ -92,8 +92,8 @@ Suivant <span class="material-symbols-outlined text-[20px]">chevron_right</span>
 
 <div th:if="${successMsg}" class="mx-xl mt-md p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
 
-<div class="flex-1 overflow-auto p-xl flex justify-center">
-<div class="w-full max-w-3xl bg-white rounded-xl border border-outline-variant p-xl">
+<div class="flex-1 overflow-auto p-md md:p-xl flex justify-center">
+<div class="w-full max-w-3xl bg-white rounded-xl border border-outline-variant p-md md:p-xl">
 <div class="border-b-2 border-outline-variant pb-md mb-xl flex justify-between items-end">
 <div>
 <p class="font-bold text-lg">Copie de l'eleve</p>
@@ -114,7 +114,7 @@ Aucune copie numerisee n'est associee a cette evaluation. Utilisez le bareme ci-
 </div>
 </main>
 
-<aside class="w-[380px] bg-white border-l border-outline-variant flex flex-col">
+<aside class="w-full md:w-[380px] bg-white border-t md:border-t-0 md:border-l border-outline-variant flex flex-col">
 <div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
 <h2 class="font-headline-sm text-headline-sm text-primary">Bareme &amp; Notes</h2>
 <a class="text-on-surface-variant hover:text-primary" th:href="@{/examens/{id}/bareme(id=${examen.id})}" title="Modifier le bareme">
