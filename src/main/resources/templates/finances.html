@@ -45,7 +45,7 @@
 </head>
 <body class="bg-background text-on-surface">
 <div class="flex h-screen overflow-hidden">
-<aside class="fixed left-0 top-0 h-full w-[260px] bg-tertiary border-r border-outline-variant flex flex-col z-50">
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-[260px] bg-tertiary border-r border-outline-variant flex-col z-50">
 <div class="p-lg">
 <div class="flex items-center gap-sm mb-xl">
 <div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center">
@@ -100,23 +100,24 @@ Nouvelle Transaction
 </div>
 </div>
 </aside>
-<main class="ml-[260px] flex-1 flex flex-col h-screen bg-surface">
-<header class="h-16 flex items-center justify-between px-lg bg-surface border-b border-outline-variant sticky top-0 z-40">
+<main class="ml-0 md:ml-[260px] flex-1 flex flex-col h-screen bg-surface">
+<header class="h-16 flex items-center justify-between px-md md:px-lg bg-surface border-b border-outline-variant sticky top-0 z-40">
 <div class="flex items-center flex-1 max-w-xl">
-<div class="relative w-full">
+<span class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">Finances</span>
+<div class="hidden md:block relative w-full">
 <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-base pl-xl pr-md text-body-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Rechercher des rapports ou transactions..." type="text"/>
 </div>
 </div>
-<div class="flex items-center gap-lg">
-<div class="flex items-center gap-md text-secondary">
+<div class="flex items-center gap-md md:gap-lg">
+<div class="hidden md:flex items-center gap-md text-secondary">
 <button class="hover:text-primary transition-colors duration-200">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
-<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<div class="hidden md:block h-8 w-[1px] bg-outline-variant mx-sm"></div>
 <div class="flex items-center gap-md">
-<a class="bg-primary-container text-on-primary-container px-md py-sm rounded font-label-md hover:opacity-90 transition-all flex items-center gap-xs" th:href="@{/export/notes/excel(trimestre=1)}">
+<a class="hidden sm:flex bg-primary-container text-on-primary-container px-md py-sm rounded font-label-md hover:opacity-90 transition-all items-center gap-xs" th:href="@{/export/notes/excel(trimestre=1)}">
 <span class="material-symbols-outlined text-[18px]">download</span>
 Exporter le Rapport
 </a>
@@ -124,7 +125,7 @@ Exporter le Rapport
 </div>
 </div>
 </header>
-<div class="flex-1 overflow-y-auto p-lg space-y-lg max-w-container-max mx-auto w-full">
+<div class="flex-1 overflow-y-auto p-md md:p-lg space-y-lg max-w-container-max mx-auto w-full">
 
 <div class="flex justify-between items-end flex-wrap gap-md">
 <div>
@@ -265,7 +266,7 @@ Envoyer Rappels Automatiques
 <div class="p-lg border-b border-outline-variant flex items-center justify-between">
 <h4 class="font-headline-sm text-on-surface">Transactions Recentes</h4>
 </div>
-<div class="overflow-x-auto">
+<div class="overflow-x-auto hidden md:block">
 <table class="w-full text-left border-collapse">
 <thead class="bg-surface-container-low">
 <tr>
@@ -292,11 +293,11 @@ Envoyer Rappels Automatiques
 </td>
 <td class="px-lg py-md text-right">
 <div class="flex items-center justify-end gap-xs">
-<a class="p-1.5 text-primary hover:bg-primary/10 rounded-full transition-colors opacity-0 group-hover:opacity-100" th:href="@{/finances/paiements/{id}/recu(id=${t.id})}" th:onclick="'event.stopPropagation()'" title="Voir / imprimer le recu">
+<a class="p-1.5 text-primary hover:bg-primary/10 rounded-full transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100" th:href="@{/finances/paiements/{id}/recu(id=${t.id})}" th:onclick="'event.stopPropagation()'" title="Voir / imprimer le recu">
 <span class="material-symbols-outlined text-[20px]">print</span>
 </a>
 <form method="post" th:action="@{/finances/paiements/{id}/supprimer(id=${t.id})}" th:onclick="'event.stopPropagation()'" onsubmit="return confirm('Supprimer cette transaction ? Cette action est irreversible.');">
-<button class="p-1.5 text-error hover:bg-error-container/30 rounded-full transition-colors opacity-0 group-hover:opacity-100" type="submit" title="Supprimer">
+<button class="p-1.5 text-error hover:bg-error-container/30 rounded-full transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100" type="submit" title="Supprimer">
 <span class="material-symbols-outlined text-[20px]">delete</span>
 </button>
 </form>
@@ -308,6 +309,25 @@ Envoyer Rappels Automatiques
 </tr>
 </tbody>
 </table>
+</div>
+<div class="md:hidden divide-y divide-outline-variant/30">
+<p class="p-lg text-center text-secondary text-sm" th:if="${dernieresTransactions.isEmpty()}">Aucun paiement enregistre.</p>
+<div class="p-md" th:each="t : ${dernieresTransactions}">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-medium text-sm" th:text="${t.eleve != null ? t.eleve.nom + ' ' + t.eleve.prenom : '?'}">Eleve</p>
+<span class="font-bold text-green-600 text-sm shrink-0" th:text="'+ ' + ${#numbers.formatDecimal(t.montantVerse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</span>
+</div>
+<p class="text-xs text-secondary mb-sm" th:text="${#temporals.format(t.datePaiement, 'dd MMM yyyy')}">Date</p>
+<div class="flex items-center justify-between">
+<span class="bg-primary/5 text-primary text-label-sm px-sm py-xs rounded" th:text="${t.typePaiement}">Categorie</span>
+<div class="flex items-center gap-md">
+<a class="text-primary text-xs font-bold uppercase" th:href="@{/finances/paiements/{id}/recu(id=${t.id})}">Recu</a>
+<form method="post" th:action="@{/finances/paiements/{id}/supprimer(id=${t.id})}" onsubmit="return confirm('Supprimer cette transaction ? Cette action est irreversible.');">
+<button class="text-error text-xs font-bold uppercase" type="submit">Supprimer</button>
+</form>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
