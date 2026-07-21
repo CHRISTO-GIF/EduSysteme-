@@ -48,7 +48,7 @@
 </head>
 <body class="bg-surface text-on-surface">
 <!-- Menu lateral -->
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">
 <div class="w-10 h-10 rounded bg-primary-fixed flex items-center justify-center">
@@ -97,10 +97,11 @@
 </div>
 </aside>
 
-<div class="ml-sidebar-width min-h-screen flex flex-col">
-<header class="h-16 fixed top-0 right-0 left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg w-full z-40">
-<div class="flex items-center gap-md w-1/3">
-<div class="relative w-full max-w-sm">
+<div class="ml-0 md:ml-sidebar-width min-h-screen flex flex-col">
+<header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-md md:px-lg w-full z-40">
+<div class="flex items-center gap-md w-1/2 md:w-1/3">
+<span class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">Emploi</span>
+<div class="hidden md:block relative w-full max-w-sm">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
 <input class="w-full bg-surface-container-high border-none rounded-lg pl-10 py-2 font-body-md text-body-md focus:ring-1 focus:ring-primary" id="recherche-creneau" placeholder="Rechercher un cours, une salle..." type="text"/>
 </div>
@@ -119,7 +120,7 @@
 </div>
 </header>
 
-<main class="mt-16 p-lg max-w-container-max mx-auto w-full flex-1">
+<main class="mt-16 p-md md:p-lg max-w-container-max mx-auto w-full flex-1">
 <div th:if="${success}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${success}"></div>
 <div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
 
@@ -176,6 +177,8 @@
 
 <!-- Grille de l'emploi du temps -->
 <div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<div class="min-w-[700px]">
 <div class="grid grid-cols-[100px_repeat(6,1fr)] border-b border-outline-variant bg-surface-container-low">
 <div class="p-md text-center border-r border-outline-variant">
 <span class="font-label-sm text-label-sm text-on-surface-variant">HEURE</span>
@@ -201,7 +204,7 @@
 <p class="font-label-md text-label-md text-on-primary-fixed" th:text="${(cr.matiere != null ? cr.matiere.nom : '?') + (classeId == null ? ' — ' + (cr.classe != null ? cr.classe.nom : '') : '')}">Matiere</p>
 <form method="post" th:action="@{/emploi-du-temps/{id}/supprimer(id=${cr.id})}">
 <input name="classeId" th:if="${classeId != null}" th:value="${classeId}" type="hidden"/>
-<button class="opacity-0 group-hover:opacity-100 text-on-primary-fixed-variant hover:text-error transition-opacity" title="Supprimer" type="submit">
+<button class="opacity-100 md:opacity-0 md:group-hover:opacity-100 text-on-primary-fixed-variant hover:text-error transition-opacity" title="Supprimer" type="submit">
 <span class="material-symbols-outlined text-sm">delete</span>
 </button>
 </form>
@@ -214,11 +217,13 @@
 </div>
 </div>
 </div>
+</div>
+</div>
 
 </main>
 
 <!-- Pied de page : notifications reelles (conflits d'emploi du temps) -->
-<footer class="border-t border-outline-variant bg-surface-container-lowest ml-sidebar-width">
+<footer class="border-t border-outline-variant bg-surface-container-lowest ml-0 md:ml-sidebar-width">
 <div class="max-w-container-max mx-auto px-lg py-md">
 <div class="flex items-center justify-between flex-wrap gap-sm">
 <span class="text-[10px] text-on-surface-variant uppercase tracking-widest opacity-50">EduSystem Pro — <span th:text="${nomEtab}">Etablissement</span></span>
@@ -254,7 +259,7 @@
 </button>
 </div>
 <form class="p-xl space-y-lg" id="form-ajout-creneau" method="post" th:action="@{/emploi-du-temps}">
-<div class="grid grid-cols-2 gap-lg">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-lg">
 <div class="space-y-xs">
 <label class="font-label-md text-label-md text-on-surface">Matiere</label>
 <select class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all" name="matiereId" required="required">
@@ -270,7 +275,7 @@
 </select>
 </div>
 </div>
-<div class="grid grid-cols-2 gap-lg">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-lg">
 <div class="space-y-xs">
 <label class="font-label-md text-label-md text-on-surface">Enseignant</label>
 <select class="w-full h-11 px-md bg-white border border-outline rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all" id="select-enseignant">
@@ -297,7 +302,7 @@
 <span class="material-symbols-outlined">schedule</span>
 <span class="font-label-md text-label-md">Planification temporelle</span>
 </div>
-<div class="grid grid-cols-3 gap-md">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-md">
 <div class="space-y-xs">
 <label class="font-label-sm text-label-sm text-secondary">Jour de la semaine</label>
 <select class="w-full h-10 px-sm bg-white border border-outline rounded font-body-md text-body-md" id="select-jour" name="jour" required="required">
@@ -358,7 +363,7 @@
 
 <div th:if="${importErreurFichier}" class="mx-xl mt-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${importErreurFichier}"></div>
 
-<div class="px-xl py-lg grid grid-cols-3 gap-md bg-surface-container-low" th:if="${importErreurFichier == null}">
+<div class="px-xl py-lg grid grid-cols-1 sm:grid-cols-3 gap-md bg-surface-container-low" th:if="${importErreurFichier == null}">
 <div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant flex items-center gap-md">
 <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary">analytics</span></div>
 <div><p class="text-on-surface-variant font-label-sm text-label-sm">Total Detecte</p><p class="font-headline-md text-headline-md text-primary" th:text="${importTotal}">0</p></div>
