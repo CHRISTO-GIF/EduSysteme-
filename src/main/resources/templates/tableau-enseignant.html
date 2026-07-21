@@ -46,6 +46,106 @@
     </script>
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="tableau-enseignant-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-sm" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'E'}">E</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface" th:text="${utilisateurConnecte != null} ? 'Bonjour, ' + ${utilisateurConnecte.prenom} : 'Bonjour'">Bonjour</h2>
+<p class="text-on-surface-variant text-sm mt-xs">Vos classes et matières pour l'année en cours.</p>
+</section>
+
+<div class="grid grid-cols-3 gap-sm">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<span class="material-symbols-outlined text-primary text-[20px]">groups</span>
+<div class="font-headline-sm text-headline-sm text-primary mt-xs" th:text="${totalClasses}">0</div>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider">Classes</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<span class="material-symbols-outlined text-primary text-[20px]">menu_book</span>
+<div class="font-headline-sm text-headline-sm text-primary mt-xs" th:text="${totalMatieres}">0</div>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider">Matières</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<span class="material-symbols-outlined text-primary text-[20px]">school</span>
+<div class="font-headline-sm text-headline-sm text-primary mt-xs" th:text="${totalEleves}">0</div>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider">Élèves</span>
+</div>
+</div>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Mes Classes &amp; Matières</h3>
+</div>
+<div th:if="${!hasAutorisations}" class="p-lg text-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[36px] text-outline mb-sm">info</span>
+<p class="text-sm">Aucune autorisation d'enseignement ne vous a encore été attribuée.</p>
+</div>
+<div class="divide-y divide-outline-variant" th:if="${hasAutorisations}">
+<a class="px-md py-sm flex items-center justify-between gap-sm active:bg-surface-container-low transition-colors" th:each="auth : ${autorisations}" th:href="@{/notes/saisie(classeId=${auth.classeId},matiereId=${auth.matiereId})}">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${classeMap.get(auth.classeId) != null ? classeMap.get(auth.classeId).nom : '?'}">Classe</p>
+<p class="text-xs text-on-surface-variant truncate" th:text="${matiereMap.get(auth.matiereId) != null ? matiereMap.get(auth.matiereId).nom : '?'}">Matiere</p>
+</div>
+<span class="material-symbols-outlined text-outline shrink-0">chevron_right</span>
+</a>
+</div>
+</section>
+
+<section class="grid grid-cols-2 gap-sm">
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center gap-sm" th:href="@{/tableau-enseignant/eleves}">
+<span class="material-symbols-outlined text-primary text-[24px]">group</span>
+<span class="font-label-md text-label-sm text-center">Mes Élèves</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center gap-sm" th:href="@{/surveillance}">
+<span class="material-symbols-outlined text-primary text-[24px]">fact_check</span>
+<span class="font-label-md text-label-sm text-center">Surveillance</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center gap-sm" th:href="@{/examens}">
+<span class="material-symbols-outlined text-primary text-[24px]">quiz</span>
+<span class="font-label-md text-label-sm text-center">Examens</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center gap-sm" th:href="@{/messagerie}">
+<span class="material-symbols-outlined text-primary text-[24px]">forum</span>
+<span class="font-label-md text-label-sm text-center">Messagerie</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center gap-sm" th:href="@{/bulletins}">
+<span class="material-symbols-outlined text-primary text-[24px]">description</span>
+<span class="font-label-md text-label-sm text-center">Bulletins</span>
+</a>
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center gap-sm" th:href="@{/emploi-du-temps}">
+<span class="material-symbols-outlined text-primary text-[24px]">calendar_today</span>
+<span class="font-label-md text-label-sm text-center">Emploi du temps</span>
+</a>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/tableau-enseignant}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/tableau-enseignant/eleves}">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-sm text-label-sm">Élèves</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/notes/saisie}">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-sm text-label-sm">Notes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/emploi-du-temps}">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Planning</span>
+</a>
+</nav>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">
@@ -180,5 +280,6 @@
 
 </div>
 </main>
+</div>
 </body>
 </html>

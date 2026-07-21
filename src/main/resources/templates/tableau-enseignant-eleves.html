@@ -45,6 +45,114 @@
     </script>
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="te-eleves-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-sm" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'U'}">U</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface">Mes Élèves</h2>
+<p class="text-on-surface-variant text-sm">Élèves de vos classes et leurs coordonnées.</p>
+</section>
+
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<span class="material-symbols-outlined text-primary text-[20px]">groups</span>
+<p class="font-headline-sm text-headline-sm mt-xs" th:text="${totalEleves}">0</p>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider">Élèves</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<span class="material-symbols-outlined text-secondary text-[20px]">meeting_room</span>
+<p class="font-headline-sm text-headline-sm mt-xs" th:text="${totalClasses}">0</p>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider">Classes</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<span class="material-symbols-outlined text-[20px]">menu_book</span>
+<p class="font-headline-sm text-headline-sm mt-xs" th:text="${totalMatieres}">0</p>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider">Matières</span>
+</div>
+<div class="bg-primary text-on-primary rounded-xl p-md relative overflow-hidden">
+<span class="material-symbols-outlined text-[20px] relative z-10">event_busy</span>
+<p class="font-headline-sm text-headline-sm mt-xs relative z-10" th:text="${absencesCeMois}">0</p>
+<span class="text-[10px] uppercase tracking-wider relative z-10">Absences (mois)</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 text-[64px] opacity-10">event_busy</span>
+</div>
+</div>
+
+<form method="get" th:action="@{/tableau-enseignant/eleves}">
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-md py-2.5 text-sm" name="classeId" onchange="this.form.submit()">
+<option value="">Toutes mes classes</option>
+<option th:each="c : ${mesClasses}" th:selected="${selectedClasseId != null and selectedClasseId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</form>
+
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm" id="recherche-eleve-mobile" placeholder="Rechercher un élève..." type="text"/>
+</div>
+
+<div class="space-y-sm" id="grille-eleves-te-mobile">
+<a class="eleve-card-te-mobile bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-md active:bg-surface-container-high transition-colors" th:attr="data-nom=${e.nom + ' ' + e.prenom + ' ' + e.matricule}" th:each="e : ${eleves}" th:href="@{/notes/bulletin/{id}(id=${e.id})}">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold flex-shrink-0" th:text="${#strings.isEmpty(e.prenom) ? '' : #strings.substring(e.prenom,0,1)} + ${#strings.isEmpty(e.nom) ? '' : #strings.substring(e.nom,0,1)}">--</div>
+<div class="flex-1 overflow-hidden">
+<h4 class="font-headline-sm text-headline-sm text-primary truncate" th:text="${e.prenom} + ' ' + ${e.nom}">Nom</h4>
+<div class="flex items-center gap-sm mt-xs">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full" th:text="${e.classe != null ? e.classe.nom : '—'}">Classe</span>
+<span class="font-body-md text-body-md text-on-surface-variant truncate" th:text="${e.matricule}">Matricule</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline flex-shrink-0">description</span>
+</a>
+<p class="text-center text-on-surface-variant py-lg text-sm" id="aucun-resultat-te-mobile" style="display:none">Aucun élève ne correspond à cette recherche.</p>
+<p class="text-center text-on-surface-variant py-lg text-sm" th:if="${#lists.isEmpty(eleves)}">Aucun élève trouvé pour cette sélection.</p>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/tableau-enseignant}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/tableau-enseignant/eleves}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-sm text-label-sm">Élèves</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/notes/saisie}">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-sm text-label-sm">Notes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/emploi-du-temps}">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Planning</span>
+</a>
+</nav>
+</div>
+<!-- Recherche mobile -->
+<script>
+    (function() {
+        const recherche = document.getElementById('recherche-eleve-mobile');
+        const grille = document.getElementById('grille-eleves-te-mobile');
+        if (!recherche || !grille) return;
+        const cartes = Array.from(grille.querySelectorAll('.eleve-card-te-mobile'));
+        const aucunResultat = document.getElementById('aucun-resultat-te-mobile');
+        recherche.addEventListener('input', () => {
+            const q = recherche.value.toLowerCase().trim();
+            let visibleCount = 0;
+            cartes.forEach(c => {
+                const match = c.getAttribute('data-nom').toLowerCase().includes(q);
+                c.style.display = match ? '' : 'none';
+                if (match) visibleCount++;
+            });
+            if (aucunResultat) aucunResultat.style.display = (visibleCount === 0 && cartes.length > 0) ? '' : 'none';
+        });
+    })();
+</script>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <!-- Menu lateral -->
 <aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
 <div class="px-lg mb-xl">
@@ -227,6 +335,7 @@ Aucun eleve trouve pour cette selection.
 </div>
 </div>
 </main>
+</div>
 
 <script>
     // Recherche client (nom, prenom, matricule)

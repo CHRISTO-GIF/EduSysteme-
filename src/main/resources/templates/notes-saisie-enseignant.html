@@ -47,6 +47,366 @@
     </script>
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-24" id="notes-saisie-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduSystem Pro</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-sm" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'U'}">U</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface">Saisie des Notes</h2>
+
+<div th:if="${erreurAuth}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${erreurAuth}"></div>
+<div th:if="${param.saved}" class="p-md rounded-lg bg-secondary-container text-on-surface text-sm" th:text="${param.saved[0]} + ' note(s) enregistrée(s) avec succès.'"></div>
+
+<!-- Etape 1 : selection du contexte -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg" th:if="${eleves == null}">
+<h3 class="font-headline-sm text-headline-sm mb-md">Démarrer une session de saisie</h3>
+<form class="space-y-md" method="get" th:action="@{/notes/saisie}">
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant uppercase">Classe</label>
+<select class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2.5 text-sm" name="classeId" required="required">
+<option th:each="c : ${classes}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant uppercase">Matière</label>
+<select class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2.5 text-sm" name="matiereId" required="required">
+<option th:each="m : ${matieres}" th:text="${m.nom}" th:value="${m.id}"></option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant uppercase">Trimestre</label>
+<select class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2.5 text-sm" name="trimestre" required="required">
+<option value="1">Trimestre 1</option>
+<option value="2">Trimestre 2</option>
+<option value="3">Trimestre 3</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant uppercase">Type</label>
+<select class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2.5 text-sm" name="type" required="required">
+<option value="DEVOIR">Devoir</option>
+<option value="EXAMEN">Examen</option>
+<option value="PARTICIPATION">Participation</option>
+</select>
+</div>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant uppercase">Titre de l'évaluation</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2.5 text-sm" name="titre" placeholder="ex: Devoir Surveillé n°2" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant uppercase">Coefficient</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2.5 text-sm" min="0.5" name="coefficient" step="0.5" type="number" value="1"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-on-surface-variant uppercase">Date</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-2.5 text-sm" name="dateEvaluation" required="required" type="date"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary p-3 rounded-lg flex items-center justify-center gap-xs font-label-md" type="submit">
+<span class="material-symbols-outlined">play_arrow</span> Commencer la saisie
+</button>
+</form>
+</div>
+
+<!-- Etape 2 : saisie -->
+<div th:if="${eleves != null}" class="space-y-md">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<div class="grid grid-cols-2 gap-sm text-sm">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Classe</p>
+<p class="font-label-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[16px]">groups</span><span th:text="${classe != null ? classe.nom : '—'}">Classe</span></p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Matière</p>
+<p class="font-label-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[16px]">menu_book</span><span th:text="${matiere != null ? matiere.nom : '—'}">Matiere</span></p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Évaluation</p>
+<p class="font-label-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[16px]">assignment</span><span th:text="${selectedTitre != null ? selectedTitre : selectedType}">Eval</span></p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Date</p>
+<p class="font-label-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary text-[16px]">event</span><span th:text="${selectedDate}">Date</span></p>
+</div>
+</div>
+<a class="mt-sm inline-flex items-center gap-xs text-primary font-label-md text-sm" th:href="@{/notes/saisie}">
+<span class="material-symbols-outlined text-[16px]">tune</span> Modifier les filtres
+</a>
+</div>
+
+<div class="bg-primary text-on-primary rounded-xl p-md">
+<p class="font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider">Progression</p>
+<p class="font-headline-sm text-headline-sm" th:text="${nbNotesSaisies} + ' / ' + ${eleves.size()} + ' notes'">0 / 0</p>
+<div class="w-full bg-white/20 h-1.5 rounded-full overflow-hidden mt-sm">
+<div class="bg-white h-full" th:style="'width:' + (${eleves.size() > 0 ? (nbNotesSaisies * 100 / eleves.size()) : 0}) + '%'"></div>
+</div>
+</div>
+
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm" id="recherche-eleve-mobile" placeholder="Rechercher un élève..." type="text"/>
+</div>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-md py-2.5 text-sm" id="tri-select-mobile">
+<option value="nom-asc">Nom (A-Z)</option>
+<option value="nom-desc">Nom (Z-A)</option>
+<option value="note-desc">Note (haute-basse)</option>
+<option value="note-asc">Note (basse-haute)</option>
+</select>
+
+<form id="grades-form-mobile" method="post" th:action="@{/notes/saisie/batch}">
+<input name="matiereId" th:value="${selectedMatiereId}" type="hidden"/>
+<input name="classeId" th:value="${selectedClasseId}" type="hidden"/>
+<input name="trimestre" th:value="${selectedTrimestre}" type="hidden"/>
+<input name="type" th:value="${selectedType}" type="hidden"/>
+<input name="titre" th:value="${selectedTitre}" type="hidden"/>
+<input name="coefficient" th:value="${selectedCoefficient}" type="hidden"/>
+<input name="dateEvaluation" th:value="${selectedDate}" type="hidden"/>
+<div class="space-y-sm" id="tbody-eleves-mobile">
+<div class="row-eleve-mobile bg-surface-container-lowest border border-outline-variant rounded-xl p-md"
+     th:attr="data-nom=${e.nom + ' ' + e.prenom},data-statut=${noteParEleve[e.id] != null ? noteParEleve[e.id].statut : ''}"
+     th:each="e, iStat : ${eleves}">
+<div class="flex items-center gap-sm mb-sm">
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant font-bold text-[13px] shrink-0" th:text="${#strings.isEmpty(e.prenom) ? '' : #strings.substring(e.prenom,0,1)} + ${#strings.isEmpty(e.nom) ? '' : #strings.substring(e.nom,0,1)}">--</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${e.nom} + ' ' + ${e.prenom}">Nom</p>
+<p class="text-[11px] text-on-surface-variant" th:text="${e.matricule}">Matricule</p>
+</div>
+<span class="statut-icon-mobile material-symbols-outlined"
+      th:classappend="${noteParEleve[e.id] == null ? 'text-outline-variant' : (noteParEleve[e.id].statut == 'PUBLIE' ? 'text-green-600' : 'text-amber-500')}"
+      th:text="${noteParEleve[e.id] == null ? 'radio_button_unchecked' : (noteParEleve[e.id].statut == 'PUBLIE' ? 'check_circle' : 'edit_note')}">radio_button_unchecked</span>
+</div>
+<div class="flex items-center gap-sm">
+<input class="note-input-mobile w-16 bg-surface border border-outline-variant rounded-lg text-center font-bold py-1.5 text-sm shrink-0"
+       max="20" min="0" step="0.5"
+       th:attr="data-original=${noteParEleve[e.id] != null ? noteParEleve[e.id].valeur : ''}"
+       th:name="'note_' + ${e.id}"
+       th:value="${noteParEleve[e.id] != null ? noteParEleve[e.id].valeur : ''}"
+       type="number"/>
+<span class="text-xs text-on-surface-variant shrink-0">/20</span>
+<input class="commentaire-input-mobile flex-1 min-w-0 bg-transparent border-none focus:ring-0 p-0 text-xs text-on-surface-variant italic placeholder:text-outline-variant"
+       placeholder="Observation..."
+       th:name="'commentaire_' + ${e.id}"
+       th:value="${noteParEleve[e.id] != null ? noteParEleve[e.id].commentaire : ''}"
+       type="text"/>
+</div>
+</div>
+<p class="text-center text-on-surface-variant py-lg text-sm" id="pagination-info-mobile">Affichage</p>
+<div class="flex items-center justify-center gap-xs flex-wrap" id="pagination-pages-mobile"></div>
+</div>
+</form>
+</div>
+</main>
+
+<!-- Barre d'actions fixe (etape 2) -->
+<div class="fixed bottom-0 left-0 w-full z-30 bg-surface-container-lowest border-t border-outline-variant shadow-lg px-md py-sm space-y-sm" th:if="${eleves != null}">
+<div class="flex items-center gap-sm text-on-surface-variant justify-center">
+<span class="material-symbols-outlined text-[18px]" id="statut-icon-global-mobile">cloud_done</span>
+<p class="text-[11px] font-label-sm" id="statut-modifications-mobile">Aucune modification non enregistrée.</p>
+</div>
+<div class="flex items-center gap-sm">
+<button class="flex-1 flex items-center justify-center gap-xs px-2 py-2.5 border border-outline text-on-surface rounded-lg font-label-md text-xs" onclick="document.getElementById('import-file-input-mobile').click()" type="button">
+<span class="material-symbols-outlined text-[18px]">upload_file</span> Importer
+</button>
+<button class="flex-1 flex items-center justify-center gap-xs px-2 py-2.5 border border-outline text-on-surface rounded-lg font-label-md text-xs" form="grades-form-mobile" name="statut" type="submit" value="BROUILLON">
+<span class="material-symbols-outlined text-[18px]">save</span> Brouillon
+</button>
+<button class="flex-1 flex items-center justify-center gap-xs px-2 py-2.5 bg-primary text-on-primary rounded-lg font-label-md text-xs" form="grades-form-mobile" name="statut" type="submit" value="PUBLIE">
+<span class="material-symbols-outlined text-[18px]">publish</span> Publier
+</button>
+</div>
+</div>
+<form enctype="multipart/form-data" id="import-form-mobile" method="post" th:action="@{/notes/saisie/import}" th:if="${eleves != null}">
+<input name="matiereId" th:value="${selectedMatiereId}" type="hidden"/>
+<input name="classeId" th:value="${selectedClasseId}" type="hidden"/>
+<input name="trimestre" th:value="${selectedTrimestre}" type="hidden"/>
+<input name="type" th:value="${selectedType}" type="hidden"/>
+<input name="titre" th:value="${selectedTitre}" type="hidden"/>
+<input name="coefficient" th:value="${selectedCoefficient}" type="hidden"/>
+<input name="dateEvaluation" th:value="${selectedDate}" type="hidden"/>
+<input accept=".xlsx,.xls" class="hidden" id="import-file-input-mobile" name="fichier" onchange="document.getElementById('import-form-mobile').submit()" type="file"/>
+</form>
+
+<!-- Modale d'apercu d'importation (mobile) -->
+<div class="fixed inset-0 z-50 flex flex-col bg-surface" th:if="${importApercu != null}">
+<div class="px-md py-sm border-b border-outline-variant flex items-center justify-between shrink-0">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Importation des Notes</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate" th:text="'Fichier : ' + ${importFichierNom}">Fichier</p>
+</div>
+<a class="text-on-surface-variant p-2 shrink-0" th:href="@{/notes/saisie(matiereId=${selectedMatiereId},classeId=${selectedClasseId},trimestre=${selectedTrimestre},type=${selectedType},titre=${selectedTitre},coefficient=${selectedCoefficient},dateEvaluation=${selectedDate})}">
+<span class="material-symbols-outlined">close</span>
+</a>
+</div>
+<div class="px-md py-sm grid grid-cols-2 gap-sm bg-surface-container-low shrink-0">
+<div class="bg-surface-container-lowest p-sm rounded-lg border border-outline-variant">
+<p class="text-on-surface-variant text-[10px] uppercase">Total</p><p class="font-headline-sm text-headline-sm text-primary" th:text="${importTotal}">0</p>
+</div>
+<div class="bg-surface-container-lowest p-sm rounded-lg border border-outline-variant">
+<p class="text-on-surface-variant text-[10px] uppercase">Prêt</p><p class="font-headline-sm text-headline-sm text-green-600" th:text="${importPret}">0</p>
+</div>
+<div class="bg-surface-container-lowest p-sm rounded-lg border border-error-container">
+<p class="text-on-surface-variant text-[10px] uppercase">Erreurs</p><p class="font-headline-sm text-headline-sm text-error" th:text="${importErreurs}">0</p>
+</div>
+<div class="bg-surface-container-lowest p-sm rounded-lg border border-outline-variant">
+<p class="text-on-surface-variant text-[10px] uppercase">Moyenne</p><p class="font-headline-sm text-headline-sm" th:text="${importMoyenne}">0</p>
+</div>
+</div>
+<div class="flex-1 overflow-auto px-md py-sm space-y-xs" id="corps-import-mobile">
+<div class="ligne-import-mobile p-sm rounded-lg border border-outline-variant flex items-center justify-between gap-sm" th:classappend="${!ligne.valide} ? 'bg-error-container/10' : ''" th:each="ligne : ${importApercu}">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${ligne.nomComplet}">Nom</p>
+<p class="text-[11px] text-on-surface-variant" th:text="${ligne.matricule} + ' • ' + (${ligne.valeur != null ? ligne.valeur : '?'})">Info</p>
+</div>
+<span class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-[10px] uppercase font-bold shrink-0" th:if="${ligne.statut == 'VALIDE'}">Prêt</span>
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-1 rounded-full text-[10px] uppercase font-bold shrink-0" th:if="${ligne.statut == 'ELEVE_INCONNU'}">Inconnu</span>
+<span class="inline-flex items-center gap-1 bg-error-container text-on-error-container px-2 py-1 rounded-full text-[10px] uppercase font-bold shrink-0" th:if="${ligne.statut == 'NOTE_INVALIDE'}">Invalide</span>
+</div>
+</div>
+<div class="p-md bg-surface-container border-t border-outline-variant flex flex-col gap-sm shrink-0">
+<a class="w-full text-center px-lg py-2.5 rounded-lg border border-outline text-secondary font-label-md text-sm" th:href="@{/notes/saisie(matiereId=${selectedMatiereId},classeId=${selectedClasseId},trimestre=${selectedTrimestre},type=${selectedType},titre=${selectedTitre},coefficient=${selectedCoefficient},dateEvaluation=${selectedDate})}">
+Modifier le fichier
+</a>
+<form method="post" th:action="@{/notes/saisie/import/confirmer}">
+<input name="matiereId" th:value="${selectedMatiereId}" type="hidden"/>
+<input name="classeId" th:value="${selectedClasseId}" type="hidden"/>
+<input name="trimestre" th:value="${selectedTrimestre}" type="hidden"/>
+<input name="type" th:value="${selectedType}" type="hidden"/>
+<input name="coefficient" th:value="${selectedCoefficient}" type="hidden"/>
+<input name="dateEvaluation" th:value="${selectedDate}" type="hidden"/>
+<button class="w-full px-xl py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-sm flex items-center justify-center gap-sm" th:disabled="${importPret == 0}" type="submit">
+<span class="material-symbols-outlined text-[18px]">check_circle</span> Valider l'importation
+</button>
+</form>
+<a class="w-full text-center px-lg py-2 text-error font-label-md text-sm" th:href="@{/notes/saisie(matiereId=${selectedMatiereId},classeId=${selectedClasseId},trimestre=${selectedTrimestre},type=${selectedType},titre=${selectedTitre},coefficient=${selectedCoefficient},dateEvaluation=${selectedDate})}">
+Annuler
+</a>
+</div>
+</div>
+</div>
+<!-- Interactions version mobile -->
+<script>
+    (function() {
+        function maj() {
+            let modifs = 0;
+            document.querySelectorAll('.row-eleve-mobile').forEach(row => {
+                const input = row.querySelector('.note-input-mobile');
+                const icon = row.querySelector('.statut-icon-mobile');
+                const original = input.getAttribute('data-original') || '';
+                const statutServeur = row.getAttribute('data-statut') || '';
+                icon.classList.remove('text-outline-variant', 'text-green-600', 'text-amber-500');
+                if (input.value !== original) {
+                    if (input.value) {
+                        icon.textContent = 'edit_note';
+                        icon.classList.add('text-amber-500');
+                    } else {
+                        icon.textContent = 'radio_button_unchecked';
+                        icon.classList.add('text-outline-variant');
+                    }
+                    modifs++;
+                } else if (input.value) {
+                    if (statutServeur === 'PUBLIE') {
+                        icon.textContent = 'check_circle';
+                        icon.classList.add('text-green-600');
+                    } else {
+                        icon.textContent = 'edit_note';
+                        icon.classList.add('text-amber-500');
+                    }
+                } else {
+                    icon.textContent = 'radio_button_unchecked';
+                    icon.classList.add('text-outline-variant');
+                }
+            });
+            const statutTxt = document.getElementById('statut-modifications-mobile');
+            const statutIcon = document.getElementById('statut-icon-global-mobile');
+            if (!statutTxt || !statutIcon) return;
+            if (modifs > 0) {
+                statutTxt.textContent = modifs + ' modification(s) non enregistrée(s).';
+                statutIcon.textContent = 'cloud_off';
+            } else {
+                statutTxt.textContent = 'Aucune modification non enregistrée.';
+                statutIcon.textContent = 'cloud_done';
+            }
+        }
+        document.querySelectorAll('.note-input-mobile').forEach(i => i.addEventListener('input', maj));
+        maj();
+
+        const recherche = document.getElementById('recherche-eleve-mobile');
+        const triSelect = document.getElementById('tri-select-mobile');
+        const PAGE_SIZE = 10;
+        const paginationState = { page: 1 };
+        const tbody = document.getElementById('tbody-eleves-mobile');
+        const allRows = tbody ? Array.from(tbody.querySelectorAll('.row-eleve-mobile')) : [];
+
+        function render() {
+            if (!tbody) return;
+            const q = (recherche ? recherche.value : '').toLowerCase().trim();
+            let visibles = allRows.filter(r => r.getAttribute('data-nom').toLowerCase().includes(q));
+
+            const tri = triSelect ? triSelect.value : 'nom-asc';
+            visibles.sort((a, b) => {
+                if (tri.startsWith('nom')) {
+                    const cmp = a.getAttribute('data-nom').localeCompare(b.getAttribute('data-nom'));
+                    return tri === 'nom-asc' ? cmp : -cmp;
+                } else {
+                    const va = parseFloat(a.querySelector('.note-input-mobile').value) || -1;
+                    const vb = parseFloat(b.querySelector('.note-input-mobile').value) || -1;
+                    return tri === 'note-desc' ? vb - va : va - vb;
+                }
+            });
+
+            allRows.forEach(r => r.style.display = 'none');
+            const totalPages = Math.max(1, Math.ceil(visibles.length / PAGE_SIZE));
+            if (paginationState.page > totalPages) paginationState.page = totalPages;
+            const start = (paginationState.page - 1) * PAGE_SIZE;
+            const pageRows = visibles.slice(start, start + PAGE_SIZE);
+            pageRows.forEach(r => { r.style.display = ''; tbody.insertBefore(r, document.getElementById('pagination-info-mobile')); });
+
+            const infoEl = document.getElementById('pagination-info-mobile');
+            if (infoEl) {
+                infoEl.textContent = visibles.length === 0
+                    ? 'Aucun élève trouvé.'
+                    : `Affichage de ${start + 1} à ${Math.min(start + PAGE_SIZE, visibles.length)} sur ${visibles.length} élève(s).`;
+            }
+
+            const pagesEl = document.getElementById('pagination-pages-mobile');
+            if (pagesEl) {
+                pagesEl.innerHTML = '';
+                for (let p = 1; p <= totalPages; p++) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = p;
+                    btn.className = p === paginationState.page
+                        ? 'px-3 py-1 rounded bg-primary text-on-primary text-sm font-bold'
+                        : 'px-3 py-1 border border-outline-variant rounded text-sm';
+                    btn.addEventListener('click', () => { paginationState.page = p; render(); });
+                    pagesEl.appendChild(btn);
+                }
+            }
+        }
+        if (recherche) recherche.addEventListener('input', () => { paginationState.page = 1; render(); });
+        if (triSelect) triSelect.addEventListener('change', () => { paginationState.page = 1; render(); });
+        render();
+
+        var lignesImport = Array.prototype.slice.call(document.querySelectorAll('#corps-import-mobile .ligne-import-mobile'));
+        if (lignesImport.length > 0) {
+            var parPage = 15;
+            lignesImport.forEach(function (ligne, i) {
+                ligne.style.display = i < parPage ? '' : 'none';
+            });
+        }
+    })();
+</script>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <!-- Menu lateral -->
 <aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
 <div class="px-lg mb-xl">
@@ -422,6 +782,7 @@ Annuler
 <span class="material-symbols-outlined text-[18px]">check_circle</span> Valider l'importation
 </button>
 </form>
+</div>
 </div>
 </div>
 </div>
