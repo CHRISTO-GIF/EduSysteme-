@@ -31,6 +31,49 @@
 </script>
 </head>
 <body class="bg-background font-body-md text-on-background min-h-screen flex">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="surv-zones-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<a class="p-1 -ml-1" th:href="@{/surveillant}"><span class="material-symbols-outlined">arrow_back</span></a>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Zones de l'école</h1>
+<span class="w-8"></span>
+</header>
+<main class="px-md pt-md space-y-lg pb-8">
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container text-sm" th:text="${successMsg}"></div>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-md">Ajouter une zone</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/surveillant/zones}">
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Nom de la zone</label>
+<input class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" name="nom" placeholder="Ex : Cour Est" required="required" type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<input class="rounded" id="zoneInterdite-mobile" name="zoneInterdite" type="checkbox" value="true"/>
+<label class="text-sm" for="zoneInterdite-mobile">Zone interdite d'accès</label>
+</div>
+<button class="mt-1 bg-primary text-on-primary font-label-md py-3 rounded-lg" type="submit">Ajouter la zone</button>
+</form>
+</section>
+
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm px-xs">Zones enregistrées</h3>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between gap-sm" th:each="z : ${zones}">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${z.nom}">Zone</p>
+<span th:if="${z.zoneInterdite}" class="px-2 py-0.5 bg-error text-on-error rounded-full text-[10px] font-bold uppercase">Interdite</span>
+<span th:unless="${z.zoneInterdite}" class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase">Libre</span>
+</div>
+<form method="post" th:action="@{/surveillant/zones/{id}/toggle(id=${z.id})}">
+<button class="text-primary font-label-md text-xs shrink-0" type="submit" th:text="${z.zoneInterdite} ? 'Rendre libre' : 'Marquer interdite'">Basculer</button>
+</form>
+</div>
+<p th:if="${#lists.isEmpty(zones)}" class="text-center text-outline py-lg text-sm">Aucune zone enregistrée.</p>
+</section>
+</main>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
 <div class="px-md mb-xl">
 <div class="flex items-center gap-sm">
@@ -101,6 +144,7 @@
 </aside>
 </div>
 </main>
+</div>
 </div>
 </body>
 </html>

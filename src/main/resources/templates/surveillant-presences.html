@@ -31,6 +31,82 @@
 </script>
 </head>
 <body class="bg-background font-body-md text-on-background min-h-screen flex">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="surv-presences-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">shield_person</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Présences</h1>
+</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container text-sm" th:text="${successMsg}"></div>
+<div th:if="${alerteMsg}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${alerteMsg}"></div>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-md">Nouveau pointage</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/surveillant/presences}">
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Élève</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" name="eleveId" required="required">
+<option th:each="e : ${eleves}" th:value="${e.id}" th:text="${e.nom + ' ' + e.prenom + (e.classe != null ? ' (' + e.classe.nom + ')' : '')}">Élève</option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Zone</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" name="zoneId" required="required">
+<option th:each="z : ${zones}" th:value="${z.id}" th:text="${z.nom + (z.zoneInterdite ? ' (interdite)' : '')}">Zone</option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Événement</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" name="typeEvenement" required="required">
+<option value="ENTREE">Entrée</option>
+<option value="SORTIE">Sortie</option>
+</select>
+</div>
+<button class="mt-1 bg-primary text-on-primary font-label-md py-3 rounded-lg" type="submit">Enregistrer le pointage</button>
+</form>
+</section>
+
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm px-xs">Historique des pointages</h3>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between gap-sm" th:each="p : ${pointages}" th:classappend="${p.alerte} ? 'border-error' : ''">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${p.eleve.prenom + ' ' + p.eleve.nom}">Élève</p>
+<p class="text-xs text-on-surface-variant" th:text="${p.zone.nom} + ' • ' + (${p.typeEvenement == 'ENTREE' ? 'Entrée' : 'Sortie'}) + ' • ' + ${#temporals.format(p.dateHeure, 'dd/MM HH:mm')}">Details</p>
+</div>
+<span th:if="${p.alerte}" class="px-2 py-1 bg-error text-on-error rounded-full text-[10px] font-bold uppercase shrink-0">Alerte</span>
+<span th:unless="${p.alerte}" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase shrink-0">Autorisé</span>
+</div>
+<p class="text-center text-outline py-lg text-sm" th:if="${#lists.isEmpty(pointages)}">Aucun pointage enregistré.</p>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/surveillant/presences}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_available</span>
+<span class="font-label-sm text-label-sm">Présences</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/retards}">
+<span class="material-symbols-outlined">schedule</span>
+<span class="font-label-sm text-label-sm">Retards</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/incidents}">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-sm text-label-sm">Incidents</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/retenues}">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-sm text-label-sm">Retenues</span>
+</a>
+</nav>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
 <div class="px-md mb-xl">
 <div class="flex items-center gap-sm">
@@ -112,6 +188,7 @@
 </aside>
 </div>
 </main>
+</div>
 </div>
 </body>
 </html>

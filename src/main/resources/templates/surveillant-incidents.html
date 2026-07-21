@@ -32,6 +32,91 @@
 </script>
 </head>
 <body class="bg-background font-body-md text-on-background min-h-screen flex">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="surv-incidents-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">shield_person</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Incidents</h1>
+</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container text-sm" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${erreurMsg}"></div>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-md">Signaler un incident</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/surveillant/incidents}">
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Élève</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" name="eleveId" required="required">
+<option th:each="e : ${eleves}" th:value="${e.id}" th:text="${e.nom + ' ' + e.prenom + (e.classe != null ? ' (' + e.classe.nom + ')' : '')}">Élève</option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Description</label>
+<textarea class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" name="description" required="required" rows="3"></textarea>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Gravité</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" name="gravite" required="required">
+<option value="DISCIPLINE">Discipline (mineur)</option>
+<option value="GRAVE">Grave</option>
+</select>
+</div>
+<button class="mt-1 bg-primary text-on-primary font-label-md py-3 rounded-lg" type="submit">Enregistrer l'incident</button>
+</form>
+</section>
+
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm px-xs">Incidents enregistrés</h3>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md" th:each="inc : ${incidents}">
+<p class="font-label-md text-sm" th:text="${inc.eleve.prenom + ' ' + inc.eleve.nom + (inc.eleve.classe != null ? ' — ' + inc.eleve.classe.nom : '')}">Élève</p>
+<p class="text-xs text-on-surface-variant italic mt-xs" th:text="${inc.description}">Description</p>
+<div class="flex gap-sm mt-xs items-center flex-wrap">
+<span th:class="${inc.gravite == 'GRAVE'} ? 'px-2 py-0.5 bg-error-container text-error rounded text-[10px] font-bold' : 'px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold'" th:text="${inc.gravite}">DISCIPLINE</span>
+<span class="text-[10px] text-outline" th:text="${#temporals.format(inc.dateHeure, 'dd/MM HH:mm')}">date</span>
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant rounded text-[10px] font-bold uppercase" th:text="${inc.statut}">OUVERT</span>
+</div>
+<div class="flex items-center gap-sm mt-sm">
+<form class="flex-1" method="post" th:action="@{/surveillant/incidents/{id}/retenue(id=${inc.id})}">
+<button class="w-full flex items-center justify-center gap-xs px-md py-2 bg-primary text-on-primary rounded font-label-md text-xs" type="submit">
+<span class="material-symbols-outlined text-[16px]">add</span> Retenue
+</button>
+</form>
+<form class="flex-1" method="post" th:action="@{/surveillant/incidents/{id}/convoquer(id=${inc.id})}">
+<button class="w-full flex items-center justify-center gap-xs px-md py-2 border border-primary text-primary rounded font-label-md text-xs" type="submit">Convoquer</button>
+</form>
+</div>
+</div>
+<p th:if="${#lists.isEmpty(incidents)}" class="text-center text-outline py-lg text-sm">Aucun incident enregistré.</p>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/presences}">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-sm text-label-sm">Présences</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/retards}">
+<span class="material-symbols-outlined">schedule</span>
+<span class="font-label-sm text-label-sm">Retards</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/surveillant/incidents}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">report_problem</span>
+<span class="font-label-sm text-label-sm">Incidents</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/retenues}">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-sm text-label-sm">Retenues</span>
+</a>
+</nav>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
 <div class="px-md mb-xl">
 <div class="flex items-center gap-sm">
@@ -120,6 +205,7 @@ Convoquer
 </aside>
 </div>
 </main>
+</div>
 </div>
 </body>
 </html>

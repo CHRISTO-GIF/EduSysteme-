@@ -44,6 +44,139 @@
 </script>
 </head>
 <body class="bg-background font-body-md text-on-background min-h-screen flex">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="surv-dashboard-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">shield_person</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Surveillance</h1>
+</div>
+<span class="material-symbols-outlined text-outline">account_circle</span>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container text-sm" th:text="${successMsg}"></div>
+<div th:if="${alerteMsg}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${alerteMsg}"></div>
+<div th:if="${erreurMsg}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${erreurMsg}"></div>
+
+<div class="grid grid-cols-3 gap-sm">
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<span class="material-symbols-outlined text-primary text-[20px]">groups</span>
+<p class="font-headline-sm text-headline-sm text-primary mt-xs" th:text="${pointagesAujourdHui}">0</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Pointages</p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<span class="material-symbols-outlined text-error text-[20px]">warning</span>
+<p class="font-headline-sm text-headline-sm text-error mt-xs" th:text="${incidentsAujourdHui}">0</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Incidents</p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<span class="material-symbols-outlined text-primary text-[20px]">map</span>
+<p class="font-headline-sm text-headline-sm text-primary mt-xs" th:text="${#lists.size(zones)}">0</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Zones</p>
+</div>
+</div>
+
+<div class="flex flex-col gap-sm">
+<a th:href="@{/surveillant/incidents}" class="w-full bg-primary text-on-primary py-3 rounded-xl flex items-center justify-center gap-sm font-label-md">
+<span class="material-symbols-outlined">add_alert</span> Signaler un Incident
+</a>
+<a th:href="@{/surveillant/presences}" class="w-full bg-surface-container-lowest border border-primary text-primary py-3 rounded-xl flex items-center justify-center gap-sm font-label-md">
+<span class="material-symbols-outlined">how_to_reg</span> Enregistrer un Pointage
+</a>
+</div>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm"><span class="material-symbols-outlined text-primary text-[18px]">history</span>Derniers pointages</h3>
+<a class="text-primary font-label-md text-sm" th:href="@{/surveillant/presences}">Voir tout</a>
+</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-md py-sm flex items-center justify-between gap-sm" th:each="p : ${pointagesRecents}">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${p.eleve.prenom + ' ' + p.eleve.nom}">Élève</p>
+<p class="text-xs text-on-surface-variant" th:text="${p.zone.nom} + ' • ' + ${#temporals.format(p.dateHeure, 'HH:mm')}">Zone</p>
+</div>
+<span th:if="${p.alerte}" class="px-2 py-1 bg-error text-on-error rounded-full text-[10px] font-bold uppercase shrink-0">Alerte</span>
+<span th:unless="${p.alerte}" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase shrink-0">Autorisé</span>
+</div>
+<p th:if="${#lists.isEmpty(pointagesRecents)}" class="text-center text-outline py-lg text-sm">Aucun pointage enregistré.</p>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm"><span class="material-symbols-outlined text-primary text-[18px]">gavel</span>Incidents récents</h3>
+<a class="text-primary font-label-md text-sm" th:href="@{/surveillant/incidents}">Gérer</a>
+</div>
+<div class="space-y-sm">
+<div th:each="inc : ${incidentsRecents}" class="p-sm border border-outline-variant rounded-lg">
+<p class="font-label-md text-sm" th:text="${inc.eleve.prenom + ' ' + inc.eleve.nom}">Élève</p>
+<p class="text-xs text-on-surface-variant italic" th:text="${inc.description}">Description</p>
+<div class="flex gap-sm mt-xs items-center">
+<span th:class="${inc.gravite == 'GRAVE'} ? 'px-2 py-0.5 bg-error-container text-error rounded text-[10px] font-bold' : 'px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold'" th:text="${inc.gravite}">GRAVITE</span>
+<span class="text-[10px] text-outline" th:text="${#temporals.format(inc.dateHeure, 'dd/MM HH:mm')}">date</span>
+</div>
+</div>
+<p th:if="${#lists.isEmpty(incidentsRecents)}" class="text-center text-outline py-md text-sm">Aucun incident enregistré.</p>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-label-md text-label-md">Retenues à venir</h3>
+<a class="text-primary text-sm" th:href="@{/surveillant/retenues}">Voir tout</a>
+</div>
+<div class="divide-y divide-outline-variant">
+<div th:each="r : ${retenuesAVenir}" class="px-md py-sm">
+<p class="text-xs font-label-md" th:text="${#temporals.format(r.dateRetenue, 'dd/MM')} + ' - ' + ${r.heureRetenue} + ' - ' + ${r.salle}">date</p>
+<p class="text-sm font-semibold" th:text="${r.eleve.prenom + ' ' + r.eleve.nom}">Élève</p>
+</div>
+<p th:if="${#lists.isEmpty(retenuesAVenir)}" class="px-md py-md text-center text-outline text-sm">Aucune retenue à venir.</p>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-label-md text-label-md">Zones de l'école</h3>
+<a class="text-primary text-sm" th:href="@{/surveillant/zones}">Gérer</a>
+</div>
+<div class="space-y-1">
+<div th:each="z : ${zones}" class="flex justify-between items-center text-sm py-1">
+<span class="flex items-center gap-xs">
+<span th:class="${z.zoneInterdite} ? 'w-2 h-2 rounded-full bg-error' : 'w-2 h-2 rounded-full bg-green-500'"></span>
+<span th:text="${z.nom}">Zone</span>
+</span>
+<span th:if="${z.zoneInterdite}" class="font-bold text-error text-[11px]">INTERDITE</span>
+<span th:unless="${z.zoneInterdite}" class="font-bold text-green-600 text-[11px]">LIBRE</span>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/surveillant}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/presences}">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-sm text-label-sm">Présences</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/retards}">
+<span class="material-symbols-outlined">schedule</span>
+<span class="font-label-sm text-label-sm">Retards</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/incidents}">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-sm text-label-sm">Incidents</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/retenues}">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-sm text-label-sm">Retenues</span>
+</a>
+</nav>
+</div>
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
 <aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
 <div class="px-md mb-xl">
 <div class="flex items-center gap-sm">
@@ -244,6 +377,7 @@ Enregistrer un Pointage
 </aside>
 </div>
 </main>
+</div>
 </div>
 </body>
 </html>
