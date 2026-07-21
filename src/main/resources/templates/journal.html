@@ -40,7 +40,7 @@
     </style>
 </head>
 <body class="bg-surface text-on-surface">
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50 overflow-y-auto">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex-col py-lg z-50 overflow-y-auto">
 <div class="px-lg mb-xl">
 <h1 class="font-headline-sm text-headline-sm font-bold text-surface-bright">EduSystem Pro</h1>
 <p class="text-label-sm text-on-tertiary-container">Administration</p>
@@ -64,7 +64,11 @@
 </nav>
 </aside>
 
-<main class="ml-sidebar-width p-xl">
+<main class="ml-0 md:ml-sidebar-width p-md md:p-xl">
+<div class="md:hidden -mx-md -mt-md mb-md px-md py-sm flex items-center gap-sm bg-tertiary">
+<a class="text-on-tertiary" href="/dashboard"><span class="material-symbols-outlined">arrow_back</span></a>
+<span class="font-headline-sm text-headline-sm font-bold text-on-tertiary">Journal d'activite</span>
+</div>
 <div class="max-w-container-max mx-auto">
 
 <div class="mb-xl">

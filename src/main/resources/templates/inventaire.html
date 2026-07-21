@@ -12,19 +12,19 @@
 </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-<header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
+<header class="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-md">
 <div>
 <h1 class="text-xl font-bold text-blue-900">Inventaire</h1>
 <p class="text-gray-500 text-sm">Gestion du materiel et des equipements de l'etablissement.</p>
 </div>
-<button class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" onclick="document.getElementById('modal-article').classList.remove('hidden')" type="button">
+<button class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2" onclick="document.getElementById('modal-article').classList.remove('hidden')" type="button">
 <span class="material-symbols-outlined text-[18px]">add</span> Ajouter un article
 </button>
 </header>
 
-<main class="max-w-6xl mx-auto px-8 py-8">
+<main class="max-w-6xl mx-auto px-4 md:px-8 py-4 md:py-8">
 
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 <div class="bg-white border border-gray-200 rounded-xl p-5">
 <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total articles</p>
 <p class="text-2xl font-bold text-blue-900" th:text="${totalArticles}">0</p>
@@ -44,7 +44,7 @@
 </div>
 
 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-<table class="w-full text-left text-sm">
+<table class="w-full text-left text-sm hidden md:table">
 <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
 <tr><th class="px-5 py-3">Article</th><th class="px-5 py-3">Categorie</th><th class="px-5 py-3">Qte</th><th class="px-5 py-3">Etat</th><th class="px-5 py-3">Localisation</th><th class="px-5 py-3 text-right">Valeur</th><th class="px-5 py-3 text-right">Actions</th></tr>
 </thead>
@@ -71,6 +71,24 @@
 </tr>
 </tbody>
 </table>
+<div class="md:hidden divide-y divide-gray-100">
+<p class="p-lg text-center text-gray-500 text-sm" th:if="${articles.isEmpty()}">Aucun article enregistre.</p>
+<div class="p-md" th:each="a : ${articles}">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-medium text-sm" th:text="${a.nom}">Nom</p>
+<span class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
+      th:classappend="${a.etat == 'NEUF'} ? 'bg-green-100 text-green-800' : (${a.etat == 'EN_REPARATION'} ? 'bg-amber-100 text-amber-800' : (${a.etat == 'HORS_SERVICE'} ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600'))"
+      th:text="${a.etat}">Etat</span>
+</div>
+<p class="text-xs text-gray-500 mb-sm" th:text="${a.categorie} + ' — Qte ' + ${a.quantite} + (${a.localisation != null and !#strings.isEmpty(a.localisation)} ? ' — ' + a.localisation : '')">Details</p>
+<div class="flex items-center justify-between">
+<span class="text-sm font-bold" th:text="${a.valeurUnitaire != null ? #numbers.formatDecimal(a.valeurUnitaire * a.quantite, 0, 'COMMA', 0, 'POINT') + ' F' : '--'}">--</span>
+<form method="post" th:action="@{/inventaire/{id}/supprimer(id=${a.id})}" onsubmit="return confirm('Supprimer cet article ?');">
+<button class="text-red-600 text-xs font-bold uppercase" type="submit">Supprimer</button>
+</form>
+</div>
+</div>
+</div>
 </div>
 
 </main>
@@ -86,7 +104,7 @@
 <label class="text-xs text-gray-500 block mb-1">Nom</label>
 <input class="w-full p-2 border border-gray-300 rounded-lg" name="nom" required="required" type="text"/>
 </div>
-<div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 <div>
 <label class="text-xs text-gray-500 block mb-1">Categorie</label>
 <select class="w-full p-2 border border-gray-300 rounded-lg" name="categorie">
@@ -109,7 +127,7 @@
 </select>
 </div>
 </div>
-<div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 <div>
 <label class="text-xs text-gray-500 block mb-1">Quantite</label>
 <input class="w-full p-2 border border-gray-300 rounded-lg" min="0" name="quantite" required="required" type="number" value="1"/>
@@ -123,7 +141,7 @@
 <label class="text-xs text-gray-500 block mb-1">Localisation</label>
 <input class="w-full p-2 border border-gray-300 rounded-lg" name="localisation" type="text"/>
 </div>
-<div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 <div>
 <label class="text-xs text-gray-500 block mb-1">Fournisseur</label>
 <input class="w-full p-2 border border-gray-300 rounded-lg" name="fournisseur" type="text"/>
