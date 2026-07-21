@@ -21,6 +21,12 @@
 <div class="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold border border-outline-variant" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'A'}">A</div>
 </div>
 </header>
+<div th:fragment="mobile-progress(etapeActuelle, libelleEtape)" class="md:hidden px-md py-sm bg-tertiary flex items-center justify-between gap-md">
+<span class="font-label-md text-label-md text-on-tertiary" th:text="'Etape ' + ${etapeActuelle} + '/5 — ' + ${libelleEtape}">Etape</span>
+<div class="w-24 bg-on-tertiary/20 h-1 rounded-full overflow-hidden shrink-0">
+<div class="bg-primary-fixed h-full" th:style="${'width:' + (etapeActuelle * 20) + '%'}"></div>
+</div>
+</div>
 <aside th:fragment="sidebar(etapeActuelle)" class="hidden md:flex w-sidebar-width flex-col bg-tertiary border-r border-outline-variant py-lg shrink-0">
 <div class="px-lg mb-xl">
 <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary opacity-60">Parcours d'inscription</p>
