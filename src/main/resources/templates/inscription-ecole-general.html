@@ -125,29 +125,30 @@
 <main class="flex-grow flex flex-col items-center py-xl px-md">
 <div class="w-full max-w-[800px]">
 <!-- Indicateur d'etapes -->
-<div class="flex items-center justify-between mb-xl px-lg">
+<div class="flex items-center justify-between mb-md sm:mb-xl px-md sm:px-lg">
 <div class="flex flex-col items-center gap-xs relative flex-1">
 <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-md z-10 shadow-sm">1</div>
-<span class="font-label-sm text-label-sm text-primary font-bold">Informations generales</span>
+<span class="hidden sm:block font-label-sm text-label-sm text-primary font-bold">Informations generales</span>
 <div class="absolute top-5 left-1/2 w-full h-[2px] bg-outline-variant"></div>
 </div>
 <div class="flex flex-col items-center gap-xs relative flex-1">
 <div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-label-md z-10">2</div>
-<span class="font-label-sm text-label-sm text-secondary">Structure academique</span>
+<span class="hidden sm:block font-label-sm text-label-sm text-secondary">Structure academique</span>
 <div class="absolute top-5 left-1/2 w-full h-[2px] bg-outline-variant"></div>
 </div>
 <div class="flex flex-col items-center gap-xs relative flex-1">
 <div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-label-md z-10">3</div>
-<span class="font-label-sm text-label-sm text-secondary">Administrateurs</span>
+<span class="hidden sm:block font-label-sm text-label-sm text-secondary">Administrateurs</span>
 <div class="absolute top-5 left-1/2 w-full h-[2px] bg-outline-variant"></div>
 </div>
 <div class="flex flex-col items-center gap-xs">
 <div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-label-md z-10">4</div>
-<span class="font-label-sm text-label-sm text-secondary">Revision</span>
+<span class="hidden sm:block font-label-sm text-label-sm text-secondary">Revision</span>
 </div>
 </div>
+<p class="sm:hidden text-center font-label-sm text-label-sm text-primary font-bold mb-lg">Etape 1/4 — Informations generales</p>
 <!-- Carte de l'assistant -->
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-xl shadow-sm">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-md sm:p-xl shadow-sm">
 <div class="mb-xl">
 <h1 class="font-headline-md text-headline-md text-primary mb-xs">Profil de l'etablissement</h1>
 <p class="font-body-md text-body-md text-secondary">Renseignez les informations fondamentales de votre etablissement. Ces informations apparaitront sur les documents academiques officiels et les communications systeme.</p>
