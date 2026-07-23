@@ -54,7 +54,7 @@
 <a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/secretariat">
 <span class="material-symbols-outlined mr-3">group</span> Eleves
 </a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/personnel">
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/personnel" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
 <span class="material-symbols-outlined mr-3">school</span> Personnel
 </a>
 <a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/notes/saisie">
@@ -66,7 +66,7 @@
 <a class="flex items-center px-lg py-3 sidebar-active font-label-md text-label-md" href="/messagerie">
 <span class="material-symbols-outlined mr-3">forum</span> Messagerie
 </a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/finances">
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/finances" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
 <span class="material-symbols-outlined mr-3">account_balance</span> Tresorerie
 </a>
 <a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/emploi-du-temps">
@@ -75,7 +75,7 @@
 </nav>
 <div class="mt-auto px-lg space-y-2">
 <div class="pt-lg border-t border-outline-variant/30 space-y-1">
-<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="/parametres">
+<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="/parametres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <span class="material-symbols-outlined mr-3">settings</span> Parametres
 </a>
 <a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">

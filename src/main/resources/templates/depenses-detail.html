@@ -61,7 +61,7 @@
 </a>
 </nav>
 <div class="px-sm pt-md border-t border-white/10 mt-auto">
-<a class="flex items-center gap-md px-md py-sm rounded-lg opacity-80 hover:bg-tertiary-container/50 transition-all font-label-md text-label-md text-on-tertiary" th:href="@{/parametres}">
+<a class="flex items-center gap-md px-md py-sm rounded-lg opacity-80 hover:bg-tertiary-container/50 transition-all font-label-md text-label-md text-on-tertiary" th:href="@{/parametres}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <span class="material-symbols-outlined">settings</span> Parametres
 </a>
 </div>

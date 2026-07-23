@@ -53,6 +53,7 @@ public class JournalController {
         model.addAttribute("pagesAffichees", pagesAffichees);
         model.addAttribute("premierElement", total == 0 ? 0 : pageCourante * TAILLE_PAGE + 1);
         model.addAttribute("dernierElement", Math.min(total, (long) (pageCourante + 1) * TAILLE_PAGE));
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         return "journal";
     }
 }

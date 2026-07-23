@@ -93,6 +93,7 @@ public class CarteIdentiteController {
         model.addAttribute("logoPath", logoPath);
         model.addAttribute("chefEtablissement", chefEtablissement);
         model.addAttribute("anneeScolaire", anneeScolaire);
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         return "carte-identite";
     }
 

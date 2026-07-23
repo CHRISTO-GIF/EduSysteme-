@@ -54,7 +54,7 @@
 <span class="material-symbols-outlined">dashboard</span>
 <span class="font-body-md text-body-md">Tableau de bord</span>
 </a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/secretariat}">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/secretariat}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined">group</span>
 <span class="font-body-md text-body-md">Eleves</span>
 </a>
@@ -62,11 +62,11 @@
 <span class="material-symbols-outlined">payments</span>
 <span class="font-body-md text-body-md">Financier</span>
 </a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/examens}">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/examens}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined">school</span>
 <span class="font-body-md text-body-md">Academique</span>
 </a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/personnel}">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 transition-colors duration-200" th:href="@{/personnel}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
 <span class="material-symbols-outlined">badge</span>
 <span class="font-body-md text-body-md">Personnel</span>
 </a>
@@ -76,7 +76,7 @@
 </a>
 </nav>
 <div class="mt-auto p-md space-y-1">
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary transition-colors" th:href="@{/parametres}">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container/70 hover:text-on-tertiary transition-colors" th:href="@{/parametres}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <span class="material-symbols-outlined">settings</span>
 <span class="font-body-md text-body-md">Parametres</span>
 </a>

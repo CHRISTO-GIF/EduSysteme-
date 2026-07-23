@@ -101,6 +101,7 @@ public class MessagerieStaffController {
         model.addAttribute("fil", fil);
         model.addAttribute("mediasPartages", messagerieService.mediasPartages(fil));
         model.addAttribute("monEmail", email);
+        model.addAttribute("utilisateurConnecte", moi);
         return "messagerie";
     }
 
