@@ -139,7 +139,9 @@ public class PersonnelController {
 
     @PostMapping("/nouveau")
     public String enregistrerNouveau(
-            @RequestParam String nomComplet,
+            @RequestParam String nom,
+            @RequestParam String prenom,
+            @RequestParam String fonction,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String telephone,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateNaissance,
@@ -157,23 +159,19 @@ public class PersonnelController {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
 
-        if (nomComplet == null || nomComplet.isBlank()) {
-            model.addAttribute("erreur", "Le nom complet est obligatoire.");
+        if (nom == null || nom.isBlank() || prenom == null || prenom.isBlank() || fonction == null || fonction.isBlank()) {
+            model.addAttribute("erreur", "Le nom, le prenom et la fonction sont obligatoires.");
             model.addAttribute("matieres", matiereRepository.findByEtablissementIdOrderByNomAsc(etabId));
             model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
             return "personnel-nouveau";
         }
 
-        String[] parts = nomComplet.trim().split("\\s+", 2);
-        String prenom = parts.length > 1 ? parts[0] : "";
-        String nomFamille = parts.length > 1 ? parts[1] : parts[0];
-
         Personnel p = new Personnel();
-        p.setNom(nomFamille.toUpperCase());
-        p.setPrenom(prenom);
+        p.setNom(nom.trim().toUpperCase());
+        p.setPrenom(prenom.trim());
         p.setEmail(email != null && !email.isBlank() ? email.trim() : null);
         p.setTelephone(telephone);
-        p.setFonction("ENSEIGNANT");
+        p.setFonction(fonction);
         p.setMatiereEnseignee(matiereEnseignee);
         p.setStatut("ACTIF");
         p.setDateNaissance(dateNaissance);
@@ -187,21 +185,31 @@ public class PersonnelController {
         p.setEtablissementId(etabId);
         personnelRepository.save(p);
 
-        // Cree un compte de connexion enseignant si un email est fourni et qu'aucun compte n'existe deja
+        // Cree un compte de connexion si un email est fourni, qu'aucun compte n'existe deja
+        // et que la fonction correspond a un role applicatif reconnu
+        String roleCompte = switch (fonction) {
+            case "ENSEIGNANT"  -> "ENSEIGNANT";
+            case "SECRETAIRE"  -> "SECRETAIRE";
+            case "TRESORIER"   -> "TRESORIER";
+            case "SURVEILLANT" -> "SURVEILLANT";
+            case "DIRECTEUR"   -> "ADMIN";
+            default -> null; // COMPTABLE, AUTRE : fiche RH seule, pas de compte de connexion automatique
+        };
+
         String motDePasseGenere = null;
-        if (p.getEmail() != null && utilisateurRepository.findByEmail(p.getEmail()).isEmpty()) {
+        if (roleCompte != null && p.getEmail() != null && utilisateurRepository.findByEmail(p.getEmail()).isEmpty()) {
             Utilisateur u = new Utilisateur();
             u.setNom(p.getNom());
             u.setPrenom(p.getPrenom());
             u.setEmail(p.getEmail());
             motDePasseGenere = genererMotDePasse();
             u.setMotDePasse(passwordEncoder.encode(motDePasseGenere));
-            u.setRole("ENSEIGNANT");
+            u.setRole(roleCompte);
             u.setEtablissement(etablissementService.getCurrentEtablissement());
             utilisateurRepository.save(u);
 
-            // Affectations de classes, si renseignees
-            if (affectationMatiereId != null && affectationClasseId != null) {
+            // Affectations de classes, uniquement pertinentes pour un compte enseignant
+            if ("ENSEIGNANT".equals(roleCompte) && affectationMatiereId != null && affectationClasseId != null) {
                 int n = Math.min(affectationMatiereId.size(), affectationClasseId.size());
                 for (int i = 0; i < n; i++) {
                     Long mId = affectationMatiereId.get(i);

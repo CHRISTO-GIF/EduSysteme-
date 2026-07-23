@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>EduSystem Pro - Ajouter un Enseignant</title>
+<title>EduSystem Pro - Ajouter un Membre du Personnel</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config" th:inline="javascript">
@@ -85,7 +85,7 @@
 <div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
 <span>Personnel</span>
 <span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
-<span class="text-primary font-bold">Ajouter un Enseignant</span>
+<span class="text-primary font-bold">Ajouter un Membre du Personnel</span>
 </div>
 </div>
 <div class="flex items-center gap-lg">
@@ -101,8 +101,8 @@
 
 <div class="flex-1 p-gutter max-w-container-max mx-auto w-full">
 <div class="mb-lg">
-<h2 class="font-headline-lg text-headline-lg text-primary">Ajouter un Nouvel Enseignant</h2>
-<p class="text-on-surface-variant font-body-md text-body-md">Veuillez remplir les informations ci-dessous pour creer le profil de l'enseignant.</p>
+<h2 class="font-headline-lg text-headline-lg text-primary">Ajouter un Nouveau Membre du Personnel</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Veuillez remplir les informations ci-dessous pour creer le profil du personnel (enseignant, secretaire, tresorier, surveillant...).</p>
 </div>
 
 <div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
@@ -116,8 +116,12 @@
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
 <div class="flex flex-col gap-xs">
-<label class="font-label-md text-label-md text-on-surface-variant">Nom Complet</label>
-<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="nomComplet" placeholder="ex: Jean Dupont" required="required" type="text"/>
+<label class="font-label-md text-label-md text-on-surface-variant">Nom</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="nom" placeholder="ex: Dupont" required="required" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Prenom</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="prenom" placeholder="ex: Jean" required="required" type="text"/>
 </div>
 <div class="flex flex-col gap-xs">
 <label class="font-label-md text-label-md text-on-surface-variant">Email Professionnel</label>
@@ -159,6 +163,18 @@
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
 <div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Fonction</label>
+<select class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" id="select-fonction" name="fonction" required="required">
+<option value="ENSEIGNANT">Enseignant</option>
+<option value="SECRETAIRE">Secretaire</option>
+<option value="TRESORIER">Tresorier</option>
+<option value="SURVEILLANT">Surveillant</option>
+<option value="DIRECTEUR">Directeur</option>
+<option value="COMPTABLE">Comptable</option>
+<option value="AUTRE">Autre</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs" id="champ-matiere">
 <label class="font-label-md text-label-md text-on-surface-variant">Matiere principale</label>
 <select class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="matiereEnseignee">
 <option value="">Selectionnez une matiere</option>
@@ -207,13 +223,13 @@
 <div class="p-md bg-secondary-container/30 border border-secondary-container rounded-lg flex gap-md items-start">
 <span class="material-symbols-outlined text-on-secondary-container mt-xs">info</span>
 <p class="font-body-md text-body-md text-on-secondary-container">
-                    Les documents (carte NNI, CV, diplomes...) pourront etre televerses juste apres la creation du profil, depuis la fiche de l'enseignant.
+                    Les documents (carte NNI, CV, diplomes...) pourront etre televerses juste apres la creation du profil, depuis la fiche du personnel.
                 </p>
 </div>
 </div>
 
-<!-- Section 5: Affectation des Classes -->
-<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<!-- Section 5: Affectation des Classes (enseignants uniquement) -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm" id="section-affectations">
 <div class="flex items-center justify-between mb-lg border-b border-surface-container pb-md">
 <div class="flex items-center gap-sm">
 <span class="material-symbols-outlined text-primary">view_module</span>
@@ -224,7 +240,7 @@
 </button>
 </div>
 <p class="font-label-sm text-label-sm text-on-surface-variant mb-md">
-                Si vous affectez au moins une classe, un compte de connexion enseignant sera automatiquement cree (avec un mot de passe temporaire affiche a la fin).
+                Si vous affectez au moins une classe, un compte de connexion enseignant sera automatiquement cree (avec un mot de passe temporaire affiche a la fin). Pour les autres fonctions (secretaire, tresorier, surveillant, directeur), le compte est cree automatiquement des qu'un email est renseigne.
             </p>
 <div class="space-y-sm" id="liste-affectations">
 <div class="row-affectation grid grid-cols-1 md:grid-cols-12 gap-md items-center p-sm border border-surface-container-high rounded-lg bg-surface-container-lowest">
@@ -271,6 +287,21 @@
         });
     }
     liste.querySelectorAll('.row-affectation').forEach(brancherSuppression);
+
+    // Le choix de la matiere principale et l'affectation des classes ne concernent que les enseignants
+    const selectFonction = document.getElementById('select-fonction');
+    const champMatiere = document.getElementById('champ-matiere');
+    const sectionAffectations = document.getElementById('section-affectations');
+
+    function actualiserVisibiliteEnseignant() {
+        const estEnseignant = selectFonction.value === 'ENSEIGNANT';
+        champMatiere.style.display = estEnseignant ? '' : 'none';
+        sectionAffectations.style.display = estEnseignant ? '' : 'none';
+    }
+    if (selectFonction) {
+        selectFonction.addEventListener('change', actualiserVisibiliteEnseignant);
+        actualiserVisibiliteEnseignant();
+    }
 
     if (btnAjouter) {
         btnAjouter.addEventListener('click', () => {

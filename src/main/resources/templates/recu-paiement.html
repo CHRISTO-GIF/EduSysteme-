@@ -99,8 +99,11 @@
 <div th:if="${successMsg}" class="no-print w-full max-w-[800px] mb-lg p-md rounded-lg bg-success-container text-success font-body-md text-body-md" th:text="${successMsg}"></div>
 <div th:if="${erreurEmail}" class="no-print w-full max-w-[800px] mb-lg p-md rounded-lg bg-error-container text-error font-body-md text-body-md" th:text="${erreurEmail}"></div>
 
-<article class="print-area w-full max-w-[800px] bg-white border border-outline-variant p-xl md:p-16 flex flex-col gap-xl relative overflow-hidden">
-<div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+<article class="print-area w-full max-w-[800px] bg-white border border-outline-variant p-xl md:p-16 flex flex-col gap-xl relative z-0 overflow-hidden">
+<div class="absolute inset-0 -z-10 flex items-center justify-center overflow-hidden pointer-events-none select-none" th:if="${logoPath != null}">
+<img class="w-[70%] h-[70%] object-contain opacity-[0.06]" th:src="@{'/uploads/' + ${logoPath}}"/>
+</div>
+<div class="absolute inset-0 -z-10 flex items-center justify-center opacity-[0.03] pointer-events-none select-none" th:if="${logoPath == null}">
 <span class="material-symbols-outlined text-[400px]" style="font-variation-settings: 'wght' 200;">school</span>
 </div>
 
