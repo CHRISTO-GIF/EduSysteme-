@@ -54,7 +54,7 @@
 </head>
 <body class="bg-background text-on-background antialiased">
 <!-- Menu lateral -->
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">
 <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -110,23 +110,24 @@
 </aside>
 
 <!-- Barre superieure -->
-<header class="h-16 fixed top-0 right-0 left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg w-full z-40">
-<div class="flex items-center gap-md w-1/3">
-<div class="relative w-full max-w-sm">
+<header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-md md:px-lg w-full z-40">
+<div class="flex items-center gap-md w-1/2 md:w-1/3">
+<span class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">Parametres</span>
+<div class="hidden md:block relative w-full max-w-sm">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
 <input class="w-full bg-surface-container-low border-none rounded-lg pl-10 py-2 font-body-md text-body-md focus:ring-2 focus:ring-primary-container transition-all" placeholder="Rechercher un reglage..." type="text"/>
 </div>
 </div>
-<div class="flex items-center gap-lg">
-<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
+<div class="flex items-center gap-md md:gap-lg">
+<button class="hidden md:block p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
 <span class="material-symbols-outlined">notifications</span>
 </button>
-<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
+<button class="hidden md:block p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
 <span class="material-symbols-outlined">help_outline</span>
 </button>
-<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="hidden md:block h-8 w-[1px] bg-outline-variant"></div>
 <div class="flex items-center gap-sm">
-<div class="text-right">
+<div class="hidden md:block text-right">
 <p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
 <p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tight">Administrateur</p>
 </div>
@@ -135,8 +136,8 @@
 </div>
 </header>
 
-<main class="ml-sidebar-width pt-16 min-h-screen">
-<div class="max-w-container-max mx-auto p-lg">
+<main class="ml-0 md:ml-sidebar-width pt-16 min-h-screen">
+<div class="max-w-container-max mx-auto p-md md:p-lg">
 
 <div class="mb-lg">
 <h2 class="font-headline-lg text-headline-lg text-primary mb-1">Configuration Globale</h2>
@@ -148,6 +149,8 @@
 
 <form id="form-logo" method="post" enctype="multipart/form-data" th:action="@{/parametres/logo}" style="display:none"></form>
 <form id="form-motdepasse" method="post" th:action="@{/parametres/mot-de-passe}" style="display:none"></form>
+<form id="form-verif-parent" method="post" th:action="@{/parametres/verification/parent}" style="display:none"></form>
+<form id="form-verif-personnel" method="post" th:action="@{/parametres/verification/personnel}" style="display:none"></form>
 
 <form id="form-general" method="post" th:action="@{/parametres/update}">
 <input name="_tab" type="hidden" value="etablissement"/>
@@ -157,7 +160,7 @@
 <section class="lg:col-span-2 space-y-lg">
 
 <!-- Configuration Generale -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
 <div class="flex items-center gap-md mb-xl">
 <div class="bg-primary-container/10 p-3 rounded-lg text-primary">
 <span class="material-symbols-outlined">school</span>
@@ -195,7 +198,7 @@
 </div>
 
 <!-- Identite de l'etablissement (pour bulletins, cartes, recus...) -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
 <div class="flex items-center gap-md mb-xl">
 <div class="bg-primary-container/10 p-3 rounded-lg text-primary">
 <span class="material-symbols-outlined">badge</span>
@@ -223,7 +226,7 @@
 </div>
 
 <!-- Logo (formulaire separe : upload de fichier) -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
 <div class="flex items-center gap-md mb-xl">
 <div class="bg-primary-container/10 p-3 rounded-lg text-primary">
 <span class="material-symbols-outlined">image</span>
@@ -240,7 +243,7 @@
 </div>
 
 <!-- Profil Administrateur -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
 <div class="flex items-center gap-md mb-xl">
 <div class="bg-secondary-container/20 p-3 rounded-lg text-secondary">
 <span class="material-symbols-outlined">manage_accounts</span>
@@ -281,7 +284,7 @@
 <aside class="space-y-lg">
 
 <!-- Apparence -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
 <h4 class="font-label-md text-label-md text-on-surface-variant mb-xl uppercase tracking-widest">Apparence</h4>
 <div class="space-y-xl">
 <div>
@@ -313,7 +316,7 @@
 </div>
 
 <!-- Securite -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
 <h4 class="font-label-md text-label-md text-on-surface-variant mb-xl uppercase tracking-widest">Securite</h4>
 <div class="space-y-md">
 <details>
@@ -335,13 +338,38 @@
 </div>
 </div>
 </details>
-<div class="w-full text-left p-md border border-outline-variant rounded-lg flex items-center justify-between">
-<div class="flex items-center gap-md">
+<details>
+<summary class="w-full text-left p-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors flex items-center justify-between cursor-pointer list-none">
+<span class="flex items-center gap-md">
 <span class="material-symbols-outlined text-outline">security</span>
-<span class="text-body-md">Authentification 2FA</span>
+<span class="text-body-md">Authentification 2FA — verification double</span>
+</span>
+<span class="material-symbols-outlined text-outline-variant">expand_more</span>
+</summary>
+<div class="p-md border border-t-0 border-outline-variant rounded-b-lg space-y-lg">
+<p class="text-label-sm text-on-surface-variant">Verifiez l'identite d'un parent ou d'un membre du personnel de cet etablissement pour lui generer un nouveau mot de passe temporaire.</p>
+
+<!-- Verification parent -->
+<div class="space-y-sm">
+<p class="text-label-sm font-bold text-on-surface uppercase tracking-wider">Parent d'eleve</p>
+<div th:if="${verifParentErreur}" class="p-sm rounded-lg bg-error-container text-on-error-container text-label-sm" th:text="${verifParentErreur}"></div>
+<div th:if="${verifParentSuccess}" class="p-sm rounded-lg bg-success-container text-on-success-container text-label-sm break-all" th:text="${verifParentSuccess}"></div>
+<input class="w-full p-sm border border-outline-variant rounded-lg text-body-md" form="form-verif-parent" name="nomParent" placeholder="Nom du parent (pere ou mere)" required="required" type="text"/>
+<input class="w-full p-sm border border-outline-variant rounded-lg text-body-md" form="form-verif-parent" name="nomEnfant" placeholder="Nom (et prenom) de l'eleve" required="required" type="text"/>
+<button class="w-full bg-primary text-on-primary py-sm rounded-lg font-label-md" form="form-verif-parent" type="submit">Verifier et generer un mot de passe</button>
 </div>
-<span class="bg-surface-container text-on-surface-variant text-[10px] px-2 py-0.5 rounded-full">BIENTOT DISPONIBLE</span>
+
+<!-- Verification personnel -->
+<div class="space-y-sm pt-md border-t border-outline-variant">
+<p class="text-label-sm font-bold text-on-surface uppercase tracking-wider">Personnel de l'etablissement</p>
+<div th:if="${verifPersonnelErreur}" class="p-sm rounded-lg bg-error-container text-on-error-container text-label-sm" th:text="${verifPersonnelErreur}"></div>
+<div th:if="${verifPersonnelSuccess}" class="p-sm rounded-lg bg-success-container text-on-success-container text-label-sm break-all" th:text="${verifPersonnelSuccess}"></div>
+<input class="w-full p-sm border border-outline-variant rounded-lg text-body-md" form="form-verif-personnel" name="nomPersonnel" placeholder="Nom" required="required" type="text"/>
+<input class="w-full p-sm border border-outline-variant rounded-lg text-body-md" form="form-verif-personnel" name="prenomPersonnel" placeholder="Prenom" required="required" type="text"/>
+<button class="w-full bg-primary text-on-primary py-sm rounded-lg font-label-md" form="form-verif-personnel" type="submit">Verifier et generer un mot de passe</button>
 </div>
+</div>
+</details>
 <a class="w-full text-left p-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors flex items-center justify-between group" th:href="@{/parametres/roles}">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">admin_panel_settings</span>
@@ -353,7 +381,7 @@
 </div>
 
 <!-- Mise a jour systeme -->
-<div class="bg-tertiary-container text-on-tertiary-container rounded-xl p-xl shadow-lg relative overflow-hidden">
+<div class="bg-tertiary-container text-on-tertiary-container rounded-xl p-md sm:p-xl shadow-lg relative overflow-hidden">
 <div class="absolute -right-4 -top-4 opacity-10">
 <span class="material-symbols-outlined text-[120px]">update</span>
 </div>
@@ -370,9 +398,9 @@
 </div>
 
 <!-- Barre d'actions -->
-<div class="mt-xl flex items-center justify-end gap-md pt-lg border-t border-outline-variant">
-<a class="px-xl py-md text-on-surface-variant font-label-md hover:bg-surface-container-low rounded-lg transition-colors" th:href="@{/parametres}">Annuler les modifications</a>
-<button class="px-xl py-md bg-primary text-on-primary font-label-md rounded-lg shadow-md hover:bg-primary/90 transition-all flex items-center gap-2" type="submit">
+<div class="mt-xl flex flex-col sm:flex-row items-center justify-end gap-md pt-lg border-t border-outline-variant">
+<a class="w-full sm:w-auto text-center px-xl py-md text-on-surface-variant font-label-md hover:bg-surface-container-low rounded-lg transition-colors" th:href="@{/parametres}">Annuler les modifications</a>
+<button class="w-full sm:w-auto justify-center px-xl py-md bg-primary text-on-primary font-label-md rounded-lg shadow-md hover:bg-primary/90 transition-all flex items-center gap-2" type="submit">
 <span class="material-symbols-outlined text-sm">save</span> Enregistrer les modifications
 </button>
 </div>

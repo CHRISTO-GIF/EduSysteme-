@@ -459,6 +459,112 @@ public class ParametreController {
         return "redirect:/parametres?tab=autorisations";
     }
 
+    // ── Double vérification : réinitialiser le mot de passe d'un parent ──
+    @PostMapping("/verification/parent")
+    public String verifierParent(@RequestParam String nomParent,
+                                 @RequestParam String nomEnfant,
+                                 RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        String parentQ = normaliser(nomParent);
+        String enfantQ = normaliser(nomEnfant);
+
+        Eleve trouve = null;
+        String emailParentTrouve = null;
+        for (Eleve e : eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId)) {
+            boolean enfantOk = enfantQ.equals(normaliser(e.getPrenom() + " " + e.getNom()))
+                || enfantQ.equals(normaliser(e.getNom() + " " + e.getPrenom()))
+                || enfantQ.equals(normaliser(e.getNom()));
+            if (!enfantOk) continue;
+
+            if (e.getPereNom() != null && parentQ.equals(normaliser(e.getPereNom()))) {
+                trouve = e; emailParentTrouve = e.getPereEmail(); break;
+            }
+            if (e.getMereNom() != null && parentQ.equals(normaliser(e.getMereNom()))) {
+                trouve = e; emailParentTrouve = e.getMereEmail(); break;
+            }
+        }
+
+        if (trouve == null) {
+            ra.addFlashAttribute("verifParentErreur",
+                "Aucun eleve de cet etablissement ne correspond a ce nom de parent et d'enfant.");
+            return "redirect:/parametres?tab=securite";
+        }
+        if (emailParentTrouve == null || emailParentTrouve.isBlank()) {
+            ra.addFlashAttribute("verifParentErreur",
+                "Aucun email parent enregistre pour " + trouve.getPrenom() + " " + trouve.getNom() + ".");
+            return "redirect:/parametres?tab=securite";
+        }
+        Utilisateur compte = utilisateurRepository.findByEmail(emailParentTrouve).orElse(null);
+        if (compte == null) {
+            ra.addFlashAttribute("verifParentErreur",
+                "Aucun compte parent cree pour " + trouve.getPrenom() + " " + trouve.getNom()
+                + " (email : " + emailParentTrouve + ").");
+            return "redirect:/parametres?tab=securite";
+        }
+        String nouveauMdp = genererMotDePasseTemporaire();
+        compte.setMotDePasse(passwordEncoder.encode(nouveauMdp));
+        utilisateurRepository.save(compte);
+        journalService.log("MDP_PARENT_REINITIALISE", JOURNAL_MODULE_ROLES,
+            "Parent de " + trouve.getPrenom() + " " + trouve.getNom() + " (" + compte.getEmail() + ")");
+        ra.addFlashAttribute("verifParentSuccess",
+            "Nouveau mot de passe pour " + compte.getPrenom() + " " + compte.getNom()
+            + " (" + compte.getEmail() + ") : " + nouveauMdp);
+        return "redirect:/parametres?tab=securite";
+    }
+
+    // ── Double vérification : réinitialiser le mot de passe d'un personnel ──
+    @PostMapping("/verification/personnel")
+    public String verifierPersonnel(@RequestParam String nomPersonnel,
+                                    @RequestParam String prenomPersonnel,
+                                    RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        String nomQ = normaliser(nomPersonnel);
+        String prenomQ = normaliser(prenomPersonnel);
+
+        Personnel trouve = personnelRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId).stream()
+            .filter(p -> nomQ.equals(normaliser(p.getNom())) && prenomQ.equals(normaliser(p.getPrenom())))
+            .findFirst().orElse(null);
+
+        if (trouve == null) {
+            ra.addFlashAttribute("verifPersonnelErreur",
+                "Aucun membre du personnel de cet etablissement ne correspond a ce nom et prenom.");
+            return "redirect:/parametres?tab=securite";
+        }
+        if (trouve.getEmail() == null || trouve.getEmail().isBlank()) {
+            ra.addFlashAttribute("verifPersonnelErreur",
+                "Aucun email enregistre pour " + trouve.getNom() + " " + trouve.getPrenom() + ".");
+            return "redirect:/parametres?tab=securite";
+        }
+        Utilisateur compte = utilisateurRepository.findByEmail(trouve.getEmail()).orElse(null);
+        if (compte == null) {
+            ra.addFlashAttribute("verifPersonnelErreur",
+                "Aucun compte utilisateur cree pour " + trouve.getNom() + " " + trouve.getPrenom()
+                + " (email : " + trouve.getEmail() + ").");
+            return "redirect:/parametres?tab=securite";
+        }
+        String nouveauMdp = genererMotDePasseTemporaire();
+        compte.setMotDePasse(passwordEncoder.encode(nouveauMdp));
+        utilisateurRepository.save(compte);
+        journalService.log("MDP_PERSONNEL_REINITIALISE", JOURNAL_MODULE_ROLES,
+            trouve.getNom() + " " + trouve.getPrenom() + " (" + compte.getEmail() + ")");
+        ra.addFlashAttribute("verifPersonnelSuccess",
+            "Nouveau mot de passe pour " + compte.getPrenom() + " " + compte.getNom()
+            + " (" + compte.getEmail() + ") : " + nouveauMdp);
+        return "redirect:/parametres?tab=securite";
+    }
+
+    private String normaliser(String s) {
+        return s == null ? "" : s.trim().toLowerCase().replaceAll("\\s+", " ");
+    }
+
+    private String genererMotDePasseTemporaire() {
+        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+        java.security.SecureRandom rnd = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 10; i++) sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        return sb.toString();
+    }
+
     // ── Gestion des roles ────────────────────────────────────────────
     private static final List<String> ROLES_ASSIGNABLES = List.of("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER");
     private static final String JOURNAL_MODULE_ROLES = "UTILISATEURS";
