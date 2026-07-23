@@ -51,7 +51,7 @@
     </style>
 </head>
 <body class="bg-background text-on-background">
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto">
 <div class="px-gutter mb-xl flex items-center gap-3">
 <div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center text-on-primary">
 <span class="material-symbols-outlined">school</span>
@@ -108,9 +108,10 @@
 </div>
 </aside>
 
-<header class="fixed top-0 left-0 right-0 z-40 bg-surface h-16 border-b border-outline-variant flex items-center justify-between ml-[260px] px-gutter">
-<div class="flex items-center gap-4 w-1/3">
-<div class="relative w-full max-w-md">
+<header class="fixed top-0 left-0 right-0 z-40 bg-surface h-16 border-b border-outline-variant flex items-center justify-between ml-0 md:ml-[260px] px-md md:px-gutter">
+<div class="flex items-center gap-4 w-1/2 md:w-1/3">
+<span class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">Roles</span>
+<div class="hidden md:block relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
 <input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-primary" placeholder="Rechercher des roles..." type="text"/>
 </div>
@@ -129,7 +130,7 @@
 </div>
 </header>
 
-<main class="ml-sidebar-width mt-16 p-gutter max-w-container-max mx-auto">
+<main class="ml-0 md:ml-sidebar-width mt-16 p-md md:p-gutter max-w-container-max mx-auto">
 
 <div class="flex items-end justify-between mb-xl flex-wrap gap-md">
 <div>
@@ -295,6 +296,7 @@ Comptes <span th:if="${filtreRole}" th:text="'— ' + ${filtreRole}"></span>
 </h3>
 <a class="text-primary font-label-sm hover:underline" th:if="${filtreRole}" th:href="@{/parametres/roles}">Reinitialiser le filtre</a>
 </div>
+<div class="overflow-x-auto hidden md:block">
 <table class="w-full text-left font-body-md border-collapse">
 <thead class="bg-surface-container-lowest border-b border-outline-variant">
 <tr>
@@ -341,6 +343,37 @@ Comptes <span th:if="${filtreRole}" th:text="'— ' + ${filtreRole}"></span>
 </tbody>
 </table>
 </div>
+<div class="md:hidden divide-y divide-outline-variant">
+<p class="p-lg text-center text-on-surface-variant text-sm" th:if="${comptes.isEmpty()}">Aucun compte trouve.</p>
+<div class="p-md" th:each="compte : ${comptes}">
+<div class="flex justify-between items-start mb-xs">
+<div>
+<p class="font-label-md" th:text="${compte.prenom} + ' ' + ${compte.nom}">Nom</p>
+<p class="text-xs text-on-surface-variant" th:text="${compte.email}">Email</p>
+</div>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0" th:class="${compte.actif} ? 'bg-success-container text-on-success-container' : 'bg-error-container text-on-error-container'" th:text="${compte.actif} ? 'Actif' : 'Suspendu'">Statut</span>
+</div>
+<span class="inline-block px-2 py-0.5 rounded-full text-label-sm bg-primary-container/20 text-primary font-bold mb-sm" th:text="${compte.role}">Role</span>
+<div class="flex flex-col gap-sm">
+<form class="flex items-center gap-sm" method="post" th:action="@{/parametres/roles/{id}(id=${compte.id})}"
+      th:if="${utilisateurConnecte != null and compte.id != utilisateurConnecte.id and compte.role != 'SUPER_ADMIN' and compte.role != 'ELEVE'}">
+<select class="flex-1 p-2 border border-outline-variant rounded-lg text-body-md" name="role">
+<option th:each="r : ${rolesDisponibles}" th:selected="${r == compte.role}" th:text="${r}" th:value="${r}"></option>
+</select>
+<button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-sm hover:bg-primary/90 transition-colors" type="submit">Enregistrer</button>
+</form>
+<form method="post" th:action="@{/parametres/roles/{id}/toggle-actif(id=${compte.id})}"
+      th:if="${utilisateurConnecte != null and compte.id != utilisateurConnecte.id and compte.role != 'SUPER_ADMIN'}">
+<button class="w-full px-md py-2 border rounded-lg font-label-md text-label-sm transition-colors"
+        th:class="${compte.actif} ? 'border-error text-error hover:bg-error-container' : 'border-outline-variant text-on-surface-variant hover:bg-surface-container-low'"
+        type="submit" th:text="${compte.actif} ? 'Suspendre' : 'Reactiver'"></button>
+</form>
+<span class="text-label-sm text-on-surface-variant" th:if="${utilisateurConnecte != null and compte.id == utilisateurConnecte.id}">Votre propre compte</span>
+<span class="text-label-sm text-on-surface-variant" th:if="${compte.role == 'SUPER_ADMIN'}">Non modifiable ici</span>
+</div>
+</div>
+</div>
+</div>
 
 <!-- Historique reel des modifications -->
 <div class="mt-xl grid grid-cols-1 gap-gutter">
@@ -349,6 +382,7 @@ Comptes <span th:if="${filtreRole}" th:text="'— ' + ${filtreRole}"></span>
 <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Dernieres modifications de permissions</h3>
 <a class="text-primary font-label-sm hover:underline" th:href="@{/journal}">Voir tout l'historique</a>
 </div>
+<div class="overflow-x-auto">
 <table class="w-full text-left font-body-md border-collapse">
 <thead class="bg-surface-container-lowest border-b border-outline-variant">
 <tr>
@@ -372,6 +406,7 @@ Comptes <span th:if="${filtreRole}" th:text="'— ' + ${filtreRole}"></span>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 </div>
 
