@@ -1,0 +1,11 @@
+target/
+holyflame_uploads/
+*.log
+.idea
+.vscode
+.git
+.gitignore
+HELP.md
+Guide_Roles_et_Acces_EduSystemPro.pdf
+*.docx
+*.pdf
