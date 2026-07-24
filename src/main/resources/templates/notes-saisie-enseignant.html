@@ -663,6 +663,9 @@ Annuler
 <p class="text-label-sm font-label-sm" id="statut-modifications">Aucune modification non enregistree.</p>
 </div>
 <div class="flex items-center gap-sm">
+<a class="flex items-center gap-xs px-md py-2 border border-outline text-on-surface hover:bg-surface-container-high transition-all rounded-lg font-label-md" th:href="@{/notes/saisie/import/modele(classeId=${selectedClasseId})}" th:if="${selectedClasseId != null}">
+<span class="material-symbols-outlined text-[20px]">download</span> Modele Excel
+</a>
 <button class="flex items-center gap-xs px-md py-2 border border-outline text-on-surface hover:bg-surface-container-high transition-all rounded-lg font-label-md" onclick="document.getElementById('import-file-input').click()" type="button">
 <span class="material-symbols-outlined text-[20px]">upload_file</span> Importer depuis Excel
 </button>

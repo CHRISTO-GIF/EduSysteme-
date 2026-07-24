@@ -4,13 +4,19 @@ import holyflame.administration.model.*;
 import holyflame.administration.repository.*;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.JournalService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -327,6 +333,53 @@ public class NoteController {
     // ──────────────────────────────────────────────────────────────
 
     private static final String SESSION_IMPORT_KEY = "importNotesValides";
+
+    /** Modele Excel pre-rempli avec les eleves de la classe (Matricule + Nom), pret a completer avec les notes. */
+    @GetMapping("/saisie/import/modele")
+    public void telechargerModeleNotes(@RequestParam Long classeId, HttpServletResponse response) throws IOException {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Classe classe = classeRepository.findById(classeId).orElse(null);
+        if (classe == null || etabId == null || !etabId.equals(classe.getEtablissementId())) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        List<Eleve> eleves = eleveRepository.findByClasseIdOrderByNomAsc(classeId);
+
+        XSSFWorkbook wb = new XSSFWorkbook();
+        var sheet = wb.createSheet("Notes");
+
+        XSSFCellStyle headerStyle = wb.createCellStyle();
+        headerStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 0, (byte) 35, (byte) 111}, null));
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        XSSFFont headerFont = wb.createFont();
+        headerFont.setColor(new XSSFColor(new byte[]{(byte) 255, (byte) 255, (byte) 255}, null));
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+
+        String[] entetes = {"Matricule", "Nom", "Note (sur 20)"};
+        Row ligneEntete = sheet.createRow(0);
+        for (int i = 0; i < entetes.length; i++) {
+            Cell c = ligneEntete.createCell(i);
+            c.setCellValue(entetes[i]);
+            c.setCellStyle(headerStyle);
+            sheet.setColumnWidth(i, 24 * 256);
+        }
+
+        int rowNum = 1;
+        for (Eleve e : eleves) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(e.getMatricule() != null ? e.getMatricule() : "");
+            row.createCell(1).setCellValue(e.getNom() + " " + e.getPrenom());
+            row.createCell(2); // note a completer
+        }
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition",
+            "attachment; filename=\"modele-import-notes-" + classe.getNom().replaceAll("\\s+", "-") + ".xlsx\"");
+        wb.write(response.getOutputStream());
+        wb.close();
+    }
 
     public static class LigneImport implements Serializable {
         public Long eleveId;

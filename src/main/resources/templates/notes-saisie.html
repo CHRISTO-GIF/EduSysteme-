@@ -154,6 +154,9 @@
 <button class="flex items-center gap-xs px-md py-2 border border-outline text-on-surface hover:bg-surface-container-high transition-all rounded-lg font-label-md" type="button">
 <span class="material-symbols-outlined text-[20px]">send</span> Notifier les parents
 </button>
+<a class="flex items-center gap-xs px-md py-2 border border-outline text-on-surface hover:bg-surface-container-high transition-all rounded-lg font-label-md" th:href="@{/notes/saisie/import/modele(classeId=${selectedClasseId})}" th:if="${selectedClasseId != null}">
+<span class="material-symbols-outlined text-[20px]">download</span> Modele Excel
+</a>
 <button class="flex items-center gap-xs px-md py-2 border border-outline text-on-surface hover:bg-surface-container-high transition-all rounded-lg font-label-md" onclick="document.getElementById('import-file-input').click()" type="button">
 <span class="material-symbols-outlined text-[20px]">upload_file</span> Importer un fichier Excel
 </button>
