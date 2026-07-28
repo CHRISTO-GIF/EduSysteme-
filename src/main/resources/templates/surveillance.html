@@ -17,12 +17,15 @@
 <h1 class="text-xl font-bold text-blue-900">Surveillance</h1>
 <p class="text-gray-500 text-sm">Suivi des absences et programmes de cours.</p>
 </div>
-<button class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" onclick="document.getElementById('modal-absence').classList.remove('hidden')" type="button">
+<a class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" th:href="@{/surveillance/absences/nouvelle}">
 <span class="material-symbols-outlined text-[18px]">add</span> Signaler une absence
-</button>
+</a>
 </header>
 
 <main class="max-w-7xl mx-auto px-8 py-8">
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-green-100 text-green-800 text-sm" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 text-sm" th:text="${erreurMsg}"></div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 <div class="bg-white border border-gray-200 rounded-xl p-5">
@@ -70,14 +73,14 @@
 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
 <div class="px-5 py-3 border-b border-gray-200 flex justify-between items-center">
 <h3 class="font-semibold">Programmes de cours</h3>
-<button class="text-blue-900 text-sm font-medium" onclick="document.getElementById('modal-programme').classList.remove('hidden')" type="button">+ Nouveau programme</button>
+<a class="text-blue-900 text-sm font-medium" th:href="@{/surveillance/programmes/nouveau}">+ Nouveau programme</a>
 </div>
 <div th:if="${programmes.isEmpty()}" class="p-8 text-center text-gray-500">Aucun programme cree.</div>
 <div class="divide-y divide-gray-100">
 <div class="px-5 py-4 flex justify-between items-start" th:each="p : ${programmes}">
 <div>
 <p class="font-medium" th:text="${p.titre}">Titre</p>
-<p class="text-xs text-gray-500" th:text="(${p.classe != null ? p.classe.nom : 'Toutes classes'}) + ' - ' + ${#temporals.format(p.dateDebut, 'dd/MM')} + ' au ' + ${#temporals.format(p.dateFin, 'dd/MM/yyyy')}">Periode</p>
+<p class="text-xs text-gray-500" th:text="(${p.classe != null ? p.classe.nom : 'Toutes classes'}) + (${p.matiere != null} ? ' • ' + ${p.matiere.nom} : '') + ' - ' + ${#temporals.format(p.dateDebut, 'dd/MM')} + ' au ' + ${#temporals.format(p.dateFin, 'dd/MM/yyyy')}">Periode</p>
 </div>
 <div class="flex items-center gap-3">
 <span class="px-2 py-0.5 rounded-full text-xs font-medium" th:classappend="${p.statut == 'PUBLIE'} ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'" th:text="${p.statut}">Statut</span>
@@ -94,80 +97,5 @@
 
 </main>
 
-<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-absence">
-<div class="bg-white rounded-xl p-xl max-w-md w-full">
-<div class="flex justify-between items-center mb-lg">
-<h3 class="font-bold text-lg">Signaler une absence</h3>
-<button onclick="document.getElementById('modal-absence').classList.add('hidden')" type="button"><span class="material-symbols-outlined">close</span></button>
-</div>
-<form class="space-y-3" method="post" th:action="@{/surveillance/absences}">
-<div>
-<label class="text-xs text-gray-500 block mb-1">Eleve</label>
-<select class="w-full p-2 border border-gray-300 rounded-lg" name="eleveId" required="required">
-<option th:each="e : ${eleves}" th:text="${e.nom} + ' ' + ${e.prenom} + ' (' + ${e.matricule} + ')'" th:value="${e.id}"></option>
-</select>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Date</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="date" required="required" type="date"/>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Periode</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="periode" placeholder="Journee entiere, Matin, Apres-midi..." type="text"/>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Motif</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="motif" type="text"/>
-</div>
-<label class="flex items-center gap-2 text-sm">
-<input name="estJustifiee" type="checkbox" value="true"/> Absence justifiee
-</label>
-<div class="flex justify-end gap-2 pt-2">
-<button class="px-4 py-2 border border-gray-300 rounded-lg" onclick="document.getElementById('modal-absence').classList.add('hidden')" type="button">Annuler</button>
-<button class="px-4 py-2 bg-blue-900 text-white rounded-lg" type="submit">Enregistrer</button>
-</div>
-</form>
-</div>
-</div>
-
-<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-programme">
-<div class="bg-white rounded-xl p-xl max-w-md w-full">
-<div class="flex justify-between items-center mb-lg">
-<h3 class="font-bold text-lg">Nouveau programme</h3>
-<button onclick="document.getElementById('modal-programme').classList.add('hidden')" type="button"><span class="material-symbols-outlined">close</span></button>
-</div>
-<form class="space-y-3" method="post" th:action="@{/surveillance/programmes}">
-<div>
-<label class="text-xs text-gray-500 block mb-1">Titre</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="titre" required="required" type="text"/>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Classe (optionnel)</label>
-<select class="w-full p-2 border border-gray-300 rounded-lg" name="classeId">
-<option value="">Toutes les classes</option>
-<option th:each="c : ${classes}" th:text="${c.nom}" th:value="${c.id}"></option>
-</select>
-</div>
-<div class="grid grid-cols-2 gap-3">
-<div>
-<label class="text-xs text-gray-500 block mb-1">Debut</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="dateDebut" required="required" type="date"/>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Fin</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="dateFin" required="required" type="date"/>
-</div>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Contenu</label>
-<textarea class="w-full p-2 border border-gray-300 rounded-lg" name="contenu" rows="3"></textarea>
-</div>
-<div class="flex justify-end gap-2 pt-2">
-<button class="px-4 py-2 border border-gray-300 rounded-lg" onclick="document.getElementById('modal-programme').classList.add('hidden')" type="button">Annuler</button>
-<button class="px-4 py-2 bg-blue-900 text-white rounded-lg" type="submit">Creer</button>
-</div>
-</form>
-</div>
-</div>
 </body>
 </html>

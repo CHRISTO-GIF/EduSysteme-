@@ -8,5 +8,6 @@ import java.util.List;
 public interface ProgrammeRepository extends JpaRepository<Programme, Long> {
     List<Programme> findAllByOrderByDateDebutDesc();
     List<Programme> findByStatutOrderByDateDebutDesc(String statut);
+    List<Programme> findByEtablissementIdOrderByDateDebutDesc(Long etablissementId);
     void deleteByClasseId(Long classeId);
 }

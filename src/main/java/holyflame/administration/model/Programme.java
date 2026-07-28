@@ -21,10 +21,26 @@ public class Programme {
     private LocalDate dateFin;
     private String statut;  // BROUILLON, PUBLIE
     private String auteur;
+    private Long etablissementId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classe_id")
     private Classe classe;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "matiere_id")
+    private Matiere matiere;
+
+    private Integer heuresEstimees;
+    private String frequence; // HEBDOMADAIRE, BI_HEBDOMADAIRE, MENSUEL, INTENSIF
+
+    @Column(length = 2000)
+    private String objectifs;
+
+    private Long enseignantId; // reference vers Personnel.id
+
+    private String syllabusPath;
+    private String syllabusNomOriginal;
 
     public Programme() {}
 
@@ -44,4 +60,20 @@ public class Programme {
     public void setAuteur(String auteur) { this.auteur = auteur; }
     public Classe getClasse() { return classe; }
     public void setClasse(Classe classe) { this.classe = classe; }
+    public Long getEtablissementId() { return etablissementId; }
+    public void setEtablissementId(Long etablissementId) { this.etablissementId = etablissementId; }
+    public Matiere getMatiere() { return matiere; }
+    public void setMatiere(Matiere matiere) { this.matiere = matiere; }
+    public Integer getHeuresEstimees() { return heuresEstimees; }
+    public void setHeuresEstimees(Integer heuresEstimees) { this.heuresEstimees = heuresEstimees; }
+    public String getFrequence() { return frequence; }
+    public void setFrequence(String frequence) { this.frequence = frequence; }
+    public String getObjectifs() { return objectifs; }
+    public void setObjectifs(String objectifs) { this.objectifs = objectifs; }
+    public Long getEnseignantId() { return enseignantId; }
+    public void setEnseignantId(Long enseignantId) { this.enseignantId = enseignantId; }
+    public String getSyllabusPath() { return syllabusPath; }
+    public void setSyllabusPath(String syllabusPath) { this.syllabusPath = syllabusPath; }
+    public String getSyllabusNomOriginal() { return syllabusNomOriginal; }
+    public void setSyllabusNomOriginal(String syllabusNomOriginal) { this.syllabusNomOriginal = syllabusNomOriginal; }
 }

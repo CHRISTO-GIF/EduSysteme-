@@ -41,6 +41,9 @@ public class SecurityConfig {
                 .requestMatchers("/matieres/**").hasRole("ADMIN")
                 .requestMatchers("/personnel").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/personnel/**").hasRole("ADMIN")
+                // Le surveillant peut signaler/consulter des absences, mais pas gerer les programmes de cours
+                .requestMatchers("/surveillance/programmes/**").hasAnyRole("ADMIN", "ENSEIGNANT")
+                .requestMatchers("/surveillance", "/surveillance/absences/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SURVEILLANT")
                 .requestMatchers("/surveillance/**").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/surveillant/**").hasAnyRole("ADMIN", "SURVEILLANT")
                 .requestMatchers("/notes/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
@@ -61,6 +64,10 @@ public class SecurityConfig {
                 .requestMatchers("/archives/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 .requestMatchers("/publications/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 .requestMatchers("/portail/**").hasAnyRole("ADMIN", "ELEVE", "SECRETAIRE")
+                // Le secretariat peut consulter/renvoyer le recu d'un paiement qu'il vient d'enregistrer
+                // (ex: frais d'inscription lors de la creation d'un eleve), sans acces au reste du module Finances
+                .requestMatchers("/finances/paiements/*/recu", "/finances/paiements/*/renvoyer-email")
+                    .hasAnyRole("ADMIN", "TRESORIER", "SECRETAIRE")
                 .requestMatchers("/finances/**").hasAnyRole("ADMIN", "TRESORIER")
                 .anyRequest().authenticated()
             )

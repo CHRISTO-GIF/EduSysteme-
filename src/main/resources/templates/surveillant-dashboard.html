@@ -77,7 +77,13 @@
 </div>
 
 <div class="flex flex-col gap-sm">
-<a th:href="@{/surveillant/incidents}" class="w-full bg-primary text-on-primary py-3 rounded-xl flex items-center justify-center gap-sm font-label-md">
+<a th:href="@{/surveillant/scan}" class="w-full bg-primary text-on-primary py-3 rounded-xl flex items-center justify-center gap-sm font-label-md">
+<span class="material-symbols-outlined">qr_code_scanner</span> Scanner un Eleve
+</a>
+<a th:href="@{/surveillance/absences/nouvelle}" class="w-full bg-surface-container-lowest border border-primary text-primary py-3 rounded-xl flex items-center justify-center gap-sm font-label-md">
+<span class="material-symbols-outlined">event_busy</span> Signaler une Absence
+</a>
+<a th:href="@{/surveillant/incidents}" class="w-full bg-surface-container-lowest border border-primary text-primary py-3 rounded-xl flex items-center justify-center gap-sm font-label-md">
 <span class="material-symbols-outlined">add_alert</span> Signaler un Incident
 </a>
 <a th:href="@{/surveillant/presences}" class="w-full bg-surface-container-lowest border border-primary text-primary py-3 rounded-xl flex items-center justify-center gap-sm font-label-md">
@@ -198,6 +204,14 @@
 <span class="material-symbols-outlined">event_available</span>
 <span class="font-label-md text-label-md">Présences</span>
 </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/scan}">
+<span class="material-symbols-outlined">qr_code_scanner</span>
+<span class="font-label-md text-label-md">Scanner QR</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillance/absences/nouvelle}">
+<span class="material-symbols-outlined">event_busy</span>
+<span class="font-label-md text-label-md">Signaler une Absence</span>
+</a>
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/retards}">
 <span class="material-symbols-outlined">schedule</span>
 <span class="font-label-md text-label-md">Retards</span>
@@ -216,6 +230,10 @@
 </a>
 </nav>
 <div class="mt-auto px-sm pt-lg border-t border-outline/20">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label-md text-label-md">Retour a l'administration</span>
+</a>
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
 <span class="material-symbols-outlined">logout</span>
 <span class="font-label-md text-label-md">Déconnexion</span>

@@ -23,6 +23,8 @@ public class Absence {
     private String periode;
     private boolean estJustifiee;
     private String motif;
+    private String documentPath;
+    private String documentNomOriginal;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -77,5 +79,21 @@ public class Absence {
 
     public void setEleve(Eleve eleve) {
         this.eleve = eleve;
+    }
+
+    public String getDocumentPath() {
+        return documentPath;
+    }
+
+    public void setDocumentPath(String documentPath) {
+        this.documentPath = documentPath;
+    }
+
+    public String getDocumentNomOriginal() {
+        return documentNomOriginal;
+    }
+
+    public void setDocumentNomOriginal(String documentNomOriginal) {
+        this.documentNomOriginal = documentNomOriginal;
     }
 }

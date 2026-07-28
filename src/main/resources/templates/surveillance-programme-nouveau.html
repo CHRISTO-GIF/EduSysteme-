@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Nouveau Programme de Cours</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config" th:inline="javascript">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#00236f", "primary-container": "#1e3a8a", "on-primary": "#ffffff",
+                      "on-primary-container": "#90a8ff", "primary-fixed": "#dce1ff", "primary-fixed-dim": "#b6c4ff",
+                      "on-primary-fixed-variant": "#264191", "secondary": "#505f76", "secondary-container": "#d0e1fb",
+                      "on-secondary-container": "#54647a", "tertiary": [[${accentColor}]], "tertiary-container": "#384055",
+                      "on-tertiary-container": "#a4acc5", "tertiary-fixed": "#dae2fd", "on-tertiary-fixed-variant": "#3f465c",
+                      "error": "#ba1a1a", "error-container": "#ffdad6", "on-error-container": "#93000a", "on-error": "#ffffff",
+                      "surface": "#f7f9fb", "background": "#f7f9fb", "on-background": "#191c1e",
+                      "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                      "surface-container-lowest": "#ffffff", "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "surface-container-highest": "#e0e3e5",
+                      "outline": "#757682", "outline-variant": "#c5c5d3", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+              },
+              "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              "spacing": {"xs": "4px", "sm": "8px", "md": "16px", "lg": "24px", "xl": "32px", "gutter": "24px", "sidebar-width": "260px", "container-max": "1440px", "base": "4px"},
+              "fontFamily": {"headline-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"]},
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+        .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+        .enseignant-item.selectionne { border-color: #00236f; background-color: #f2f4f6; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-white leading-tight">EduSystem Pro</span>
+<span class="text-[10px] uppercase tracking-wider text-on-tertiary-container opacity-70">Portail Enseignant</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-sm space-y-1">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" th:href="@{/tableau-enseignant}">
+<span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" th:href="@{/tableau-enseignant/eleves}">
+<span class="material-symbols-outlined">group</span><span class="font-label-md text-label-md">Eleves</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg border-l-4 border-primary-fixed bg-tertiary-container text-white font-bold" th:href="@{/surveillance}">
+<span class="material-symbols-outlined">fact_check</span><span class="font-label-md text-label-md">Surveillance</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" th:href="@{/notes/saisie}">
+<span class="material-symbols-outlined">edit_note</span><span class="font-label-md text-label-md">Saisie des notes</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" th:href="@{/examens}">
+<span class="material-symbols-outlined">quiz</span><span class="font-label-md text-label-md">Examens</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" th:href="@{/messagerie}">
+<span class="material-symbols-outlined">forum</span><span class="font-label-md text-label-md">Messagerie</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" th:href="@{/emploi-du-temps}">
+<span class="material-symbols-outlined">calendar_today</span><span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" th:href="@{/bulletins}">
+<span class="material-symbols-outlined">description</span><span class="font-label-md text-label-md">Bulletins</span>
+</a>
+</nav>
+<div class="px-sm mt-auto space-y-1 pt-md border-t border-tertiary-container/50">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span><span class="font-label-md text-label-md">Deconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="flex-1 flex flex-col md:ml-sidebar-width">
+<header class="h-16 sticky top-0 z-40 bg-surface border-b border-surface-variant flex justify-between items-center px-lg w-full">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-xl pr-md py-sm bg-surface-container-low rounded-full border-none focus:ring-2 focus:ring-primary text-body-md font-body-md transition-all" placeholder="Rechercher un eleve, un professeur ou un cours..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg ml-xl">
+<div class="flex items-center gap-sm pl-md border-l border-outline-variant">
+<div class="text-right hidden md:block">
+<p class="text-label-md font-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Enseignant</p>
+<p class="text-label-sm font-label-sm text-outline" th:text="${utilisateurConnecte != null ? utilisateurConnecte.role : ''}">Enseignant</p>
+</div>
+<span class="material-symbols-outlined text-primary-container scale-125">account_circle</span>
+</div>
+</div>
+</header>
+
+<main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
+<form method="post" th:action="@{/surveillance/programmes}" enctype="multipart/form-data" id="form-programme">
+<div class="mb-xl flex flex-wrap justify-between items-end gap-md">
+<div>
+<nav class="flex items-center gap-xs text-label-sm font-label-sm text-outline mb-sm">
+<a th:href="@{/surveillance}" class="hover:text-primary transition-colors">Surveillance</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Nouveau Programme de Cours</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary">Creer un Nouveau Programme</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Definissez les parametres structurels et pedagogiques pour la nouvelle session de cours.</p>
+</div>
+<div class="flex gap-md">
+<a th:href="@{/surveillance}" class="px-lg py-md border border-outline-variant text-secondary font-label-md text-label-md rounded-xl hover:bg-surface-container transition-colors">
+Annuler
+</a>
+<button class="px-xl py-md bg-primary text-on-primary font-label-md text-label-md rounded-xl hover:brightness-125 transition-all shadow-md flex items-center gap-sm" type="submit">
+<span class="material-symbols-outlined text-[20px]">save</span>
+Enregistrer le programme
+</button>
+</div>
+</div>
+
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<!-- Bento Form Layout -->
+<div class="bento-grid">
+<!-- Informations Generales -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg text-primary">
+<span class="material-symbols-outlined">info</span>
+<h3 class="font-headline-sm text-headline-sm">Informations Generales</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="col-span-2">
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Titre du Cours</label>
+<input class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" name="titre" placeholder="Ex: Mathematiques Avancees - Analyse Reelle" required="required" type="text"/>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Niveau / Classe</label>
+<select class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" name="classeId">
+<option value="">Toutes les classes</option>
+<option th:each="c : ${classes}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Matiere</label>
+<select class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" name="matiereId">
+<option value="">Selectionnez une matiere</option>
+<option th:each="m : ${matieres}" th:text="${m.nom}" th:value="${m.id}"></option>
+</select>
+</div>
+<div class="col-span-2 md:col-span-1">
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Annee Academique</label>
+<input class="w-full p-md bg-surface-container border border-outline-variant rounded-lg text-outline cursor-not-allowed" readonly="readonly" th:value="${anneeScolaire}" type="text"/>
+</div>
+</div>
+</section>
+
+<!-- Assignation Enseignant -->
+<section class="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col">
+<div class="flex items-center gap-sm mb-lg text-primary">
+<span class="material-symbols-outlined">person_search</span>
+<h3 class="font-headline-sm text-headline-sm">Assignation Enseignant</h3>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-lg">Recherchez un professeur dans le registre pour ce programme (optionnel).</p>
+<input type="hidden" name="enseignantId" id="input-enseignant-id"/>
+<div class="relative mb-lg">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-xl pr-md py-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" id="filtre-enseignant" placeholder="Nom du professeur..." type="text"/>
+</div>
+<div class="flex-1 space-y-md overflow-y-auto max-h-48 pr-xs" id="liste-enseignants">
+<p class="text-body-md text-on-surface-variant" th:if="${enseignants.isEmpty()}">Aucun enseignant enregistre.</p>
+<div class="enseignant-item flex items-center gap-md p-sm rounded-lg hover:bg-surface-container-low border border-transparent hover:border-primary-fixed cursor-pointer transition-all"
+     th:attr="data-id=${p.id},data-nom=${p.prenom} + ' ' + ${p.nom}" th:each="p : ${enseignants}">
+<div class="w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div class="min-w-0">
+<p class="text-label-md font-label-md truncate" th:text="${p.prenom} + ' ' + ${p.nom}">Nom</p>
+<p class="text-label-sm font-label-sm text-outline truncate" th:text="${p.matiereEnseignee != null ? p.matiereEnseignee : 'Enseignant'}">Matiere</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Planification & Duree -->
+<section class="col-span-12 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg text-primary">
+<span class="material-symbols-outlined">calendar_today</span>
+<h3 class="font-headline-sm text-headline-sm">Planification &amp; Duree</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Date de Debut</label>
+<input class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" name="dateDebut" required="required" type="date"/>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Date de Fin</label>
+<input class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" name="dateFin" required="required" type="date"/>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Heures Estimees</label>
+<div class="relative">
+<input class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary pr-xl" min="0" name="heuresEstimees" placeholder="40" type="number"/>
+<span class="absolute right-md top-1/2 -translate-y-1/2 text-label-sm font-label-sm text-outline">hrs</span>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Frequence</label>
+<select class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" name="frequence">
+<option value="HEBDOMADAIRE">Hebdomadaire</option>
+<option value="BI_HEBDOMADAIRE">Bi-hebdomadaire</option>
+<option value="MENSUEL">Mensuel</option>
+<option value="INTENSIF">Intensif</option>
+</select>
+</div>
+</div>
+</section>
+
+<!-- Contenu & Objectifs -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg text-primary">
+<span class="material-symbols-outlined">menu_book</span>
+<h3 class="font-headline-sm text-headline-sm">Contenu &amp; Objectifs</h3>
+</div>
+<div class="space-y-lg">
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Description / Resume</label>
+<div class="border border-outline-variant rounded-lg">
+<div class="bg-surface-container-low p-sm border-b border-outline-variant flex gap-sm">
+<span class="p-xs text-outline"><span class="material-symbols-outlined text-[18px]">format_bold</span></span>
+<span class="p-xs text-outline"><span class="material-symbols-outlined text-[18px]">format_italic</span></span>
+<span class="p-xs text-outline"><span class="material-symbols-outlined text-[18px]">format_list_bulleted</span></span>
+<span class="p-xs text-outline"><span class="material-symbols-outlined text-[18px]">link</span></span>
+</div>
+<textarea class="w-full p-md bg-white border-none rounded-b-lg focus:ring-0 text-body-md" name="contenu" placeholder="Decrivez les grandes lignes du cours..." rows="4"></textarea>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs">Objectifs d'Apprentissage</label>
+<textarea class="w-full p-md bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary text-body-md" name="objectifs" placeholder="- Maitriser les derivees complexes&#10;- Appliquer le theoreme de Rolle..." rows="3"></textarea>
+</div>
+</div>
+</section>
+
+<!-- Syllabus Upload -->
+<section class="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col">
+<div class="flex items-center gap-sm mb-lg text-primary">
+<span class="material-symbols-outlined">upload_file</span>
+<h3 class="font-headline-sm text-headline-sm">Syllabus</h3>
+</div>
+<label class="flex-1 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center p-xl text-center group hover:border-primary-container transition-colors cursor-pointer bg-surface-container-lowest" for="input-syllabus">
+<span class="material-symbols-outlined text-[48px] text-outline mb-md group-hover:text-primary transition-colors">cloud_upload</span>
+<p class="text-label-md font-label-md text-on-surface mb-xs">Cliquez pour televerser le syllabus</p>
+<p class="text-label-sm font-label-sm text-outline">PDF, DOCX (Max. 10MB)</p>
+<input accept=".pdf,.doc,.docx" class="hidden" id="input-syllabus" name="syllabus" type="file"/>
+</label>
+<div class="mt-lg hidden" id="apercu-syllabus">
+<div class="flex items-center justify-between p-sm bg-surface-container rounded-lg border border-outline-variant">
+<div class="flex items-center gap-sm min-w-0">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+<span class="text-label-sm font-label-sm truncate max-w-[150px]" id="nom-syllabus"></span>
+</div>
+<button class="text-outline hover:text-error transition-colors" id="btn-retirer-syllabus" type="button"><span class="material-symbols-outlined text-[20px]">close</span></button>
+</div>
+</div>
+</section>
+</div>
+
+<div class="mt-xl p-lg bg-primary-container/10 rounded-xl border border-primary-fixed-dim flex items-center gap-lg">
+<div class="w-16 h-16 rounded-lg bg-primary-container/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[32px]">verified</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md text-primary">Apercu de la conformite</h4>
+<p class="text-body-md font-body-md text-on-surface-variant">Ce programme sera enregistre en brouillon — vous pourrez le publier depuis la liste des programmes une fois relu.</p>
+</div>
+</div>
+
+<div class="h-16 md:hidden"></div>
+</form>
+</main>
+</div>
+
+<script>
+    document.querySelectorAll('input, select, textarea').forEach(function (element) {
+        element.addEventListener('focus', function () {
+            if (this.parentElement) this.parentElement.classList.add('scale-[1.01]');
+        });
+        element.addEventListener('blur', function () {
+            if (this.parentElement) this.parentElement.classList.remove('scale-[1.01]');
+        });
+    });
+
+    // Selection d'un enseignant dans la liste
+    var listeEnseignants = document.getElementById('liste-enseignants');
+    var inputEnseignantId = document.getElementById('input-enseignant-id');
+    listeEnseignants.querySelectorAll('.enseignant-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+            listeEnseignants.querySelectorAll('.enseignant-item').forEach(function (i) { i.classList.remove('selectionne'); });
+            item.classList.add('selectionne');
+            inputEnseignantId.value = item.getAttribute('data-id');
+        });
+    });
+
+    // Filtre de recherche enseignant
+    var filtreEnseignant = document.getElementById('filtre-enseignant');
+    if (filtreEnseignant) {
+        filtreEnseignant.addEventListener('input', function () {
+            var terme = this.value.toLowerCase();
+            listeEnseignants.querySelectorAll('.enseignant-item').forEach(function (item) {
+                var nom = (item.getAttribute('data-nom') || '').toLowerCase();
+                item.style.display = nom.includes(terme) ? '' : 'none';
+            });
+        });
+    }
+
+    // Apercu du syllabus televerse
+    var inputSyllabus = document.getElementById('input-syllabus');
+    var apercuSyllabus = document.getElementById('apercu-syllabus');
+    var nomSyllabus = document.getElementById('nom-syllabus');
+    var btnRetirerSyllabus = document.getElementById('btn-retirer-syllabus');
+    inputSyllabus.addEventListener('change', function () {
+        if (this.files && this.files.length > 0) {
+            nomSyllabus.textContent = this.files[0].name;
+            apercuSyllabus.classList.remove('hidden');
+        } else {
+            apercuSyllabus.classList.add('hidden');
+        }
+    });
+    btnRetirerSyllabus.addEventListener('click', function () {
+        inputSyllabus.value = '';
+        apercuSyllabus.classList.add('hidden');
+    });
+</script>
+</body>
+</html>
