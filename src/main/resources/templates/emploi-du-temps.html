@@ -56,7 +56,7 @@
 </div>
 <div>
 <h1 class="font-headline-sm text-headline-sm text-white font-bold leading-tight">EduSystem Pro</h1>
-<p class="text-on-tertiary-container text-xs opacity-80">Portail Admin</p>
+<p class="text-on-tertiary-container text-xs opacity-80" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Portail Admin'))">Portail Admin</p>
 </div>
 </div>
 </div>
@@ -64,22 +64,22 @@
 <a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/dashboard">
 <span class="material-symbols-outlined mr-md">dashboard</span> Tableau de bord
 </a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/secretariat">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined mr-md">group</span> Eleves
 </a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/personnel">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/personnel" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
 <span class="material-symbols-outlined mr-md">school</span> Personnel
 </a>
 <a class="flex items-center px-lg py-md text-white border-l-4 border-primary-fixed bg-tertiary-container transition-colors duration-200 font-label-md text-label-md" href="/emploi-du-temps">
 <span class="material-symbols-outlined mr-md">calendar_month</span> Emploi du temps
 </a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/examens">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/examens" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined mr-md">quiz</span> Examens
 </a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/messagerie">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/messagerie" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined mr-md">forum</span> Messagerie
 </a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/finances">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/finances" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
 <span class="material-symbols-outlined mr-md">account_balance</span> Tresorerie
 </a>
 <a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md" href="/journal">
@@ -87,7 +87,7 @@
 </a>
 </nav>
 <div class="mt-auto border-t border-tertiary-container/30 pt-md px-lg">
-<a class="flex items-center py-sm text-on-tertiary-container hover:text-white transition-colors duration-200 font-label-md text-label-md" href="/parametres">
+<a class="flex items-center py-sm text-on-tertiary-container hover:text-white transition-colors duration-200 font-label-md text-label-md" href="/parametres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <span class="material-symbols-outlined mr-md">settings</span> Parametres
 </a>
 <a class="flex items-center py-sm text-on-tertiary-container hover:text-white transition-colors duration-200 font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">

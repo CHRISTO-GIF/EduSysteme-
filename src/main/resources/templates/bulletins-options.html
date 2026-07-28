@@ -54,7 +54,7 @@
 </div>
 <div>
 <h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
-<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70">Portail Admin</p>
+<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : 'Portail Admin')">Portail Admin</p>
 </div>
 </div>
 </div>

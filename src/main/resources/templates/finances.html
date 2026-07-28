@@ -53,7 +53,7 @@
 </div>
 <div>
 <h1 class="font-headline-sm text-headline-sm font-bold text-on-tertiary">EduSystem Pro</h1>
-<p class="text-label-sm text-on-tertiary/60">Portail Admin</p>
+<p class="text-label-sm text-on-tertiary/60" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Portail Admin'">Portail Admin</p>
 </div>
 </div>
 <nav class="space-y-base">

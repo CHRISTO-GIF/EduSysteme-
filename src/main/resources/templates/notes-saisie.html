@@ -66,7 +66,7 @@
 <span class="material-symbols-outlined text-on-primary-fixed text-headline-sm" style="font-variation-settings: 'FILL' 1;">school</span>
 <div class="flex flex-col">
 <span class="font-headline-sm text-headline-sm text-on-primary-fixed font-bold leading-tight">EduSystem Pro</span>
-<span class="text-on-tertiary-container font-label-sm text-label-sm">Portail Admin</span>
+<span class="text-on-tertiary-container font-label-sm text-label-sm" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Portail Admin'))">Portail Admin</span>
 </div>
 </div>
 </div>

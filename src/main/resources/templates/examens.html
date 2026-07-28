@@ -54,7 +54,7 @@
 <aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex-col py-lg z-50 overflow-y-auto">
 <div class="px-lg mb-xl">
 <h1 class="font-headline-sm text-headline-sm font-bold text-surface-bright">EduSystem Pro</h1>
-<p class="text-label-sm text-on-tertiary-container">Administration</p>
+<p class="text-label-sm text-on-tertiary-container" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Administration'))">Administration</p>
 </div>
 <nav class="flex-1 space-y-1">
 <a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/dashboard">

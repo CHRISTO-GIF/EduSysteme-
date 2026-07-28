@@ -117,7 +117,7 @@ Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
 <span class="material-symbols-outlined">dashboard</span>
 <span class="font-label-sm text-label-sm">Tableau</span>
 </a>
-<a class="flex flex-col items-center justify-center text-secondary" href="/secretariat">
+<a class="flex flex-col items-center justify-center text-secondary" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined">group</span>
 <span class="font-label-sm text-label-sm">Eleves</span>
 </a>
@@ -142,7 +142,7 @@ Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
 </div>
 <div>
 <h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
-<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70">Portail Admin</p>
+<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : 'Portail Admin'">Portail Admin</p>
 </div>
 </div>
 </div>
@@ -150,13 +150,13 @@ Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
 <a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/dashboard">
 <span class="material-symbols-outlined">dashboard</span> Tableau de bord
 </a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined">group</span> Eleves
 </a>
 <a class="flex items-center gap-md px-md py-sm text-white border-l-4 border-primary-fixed bg-tertiary-container rounded-lg font-label-md text-label-md font-bold" href="/personnel">
 <span class="material-symbols-outlined">school</span> Personnel
 </a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/matieres">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/matieres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <span class="material-symbols-outlined">menu_book</span> Matieres
 </a>
 <a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/emploi-du-temps">
@@ -171,7 +171,7 @@ Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
 <a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/messagerie">
 <span class="material-symbols-outlined">forum</span> Messagerie
 </a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/finances">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/finances" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
 <span class="material-symbols-outlined">account_balance</span> Tresorerie
 </a>
 <a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/journal">
@@ -179,7 +179,7 @@ Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
 </a>
 </nav>
 <div class="px-sm mt-auto space-y-xs pt-md border-t border-tertiary-container/30">
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/parametres">
+<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/parametres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <span class="material-symbols-outlined">settings</span> Parametres
 </a>
 <a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
