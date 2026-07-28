@@ -71,6 +71,7 @@ public class BulletinController {
         model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
         model.addAttribute("classeId", classeId);
         model.addAttribute("q", q);
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         return "bulletins";
     }
 

@@ -6,60 +6,214 @@
 <title>Bulletins - EduSystem Pro</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config" th:inline="javascript">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e6e8ea", "error-container": "#ffdad6", "surface-dim": "#d8dadc",
+                    "secondary-fixed-dim": "#b7c8e1", "surface-tint": "#4059aa", "primary-fixed": "#dce1ff",
+                    "tertiary-fixed-dim": "#bec6e0", "on-tertiary": "#ffffff", "surface": "#f7f9fb",
+                    "on-tertiary-container": "#a4acc5", "on-primary": "#ffffff", "outline-variant": "#c5c5d3",
+                    "on-primary-fixed-variant": "#264191", "on-primary-fixed": "#00164e", "surface-bright": "#f7f9fb",
+                    "secondary-fixed": "#d3e4fe", "surface-variant": "#e0e3e5", "secondary-container": "#d0e1fb",
+                    "secondary": "#505f76", "outline": "#757682", "error": "#ba1a1a", "on-tertiary-fixed": "#131b2e",
+                    "on-tertiary-fixed-variant": "#3f465c", "surface-container-low": "#f2f4f6", "on-error": "#ffffff",
+                    "primary": "#00236f", "on-surface-variant": "#444651", "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#384055", "on-background": "#191c1e", "primary-fixed-dim": "#b6c4ff",
+                    "tertiary": [[${accentColor}]], "on-secondary-fixed-variant": "#38485d", "on-secondary-container": "#54647a",
+                    "on-primary-container": "#90a8ff", "tertiary-fixed": "#dae2fd", "surface-container-highest": "#e0e3e5",
+                    "on-secondary": "#ffffff", "on-error-container": "#93000a", "background": "#f7f9fb",
+                    "primary-container": "#1e3a8a", "on-secondary-fixed": "#0b1c30", "surface-container": "#eceef0",
+                    "on-surface": "#191c1e", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"gutter": "24px", "base": "4px", "container-max": "1440px", "xl": "32px", "lg": "24px", "md": "16px", "sidebar-width": "260px", "sm": "8px", "xs": "4px"},
+            "fontFamily": {"headline-md": ["Inter"], "headline-sm": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "body-lg": ["Inter"], "headline-lg": ["Inter"]},
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
 <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-</style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active { border-left: 4px solid #4059aa; background-color: rgba(56, 64, 85, 0.3); color: #dce1ff; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
-<header class="bg-white border-b border-gray-200 px-md md:px-8 py-4 flex flex-wrap gap-md justify-between items-center">
-<div>
-<h1 class="text-xl font-bold text-blue-900">Bulletins</h1>
-<p class="text-gray-500 text-sm">Consultez et imprimez les bulletins de chaque eleve.</p>
+<body class="bg-surface text-on-surface">
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex-col py-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-surface-bright">EduSystem Pro</h1>
+<p class="text-label-sm text-on-tertiary-container" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Administration'))">Administration</p>
 </div>
-<a class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2" th:href="@{/bulletins/impression(classeId=${classeId})}">
-<span class="material-symbols-outlined text-[18px]">print</span> Impression par classe
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/dashboard">
+<span class="material-symbols-outlined mr-3">dashboard</span> Tableau de bord
 </a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-3">group</span> Eleves
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/personnel" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
+<span class="material-symbols-outlined mr-3">school</span> Personnel
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/notes/saisie" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-3">grading</span> Notes
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/examens" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-3">quiz</span> Examens
+</a>
+<a class="flex items-center px-lg py-3 sidebar-active font-label-md text-label-md" href="/bulletins">
+<span class="material-symbols-outlined mr-3">description</span> Bulletins
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/messagerie" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-3">forum</span> Messagerie
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/finances" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
+<span class="material-symbols-outlined mr-3">account_balance</span> Tresorerie
+</a>
+<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/emploi-du-temps">
+<span class="material-symbols-outlined mr-3">calendar_today</span> Emploi du temps
+</a>
+</nav>
+<div class="mt-auto px-lg space-y-2">
+<div class="pt-lg border-t border-outline-variant/30 space-y-1">
+<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="/parametres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined mr-3">settings</span> Parametres
+</a>
+<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined mr-3">logout</span> Deconnexion
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</div>
+</aside>
+
+<header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface border-b border-outline-variant flex justify-between items-center px-md md:px-lg z-40">
+<div class="flex items-center w-1/2 md:w-1/3">
+<span class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">Bulletins</span>
+<form class="hidden md:block relative w-full max-w-sm" method="get" th:action="@{/bulletins}">
+<input name="classeId" th:value="${classeId}" type="hidden"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:ring-2 focus:ring-primary focus:outline-none transition-all" name="q" placeholder="Rechercher un eleve, un matricule..." th:value="${q}" type="text"/>
+</form>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-secondary hover:bg-surface-container-low rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-sm ml-2">
+<div class="text-right hidden md:block">
+<p class="font-label-md text-label-md text-on-surface" th:if="${utilisateurConnecte != null}" th:text="${utilisateurConnecte.prenom} + ' ' + ${utilisateurConnecte.nom}">Admin</p>
+<p class="text-xs text-secondary" th:text="${utilisateurConnecte != null ? utilisateurConnecte.role : ''}">Administrateur</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed border border-outline-variant flex items-center justify-center text-primary font-bold" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'A'}">A</div>
+</div>
+</div>
 </header>
 
-<main class="max-w-5xl mx-auto px-md md:px-8 py-8">
+<main class="pt-16 ml-0 md:ml-sidebar-width min-h-screen">
+<div class="max-w-container-max mx-auto p-md md:p-lg">
 
-<form class="bg-white border border-gray-200 rounded-xl p-lg mb-lg flex flex-wrap items-end gap-md" method="get">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-xl gap-md">
 <div>
-<label class="text-xs text-gray-500 block mb-1">Classe</label>
-<select class="p-2 border border-gray-300 rounded-lg" name="classeId" onchange="this.form.submit()">
+<h2 class="font-headline-lg text-headline-lg text-primary">Bulletins</h2>
+<p class="text-body-md text-secondary">Consultez et imprimez le bulletin de chaque eleve.</p>
+</div>
+<div class="flex gap-sm">
+<a class="px-lg py-2.5 bg-primary text-on-primary font-label-md text-label-md rounded-lg flex items-center gap-2 hover:shadow-lg transition-all" th:href="@{/bulletins/impression(classeId=${classeId})}">
+<span class="material-symbols-outlined">print</span> Impression par classe
+</a>
+</div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-lg mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center gap-lg">
+<div class="w-12 h-12 bg-primary-fixed flex items-center justify-center rounded-full text-on-primary-fixed-variant">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<div>
+<p class="text-label-sm text-secondary uppercase tracking-wider" th:text="${classeId != null ? 'Eleves de la classe' : 'Total eleves'}">Total eleves</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" th:text="${eleves.size()}">0</h3>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center gap-lg">
+<div class="w-12 h-12 bg-secondary-fixed flex items-center justify-center rounded-full text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<div>
+<p class="text-label-sm text-secondary uppercase tracking-wider">Classes de l'etablissement</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" th:text="${classes.size()}">0</h3>
+</div>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center flex-wrap gap-sm">
+<h4 class="font-headline-sm text-headline-sm text-primary">Liste des eleves</h4>
+<form class="flex items-center gap-sm" method="get" th:action="@{/bulletins}">
+<input name="q" th:value="${q}" type="hidden"/>
+<select class="bg-surface-container-low border-none text-label-sm rounded-lg py-1 px-3 focus:ring-1 focus:ring-primary" name="classeId" onchange="this.form.submit()">
 <option value="">Toutes les classes</option>
 <option th:each="c : ${classes}" th:selected="${classeId != null and classeId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
 </select>
-</div>
-<div class="flex-1">
-<label class="text-xs text-gray-500 block mb-1">Nom ou matricule</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="q" placeholder="Rechercher un eleve..." th:value="${q}" type="text"/>
-</div>
-<button class="px-4 py-2 bg-blue-900 text-white rounded-lg font-medium" type="submit">Rechercher</button>
 </form>
+</div>
 
-<div class="bg-white border border-gray-200 rounded-xl overflow-x-auto">
-<table class="w-full text-left text-sm min-w-[480px]">
-<thead class="bg-gray-50 text-gray-500 uppercase text-xs">
-<tr><th class="px-5 py-3">Eleve</th><th class="px-5 py-3">Matricule</th><th class="px-5 py-3">Classe</th><th class="px-5 py-3 text-right">Actions</th></tr>
-</thead>
-<tbody class="divide-y divide-gray-100">
-<tr th:if="${eleves.isEmpty()}">
-<td class="px-5 py-8 text-center text-gray-500" colspan="4">Aucun eleve trouve.</td>
+<div class="overflow-x-auto hidden md:block">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50 text-label-sm text-secondary">
+<th class="px-lg py-3 font-semibold uppercase tracking-wider">Eleve</th>
+<th class="px-lg py-3 font-semibold uppercase tracking-wider">Matricule</th>
+<th class="px-lg py-3 font-semibold uppercase tracking-wider">Classe</th>
+<th class="px-lg py-3"></th>
 </tr>
-<tr th:each="e : ${eleves}">
-<td class="px-5 py-3 font-medium" th:text="${e.prenom} + ' ' + ${e.nom}">Eleve</td>
-<td class="px-5 py-3 text-gray-500" th:text="${e.matricule}">Matricule</td>
-<td class="px-5 py-3" th:text="${e.classe != null ? e.classe.nom : '?'}">Classe</td>
-<td class="px-5 py-3 text-right">
-<a class="text-blue-900 hover:underline text-xs font-medium" th:href="@{/bulletins/{id}(id=${e.id})}">Voir le bulletin</a>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors" th:each="e : ${eleves}">
+<td class="px-lg py-4">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-[13px] shrink-0" th:text="${#strings.isEmpty(e.prenom) ? '' : #strings.substring(e.prenom,0,1)} + ${#strings.isEmpty(e.nom) ? '' : #strings.substring(e.nom,0,1)}">--</div>
+<p class="font-label-md text-on-surface" th:text="${e.prenom} + ' ' + ${e.nom}">Eleve</p>
+</div>
 </td>
+<td class="px-lg py-4 text-secondary font-mono text-sm" th:text="${e.matricule}">Matricule</td>
+<td class="px-lg py-4 text-on-surface" th:text="${e.classe != null ? e.classe.nom : '?'}">Classe</td>
+<td class="px-lg py-4 text-right">
+<a class="text-primary hover:underline text-xs font-bold uppercase" th:href="@{/bulletins/{id}(id=${e.id})}">Voir le bulletin</a>
+</td>
+</tr>
+<tr th:if="${eleves.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="4">Aucun eleve trouve.</td>
 </tr>
 </tbody>
 </table>
 </div>
 
+<div class="md:hidden divide-y divide-outline-variant">
+<p class="p-lg text-center text-secondary text-sm" th:if="${eleves.isEmpty()}">Aucun eleve trouve.</p>
+<a class="p-md flex items-center gap-md" th:each="e : ${eleves}" th:href="@{/bulletins/{id}(id=${e.id})}">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-[13px] shrink-0" th:text="${#strings.isEmpty(e.prenom) ? '' : #strings.substring(e.prenom,0,1)} + ${#strings.isEmpty(e.nom) ? '' : #strings.substring(e.nom,0,1)}">--</div>
+<div class="min-w-0 flex-1">
+<p class="font-label-md text-on-surface truncate" th:text="${e.prenom} + ' ' + ${e.nom}">Eleve</p>
+<p class="text-xs text-secondary" th:text="(${e.classe != null ? e.classe.nom : '?'}) + ' • ' + ${e.matricule}">Classe — Matricule</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</a>
+</div>
+</div>
+
+</div>
 </main>
 </body>
 </html>
