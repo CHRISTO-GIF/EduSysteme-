@@ -242,6 +242,102 @@
 </div>
 </div>
 
+<!-- Frais et modalites d'inscription -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
+<div class="flex items-center gap-md mb-xl">
+<div class="bg-primary-container/10 p-3 rounded-lg text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Frais et modalites d'inscription</h4>
+</div>
+<p class="text-label-sm text-on-surface-variant mb-lg">Definissez les sommes a verser (inscription, tranches de scolarite, transport, cantine, autre...). Cette liste apparaitra lors de l'enregistrement d'un paiement pour aider la tresoriere — le montant reste modifiable manuellement au moment du paiement.</p>
+
+<div class="overflow-x-auto mb-lg" th:if="${!frais.isEmpty()}">
+<table class="w-full text-left text-body-md">
+<thead>
+<tr class="text-label-sm text-on-surface-variant uppercase border-b border-outline-variant">
+<th class="py-2 pr-md">Designation</th>
+<th class="py-2 pr-md">Type</th>
+<th class="py-2 pr-md">Echeance</th>
+<th class="py-2 pr-md text-right">Montant</th>
+<th class="py-2 pr-md">Niveau</th>
+<th class="py-2 pr-md text-center">Obligatoire</th>
+<th class="py-2"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50">
+<tr th:each="f : ${frais}">
+<td class="py-2 pr-md font-label-md" th:text="${f.designation}">Designation</td>
+<td class="py-2 pr-md">
+<span class="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase bg-primary-fixed text-on-primary-fixed-variant" th:text="${f.typeFrais}">TYPE</span>
+</td>
+<td class="py-2 pr-md text-on-surface-variant" th:text="${f.echeance}">Echeance</td>
+<td class="py-2 pr-md text-right font-bold" th:text="${#numbers.formatDecimal(f.montant, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</td>
+<td class="py-2 pr-md text-on-surface-variant" th:text="${f.niveauCible != null and !f.niveauCible.isEmpty() ? f.niveauCible : 'Tous niveaux'}">Niveau</td>
+<td class="py-2 pr-md text-center">
+<span class="material-symbols-outlined text-primary text-[18px]" th:if="${f.obligatoire}">check_circle</span>
+<span class="text-on-surface-variant text-[11px]" th:unless="${f.obligatoire}">Optionnel</span>
+</td>
+<td class="py-2 text-right whitespace-nowrap">
+<button class="btn-modifier-frais text-primary text-label-sm hover:underline mr-md"
+        th:data-designation="${f.designation}" th:data-echeance="${f.echeance}"
+        th:data-id="${f.id}" th:data-montant="${f.montant}"
+        th:data-niveau="${f.niveauCible != null ? f.niveauCible : ''}"
+        th:data-obligatoire="${f.obligatoire}" th:data-type="${f.typeFrais}" type="button">Modifier</button>
+<form class="inline" method="post" th:action="@{/parametres/frais/{id}/supprimer(id=${f.id})}">
+<button class="text-error text-label-sm hover:underline" type="submit">Supprimer</button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-on-surface-variant text-body-md mb-lg" th:if="${frais.isEmpty()}">Aucun frais defini pour l'instant. Ajoutez-en un ci-dessous.</p>
+
+<form class="grid grid-cols-1 md:grid-cols-6 gap-md items-end border-t border-outline-variant pt-lg" id="form-frais" method="post" th:action="@{/parametres/frais}">
+<div class="md:col-span-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Designation</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg text-body-md" id="frais-designation" name="designation" placeholder="Ex: Frais de cantine" required="required" type="text"/>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Type</label>
+<select class="w-full p-2 border border-outline-variant rounded-lg text-body-md" id="frais-type" name="typeFrais" required="required">
+<option value="INSCRIPTION">Inscription</option>
+<option value="SCOLARITE">Scolarite (tranche)</option>
+<option value="TRANSPORT">Transport</option>
+<option value="CANTINE">Cantine</option>
+<option value="AUTRE">Autre</option>
+</select>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Montant</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg text-body-md" id="frais-montant" min="0" name="montant" required="required" step="1" type="number"/>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Echeance</label>
+<select class="w-full p-2 border border-outline-variant rounded-lg text-body-md" id="frais-echeance" name="echeance">
+<option value="ANNUEL">Annuel</option>
+<option value="T1">Trimestre 1</option>
+<option value="T2">Trimestre 2</option>
+<option value="T3">Trimestre 3</option>
+<option value="MENSUEL">Mensuel</option>
+</select>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Niveau cible</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg text-body-md" id="frais-niveau" name="niveauCible" placeholder="Tous niveaux" type="text"/>
+</div>
+<div class="flex items-center gap-2 md:col-span-3">
+<input class="w-4 h-4" id="frais-obligatoire" name="obligatoire" type="checkbox" value="true"/>
+<label class="text-label-sm text-on-surface-variant" for="frais-obligatoire">Obligatoire pour tous les eleves concernes</label>
+</div>
+<div class="md:col-span-3 flex justify-end gap-sm">
+<button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md hidden" id="btn-annuler-frais" type="button">Annuler la modification</button>
+<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md" id="btn-submit-frais" type="submit">Ajouter le frais</button>
+</div>
+</form>
+</div>
+
 <!-- Profil Administrateur -->
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
 <div class="flex items-center gap-md mb-xl">
@@ -408,5 +504,36 @@
 
 </div>
 </main>
+<script>
+    (function () {
+        var formFrais = document.getElementById('form-frais');
+        var btnAnnuler = document.getElementById('btn-annuler-frais');
+        var btnSubmit = document.getElementById('btn-submit-frais');
+        var urlAjout = formFrais.getAttribute('action');
+
+        function reinitialiserFormulaireFrais() {
+            formFrais.reset();
+            formFrais.setAttribute('action', urlAjout);
+            btnSubmit.textContent = 'Ajouter le frais';
+            btnAnnuler.classList.add('hidden');
+        }
+        btnAnnuler.addEventListener('click', reinitialiserFormulaireFrais);
+
+        document.querySelectorAll('.btn-modifier-frais').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.getElementById('frais-designation').value = btn.dataset.designation;
+                document.getElementById('frais-type').value = btn.dataset.type;
+                document.getElementById('frais-montant').value = btn.dataset.montant;
+                document.getElementById('frais-echeance').value = btn.dataset.echeance;
+                document.getElementById('frais-niveau').value = btn.dataset.niveau || '';
+                document.getElementById('frais-obligatoire').checked = btn.dataset.obligatoire === 'true';
+                formFrais.setAttribute('action', '/parametres/frais/' + btn.dataset.id + '/modifier');
+                btnSubmit.textContent = 'Enregistrer les modifications';
+                btnAnnuler.classList.remove('hidden');
+                formFrais.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        });
+    })();
+</script>
 </body>
 </html>

@@ -570,13 +570,24 @@ public class ParametreController {
     private static final String JOURNAL_MODULE_ROLES = "UTILISATEURS";
 
     @GetMapping("/roles")
-    public String roles(@RequestParam(required = false) String role, Model model) {
+    public String roles(@RequestParam(required = false) String role,
+                        @RequestParam(required = false) String q, Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
         List<Utilisateur> tousLesComptes = utilisateurRepository.findByEtablissementId(etabId);
 
         List<Utilisateur> comptesAffiches = (role == null || role.isBlank())
             ? tousLesComptes
             : tousLesComptes.stream().filter(u -> role.equals(u.getRole())).toList();
+
+        if (q != null && !q.isBlank()) {
+            String terme = q.trim().toLowerCase();
+            comptesAffiches = comptesAffiches.stream()
+                .filter(u -> (u.getNom() != null && u.getNom().toLowerCase().contains(terme))
+                    || (u.getPrenom() != null && u.getPrenom().toLowerCase().contains(terme))
+                    || (u.getEmail() != null && u.getEmail().toLowerCase().contains(terme)))
+                .toList();
+        }
+
         comptesAffiches = comptesAffiches.stream()
             .sorted(Comparator.comparing((Utilisateur u) -> u.getNom() == null ? "" : u.getNom()))
             .toList();
@@ -596,6 +607,7 @@ public class ParametreController {
 
         model.addAttribute("comptes", comptesAffiches);
         model.addAttribute("filtreRole", role);
+        model.addAttribute("filtreQ", q);
         model.addAttribute("totalUtilisateurs", total);
         model.addAttribute("tauxActivite", tauxActivite);
         model.addAttribute("suspendus", suspendus);
@@ -604,7 +616,31 @@ public class ParametreController {
         model.addAttribute("historique", historique);
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         model.addAttribute("rolesDisponibles", ROLES_ASSIGNABLES);
+        model.addAttribute("rolesRecherche", List.of("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "SURVEILLANT", "ELEVE", "PARENT"));
         return "parametres-roles";
+    }
+
+    // ── Reinitialiser directement le mot de passe d'un compte (depuis la liste des roles) ──
+    @PostMapping("/roles/{id}/reset-mdp")
+    public String reinitialiserMotDePasseCompte(@PathVariable Long id,
+                                                @RequestParam(required = false) String role,
+                                                @RequestParam(required = false) String q,
+                                                RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Utilisateur u = utilisateurRepository.findById(id).orElse(null);
+        if (u == null || u.getEtablissement() == null || etabId == null || !etabId.equals(u.getEtablissement().getId())) {
+            ra.addFlashAttribute("erreurMsg", "Ce compte est introuvable dans cet établissement.");
+            return "redirect:/parametres/roles";
+        }
+        String nouveauMdp = genererMotDePasseTemporaire();
+        u.setMotDePasse(passwordEncoder.encode(nouveauMdp));
+        utilisateurRepository.save(u);
+        journalService.log("MDP_REINITIALISE", JOURNAL_MODULE_ROLES,
+            u.getPrenom() + " " + u.getNom() + " (" + u.getEmail() + ")");
+        ra.addFlashAttribute("successMsg",
+            "Nouveau mot de passe pour " + u.getPrenom() + " " + u.getNom() + " (" + u.getEmail() + ") : " + nouveauMdp);
+        String suffixe = "?role=" + (role != null ? role : "") + "&q=" + (q != null ? q : "");
+        return "redirect:/parametres/roles" + suffixe;
     }
 
     @PostMapping("/roles/{id}")
