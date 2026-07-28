@@ -15,6 +15,7 @@ public interface EleveRepository extends JpaRepository<Eleve, Long> {
     List<Eleve> findAllByOrderByNomAscPrenomAsc();
     List<Eleve> findByEtablissementIdOrderByNomAscPrenomAsc(Long etablissementId);
     Optional<Eleve> findByCompteEmail(String compteEmail);
+    Optional<Eleve> findByMatriculeAndEtablissementId(String matricule, Long etablissementId);
     Optional<Eleve> findByEmailParent(String emailParent);
     List<Eleve> findAllByEmailParentOrderByNomAsc(String emailParent);
     long countByEtablissementId(Long etablissementId);

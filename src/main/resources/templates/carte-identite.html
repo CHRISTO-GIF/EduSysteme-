@@ -5,6 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Cartes d'Identite Scolaires | EduSystem Pro</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
     body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
@@ -56,7 +57,7 @@
 </div>
 <div>
 <h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
-<p class="text-on-tertiary-container text-[10px] tracking-widest uppercase mt-1">Portail Admin</p>
+<p class="text-on-tertiary-container text-[10px] tracking-widest uppercase mt-1" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : 'Portail Admin'">Portail Admin</p>
 </div>
 </div>
 </div>
@@ -196,7 +197,8 @@
 <img class="w-[85%] h-[85%] object-contain opacity-[0.06]" th:src="@{'/uploads/' + ${logoPath}}"/>
 </div>
 <div class="h-1 bg-primary"></div>
-<div class="flex-1 p-md flex flex-col">
+<div class="flex-1 p-md flex gap-md">
+<div class="flex-1 flex flex-col min-w-0">
 <div class="mb-md">
 <h4 class="text-[10px] font-bold uppercase text-primary mb-xs">Regles de Conduite</h4>
 <p class="text-[9px] text-on-surface-variant leading-tight" th:text="'Cette carte est strictement personnelle. En cas de perte, veuillez contacter immediatement l administration. Reglement interieur de ' + ${nomEtab}">Regles</p>
@@ -213,6 +215,11 @@
 <span class="text-[8px] text-outline" th:if="${telEtab != null and !telEtab.isEmpty()}" th:text="${telEtab}">Tel</span>
 </div>
 </div>
+<div class="w-20 shrink-0 flex flex-col items-center justify-center gap-1" th:if="${selection != null}">
+<div id="qrcode-surveillance"></div>
+<span class="text-[6px] text-outline text-center leading-tight">Scan surveillance</span>
+</div>
+</div>
 <div class="h-1 bg-primary"></div>
 </div>
 <p class="text-center text-label-sm text-outline mt-sm">Apercu haute fidelite (Verso)</p>
@@ -225,5 +232,14 @@ Aucun eleve selectionne.
 </div>
 </div>
 </main>
+<script th:if="${selection != null}" th:inline="javascript">
+    /*<![CDATA[*/
+    var matriculeSelection = /*[[${selection.matricule}]]*/ '';
+    var conteneurQr = document.getElementById('qrcode-surveillance');
+    if (conteneurQr && matriculeSelection) {
+        new QRCode(conteneurQr, { text: matriculeSelection, width: 70, height: 70, correctLevel: QRCode.CorrectLevel.M });
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

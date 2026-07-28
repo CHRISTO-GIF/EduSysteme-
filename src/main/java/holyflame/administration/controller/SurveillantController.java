@@ -110,6 +110,57 @@ public class SurveillantController {
     }
 
 
+    // ── Scan QR (pointage automatique) ──────────────────────────────────────
+    @GetMapping("/scan")
+    public String scan(Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        model.addAttribute("zones", zoneRepository.findByEtablissementIdOrderByNomAsc(etabId));
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "surveillant-scan";
+    }
+
+    @PostMapping("/scan/pointage")
+    @ResponseBody
+    public java.util.Map<String, Object> scanPointage(@RequestParam String matricule,
+                                                       @RequestParam Long zoneId,
+                                                       @RequestParam String typeEvenement) {
+        java.util.Map<String, Object> resultat = new java.util.LinkedHashMap<>();
+        Long etabId = etablissementService.getCurrentEtablissementId();
+
+        Eleve eleve = eleveRepository.findByMatriculeAndEtablissementId(matricule.trim().toUpperCase(), etabId).orElse(null);
+        if (eleve == null) {
+            resultat.put("succes", false);
+            resultat.put("message", "Aucun eleve ne correspond a ce code (" + matricule + ").");
+            return resultat;
+        }
+
+        Zone zone = zoneRepository.findById(zoneId).orElse(null);
+        if (zone == null || etabId == null || !etabId.equals(zone.getEtablissementId())) {
+            resultat.put("succes", false);
+            resultat.put("message", "Zone invalide.");
+            return resultat;
+        }
+
+        Pointage p = new Pointage();
+        p.setEleve(eleve);
+        p.setZone(zone);
+        p.setTypeEvenement(typeEvenement);
+        p.setDateHeure(LocalDateTime.now());
+        p.setAlerte(zone.isZoneInterdite());
+        var utilisateur = etablissementService.getCurrentUtilisateur();
+        if (utilisateur != null) p.setEnregistreParId(utilisateur.getId());
+        p.setEtablissementId(etabId);
+        pointageRepository.save(p);
+
+        resultat.put("succes", true);
+        resultat.put("alerte", zone.isZoneInterdite());
+        resultat.put("nomEleve", eleve.getPrenom() + " " + eleve.getNom());
+        resultat.put("classe", eleve.getClasse() != null ? eleve.getClasse().getNom() : "");
+        resultat.put("zone", zone.getNom());
+        resultat.put("typeEvenement", typeEvenement);
+        return resultat;
+    }
+
     // ── Retards (arrivées tardives) ─────────────────────────────────────────
     @GetMapping("/retards")
     public String retards(Model model) {

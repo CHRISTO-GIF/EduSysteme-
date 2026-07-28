@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<title>Scanner QR - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    #qr-reader { border-radius: 0.75rem; overflow: hidden; }
+    #qr-reader video { border-radius: 0.75rem; }
+</style>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = { theme: { extend: {
+      colors: {
+        "surface-container-low": "#f2f4f6", "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
+        "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb", "primary-fixed": "#dce1ff",
+        "on-error": "#ffffff", "tertiary": [[${accentColor}]], "outline": "#757682", "surface-variant": "#e0e3e5",
+        "surface-container": "#eceef0", "surface": "#f7f9fb", "on-background": "#191c1e", "on-surface": "#191c1e",
+        "on-surface-variant": "#444651", "success-container": "#c4f7d0", "on-success-container": "#0a3818",
+        "tertiary-fixed-dim": "#bec6e0", "outline-variant": "#c5c5d3"
+      },
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      spacing: { gutter: "24px", xs: "4px", lg: "24px", xl: "32px", sm: "8px", "sidebar-width": "260px", md: "16px", "container-max": "1440px" },
+      fontFamily: { "label-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"] },
+      fontSize: {
+        "label-md": ["14px", {lineHeight: "20px", fontWeight: "600"}],
+        "headline-sm": ["18px", {lineHeight: "28px", fontWeight: "600"}],
+        "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+        "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500"}]
+      }
+    } } }
+</script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+<!-- ===================== VERSION MOBILE ===================== -->
+<div class="md:hidden bg-background min-h-screen pb-20" id="surv-scan-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">qr_code_scanner</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Scanner QR</h1>
+</div>
+</header>
+<main class="px-md pt-md space-y-lg">
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg space-y-md">
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Zone</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm" id="zoneSelect-mobile">
+<option th:each="z : ${zones}" th:text="${z.nom + (z.zoneInterdite ? ' (interdite)' : '')}" th:value="${z.id}"></option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Événement</label>
+<div class="grid grid-cols-2 gap-sm">
+<button class="type-btn-mobile py-2.5 rounded-lg font-label-md border border-primary bg-primary text-on-primary" data-type="ENTREE" type="button">Entrée</button>
+<button class="type-btn-mobile py-2.5 rounded-lg font-label-md border border-outline-variant text-on-surface" data-type="SORTIE" type="button">Sortie</button>
+</div>
+</div>
+<div id="qr-reader-mobile"></div>
+<button class="w-full bg-primary text-on-primary font-label-md py-3 rounded-lg" id="btn-toggle-scan-mobile" type="button">Démarrer le scan</button>
+</section>
+
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm px-xs">Scans récents</h3>
+<div class="space-y-sm" id="feed-mobile"></div>
+<p class="text-center text-outline py-lg text-sm" id="feed-empty-mobile">Aucun scan pour l'instant.</p>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/presences}">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-sm text-label-sm">Présences</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" th:href="@{/surveillant/scan}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+<span class="font-label-sm text-label-sm">Scanner</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/incidents}">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-sm text-label-sm">Incidents</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" th:href="@{/surveillant/retenues}">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-sm text-label-sm">Retenues</span>
+</a>
+</nav>
+</div>
+
+<!-- ===================== VERSION DESKTOP ===================== -->
+<div class="hidden md:contents">
+<aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center"><span class="material-symbols-outlined text-primary">shield_person</span></div>
+<div><h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduSystem Pro</h1><p class="text-[10px] text-tertiary-fixed-dim uppercase tracking-widest">Module Surveillance</p></div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs px-sm overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant}"><span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Tableau de bord</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/presences}"><span class="material-symbols-outlined">event_available</span><span class="font-label-md text-label-md">Présences</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary border-l-4 border-primary-fixed bg-tertiary/50" th:href="@{/surveillant/scan}"><span class="material-symbols-outlined">qr_code_scanner</span><span class="font-label-md text-label-md">Scanner QR</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillance/absences/nouvelle}"><span class="material-symbols-outlined">event_busy</span><span class="font-label-md text-label-md">Signaler une Absence</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/incidents}"><span class="material-symbols-outlined">report_problem</span><span class="font-label-md text-label-md">Incidents</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/retenues}"><span class="material-symbols-outlined">gavel</span><span class="font-label-md text-label-md">Retenues</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/surveillant/zones}"><span class="material-symbols-outlined">map</span><span class="font-label-md text-label-md">Zones de l'école</span></a>
+</nav>
+<div class="mt-auto px-sm pt-lg border-t border-outline/20">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}"><span class="material-symbols-outlined">arrow_back</span><span class="font-label-md text-label-md">Retour a l'administration</span></a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;"><span class="material-symbols-outlined">logout</span><span class="font-label-md text-label-md">Déconnexion</span></a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="flex-1 flex flex-col min-w-0">
+<header class="w-full h-16 sticky top-0 z-40 bg-surface border-b border-surface-variant flex justify-between items-center px-lg py-md">
+<nav class="flex items-center gap-xs text-label-sm text-outline"><span>EduSystem Pro</span><span class="material-symbols-outlined text-[14px]">chevron_right</span><span class="text-primary font-semibold">Scanner QR</span></nav>
+</header>
+
+<main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg space-y-md h-fit">
+<h3 class="font-headline-sm text-headline-sm mb-1">Pointage automatique</h3>
+<p class="text-label-sm text-on-surface-variant">Choisissez la zone et le sens, puis présentez la carte d'élève (QR code) devant la caméra.</p>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Zone</label>
+<select class="w-full border border-outline-variant rounded-lg px-3 py-2" id="zoneSelect">
+<option th:each="z : ${zones}" th:text="${z.nom + (z.zoneInterdite ? ' (interdite)' : '')}" th:value="${z.id}"></option>
+</select>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Événement</label>
+<div class="grid grid-cols-2 gap-sm">
+<button class="type-btn py-2 rounded-lg font-label-md border border-primary bg-primary text-on-primary" data-type="ENTREE" type="button">Entrée</button>
+<button class="type-btn py-2 rounded-lg font-label-md border border-outline-variant text-on-surface" data-type="SORTIE" type="button">Sortie</button>
+</div>
+</div>
+<div id="qr-reader"></div>
+<button class="w-full bg-primary text-on-primary font-label-md py-3 rounded-lg hover:opacity-90 transition-all" id="btn-toggle-scan" type="button">Démarrer le scan</button>
+</section>
+
+<section class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden h-fit">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm">Scans récents (cette session)</h3>
+</div>
+<div class="divide-y divide-surface-variant" id="feed"></div>
+<p class="text-center text-outline py-lg text-sm" id="feed-empty">Aucun scan pour l'instant.</p>
+</section>
+
+</div>
+</main>
+</div>
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+(function () {
+    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    var scanUrl = /*[[@{/surveillant/scan/pointage}]]*/ '/surveillant/scan/pointage';
+
+    var typeEvenement = 'ENTREE';
+    var dernierCode = null;
+    var dernierScanAt = 0;
+
+    function setupTypeButtons(selector) {
+        var boutons = document.querySelectorAll(selector);
+        boutons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                typeEvenement = btn.getAttribute('data-type');
+                boutons.forEach(function (b) {
+                    b.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+                    b.classList.add('border-outline-variant', 'text-on-surface');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary', 'border-primary');
+                btn.classList.remove('border-outline-variant', 'text-on-surface');
+            });
+        });
+    }
+    setupTypeButtons('.type-btn');
+    setupTypeButtons('.type-btn-mobile');
+
+    function ajouterAuFeed(feedId, emptyId, data, estErreur) {
+        var feed = document.getElementById(feedId);
+        var vide = document.getElementById(emptyId);
+        if (vide) vide.style.display = 'none';
+
+        var couleur = estErreur ? 'bg-surface-container text-on-surface-variant'
+            : (data.alerte ? 'bg-error-container text-on-error-container' : 'bg-success-container text-on-success-container');
+        var badge = estErreur ? 'Erreur' : (data.alerte ? 'Alerte' : 'OK');
+        var titre = estErreur ? data.message : (data.nomEleve + (data.classe ? ' (' + data.classe + ')' : ''));
+        var sousTitre = estErreur ? '' : (data.zone + ' • ' + (data.typeEvenement === 'ENTREE' ? 'Entrée' : 'Sortie'));
+
+        var ligne = document.createElement('div');
+        ligne.className = 'px-lg py-3 flex items-center justify-between gap-sm';
+        ligne.innerHTML =
+            '<div class="min-w-0"><p class="font-label-md text-sm truncate">' + titre + '</p>' +
+            (sousTitre ? '<p class="text-xs text-on-surface-variant">' + sousTitre + '</p>' : '') + '</div>' +
+            '<span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase shrink-0 ' + couleur + '">' + badge + '</span>';
+        feed.prepend(ligne);
+    }
+
+    function envoyerScan(matricule) {
+        var maintenant = Date.now();
+        if (matricule === dernierCode && (maintenant - dernierScanAt) < 4000) return; // anti double-scan
+        dernierCode = matricule;
+        dernierScanAt = maintenant;
+
+        var zoneSelect = document.getElementById('zoneSelect') || document.getElementById('zoneSelect-mobile');
+        var zoneId = zoneSelect ? zoneSelect.value : null;
+        if (!zoneId) {
+            ajouterAuFeed('feed', 'feed-empty', { message: 'Choisissez une zone avant de scanner.' }, true);
+            ajouterAuFeed('feed-mobile', 'feed-empty-mobile', { message: 'Choisissez une zone avant de scanner.' }, true);
+            return;
+        }
+
+        var params = new URLSearchParams();
+        params.append('matricule', matricule);
+        params.append('zoneId', zoneId);
+        params.append('typeEvenement', typeEvenement);
+
+        var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+        headers[csrfHeader] = csrfToken;
+
+        fetch(scanUrl, { method: 'POST', headers: headers, body: params.toString() })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                ajouterAuFeed('feed', 'feed-empty', data, !data.succes);
+                ajouterAuFeed('feed-mobile', 'feed-empty-mobile', data, !data.succes);
+            })
+            .catch(function () {
+                ajouterAuFeed('feed', 'feed-empty', { message: 'Erreur reseau, reessayez.' }, true);
+                ajouterAuFeed('feed-mobile', 'feed-empty-mobile', { message: 'Erreur reseau, reessayez.' }, true);
+            });
+    }
+
+    var scannerDesktop = null;
+    var scannerMobile = null;
+    var enCours = false;
+
+    function demarrer(elementId, setScanner) {
+        var instance = new Html5Qrcode(elementId);
+        setScanner(instance);
+        instance.start(
+            { facingMode: 'environment' },
+            { fps: 10, qrbox: 220 },
+            function (decodedText) { envoyerScan(decodedText.trim()); },
+            function () { /* frames sans QR detecte, ignorer */ }
+        ).catch(function (err) {
+            ajouterAuFeed('feed', 'feed-empty', { message: "Impossible d'acceder a la camera : " + err }, true);
+        });
+    }
+
+    function arreter(scanner, setScanner) {
+        if (scanner) {
+            scanner.stop().then(function () { scanner.clear(); }).catch(function () {});
+            setScanner(null);
+        }
+    }
+
+    function brancherBouton(boutonId, readerId) {
+        var bouton = document.getElementById(boutonId);
+        if (!bouton) return;
+        bouton.addEventListener('click', function () {
+            if (!enCours) {
+                demarrer(readerId, function (v) {
+                    if (readerId === 'qr-reader') scannerDesktop = v; else scannerMobile = v;
+                });
+                bouton.textContent = 'Arrêter le scan';
+                enCours = true;
+            } else {
+                arreter(readerId === 'qr-reader' ? scannerDesktop : scannerMobile,
+                    function (v) { if (readerId === 'qr-reader') scannerDesktop = v; else scannerMobile = v; });
+                bouton.textContent = 'Démarrer le scan';
+                enCours = false;
+            }
+        });
+    }
+    brancherBouton('btn-toggle-scan', 'qr-reader');
+    brancherBouton('btn-toggle-scan-mobile', 'qr-reader-mobile');
+})();
+/*]]>*/
+</script>
+</body>
+</html>
