@@ -133,7 +133,7 @@
 <label class="font-label-md text-label-md text-on-surface flex items-center gap-2">Montant <span class="text-error">*</span></label>
 <div class="relative">
 <span class="absolute left-md top-1/2 -translate-y-1/2 font-label-md text-label-md text-on-surface-variant">F</span>
-<input class="w-full border-outline-variant rounded-lg font-body-md text-body-md focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all pl-xl pr-md py-2.5 font-bold" min="0" name="montantVerse" placeholder="0.00" required="required" step="0.01" type="number"/>
+<input class="w-full border-outline-variant rounded-lg font-body-md text-body-md focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all pl-xl pr-md py-2.5 font-bold" id="input-montant-verse" min="0" name="montantVerse" placeholder="0.00" required="required" step="0.01" type="number"/>
 </div>
 </div>
 <div class="space-y-xs">
@@ -147,10 +147,11 @@
 </div>
 <div class="space-y-xs">
 <label class="font-label-md text-label-md text-on-surface">Frais précis (optionnel)</label>
-<select class="w-full border-outline-variant rounded-lg font-body-md text-body-md focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all px-md py-2.5" name="fraisScolariteId">
+<select class="w-full border-outline-variant rounded-lg font-body-md text-body-md focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all px-md py-2.5" id="select-frais-precis" name="fraisScolariteId">
 <option value="">-- Non lié à un frais précis --</option>
-<option th:each="f : ${tousLesFrais}" th:text="${f.designation}" th:value="${f.id}"></option>
+<option th:data-montant="${f.montant}" th:each="f : ${tousLesFrais}" th:text="${f.designation} + ' (' + ${#numbers.formatDecimal(f.montant, 0, 'COMMA', 0, 'POINT')} + ' F)'" th:value="${f.id}"></option>
 </select>
+<p class="text-label-sm text-on-surface-variant">Selectionner un frais pre-rempli le montant ci-dessus — vous pouvez toujours le modifier manuellement.</p>
 </div>
 </div>
 </div>
@@ -329,6 +330,12 @@ function filtrerEleves() {
     }
     if (premierVisible) select.value = premierVisible.value;
 }
+
+document.getElementById('select-frais-precis').addEventListener('change', function () {
+    const option = this.options[this.selectedIndex];
+    const montant = option.getAttribute('data-montant');
+    if (montant) document.getElementById('input-montant-verse').value = montant;
+});
 </script>
 </body>
 </html>
