@@ -69,6 +69,10 @@
 <span class="material-symbols-outlined mr-md">payments</span>
 <span class="font-body-md text-body-md">Financier</span>
 </a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/messagerie}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
+<span class="material-symbols-outlined mr-md">forum</span>
+<span class="font-body-md text-body-md">Messagerie</span>
+</a>
 <a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/examens}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
 <span class="material-symbols-outlined mr-md">school</span>
 <span class="font-body-md text-body-md">Academique</span>

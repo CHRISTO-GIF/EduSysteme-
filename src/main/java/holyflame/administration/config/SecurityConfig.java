@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .requestMatchers("/examens/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
                 .requestMatchers("/bulletins/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "PARENT")
                 .requestMatchers("/portail-parent/**").hasAnyRole("ADMIN", "PARENT")
-                .requestMatchers("/messagerie/**").hasAnyRole("ADMIN", "SECRETAIRE", "ENSEIGNANT")
+                .requestMatchers("/messagerie/**").hasAnyRole("ADMIN", "SECRETAIRE", "ENSEIGNANT", "TRESORIER")
                 .requestMatchers("/export/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/parametres/**").hasRole("ADMIN")
                 .requestMatchers("/tableau-enseignant/**").hasAnyRole("ADMIN", "ENSEIGNANT")
