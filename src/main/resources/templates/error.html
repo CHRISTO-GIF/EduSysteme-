@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Erreur - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex items-center justify-center px-md">
+
+<div th:with="code=${status != null ? status : 500}" class="max-w-md w-full bg-white border border-gray-200 rounded-xl p-xl text-center">
+
+<span class="material-symbols-outlined text-red-600 text-[56px] mb-md"
+      th:text="${code == 403} ? 'lock' : (${code == 404} ? 'search_off' : 'error')">error</span>
+
+<h1 class="text-xl font-bold text-gray-900 mb-sm"
+    th:text="${code == 403} ? 'Acces refuse' : (${code == 404} ? 'Page introuvable' : 'Une erreur est survenue')">Erreur</h1>
+
+<p class="text-gray-500 mb-lg"
+   th:text="${code == 403} ? 'Vous n''avez pas les autorisations necessaires pour acceder a cette page.' : (${code == 404} ? 'La page demandee n''existe pas ou a ete deplacee.' : 'Une erreur inattendue est survenue. Veuillez reessayer ou contacter le support si le probleme persiste.')">
+Details de l'erreur
+</p>
+
+<p class="text-xs text-gray-400 mb-lg" th:if="${path != null}" th:text="'Code ' + ${code} + ' — ' + ${path}">Code — chemin</p>
+
+<div class="flex items-center justify-center gap-sm">
+<a class="inline-flex items-center gap-xs px-lg py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50" href="javascript:history.back()">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour
+</a>
+<a class="inline-flex items-center gap-xs px-lg py-2 bg-blue-900 text-white rounded-lg font-medium hover:opacity-90" href="/dashboard">
+<span class="material-symbols-outlined text-[18px]">home</span> Tableau de bord
+</a>
+</div>
+</div>
+</body>
+</html>
