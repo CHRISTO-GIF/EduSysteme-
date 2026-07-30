@@ -119,12 +119,17 @@ public class PersonnelController {
         Map<String, List<DocumentPersonnel>> docsByType = docs.stream()
             .collect(Collectors.groupingBy(d -> d.getTypeDocument() != null ? d.getTypeDocument() : "AUTRE"));
 
+        String roleApplicatif = roleApplicatifPour(p.getFonction());
+        boolean compteExistant = p.getEmail() != null && utilisateurRepository.findByEmail(p.getEmail()).isPresent();
+
         model.addAttribute("personnel",  p);
         model.addAttribute("documents",  docs);
         model.addAttribute("docsByType", docsByType);
         model.addAttribute("contrats",   contratRepository.findByPersonnelId(id));
         model.addAttribute("conges",     congeRepository.findByPersonnelId(id));
         model.addAttribute("salaires",   salaireRepository.findByPersonnelIdOrderByAnneeDescMoisDesc(id));
+        model.addAttribute("roleApplicatif", roleApplicatif);
+        model.addAttribute("compteExistant", compteExistant);
         return "personnel-fiche";
     }
 
@@ -187,14 +192,7 @@ public class PersonnelController {
 
         // Cree un compte de connexion si un email est fourni, qu'aucun compte n'existe deja
         // et que la fonction correspond a un role applicatif reconnu
-        String roleCompte = switch (fonction) {
-            case "ENSEIGNANT"  -> "ENSEIGNANT";
-            case "SECRETAIRE"  -> "SECRETAIRE";
-            case "TRESORIER"   -> "TRESORIER";
-            case "SURVEILLANT" -> "SURVEILLANT";
-            case "DIRECTEUR"   -> "ADMIN";
-            default -> null; // COMPTABLE, AUTRE : fiche RH seule, pas de compte de connexion automatique
-        };
+        String roleCompte = roleApplicatifPour(fonction);
 
         String motDePasseGenere = null;
         if (roleCompte != null && p.getEmail() != null && utilisateurRepository.findByEmail(p.getEmail()).isEmpty()) {
@@ -289,6 +287,82 @@ public class PersonnelController {
             ra.addFlashAttribute("erreurMsg", messageErreur);
         }
         return "redirect:/personnel/nouveau/confirmation";
+    }
+
+    /** Fonction RH -> role applicatif donnant acces a une interface de connexion. Null = fiche RH seule. */
+    private String roleApplicatifPour(String fonction) {
+        return switch (fonction) {
+            case "ENSEIGNANT"  -> "ENSEIGNANT";
+            case "SECRETAIRE"  -> "SECRETAIRE";
+            case "TRESORIER", "COMPTABLE" -> "TRESORIER"; // le comptable utilise le meme espace finances que le tresorier
+            case "SURVEILLANT" -> "SURVEILLANT";
+            case "DIRECTEUR"   -> "ADMIN";
+            default -> null; // AUTRE : fiche RH seule, pas de compte de connexion automatique
+        };
+    }
+
+    // ── Creer un compte de connexion pour un personnel existant (retroactif) ─
+    @PostMapping("/{id}/creer-compte")
+    public String creerCompte(@PathVariable Long id,
+                              @RequestParam String email,
+                              @RequestParam String motDePasse,
+                              RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Personnel p = personnelRepository.findById(id).orElseThrow();
+        if (p.getEtablissementId() != null) verifierProprietaire(p, etabId);
+
+        String roleCompte = roleApplicatifPour(p.getFonction());
+        if (roleCompte == null) {
+            ra.addFlashAttribute("erreurMsg", "La fonction \"" + p.getFonction() + "\" ne correspond a aucun espace de connexion applicatif.");
+            return "redirect:/personnel/" + id;
+        }
+        String emailTrim = email != null ? email.trim().toLowerCase() : "";
+        if (emailTrim.isBlank()) {
+            ra.addFlashAttribute("erreurMsg", "L'adresse email est obligatoire.");
+            return "redirect:/personnel/" + id;
+        }
+        if (utilisateurRepository.findByEmail(emailTrim).isPresent()) {
+            ra.addFlashAttribute("erreurMsg", "Un compte existe deja pour l'adresse " + emailTrim + ".");
+            return "redirect:/personnel/" + id;
+        }
+
+        Utilisateur u = new Utilisateur();
+        u.setNom(p.getNom());
+        u.setPrenom(p.getPrenom());
+        u.setEmail(emailTrim);
+        u.setMotDePasse(passwordEncoder.encode(motDePasse));
+        u.setRole(roleCompte);
+        u.setEtablissement(etablissementService.getCurrentEtablissement());
+        utilisateurRepository.save(u);
+
+        if (p.getEmail() == null || p.getEmail().isBlank()) {
+            p.setEmail(emailTrim);
+            personnelRepository.save(p);
+        }
+
+        ra.addFlashAttribute("successMsg", "Compte de connexion cree pour " + p.getPrenom() + " " + p.getNom() + " — email : " + emailTrim);
+        return "redirect:/personnel/" + id;
+    }
+
+    // ── Reinitialiser le mot de passe du compte de connexion d'un personnel ──
+    @PostMapping("/{id}/reset-mdp")
+    public String resetMdp(@PathVariable Long id,
+                           @RequestParam String motDePasse,
+                           RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Personnel p = personnelRepository.findById(id).orElseThrow();
+        if (p.getEtablissementId() != null) verifierProprietaire(p, etabId);
+
+        if (p.getEmail() == null || p.getEmail().isBlank()) {
+            ra.addFlashAttribute("erreurMsg", "Aucun compte trouve pour ce personnel.");
+            return "redirect:/personnel/" + id;
+        }
+        utilisateurRepository.findByEmail(p.getEmail()).ifPresentOrElse(u -> {
+            u.setMotDePasse(passwordEncoder.encode(motDePasse));
+            utilisateurRepository.save(u);
+            ra.addFlashAttribute("successMsg", "Mot de passe reinitialise pour " + p.getPrenom() + " " + p.getNom() + ".");
+        }, () -> ra.addFlashAttribute("erreurMsg", "Aucun compte trouve pour cet email."));
+        return "redirect:/personnel/" + id;
     }
 
     private String genererMotDePasse() {

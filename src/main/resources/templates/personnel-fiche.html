@@ -87,6 +87,8 @@
 
 <div th:if="${param.uploaded}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md">Document televerse avec succes.</div>
 <div th:if="${param.error}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md">Erreur lors du televersement du document.</div>
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
 <!-- Colonne gauche : profil -->
@@ -219,6 +221,41 @@
 <p class="font-label-md text-label-md text-primary" th:text="${s.net} + ' FCFA'">Net</p>
 <span class="bg-secondary-container text-on-secondary-container px-sm py-1 rounded font-label-sm text-label-sm" th:text="${s.statut}">Statut</span>
 </div>
+</div>
+</div>
+
+<!-- Compte de connexion -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-sm"><span class="material-symbols-outlined text-primary">lock_person</span> Compte de connexion</h3>
+
+<p class="font-body-md text-body-md text-on-surface-variant" th:if="${roleApplicatif == null}">
+La fonction "<span th:text="${personnel.fonction}"></span>" ne dispose pas d'espace de connexion applicatif.
+</p>
+
+<div th:if="${roleApplicatif != null and compteExistant}">
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Compte actif — connexion avec l'email <strong th:text="${personnel.email}"></strong>.</p>
+<form class="flex flex-wrap items-end gap-md" method="post" th:action="@{/personnel/{id}/reset-mdp(id=${personnel.id})}">
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Nouveau mot de passe</label>
+<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+</div>
+<button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors" type="submit">Reinitialiser le mot de passe</button>
+</form>
+</div>
+
+<div th:if="${roleApplicatif != null and !compteExistant}">
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Aucun compte de connexion n'a encore ete cree pour ce personnel.</p>
+<form class="flex flex-wrap items-end gap-md" method="post" th:action="@{/personnel/{id}/creer-compte(id=${personnel.id})}">
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Email de connexion</label>
+<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" name="email" required="required" th:value="${personnel.email}" type="email"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Mot de passe</label>
+<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+</div>
+<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors" type="submit">Creer le compte</button>
+</form>
 </div>
 </div>
 </div>
