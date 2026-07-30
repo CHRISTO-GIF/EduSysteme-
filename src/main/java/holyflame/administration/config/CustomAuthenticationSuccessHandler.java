@@ -49,6 +49,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             case "SURVEILLANT" -> response.sendRedirect("/surveillant");
             case "TRESORIER"   -> response.sendRedirect("/finances");
             case "ELEVE"       -> response.sendRedirect("/portail");
+            case "PARENT"      -> response.sendRedirect("/portail-parent");
             case "ADMIN" -> {
                 // Vérifier si cet admin est aussi le directeur avec délégation active
                 boolean delegue = etabId != null && parametreRepository
