@@ -80,6 +80,36 @@
 <button class="px-5 py-2 bg-blue-900 text-white rounded-lg font-medium" type="submit">Enregistrer</button>
 </div>
 </form>
+
+<div class="mt-6 pt-6 border-t border-gray-200">
+<h2 class="text-sm font-bold text-blue-900 mb-3">Compte portail de l'eleve</h2>
+
+<div th:if="${eleve.compteEmail != null and !eleve.compteEmail.isBlank()}" class="space-y-3">
+<p class="text-sm text-gray-600">Compte actif — connexion avec l'email <strong th:text="${eleve.compteEmail}"></strong>.</p>
+<form class="flex flex-wrap items-end gap-3" method="post" th:action="@{/secretariat/eleves/{id}/reset-mdp(id=${eleve.id})}">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Nouveau mot de passe</label>
+<input class="p-2 border border-gray-300 rounded-lg" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+</div>
+<button class="px-4 py-2 border border-gray-300 rounded-lg font-medium" type="submit">Reinitialiser le mot de passe</button>
+</form>
+</div>
+
+<div th:if="${eleve.compteEmail == null or eleve.compteEmail.isBlank()}" class="space-y-3">
+<p class="text-sm text-gray-600">Aucun compte portail n'a encore ete cree pour cet eleve. Renseignez un email et un mot de passe pour lui permettre de se connecter.</p>
+<form class="flex flex-wrap items-end gap-3" method="post" th:action="@{/secretariat/eleves/{id}/creer-compte(id=${eleve.id})}">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Email de connexion</label>
+<input class="p-2 border border-gray-300 rounded-lg" name="email" required="required" th:value="${eleve.emailParent}" type="email"/>
+</div>
+<div>
+<label class="text-xs text-gray-500 block mb-1">Mot de passe</label>
+<input class="p-2 border border-gray-300 rounded-lg" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+</div>
+<button class="px-4 py-2 bg-blue-900 text-white rounded-lg font-medium" type="submit">Creer le compte</button>
+</form>
+</div>
+</div>
 </div>
 </main>
 </body>
