@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Barre laterale des pages Finances/Tresorerie (ADMIN + TRESORIER).
+  Usage : <div th:replace="~{fragments/sidebar-tresorier :: admin('financier')}"></div>
+  activePage : financier, budget.
+-->
+<aside th:fragment="admin(activePage)" class="hidden md:flex fixed left-0 top-0 h-full w-[260px] bg-tertiary border-r border-outline-variant flex-col z-50">
+<div class="p-lg">
+<div class="flex items-center gap-sm mb-xl">
+<div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="text-label-sm text-on-tertiary/60" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Portail Admin'">Portail Admin</p>
+</div>
+</div>
+<nav class="space-y-base">
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/dashboard}">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-body-md text-body-md">Tableau de bord</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/secretariat}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-md">group</span>
+<span class="font-body-md text-body-md">Eleves</span>
+</a>
+<a th:class="'flex items-center px-md py-sm transition-all duration-200 ' + (${activePage == 'financier'} ? 'border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10' : 'rounded text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50')" th:href="@{/finances}">
+<span class="material-symbols-outlined mr-md">payments</span>
+<span class="font-body-md text-body-md">Financier</span>
+</a>
+<a th:class="'flex items-center px-md py-sm transition-all duration-200 ' + (${activePage == 'budget'} ? 'border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10' : 'rounded text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50')" th:href="@{/finances/budget}">
+<span class="material-symbols-outlined mr-md">bar_chart</span>
+<span class="font-body-md text-body-md">Budget previsionnel</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/messagerie}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
+<span class="material-symbols-outlined mr-md">forum</span>
+<span class="font-body-md text-body-md">Messagerie</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/examens}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-md">school</span>
+<span class="font-body-md text-body-md">Academique</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/personnel}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'TRESORIER')}">
+<span class="material-symbols-outlined mr-md">badge</span>
+<span class="font-body-md text-body-md">Personnel</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/journal}">
+<span class="material-symbols-outlined mr-md">analytics</span>
+<span class="font-body-md text-body-md">Rapports</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-lg border-t border-outline-variant/20">
+<a class="w-full bg-primary text-white py-sm rounded-lg font-label-md flex items-center justify-center gap-base active:scale-95 transition-all mb-lg" th:href="@{/finances/nouvelle-transaction}">
+<span class="material-symbols-outlined text-[20px]">add</span>
+Nouvelle Transaction
+</a>
+<div class="space-base">
+<a class="flex items-center px-md py-sm rounded text-on-tertiary-container/70 hover:text-on-tertiary transition-all duration-200" th:href="@{/parametres}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-body-md text-body-md">Parametres</span>
+</a>
+<a class="flex items-center px-md py-sm rounded text-on-tertiary-container/70 hover:text-on-tertiary transition-all duration-200" href="mailto:support@holyflame.com">
+<span class="material-symbols-outlined mr-md">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+</div>
+</div>
+</aside>
+</body>
+</html>

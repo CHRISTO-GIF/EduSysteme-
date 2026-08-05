@@ -172,6 +172,27 @@ public class FinancesController {
         return "finances";
     }
 
+    @GetMapping("/budget")
+    public String budgetPage(@RequestParam(defaultValue = "2025-2026") String annee, Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        List<LigneBudget> lignes = budgetRepository.findByEtablissementIdAndAnneeScolaireOrderByCategorieAscDesignationAsc(etabId, annee);
+        double totalRevenuPrevu = lignes.stream().filter(l -> "REVENU".equals(l.getCategorie()))
+            .mapToDouble(l -> l.getMontantPrevu() != null ? l.getMontantPrevu() : 0).sum();
+        double totalDepensePrevu = lignes.stream().filter(l -> "DEPENSE".equals(l.getCategorie()))
+            .mapToDouble(l -> l.getMontantPrevu() != null ? l.getMontantPrevu() : 0).sum();
+        double totalRevenuReel = lignes.stream().filter(l -> "REVENU".equals(l.getCategorie()))
+            .mapToDouble(l -> l.getMontantReel() != null ? l.getMontantReel() : 0).sum();
+        double totalDepenseReel = lignes.stream().filter(l -> "DEPENSE".equals(l.getCategorie()))
+            .mapToDouble(l -> l.getMontantReel() != null ? l.getMontantReel() : 0).sum();
+
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        model.addAttribute("lignes", lignes);
+        model.addAttribute("annee", annee);
+        model.addAttribute("soldePrevu", totalRevenuPrevu - totalDepensePrevu);
+        model.addAttribute("soldeReel", totalRevenuReel - totalDepenseReel);
+        return "finances-budget";
+    }
+
     @GetMapping("/nouvelle-transaction")
     public String nouvelleTransaction(Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
@@ -399,7 +420,7 @@ public class FinancesController {
         l.setAnneeScolaire(anneeScolaire); l.setNotes(notes); l.setDateCreation(LocalDate.now());
         l.setEtablissementId(etablissementService.getCurrentEtablissementId());
         budgetRepository.save(l);
-        return "redirect:/finances?tab=budget&annee=" + anneeScolaire;
+        return "redirect:/finances/budget?annee=" + anneeScolaire;
     }
 
     @PostMapping("/budget/{id}/supprimer")
@@ -410,15 +431,16 @@ public class FinancesController {
         if (ligne != null && etabId.equals(ligne.getEtablissementId())) {
             budgetRepository.deleteById(id);
         }
-        return "redirect:/finances?tab=budget&annee=" + annee;
+        return "redirect:/finances/budget?annee=" + annee;
     }
 
     @PostMapping("/budget/{id}/realiser")
     public String realiserBudget(@PathVariable Long id, @RequestParam Double montantReel) {
         Long etabId = etablissementService.getCurrentEtablissementId();
-        budgetRepository.findById(id)
+        String annee = budgetRepository.findById(id)
             .filter(l -> etabId.equals(l.getEtablissementId()))
-            .ifPresent(l -> { l.setMontantReel(montantReel); budgetRepository.save(l); });
-        return "redirect:/finances?tab=budget";
+            .map(l -> { l.setMontantReel(montantReel); budgetRepository.save(l); return l.getAnneeScolaire(); })
+            .orElse("2025-2026");
+        return "redirect:/finances/budget?annee=" + annee;
     }
 }
