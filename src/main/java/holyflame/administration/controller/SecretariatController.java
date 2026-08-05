@@ -14,15 +14,35 @@ import holyflame.administration.repository.UtilisateurRepository;
 import jakarta.transaction.Transactional;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.JournalService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/secretariat")
@@ -254,6 +274,248 @@ public class SecretariatController {
         if (absence.getEleve() != null) verifierProprietaire(absence.getEleve(), etabId);
         absenceRepository.deleteById(id);
         return "redirect:/secretariat";
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Import Excel des eleves
+    // ──────────────────────────────────────────────────────────────
+
+    private static final String SESSION_IMPORT_ELEVES_KEY = "importElevesValides";
+    private static final DateTimeFormatter FORMAT_DATE_IMPORT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    public static class LigneImportEleve implements Serializable {
+        public String nom;
+        public String prenom;
+        public String dateNaissanceTexte;
+        public LocalDate dateNaissance;
+        public String genre;
+        public String classeNom;
+        public transient Classe classe;
+        public Long classeId;
+        public String telephoneParent;
+        public String emailParent;
+        public String adresse;
+        public String pereNom;
+        public String pereTelephone;
+        public String pereEmail;
+        public String mereNom;
+        public String mereTelephone;
+        public String mereEmail;
+        public boolean valide;
+        public String statut; // VALIDE, NOM_MANQUANT, CLASSE_MANQUANTE, CLASSE_INTROUVABLE, DATE_INVALIDE
+    }
+
+    @GetMapping("/eleves/import")
+    public String importForm(Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "secretariat-eleves-import";
+    }
+
+    @GetMapping("/eleves/import/modele")
+    public void telechargerModeleEleves(HttpServletResponse response) throws IOException {
+        XSSFWorkbook wb = new XSSFWorkbook();
+        var sheet = wb.createSheet("Eleves");
+
+        XSSFCellStyle headerStyle = wb.createCellStyle();
+        headerStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 0, (byte) 35, (byte) 111}, null));
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        XSSFFont headerFont = wb.createFont();
+        headerFont.setColor(new XSSFColor(new byte[]{(byte) 255, (byte) 255, (byte) 255}, null));
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+
+        String[] entetes = {
+            "Nom", "Prenom", "DateNaissance (JJ/MM/AAAA)", "Genre (M/F)", "Classe (nom exact)",
+            "TelephoneParent", "EmailParent", "Adresse",
+            "PereNom", "PereTelephone", "PereEmail",
+            "MereNom", "MereTelephone", "MereEmail"
+        };
+        Row ligneEntete = sheet.createRow(0);
+        for (int i = 0; i < entetes.length; i++) {
+            Cell c = ligneEntete.createCell(i);
+            c.setCellValue(entetes[i]);
+            c.setCellStyle(headerStyle);
+            sheet.setColumnWidth(i, 20 * 256);
+        }
+
+        Row exemple = sheet.createRow(1);
+        String[] valeursExemple = {
+            "KONE", "Awa", "12/05/2013", "F", "6eme A",
+            "0700000000", "parent@example.com", "Abidjan, Cocody",
+            "Kone Ibrahim", "0701000000", "pere@example.com",
+            "Kone Fatou", "0702000000", "mere@example.com"
+        };
+        for (int i = 0; i < valeursExemple.length; i++) {
+            exemple.createCell(i).setCellValue(valeursExemple[i]);
+        }
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=\"modele-import-eleves.xlsx\"");
+        wb.write(response.getOutputStream());
+        wb.close();
+    }
+
+    @PostMapping("/eleves/import")
+    public String importerElevesApercu(@RequestParam MultipartFile fichier, HttpSession session, Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+
+        List<LigneImportEleve> apercu = new ArrayList<>();
+        String erreurFichier = null;
+        if (fichier == null || fichier.isEmpty()) {
+            erreurFichier = "Aucun fichier sélectionné.";
+        } else {
+            try (Workbook wb = WorkbookFactory.create(fichier.getInputStream())) {
+                Sheet sheet = wb.getSheetAt(0);
+                for (Row row : sheet) {
+                    if (row.getRowNum() == 0) continue; // en-tête
+                    String nom = lireCelluleTexteEleve(row.getCell(0));
+                    String prenom = lireCelluleTexteEleve(row.getCell(1));
+                    String dateTexte = lireCelluleTexteEleve(row.getCell(2));
+                    String genre = lireCelluleTexteEleve(row.getCell(3));
+                    String classeNom = lireCelluleTexteEleve(row.getCell(4));
+                    String telParent = lireCelluleTexteEleve(row.getCell(5));
+                    String emailParent = lireCelluleTexteEleve(row.getCell(6));
+                    String adresse = lireCelluleTexteEleve(row.getCell(7));
+                    String pereNom = lireCelluleTexteEleve(row.getCell(8));
+                    String pereTel = lireCelluleTexteEleve(row.getCell(9));
+                    String pereEmail = lireCelluleTexteEleve(row.getCell(10));
+                    String mereNom = lireCelluleTexteEleve(row.getCell(11));
+                    String mereTel = lireCelluleTexteEleve(row.getCell(12));
+                    String mereEmail = lireCelluleTexteEleve(row.getCell(13));
+
+                    boolean ligneVide = (nom == null || nom.isBlank()) && (prenom == null || prenom.isBlank())
+                        && (classeNom == null || classeNom.isBlank());
+                    if (ligneVide) continue;
+
+                    LigneImportEleve ligne = new LigneImportEleve();
+                    ligne.nom = nom;
+                    ligne.prenom = prenom;
+                    ligne.dateNaissanceTexte = dateTexte;
+                    ligne.genre = genre;
+                    ligne.classeNom = classeNom;
+                    ligne.telephoneParent = telParent;
+                    ligne.emailParent = emailParent;
+                    ligne.adresse = adresse;
+                    ligne.pereNom = pereNom;
+                    ligne.pereTelephone = pereTel;
+                    ligne.pereEmail = pereEmail;
+                    ligne.mereNom = mereNom;
+                    ligne.mereTelephone = mereTel;
+                    ligne.mereEmail = mereEmail;
+
+                    if (dateTexte != null && !dateTexte.isBlank()) {
+                        try {
+                            ligne.dateNaissance = LocalDate.parse(dateTexte.trim(), FORMAT_DATE_IMPORT);
+                        } catch (DateTimeParseException ignored) {
+                            // date invalide : on continue sans bloquer l'import, le champ restera vide
+                        }
+                    }
+
+                    if (nom == null || nom.isBlank() || prenom == null || prenom.isBlank()) {
+                        ligne.valide = false;
+                        ligne.statut = "NOM_MANQUANT";
+                    } else if (classeNom == null || classeNom.isBlank()) {
+                        ligne.valide = false;
+                        ligne.statut = "CLASSE_MANQUANTE";
+                    } else {
+                        Classe classe = classeRepository.findByNomIgnoreCaseAndEtablissementId(classeNom.trim(), etabId).orElse(null);
+                        if (classe == null) {
+                            ligne.valide = false;
+                            ligne.statut = "CLASSE_INTROUVABLE";
+                        } else {
+                            ligne.classe = classe;
+                            ligne.classeId = classe.getId();
+                            ligne.valide = true;
+                            ligne.statut = "VALIDE";
+                        }
+                    }
+                    apercu.add(ligne);
+                }
+            } catch (IOException | RuntimeException ex) {
+                erreurFichier = "Fichier illisible. Utilisez un fichier Excel (.xlsx ou .xls) valide.";
+            }
+        }
+
+        List<LigneImportEleve> validesUniquement = apercu.stream().filter(l -> l.valide).toList();
+        session.setAttribute(SESSION_IMPORT_ELEVES_KEY, new ArrayList<>(validesUniquement));
+
+        model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
+        model.addAttribute("erreurImport", erreurFichier);
+        model.addAttribute("importFichierNom", fichier != null ? fichier.getOriginalFilename() : null);
+        model.addAttribute("importApercu", apercu);
+        model.addAttribute("importTotal", apercu.size());
+        model.addAttribute("importPret", validesUniquement.size());
+        model.addAttribute("importErreurs", apercu.size() - validesUniquement.size());
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "secretariat-eleves-import";
+    }
+
+    @PostMapping("/eleves/import/confirmer")
+    public String confirmerImportEleves(HttpSession session, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+
+        @SuppressWarnings("unchecked")
+        List<LigneImportEleve> lignes = (List<LigneImportEleve>) session.getAttribute(SESSION_IMPORT_ELEVES_KEY);
+        int saved = 0;
+        if (lignes != null) {
+            for (LigneImportEleve l : lignes) {
+                Classe classe = l.classeId != null ? classeRepository.findById(l.classeId).orElse(null) : null;
+                if (classe == null) continue;
+
+                Eleve eleve = new Eleve();
+                eleve.setNom(l.nom.trim().toUpperCase());
+                eleve.setPrenom(l.prenom.trim());
+                eleve.setDateNaissance(l.dateNaissance);
+                eleve.setGenre(l.genre);
+                eleve.setClasse(classe);
+                eleve.setTelephoneParent(l.telephoneParent);
+                eleve.setEmailParent(l.emailParent);
+                eleve.setAdresse(l.adresse);
+                eleve.setPereNom(l.pereNom);
+                eleve.setPereTelephone(l.pereTelephone);
+                eleve.setPereEmail(l.pereEmail);
+                eleve.setMereNom(l.mereNom);
+                eleve.setMereTelephone(l.mereTelephone);
+                eleve.setMereEmail(l.mereEmail);
+                eleve.setStatutInscription("INSCRIT");
+                eleve.setDateInscription(LocalDate.now());
+                eleve.setEtablissementId(etabId);
+                eleve.setMatricule("HF-" + LocalDate.now().getYear() + "-" + String.format("%03d", (eleveRepository.count() + 1)));
+                if (l.pereEmail != null && !l.pereEmail.isBlank()) eleve.setPereCodeAcces(genererCodeAcces());
+                if (l.mereEmail != null && !l.mereEmail.isBlank()) eleve.setMereCodeAcces(genererCodeAcces());
+                eleveRepository.save(eleve);
+                saved++;
+            }
+            session.removeAttribute(SESSION_IMPORT_ELEVES_KEY);
+        }
+        journalService.log("ELEVES_IMPORTES", "ELEVES", saved + " eleve(s) importe(s) depuis Excel");
+        ra.addFlashAttribute("successMsg", saved + " eleve(s) importe(s) avec succes.");
+        return "redirect:/secretariat";
+    }
+
+    private String genererCodeAcces() {
+        String caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 8; i++) sb.append(caracteres.charAt(random.nextInt(caracteres.length())));
+        return sb.toString();
+    }
+
+    private String lireCelluleTexteEleve(Cell cell) {
+        if (cell == null) return null;
+        if (cell.getCellType() == CellType.STRING) {
+            String v = cell.getStringCellValue().trim();
+            return v.isEmpty() ? null : v;
+        }
+        if (cell.getCellType() == CellType.NUMERIC) {
+            if (org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell)) {
+                return cell.getLocalDateTimeCellValue().format(FORMAT_DATE_IMPORT);
+            }
+            return String.valueOf((long) cell.getNumericCellValue());
+        }
+        return null;
     }
 
     /** Verifie que l'eleve appartient bien a l'etablissement de l'utilisateur connecte (isolation multi-tenant). */

@@ -14,6 +14,7 @@ public interface ClasseRepository extends JpaRepository<Classe, Long> {
     boolean existsByNomAndAnneeScolaire(String nom, String anneeScolaire);
     boolean existsByNomAndAnneeScolaireAndEtablissementId(String nom, String anneeScolaire, Long etablissementId);
     Optional<Classe> findByNomIgnoreCaseAndAnneeScolaireAndEtablissementId(String nom, String anneeScolaire, Long etablissementId);
+    Optional<Classe> findByNomIgnoreCaseAndEtablissementId(String nom, Long etablissementId);
     Optional<Classe> findBySalleIgnoreCaseAndAnneeScolaireAndEtablissementId(String salle, String anneeScolaire, Long etablissementId);
     List<Classe> findByAnneeScolaire(String anneeScolaire);
     List<Classe> findByEtablissementId(Long etablissementId);
