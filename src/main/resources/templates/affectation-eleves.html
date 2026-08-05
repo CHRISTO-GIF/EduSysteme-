@@ -48,48 +48,7 @@
 </head>
 <body class="bg-background text-on-background min-h-screen">
 <!-- Menu lateral -->
-<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50">
-<div class="px-lg mb-xl">
-<div class="flex items-center gap-sm">
-<div class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">school</span>
-</div>
-<div>
-<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
-<p class="font-label-sm text-label-sm text-on-tertiary-container opacity-70">Portail Admin</p>
-</div>
-</div>
-</div>
-<nav class="flex-1 space-y-xs px-sm overflow-y-auto">
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/dashboard">
-<span class="material-symbols-outlined">dashboard</span> Tableau de bord
-</a>
-<a class="flex items-center gap-md px-md py-sm text-white border-l-4 border-primary-fixed bg-tertiary-container rounded-lg font-label-md text-label-md font-bold" href="/gestion-academique">
-<span class="material-symbols-outlined">school</span> Gestion Academique
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/matieres">
-<span class="material-symbols-outlined">menu_book</span> Matieres
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/secretariat">
-<span class="material-symbols-outlined">group</span> Eleves
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/personnel">
-<span class="material-symbols-outlined">person</span> Personnel
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/emploi-du-temps">
-<span class="material-symbols-outlined">calendar_month</span> Emploi du temps
-</a>
-</nav>
-<div class="px-sm mt-auto space-y-xs pt-md border-t border-tertiary-container/30">
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="/parametres">
-<span class="material-symbols-outlined">settings</span> Parametres
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors rounded-lg font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-<span class="material-symbols-outlined">logout</span> Deconnexion
-</a>
-<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
-</div>
-</aside>
+<div th:replace="~{fragments/sidebar-admin :: admin('gestion-academique')}"></div>
 
 <!-- Barre superieure -->
 <header class="h-16 fixed top-0 right-0 left-0 md:left-[260px] bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-md md:px-lg z-40">

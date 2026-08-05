@@ -40,29 +40,7 @@
     </style>
 </head>
 <body class="bg-surface text-on-surface">
-<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex-col py-lg z-50 overflow-y-auto">
-<div class="px-lg mb-xl">
-<h1 class="font-headline-sm text-headline-sm font-bold text-surface-bright">EduSystem Pro</h1>
-<p class="text-label-sm text-on-tertiary-container" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'SURVEILLANT'}) ? 'Portail Surveillance' : 'Administration')))">Administration</p>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/dashboard">
-<span class="material-symbols-outlined mr-3">dashboard</span> Tableau de bord
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined mr-3">group</span> Eleves
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/finances" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
-<span class="material-symbols-outlined mr-3">account_balance</span> Tresorerie
-</a>
-<a class="flex items-center px-lg py-3 sidebar-active font-label-md text-label-md" href="/journal">
-<span class="material-symbols-outlined mr-3">assessment</span> Rapports
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/parametres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
-<span class="material-symbols-outlined mr-3">settings</span> Parametres
-</a>
-</nav>
-</aside>
+<div th:replace="~{fragments/sidebar-admin :: admin('journal')}"></div>
 
 <main class="ml-0 md:ml-sidebar-width p-md md:p-xl">
 <div class="md:hidden -mx-md -mt-md mb-md px-md py-sm flex items-center gap-sm bg-tertiary">

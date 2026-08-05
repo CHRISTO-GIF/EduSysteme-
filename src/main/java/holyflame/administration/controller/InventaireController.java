@@ -4,6 +4,7 @@ import holyflame.administration.model.ArticleInventaire;
 import holyflame.administration.model.MouvementInventaire;
 import holyflame.administration.repository.ArticleInventaireRepository;
 import holyflame.administration.repository.MouvementInventaireRepository;
+import holyflame.administration.service.EtablissementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -19,9 +20,11 @@ public class InventaireController {
 
     @Autowired private ArticleInventaireRepository articleRepository;
     @Autowired private MouvementInventaireRepository mouvementRepository;
+    @Autowired private EtablissementService etablissementService;
 
     @GetMapping
     public String index(Model model) {
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         List<ArticleInventaire> articles = articleRepository.findAllByOrderByCategorieAscNomAsc();
         model.addAttribute("articles", articles);
         model.addAttribute("totalArticles", articles.size());

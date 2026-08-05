@@ -51,62 +51,7 @@
     </style>
 </head>
 <body class="bg-background text-on-background">
-<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto">
-<div class="px-gutter mb-xl flex items-center gap-3">
-<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center text-on-primary">
-<span class="material-symbols-outlined">school</span>
-</div>
-<div>
-<h1 class="font-headline-md text-headline-md font-bold text-on-primary leading-tight">EduSystem Pro</h1>
-<p class="font-label-sm text-label-sm text-on-tertiary-container">Console Admin</p>
-</div>
-</div>
-<nav class="flex-1 px-sm space-y-1">
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/dashboard">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-body-md text-body-md">Tableau de bord</span>
-</a>
-<a class="border-l-4 border-primary bg-tertiary-container text-on-primary-container font-bold px-4 py-3 flex items-center gap-3" href="/parametres/roles">
-<span class="material-symbols-outlined">security</span>
-<span class="font-body-md text-body-md">Roles</span>
-</a>
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/personnel">
-<span class="material-symbols-outlined">school</span>
-<span class="font-body-md text-body-md">Personnel</span>
-</a>
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/examens">
-<span class="material-symbols-outlined">quiz</span>
-<span class="font-body-md text-body-md">Examens</span>
-</a>
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/messagerie">
-<span class="material-symbols-outlined">forum</span>
-<span class="font-body-md text-body-md">Messagerie</span>
-</a>
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/parametres/signalements">
-<span class="material-symbols-outlined">flag</span>
-<span class="font-body-md text-body-md">Signalements</span>
-</a>
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/finances">
-<span class="material-symbols-outlined">account_balance</span>
-<span class="font-body-md text-body-md">Tresorerie</span>
-</a>
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/journal">
-<span class="material-symbols-outlined">apps</span>
-<span class="font-body-md text-body-md">Journal</span>
-</a>
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="/parametres">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-body-md text-body-md">Parametres</span>
-</a>
-</nav>
-<div class="mt-auto px-sm space-y-1">
-<a class="text-on-tertiary-container hover:bg-tertiary-container transition-colors duration-200 px-4 py-3 flex items-center gap-3 rounded-lg" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-<span class="material-symbols-outlined">logout</span>
-<span class="font-label-sm text-label-sm">Deconnexion</span>
-</a>
-<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
-</div>
-</aside>
+<div th:replace="~{fragments/sidebar-admin :: admin('parametres')}"></div>
 
 <header class="fixed top-0 left-0 right-0 z-40 bg-surface h-16 border-b border-outline-variant flex items-center justify-between ml-0 md:ml-[260px] px-md md:px-gutter">
 <div class="flex items-center gap-4 w-1/2 md:w-1/3">

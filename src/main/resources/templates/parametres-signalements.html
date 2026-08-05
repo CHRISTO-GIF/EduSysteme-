@@ -37,51 +37,7 @@
 </script>
 </head>
 <body class="bg-background text-on-background antialiased">
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50 overflow-y-auto">
-<div class="px-lg mb-xl">
-<div class="flex items-center gap-sm">
-<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined text-on-primary text-headline-sm">school</span>
-</div>
-<div>
-<h1 class="font-headline-sm text-headline-sm text-white font-bold leading-none">EduSystem Pro</h1>
-<p class="text-on-tertiary-container text-[10px] tracking-widest uppercase mt-1">Portail Admin</p>
-</div>
-</div>
-</div>
-<nav class="flex-1 space-y-1 px-sm">
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/dashboard">
-<span class="material-symbols-outlined">dashboard</span> Tableau de bord
-</a>
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/secretariat">
-<span class="material-symbols-outlined">group</span> Eleves
-</a>
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/personnel">
-<span class="material-symbols-outlined">school</span> Personnel
-</a>
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/examens">
-<span class="material-symbols-outlined">quiz</span> Examens
-</a>
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/messagerie">
-<span class="material-symbols-outlined">forum</span> Messagerie
-</a>
-<a class="px-md py-sm flex items-center gap-md text-white border-l-4 border-primary-fixed bg-tertiary-container font-bold font-label-md text-label-md rounded-lg" href="/parametres/signalements">
-<span class="material-symbols-outlined">flag</span> Signalements
-</a>
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/finances">
-<span class="material-symbols-outlined">account_balance</span> Tresorerie
-</a>
-</nav>
-<div class="mt-auto border-t border-tertiary-container/30 pt-md px-sm">
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="/parametres">
-<span class="material-symbols-outlined">settings</span> Parametres
-</a>
-<a class="px-md py-sm flex items-center gap-md text-on-tertiary-container hover:text-white hover:bg-tertiary-container/50 transition-colors duration-200 font-label-md text-label-md rounded-lg" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-<span class="material-symbols-outlined">logout</span> Deconnexion
-</a>
-<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
-</div>
-</aside>
+<div th:replace="~{fragments/sidebar-admin :: admin('parametres')}"></div>
 
 <main class="ml-sidebar-width p-xl">
 <div class="max-w-container-max mx-auto">

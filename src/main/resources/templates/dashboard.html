@@ -232,77 +232,7 @@
 <!-- ===================== VERSION DESKTOP ===================== -->
 <div class="hidden md:contents">
 <!-- Menu lateral persistant -->
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary dark:bg-tertiary-container flex flex-col py-lg z-50">
-<div class="px-lg mb-xl">
-<h1 class="font-headline-sm text-headline-sm text-on-primary-fixed font-bold">EduSystem Pro</h1>
-<p class="text-on-tertiary-container font-label-sm text-label-sm opacity-80" th:text="${nomEtablissement}">Portail Admin</p>
-</div>
-<nav class="flex-grow flex flex-col space-y-xs overflow-y-auto hide-scrollbar">
-<a class="flex items-center px-lg py-md gap-md text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary cursor-pointer active:scale-95 transition-all duration-200" href="/dashboard">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-label-md text-label-md">Tableau de bord</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/gestion-academique" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
-<span class="material-symbols-outlined">school</span>
-<span class="font-label-md text-label-md">Gestion Academique</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/matieres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
-<span class="material-symbols-outlined">menu_book</span>
-<span class="font-label-md text-label-md">Matieres</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined">group</span>
-<span class="font-label-md text-label-md">Eleves</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/secretariat/cartes" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined">badge</span>
-<span class="font-label-md text-label-md">Cartes d'identite</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/personnel" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
-<span class="material-symbols-outlined">school</span>
-<span class="font-label-md text-label-md">Personnel</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/emploi-du-temps">
-<span class="material-symbols-outlined">calendar_month</span>
-<span class="font-label-md text-label-md">Emploi du temps</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/notes/saisie" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined">grading</span>
-<span class="font-label-md text-label-md">Notes</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/examens" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined">quiz</span>
-<span class="font-label-md text-label-md">Examens</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/surveillant" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SURVEILLANT')}">
-<span class="material-symbols-outlined">shield_person</span>
-<span class="font-label-md text-label-md">Surveillance</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/messagerie" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined">forum</span>
-<span class="font-label-md text-label-md">Messagerie</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/finances" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
-<span class="material-symbols-outlined">account_balance</span>
-<span class="font-label-md text-label-md">Tresorerie</span>
-</a>
-<a class="flex items-center px-lg py-md gap-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50 cursor-pointer active:scale-95 transition-all duration-200" href="/journal">
-<span class="material-symbols-outlined">assessment</span>
-<span class="font-label-md text-label-md">Rapports</span>
-</a>
-</nav>
-<div class="mt-auto px-lg border-t border-tertiary-container/30 pt-lg space-y-xs">
-<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" href="/parametres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-label-md text-label-md">Parametres</span>
-</a>
-<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-<span class="material-symbols-outlined">logout</span>
-<span class="font-label-md text-label-md">Deconnexion</span>
-</a>
-<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
-</div>
-</aside>
+<div th:replace="~{fragments/sidebar-admin :: admin('dashboard')}"></div>
 <!-- Zone de contenu principale -->
 <div class="ml-sidebar-width min-h-screen flex flex-col">
 <!-- Barre superieure -->

@@ -51,52 +51,7 @@
     </style>
 </head>
 <body class="bg-surface text-on-surface">
-<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary border-r border-outline-variant flex-col py-lg z-50 overflow-y-auto">
-<div class="px-lg mb-xl">
-<h1 class="font-headline-sm text-headline-sm font-bold text-surface-bright">EduSystem Pro</h1>
-<p class="text-label-sm text-on-tertiary-container" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'SECRETAIRE'}) ? 'Portail Secretariat' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'ENSEIGNANT'}) ? 'Portail Enseignant' : ((${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Administration'))">Administration</p>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/dashboard">
-<span class="material-symbols-outlined mr-3">dashboard</span> Tableau de bord
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined mr-3">group</span> Eleves
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/personnel" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
-<span class="material-symbols-outlined mr-3">school</span> Personnel
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/notes/saisie" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined mr-3">grading</span> Notes
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/examens" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined mr-3">quiz</span> Examens
-</a>
-<a class="flex items-center px-lg py-3 sidebar-active font-label-md text-label-md" href="/bulletins">
-<span class="material-symbols-outlined mr-3">description</span> Bulletins
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/messagerie" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined mr-3">forum</span> Messagerie
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/finances" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
-<span class="material-symbols-outlined mr-3">account_balance</span> Tresorerie
-</a>
-<a class="flex items-center px-lg py-3 text-on-tertiary-container hover:bg-tertiary-container/20 transition-colors font-label-md text-label-md" href="/emploi-du-temps">
-<span class="material-symbols-outlined mr-3">calendar_today</span> Emploi du temps
-</a>
-</nav>
-<div class="mt-auto px-lg space-y-2">
-<div class="pt-lg border-t border-outline-variant/30 space-y-1">
-<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="/parametres" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
-<span class="material-symbols-outlined mr-3">settings</span> Parametres
-</a>
-<a class="flex items-center py-2 text-on-tertiary-container hover:text-surface-bright font-label-md text-label-md" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-<span class="material-symbols-outlined mr-3">logout</span> Deconnexion
-</a>
-<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
-</div>
-</div>
-</aside>
+<div th:replace="~{fragments/sidebar-admin :: admin('bulletins')}"></div>
 
 <header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface border-b border-outline-variant flex justify-between items-center px-md md:px-lg z-40">
 <div class="flex items-center w-1/2 md:w-1/3">

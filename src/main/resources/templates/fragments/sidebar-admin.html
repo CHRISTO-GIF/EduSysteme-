@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Barre laterale desktop partagee par les pages "back-office" (ADMIN et roles
+  associes). Un seul point de verite pour la liste des destinations et les
+  droits d'acces par role — evite que chaque page ne reimplante sa propre
+  copie (incomplete) de la navigation.
+  Usage : <div th:replace="~{fragments/sidebar-admin :: admin('personnel')}"></div>
+  activePage : identifiant de la page courante parmi les valeurs utilisees
+  ci-dessous (dashboard, gestion-academique, matieres, secretariat, cartes,
+  personnel, inventaire, emploi-du-temps, notes, examens, bulletins,
+  surveillance, messagerie, finances, journal, parametres).
+-->
+<aside th:fragment="admin(activePage)" class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary dark:bg-tertiary-container flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-sm text-headline-sm text-on-primary-fixed font-bold">EduSystem Pro</h1>
+<p class="text-on-tertiary-container font-label-sm text-label-sm opacity-80" th:text="${nomEtablissement != null ? nomEtablissement : 'Portail Admin'}">Portail Admin</p>
+</div>
+<nav class="flex-grow flex flex-col space-y-xs overflow-y-auto hide-scrollbar">
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'dashboard'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'gestion-academique'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" href="/gestion-academique">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Gestion Academique</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'matieres'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" href="/matieres">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-md text-label-md">Matieres</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'secretariat'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}" href="/secretariat">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Eleves</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'cartes'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}" href="/secretariat/cartes">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Cartes d'identite</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'personnel'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'TRESORIER' or utilisateurConnecte.role == 'SECRETAIRE')}" href="/personnel">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Personnel</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'inventaire'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" href="/inventaire">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Inventaire</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'emploi-du-temps'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" href="/emploi-du-temps">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'notes'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}" href="/notes/saisie">
+<span class="material-symbols-outlined">grading</span>
+<span class="font-label-md text-label-md">Notes</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'examens'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}" href="/examens">
+<span class="material-symbols-outlined">quiz</span>
+<span class="font-label-md text-label-md">Examens</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'bulletins'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}" href="/bulletins">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Bulletins</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'surveillance'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SURVEILLANT')}" href="/surveillant">
+<span class="material-symbols-outlined">shield_person</span>
+<span class="font-label-md text-label-md">Surveillance</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'messagerie'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE' or utilisateurConnecte.role == 'TRESORIER')}" href="/messagerie">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-label-md text-label-md">Messagerie</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'finances'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}" href="/finances">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-md text-label-md">Tresorerie</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'journal'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" href="/journal">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-label-md text-label-md">Rapports</span>
+</a>
+</nav>
+<div class="mt-auto px-lg border-t border-tertiary-container/30 pt-lg space-y-xs">
+<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" href="/parametres">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Parametres</span>
+</a>
+<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Deconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+</body>
+</html>

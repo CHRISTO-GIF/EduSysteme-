@@ -49,34 +49,7 @@
 </head>
 <body class="bg-surface text-on-surface">
 <!-- Menu lateral -->
-<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex flex-col py-lg z-50">
-<div class="px-lg mb-xl">
-<h1 class="font-headline-md text-headline-md font-bold text-white">EduSystem Pro</h1>
-<p class="font-label-sm text-label-sm text-on-tertiary-container/70">Portail Admin</p>
-</div>
-<nav class="flex-1 space-y-base">
-<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/dashboard">
-<span class="material-symbols-outlined mr-md">dashboard</span>
-<span class="font-label-md text-label-md">Tableau de bord</span>
-</a>
-<a class="flex items-center px-lg py-md sidebar-active transition-colors duration-200" href="/personnel">
-<span class="material-symbols-outlined mr-md">school</span>
-<span class="font-label-md text-label-md">Personnel</span>
-</a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/secretariat">
-<span class="material-symbols-outlined mr-md">group</span>
-<span class="font-label-md text-label-md">Eleves</span>
-</a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/gestion-classes">
-<span class="material-symbols-outlined mr-md">account_tree</span>
-<span class="font-label-md text-label-md">Classes</span>
-</a>
-<a class="flex items-center px-lg py-md text-on-tertiary-container/70 hover:bg-white/10 hover:text-white transition-colors duration-200" href="/parametres">
-<span class="material-symbols-outlined mr-md">settings</span>
-<span class="font-label-md text-label-md">Parametres</span>
-</a>
-</nav>
-</aside>
+<div th:replace="~{fragments/sidebar-admin :: admin('personnel')}"></div>
 
 <!-- Contenu principal -->
 <main class="ml-sidebar-width min-h-screen flex flex-col">
