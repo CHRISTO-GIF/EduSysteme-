@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Emploi du temps - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a", "on-primary-container": "#90a8ff", "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#bec6e0", "primary-container": "#1e3a8a", "surface-container-low": "#f2f4f6",
+                    "surface-container": "#eceef0", "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                    "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "secondary-fixed-dim": "#b7c8e1",
+                    "tertiary": "#222a3e", "secondary-container": "#d0e1fb", "surface-variant": "#e0e3e5",
+                    "on-tertiary-container": "#a4acc5", "on-secondary": "#ffffff", "secondary-fixed": "#d3e4fe",
+                    "error": "#ba1a1a", "surface-container-high": "#e6e8ea", "outline-variant": "#c5c5d3",
+                    "surface-container-lowest": "#ffffff", "tertiary-container": "#384055", "on-tertiary": "#ffffff",
+                    "background": "#f7f9fb", "outline": "#757682", "surface-bright": "#f7f9fb", "secondary": "#505f76",
+                    "primary": "#00236f", "surface": "#f7f9fb", "on-background": "#191c1e", "error-container": "#ffdad6",
+                    "inverse-primary": "#b5c4ff"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "lg": "24px", "xs": "4px", "md": "16px", "base": "4px", "sm": "8px", "xl": "32px", "gutter": "24px", "container-max": "1440px"},
+            "fontFamily": {"label-md": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"], "headline-sm": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .calendar-grid { display: grid; grid-template-columns: 80px repeat(6, 1fr); }
+        @media print {
+            .no-print { display: none !important; }
+            main { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<aside class="hidden md:flex w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex-col py-lg border-r border-outline-variant z-50 no-print">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase tracking-widest mt-xs">Portail Eleve</p>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail}">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-primary-container border-l-4 border-primary bg-primary-container/10 transition-colors duration-200" th:href="@{/portail/emploi-du-temps}">
+<span class="material-symbols-outlined mr-md">calendar_month</span>
+<span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/devoirs}">
+<span class="material-symbols-outlined mr-md">assignment</span>
+<span class="font-label-md text-label-md">Devoirs</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/cours}">
+<span class="material-symbols-outlined mr-md">school</span>
+<span class="font-label-md text-label-md">Cours</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/bulletin}">
+<span class="material-symbols-outlined mr-md">analytics</span>
+<span class="font-label-md text-label-md">Bulletin</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/vie-scolaire}">
+<span class="material-symbols-outlined mr-md">campaign</span>
+<span class="font-label-md text-label-md">Vie scolaire</span>
+</a>
+</nav>
+<div class="px-lg mt-auto pt-lg border-t border-tertiary-container">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-tertiary font-bold">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-tertiary truncate" th:if="${eleve != null}" th:text="${eleve.prenom} + ' ' + ${eleve.nom}">Eleve</p>
+<p class="font-label-sm text-label-sm text-on-tertiary-container truncate" th:if="${eleve != null and eleve.classe != null}" th:text="${eleve.classe.nom}">Classe</p>
+</div>
+</div>
+</div>
+</aside>
+
+<header class="md:hidden sticky top-0 z-40 flex items-center gap-sm h-14 px-md bg-surface border-b border-outline-variant no-print">
+<a class="text-on-surface-variant" th:href="@{/portail}"><span class="material-symbols-outlined">arrow_back</span></a>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Emploi du temps</h1>
+</header>
+
+<main class="md:ml-sidebar-width min-h-screen p-lg max-w-container-max mx-auto">
+
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-lg no-print gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary hidden md:block">Emploi du temps</h2>
+<p class="font-body-lg text-body-lg text-secondary mt-xs" th:if="${!#lists.isEmpty(joursSemaine)}"
+   th:text="'Semaine du ' + ${#temporals.format(joursSemaine[0].date, 'dd MMM')} + ' au ' + ${#temporals.format(joursSemaine[5].date, 'dd MMM')}">Semaine</p>
+</div>
+<div class="flex items-center gap-md">
+<div class="bg-surface-container-low p-1 rounded-lg flex items-center">
+<a class="px-md py-sm rounded-lg font-label-md text-label-md transition-all" th:classappend="${semaine == 0} ? 'bg-white shadow-sm text-primary' : 'text-secondary hover:text-primary'" th:href="@{/portail/emploi-du-temps(semaine=0)}">Cette semaine</a>
+<a class="px-md py-sm rounded-lg font-label-md text-label-md transition-all" th:classappend="${semaine == 1} ? 'bg-white shadow-sm text-primary' : 'text-secondary hover:text-primary'" th:href="@{/portail/emploi-du-temps(semaine=1)}">Semaine prochaine</a>
+</div>
+<button class="flex items-center gap-sm px-lg py-sm border border-outline text-primary font-label-md rounded-lg hover:bg-surface-container-low transition-colors" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer
+</button>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+
+<!-- En-tete jours -->
+<div class="calendar-grid border-b border-outline-variant bg-surface-container-high no-print">
+<div class="p-md border-r border-outline-variant"></div>
+<div class="p-md text-center border-r border-outline-variant last:border-r-0" th:each="j : ${joursSemaine}">
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest" th:text="${#strings.substring(j.nom,0,3)}">Jour</p>
+<p class="font-headline-sm text-headline-sm text-primary" th:text="${#temporals.format(j.date, 'dd MMM')}">Date</p>
+</div>
+</div>
+
+<!-- Grille horaire -->
+<div class="relative calendar-grid" th:style="'min-height:' + ${hauteurGrillePx} + 'px'">
+<div class="flex flex-col border-r border-outline-variant">
+<div class="h-[100px] p-sm text-right font-label-sm text-label-sm text-secondary" th:each="h : ${heuresGrille}" th:text="${h}">08:00</div>
+</div>
+<div class="border-r border-outline-variant last:border-r-0" th:each="j : ${joursSemaine}"></div>
+
+<!-- Blocs de cours positionnes -->
+<div class="absolute bg-primary-container text-on-primary rounded-lg p-md shadow-sm border-l-4 border-on-primary-container z-20 overflow-hidden"
+     th:each="cp : ${creneauxPositionnes}" th:style="${cp.style}">
+<h4 class="font-label-md text-label-md" th:text="${cp.creneau.matiere != null ? cp.creneau.matiere.nom : '?'}">Matiere</h4>
+<p class="font-label-sm text-on-primary-container mt-xs" th:if="${cp.creneau.enseignantNom != null}" th:text="${cp.creneau.enseignantNom}">Enseignant</p>
+<div class="mt-sm flex items-center gap-xs" th:if="${cp.creneau.salle != null}">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="font-label-sm text-label-sm" th:text="${cp.creneau.salle}">Salle</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-primary-container/80 mt-xs" th:text="${cp.creneau.heureDebut} + ' - ' + ${cp.creneau.heureFin}">Heure</p>
+</div>
+</div>
+</div>
+
+<p class="text-center text-on-surface-variant py-lg" th:if="${#lists.isEmpty(creneauxPositionnes)}">Aucun cours n'a encore ete renseigne pour votre classe.</p>
+
+<!-- Tuiles d'information -->
+<div class="mt-lg grid grid-cols-1 lg:grid-cols-12 gap-lg no-print">
+<div class="lg:col-span-8 bg-surface-container-lowest p-lg border border-outline-variant rounded-xl flex items-center gap-lg" th:if="${prochaineEcheanceLibelle != null}">
+<div class="w-16 h-16 bg-primary-container text-on-primary rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[32px]">event_available</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-primary">Prochaine echeance</h3>
+<p class="font-body-md text-body-md text-secondary" th:text="${prochaineEcheanceLibelle} + ' — ' + ${#temporals.format(prochaineEcheanceDate, 'dd MMMM yyyy')}">Echeance</p>
+</div>
+<a class="px-lg py-sm bg-primary text-on-primary font-label-md text-label-md rounded-lg" th:href="@{/portail/devoirs}">Voir</a>
+</div>
+<div class="lg:col-span-8 bg-surface-container-lowest p-lg border border-outline-variant rounded-xl flex items-center gap-lg text-on-surface-variant" th:if="${prochaineEcheanceLibelle == null}">
+<span class="material-symbols-outlined text-[32px] text-outline">event_available</span>
+<p class="font-body-md text-body-md">Aucune echeance a venir pour le moment.</p>
+</div>
+
+<div class="lg:col-span-4 bg-tertiary p-lg border border-outline-variant rounded-xl text-on-tertiary">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-label-md text-label-md">Charge hebdomadaire</h3>
+<span class="font-label-sm text-label-sm text-on-tertiary-container" th:text="${totalHeures} + 'h'">0h</span>
+</div>
+<div class="space-y-sm">
+<div th:each="c : ${chargeParJour}">
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span th:text="${c.nom}">Jour</span>
+<span th:text="${c.heures} + 'h'">0h</span>
+</div>
+<div class="w-full bg-tertiary-container h-2 rounded-full overflow-hidden">
+<div class="bg-on-primary-container h-full" th:style="'width:' + ${c.pourcentage} + '%'"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vie scolaire - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a", "on-primary-container": "#90a8ff", "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#bec6e0", "primary-container": "#1e3a8a", "surface-container-low": "#f2f4f6",
+                    "surface-container": "#eceef0", "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                    "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "secondary-fixed-dim": "#b7c8e1",
+                    "tertiary": "#222a3e", "secondary-container": "#d0e1fb", "surface-variant": "#e0e3e5",
+                    "on-tertiary-container": "#a4acc5", "on-secondary": "#ffffff", "secondary-fixed": "#d3e4fe",
+                    "error": "#ba1a1a", "surface-container-high": "#e6e8ea", "outline-variant": "#c5c5d3",
+                    "surface-container-lowest": "#ffffff", "tertiary-container": "#384055", "on-tertiary": "#ffffff",
+                    "background": "#f7f9fb", "outline": "#757682", "surface-bright": "#f7f9fb", "secondary": "#505f76",
+                    "primary": "#00236f", "surface": "#f7f9fb", "on-background": "#191c1e", "error-container": "#ffdad6",
+                    "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "lg": "24px", "xs": "4px", "md": "16px", "base": "4px", "sm": "8px", "xl": "32px", "gutter": "24px", "container-max": "1440px"},
+            "fontFamily": {"label-md": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"], "headline-sm": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<aside class="hidden md:flex w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex-col py-lg border-r border-outline-variant z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase tracking-widest mt-xs">Portail Eleve</p>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail}">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/emploi-du-temps}">
+<span class="material-symbols-outlined mr-md">calendar_month</span>
+<span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/devoirs}">
+<span class="material-symbols-outlined mr-md">assignment</span>
+<span class="font-label-md text-label-md">Devoirs</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/cours}">
+<span class="material-symbols-outlined mr-md">school</span>
+<span class="font-label-md text-label-md">Cours</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/bulletin}">
+<span class="material-symbols-outlined mr-md">analytics</span>
+<span class="font-label-md text-label-md">Bulletin</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-primary-container border-l-4 border-primary bg-primary-container/10 transition-colors duration-200" th:href="@{/portail/vie-scolaire}">
+<span class="material-symbols-outlined mr-md">campaign</span>
+<span class="font-label-md text-label-md">Vie scolaire</span>
+</a>
+</nav>
+<div class="px-lg mt-auto pt-lg border-t border-tertiary-container">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-tertiary font-bold">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-tertiary truncate" th:if="${eleve != null}" th:text="${eleve.prenom} + ' ' + ${eleve.nom}">Eleve</p>
+<p class="font-label-sm text-label-sm text-on-tertiary-container truncate" th:if="${eleve != null and eleve.classe != null}" th:text="${eleve.classe.nom}">Classe</p>
+</div>
+</div>
+</div>
+</aside>
+
+<header class="md:hidden sticky top-0 z-40 flex items-center gap-sm h-14 px-md bg-surface border-b border-outline-variant">
+<a class="text-on-surface-variant" th:href="@{/portail}"><span class="material-symbols-outlined">arrow_back</span></a>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Vie scolaire</h1>
+</header>
+
+<main class="md:ml-sidebar-width min-h-screen p-lg max-w-container-max mx-auto">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-lg hidden md:block">Vie scolaire</h2>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="p-md border-b border-outline-variant bg-surface-container-low/50">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-xs"><span class="material-symbols-outlined">campaign</span> Annonces</h3>
+</div>
+<p class="text-center text-on-surface-variant py-lg" th:if="${#lists.isEmpty(publications)}">Aucune annonce pour le moment.</p>
+<div class="divide-y divide-outline-variant" th:if="${!#lists.isEmpty(publications)}">
+<div class="p-md" th:each="p : ${publications}">
+<div class="flex justify-between items-start gap-sm mb-xs">
+<p class="font-label-md text-label-md text-on-surface" th:text="${p.titre}">Titre</p>
+<span class="text-[10px] text-outline uppercase font-bold" th:text="${#temporals.format(p.datePublication, 'dd/MM/yyyy')}">Date</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant" th:text="${p.contenu}">Contenu</p>
+</div>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="p-md border-b border-outline-variant bg-surface-container-low/50">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-xs"><span class="material-symbols-outlined">event</span> Evenements a venir</h3>
+</div>
+<p class="text-center text-on-surface-variant py-lg" th:if="${#lists.isEmpty(evenementsAVenir)}">Aucun evenement prevu.</p>
+<div class="divide-y divide-outline-variant" th:if="${!#lists.isEmpty(evenementsAVenir)}">
+<div class="p-md flex items-start gap-md" th:each="ev : ${evenementsAVenir}">
+<div class="flex flex-col items-center bg-primary-container text-white p-sm rounded min-w-[52px]">
+<span class="font-label-sm" th:text="${#temporals.format(ev.dateEvenement, 'MMM')}">Mois</span>
+<span class="font-headline-sm text-headline-sm" th:text="${#temporals.day(ev.dateEvenement)}">0</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface" th:text="${ev.titre}">Titre</p>
+<p class="font-body-md text-body-md text-on-surface-variant" th:text="(${ev.heureDebut != null ? ev.heureDebut + ' • ' : ''}) + (${ev.lieu != null ? ev.lieu : ''})">Details</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="p-md border-b border-outline-variant bg-surface-container-low/50">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-xs"><span class="material-symbols-outlined">event_busy</span> Absences</h3>
+</div>
+<p class="text-center text-on-surface-variant py-lg" th:if="${#lists.isEmpty(absences)}">Aucune absence enregistree.</p>
+<div class="divide-y divide-outline-variant" th:if="${!#lists.isEmpty(absences)}">
+<div class="p-md flex justify-between items-center gap-sm" th:each="a : ${absences}">
+<div>
+<p class="font-label-md text-label-md text-on-surface" th:text="${#temporals.format(a.date, 'dd/MM/yyyy')} + ' - ' + ${a.periode}">Date</p>
+<p class="font-body-md text-body-md text-on-surface-variant" th:if="${a.motif != null}" th:text="${a.motif}">Motif</p>
+</div>
+<span class="px-sm py-1 rounded-full text-[10px] font-bold uppercase" th:classappend="${a.estJustifiee} ? 'bg-success-container text-on-success-container' : 'bg-error-container text-on-error-container'" th:text="${a.estJustifiee} ? 'Justifiee' : 'Non justifiee'">Statut</span>
+</div>
+</div>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="p-md border-b border-outline-variant bg-surface-container-low/50">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-xs"><span class="material-symbols-outlined">military_tech</span> Conduite</h3>
+</div>
+<p class="text-center text-on-surface-variant py-lg" th:if="${#lists.isEmpty(conduites)}">Aucune evaluation de conduite enregistree.</p>
+<div class="divide-y divide-outline-variant" th:if="${!#lists.isEmpty(conduites)}">
+<div class="p-md flex justify-between items-center gap-sm" th:each="c : ${conduites}">
+<div>
+<p class="font-label-md text-label-md text-on-surface" th:text="'Trimestre ' + ${c.trimestre} + ' — ' + ${c.anneeScolaire}">Periode</p>
+<p class="font-body-md text-body-md text-on-surface-variant" th:if="${c.commentaire != null and !#strings.isEmpty(c.commentaire)}" th:text="${c.commentaire}">Commentaire</p>
+</div>
+<span class="px-sm py-1 rounded-full text-[10px] font-bold uppercase bg-secondary-container text-on-secondary-container" th:text="${c.evaluation}">Evaluation</span>
+</div>
+</div>
+</section>
+
+</div>
+</main>
+</body>
+</html>

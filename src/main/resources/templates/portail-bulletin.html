@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bulletin - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a", "on-primary-container": "#90a8ff", "on-primary": "#ffffff",
+                    "primary-container": "#1e3a8a", "surface-container-low": "#f2f4f6",
+                    "surface-container": "#eceef0", "on-surface": "#191c1e", "on-surface-variant": "#444651",
+                    "tertiary": "#222a3e", "secondary-container": "#d0e1fb", "on-secondary-container": "#54647a",
+                    "error": "#ba1a1a", "surface-container-high": "#e6e8ea", "outline-variant": "#c5c5d3",
+                    "surface-container-lowest": "#ffffff", "tertiary-container": "#384055", "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#a4acc5",
+                    "background": "#f7f9fb", "outline": "#757682", "surface-bright": "#f7f9fb", "secondary": "#505f76",
+                    "primary": "#00236f", "surface": "#f7f9fb", "on-background": "#191c1e", "error-container": "#ffdad6",
+                    "success": "#1e824c"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "lg": "24px", "xs": "4px", "md": "16px", "base": "4px", "sm": "8px", "xl": "32px", "gutter": "24px", "container-max": "1440px"},
+            "fontFamily": {"label-md": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"], "headline-sm": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+        @media print {
+            .no-print { display: none !important; }
+            main { margin-left: 0 !important; }
+            .bento-grid { display: block; }
+            .bento-grid > * { margin-bottom: 16px; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<aside class="hidden md:flex w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex-col py-lg border-r border-outline-variant z-50 no-print">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase tracking-widest mt-xs">Portail Eleve</p>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail}">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/emploi-du-temps}">
+<span class="material-symbols-outlined mr-md">calendar_month</span>
+<span class="font-label-md text-label-md">Emploi du temps</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/devoirs}">
+<span class="material-symbols-outlined mr-md">assignment</span>
+<span class="font-label-md text-label-md">Devoirs</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/cours}">
+<span class="material-symbols-outlined mr-md">school</span>
+<span class="font-label-md text-label-md">Cours</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-primary-container border-l-4 border-primary bg-primary-container/10 transition-colors duration-200" th:href="@{/portail/bulletin}">
+<span class="material-symbols-outlined mr-md">analytics</span>
+<span class="font-label-md text-label-md">Bulletin</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail/vie-scolaire}">
+<span class="material-symbols-outlined mr-md">campaign</span>
+<span class="font-label-md text-label-md">Vie scolaire</span>
+</a>
+</nav>
+<div class="px-lg mt-auto pt-lg border-t border-tertiary-container">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-tertiary font-bold">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-tertiary truncate" th:if="${eleve != null}" th:text="${eleve.prenom} + ' ' + ${eleve.nom}">Eleve</p>
+<p class="font-label-sm text-label-sm text-on-tertiary-container truncate" th:if="${eleve != null and eleve.classe != null}" th:text="${eleve.classe.nom}">Classe</p>
+</div>
+</div>
+</div>
+</aside>
+
+<header class="md:hidden sticky top-0 z-40 flex items-center gap-sm h-14 px-md bg-surface border-b border-outline-variant no-print">
+<a class="text-on-surface-variant" th:href="@{/portail}"><span class="material-symbols-outlined">arrow_back</span></a>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Bulletin</h1>
+</header>
+
+<main class="md:ml-sidebar-width min-h-screen p-lg max-w-container-max mx-auto">
+
+<div class="mb-lg flex flex-col md:flex-row justify-between items-end gap-md no-print">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary hidden md:block">Bulletin scolaire</h2>
+<p class="font-body-md text-body-md text-secondary mt-xs" th:text="'Trimestre ' + ${trimestre} + (${anneeScolaire != null} ? ' — Annee ' + ${anneeScolaire} : '')">Periode</p>
+</div>
+<div class="flex gap-md">
+<button class="flex items-center gap-xs px-md py-sm bg-surface-container-lowest border border-outline text-secondary font-label-md text-label-sm rounded-lg hover:bg-surface-container-low transition-colors" onclick="window.print()" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span> Exporter en PDF
+</button>
+<div class="flex bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+<a class="px-lg py-2 font-label-md text-label-md transition-colors" th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/portail/bulletin(trimestre=1)}">T1</a>
+<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/portail/bulletin(trimestre=2)}">T2</a>
+<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 3} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/portail/bulletin(trimestre=3)}">T3</a>
+</div>
+</div>
+</div>
+
+<div class="bento-grid">
+
+<!-- Resume -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col">
+<div class="flex justify-between items-start mb-md">
+<h3 class="font-headline-sm text-headline-sm text-primary">Resume</h3>
+<span class="material-symbols-outlined text-on-primary-container">monitoring</span>
+</div>
+<div class="flex-1 flex flex-col justify-center items-center py-md bg-surface-container-low rounded-lg mb-md">
+<span class="font-headline-lg text-headline-lg text-primary text-[56px] leading-tight" th:text="${moyenneGenerale}">0</span>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest" th:text="'/ 20 — ' + ${mention}">Moyenne</span>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between items-center p-sm rounded-lg bg-surface-container">
+<span class="font-body-md text-body-md text-secondary">Rang</span>
+<span class="font-label-md text-label-md text-primary" th:text="${rang} + 'e sur ' + ${effectif}">--</span>
+</div>
+<div class="flex justify-between items-center p-sm rounded-lg bg-surface-container">
+<span class="font-body-md text-body-md text-secondary">Assiduite</span>
+<span class="font-label-md text-label-md text-success" th:text="${tauxAssiduite} + '%'">--</span>
+</div>
+<div class="flex justify-between items-center p-sm rounded-lg bg-surface-container">
+<span class="font-body-md text-body-md text-secondary">Notes publiees</span>
+<span class="font-label-md text-label-md text-primary" th:text="${nombreNotes}">0</span>
+</div>
+</div>
+</div>
+
+<!-- Tableau des matieres -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h3 class="font-headline-sm text-headline-sm text-primary">Performance par matiere</h3>
+</div>
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-md font-label-sm text-label-sm text-secondary border-b border-outline-variant">MATIERE</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-secondary border-b border-outline-variant text-center">CONTROLE CONTINU</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-secondary border-b border-outline-variant text-center">EXAMENS</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-secondary border-b border-outline-variant text-center">MOYENNE</th>
+<th class="px-lg py-md font-label-sm text-label-sm text-secondary border-b border-outline-variant text-center">MENTION</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 font-body-md text-body-md text-on-surface">
+<th:block th:each="pole : ${poles}">
+<tr th:each="ligne : ${pole.value}" class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md font-label-md text-label-md text-primary" th:text="${ligne.matiere.nom}">Matiere</td>
+<td class="px-lg py-md text-center" th:text="${ligne.moyenneControleContinu != null} ? ${ligne.moyenneControleContinu} + '/20' : '—'">--</td>
+<td class="px-lg py-md text-center" th:text="${ligne.moyenneExamens != null} ? ${ligne.moyenneExamens} + '/20' : '—'">--</td>
+<td class="px-lg py-md text-center font-bold" th:text="${ligne.moyenne} + '/20'">--</td>
+<td class="px-lg py-md text-center">
+<span class="px-2 py-1 rounded font-bold text-label-sm" th:classappend="${ligne.moyenne >= 12} ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-high text-secondary'" th:text="${ligne.mention}">--</span>
+</td>
+</tr>
+</th:block>
+<tr th:if="${#maps.isEmpty(poles)}">
+<td class="px-lg py-xl text-center text-on-surface-variant" colspan="5">Aucune note publiee pour ce trimestre.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Appreciations des enseignants -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-lg">
+<div class="flex items-center gap-sm mb-lg border-b border-outline-variant pb-md">
+<span class="material-symbols-outlined text-primary">chat</span>
+<h3 class="font-headline-sm text-headline-sm text-primary">Appreciations</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg" th:if="${aDesAppreciations}">
+<th:block th:each="pole : ${poles}">
+<div class="flex gap-md" th:each="ligne : ${pole.value}" th:if="${ligne.appreciation != null and !#strings.isEmpty(ligne.appreciation)}">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-secondary">menu_book</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-start gap-sm">
+<h4 class="font-label-md text-label-md text-primary" th:text="${ligne.matiere.nom}">Matiere</h4>
+<span class="font-label-sm text-label-sm text-secondary" th:text="${pole.key}">Pole</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm italic leading-relaxed" th:text="${ligne.appreciation}">Appreciation</p>
+</div>
+</div>
+</th:block>
+</div>
+<p class="text-center text-secondary py-lg" th:if="${!aDesAppreciations}">Aucune appreciation pour ce trimestre.</p>
+</div>
+
+<!-- Insights -->
+<div class="col-span-12 lg:col-span-4 bg-tertiary border border-outline-variant rounded-xl p-lg shadow-sm text-on-tertiary">
+<h3 class="font-headline-sm text-headline-sm mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined">insights</span> Analyse
+</h3>
+<div class="space-y-lg mt-lg">
+<div>
+<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full"
+      th:classappend="${tendanceDelta != null and tendanceDelta >= 0} ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'"
+      th:if="${tendanceDelta != null}"
+      th:text="${tendanceDelta >= 0} ? ('+' + ${tendanceDelta} + ' pts vs trimestre precedent') : (${tendanceDelta} + ' pts vs trimestre precedent')">Tendance</span>
+<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-white/10 text-on-tertiary-container" th:if="${tendanceDelta == null}">Pas de comparaison disponible</span>
+</div>
+<div class="p-md bg-white/5 rounded-lg border border-white/10" th:if="${pointFort != null}">
+<p class="font-label-sm text-label-sm text-on-tertiary-container mb-2">POINT FORT</p>
+<p class="font-headline-sm text-headline-sm text-on-tertiary" th:text="${pointFort.matiere.nom}">Matiere</p>
+<p class="font-body-md text-body-md text-on-tertiary-container mt-1" th:text="'Moyenne de ' + ${pointFort.moyenne} + '/20 ce trimestre.'">Detail</p>
+</div>
+<div class="p-md bg-white/5 rounded-lg border border-white/10" th:if="${pointAmeliorer != null}">
+<p class="font-label-sm text-label-sm text-on-tertiary-container mb-2">A AMELIORER</p>
+<p class="font-headline-sm text-headline-sm text-on-tertiary" th:text="${pointAmeliorer.matiere.nom}">Matiere</p>
+<p class="font-body-md text-body-md text-on-tertiary-container mt-1" th:text="'Moyenne de ' + ${pointAmeliorer.moyenne} + '/20 ce trimestre.'">Detail</p>
+</div>
+</div>
+</div>
+
+</div>
+
+<footer class="mt-xl pt-lg border-t border-outline-variant flex justify-between items-center text-on-surface-variant no-print">
+<p class="font-label-sm text-label-sm">EduSystem Pro — Portail Eleve.</p>
+</footer>
+</main>
+</body>
+</html>

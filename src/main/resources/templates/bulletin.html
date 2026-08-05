@@ -92,14 +92,14 @@
 
 <!-- Barre d'actions (non imprimee) -->
 <div class="max-w-[1000px] mx-auto px-lg no-print flex flex-wrap justify-between items-center gap-md mb-md">
-<a class="text-primary font-bold flex items-center gap-xs hover:underline" th:href="${estAdminOuEnseignant} ? @{/bulletins} : @{/portail-parent}">
+<a class="text-primary font-bold flex items-center gap-xs hover:underline" th:href="@{${retourUrl}}">
 <span class="material-symbols-outlined">arrow_back</span> Retour
 </a>
 <div class="flex gap-sm items-center">
 <div class="flex bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
-<a class="px-lg py-2 font-label-md text-label-md transition-colors" th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/bulletins/{id}(id=${eleve.id},trimestre=1)}">T1</a>
-<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/bulletins/{id}(id=${eleve.id},trimestre=2)}">T2</a>
-<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 3} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/bulletins/{id}(id=${eleve.id},trimestre=3)}">T3</a>
+<a class="px-lg py-2 font-label-md text-label-md transition-colors" th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{${baseUrl}(trimestre=1)}">T1</a>
+<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{${baseUrl}(trimestre=2)}">T2</a>
+<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 3} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{${baseUrl}(trimestre=3)}">T3</a>
 </div>
 <button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center gap-xs hover:opacity-90 transition-all shadow-sm" onclick="window.print()" type="button">
 <span class="material-symbols-outlined text-[18px]">print</span> Imprimer le bulletin
