@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="${devoir.titre} + ' - EduSystem Pro'">Devoir - EduSystem Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+</style>
+</head>
+<body class="bg-background text-on-background">
+<header class="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex items-center gap-3">
+<a class="text-gray-500" href="/tableau-enseignant/devoirs"><span class="material-symbols-outlined">arrow_back</span></a>
+<div>
+<h1 class="text-xl font-bold text-blue-900" th:text="${devoir.titre}">Devoir</h1>
+<p class="text-sm text-gray-500" th:text="(${devoir.classe != null ? devoir.classe.nom : '?'}) + (${devoir.matiere != null} ? ' • ' + devoir.matiere.nom : '') + ' • Echeance ' + ${#temporals.format(devoir.dateEcheance, 'dd/MM/yyyy')}">Details</p>
+</div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 md:px-8 py-4 md:py-8">
+
+<div th:if="${successMsg}" class="mb-lg p-4 rounded-lg bg-green-50 text-green-800 font-medium" th:text="${successMsg}"></div>
+
+<div class="bg-white border border-gray-200 rounded-xl p-4 md:p-6 mb-6" th:if="${devoir.description != null and !#strings.isEmpty(devoir.description)}">
+<h3 class="text-sm font-bold text-gray-500 uppercase mb-2">Consignes</h3>
+<p class="text-gray-700" th:text="${devoir.description}">Description</p>
+<a class="inline-flex items-center gap-1 text-blue-900 font-medium mt-3" th:href="@{'/uploads/' + ${devoir.pieceJointePath}}" target="_blank" th:if="${devoir.pieceJointePath != null}">
+<span class="material-symbols-outlined text-[18px]">attach_file</span> <span th:text="${devoir.pieceJointeNomOriginal}">Fichier</span>
+</a>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+<div class="p-4 border-b border-gray-200">
+<h3 class="font-bold text-blue-900">Suivi des eleves</h3>
+</div>
+<p class="text-center text-gray-500 py-8" th:if="${#lists.isEmpty(soumissions)}">Aucun eleve rattache a cette classe.</p>
+<div class="divide-y divide-gray-200" th:if="${!#lists.isEmpty(soumissions)}">
+<div class="p-4" th:each="s : ${soumissions}">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+<div>
+<p class="font-medium text-gray-900" th:text="${s.eleve.prenom} + ' ' + ${s.eleve.nom}">Eleve</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
+      th:classappend="${s.statut == 'TERMINE'} ? 'bg-green-100 text-green-800' : (${s.statut == 'EN_COURS'} ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600')"
+      th:text="${s.statut == 'TERMINE'} ? 'Termine' : (${s.statut == 'EN_COURS'} ? 'En cours (' + s.pourcentageAvancement + '%)' : 'A faire')">Statut</span>
+<a class="text-blue-900 text-sm font-medium flex items-center gap-1" th:href="@{'/uploads/' + ${s.fichierPath}}" target="_blank" th:if="${s.fichierPath != null}">
+<span class="material-symbols-outlined text-[16px]">description</span> <span th:text="${s.fichierNomOriginal}">Fichier</span>
+</a>
+</div>
+</div>
+<div class="text-right" th:if="${s.corrige}">
+<span class="font-bold text-blue-900" th:text="${s.note != null} ? (${s.note} + '/20') : 'Corrige'">Note</span>
+</div>
+</div>
+<form class="flex flex-wrap items-end gap-3 mt-2" method="post" th:action="@{/tableau-enseignant/devoirs/{id}/soumissions/{sid}/corriger(id=${devoir.id},sid=${s.id})}" th:if="${s.statut == 'TERMINE'}">
+<div>
+<label class="text-xs text-gray-500 block mb-1">Note /20</label>
+<input class="w-24 p-2 border border-gray-300 rounded-lg" max="20" min="0" name="note" step="0.5" th:value="${s.note}" type="number"/>
+</div>
+<div class="flex-1 min-w-[200px]">
+<label class="text-xs text-gray-500 block mb-1">Appreciation</label>
+<input class="w-full p-2 border border-gray-300 rounded-lg" name="appreciation" th:value="${s.appreciation}" type="text"/>
+</div>
+<button class="px-4 py-2 bg-blue-900 text-white rounded-lg font-medium" type="submit" th:text="${s.corrige} ? 'Mettre a jour' : 'Corriger'">Corriger</button>
+</form>
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>
