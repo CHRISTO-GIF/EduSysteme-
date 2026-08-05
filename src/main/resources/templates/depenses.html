@@ -227,7 +227,12 @@ Ajouter une Depense
 <tbody class="divide-y divide-outline-variant" id="depenses-tbody">
 <tr class="depense-row hover:bg-surface-container/30 transition-colors group" th:each="d : ${depenses}">
 <td class="p-md text-body-md text-on-surface" th:text="${#temporals.format(d.dateDepense, 'dd MMM yyyy')}"></td>
-<td class="p-md text-body-md text-on-surface font-medium" th:text="${d.designation}"></td>
+<td class="p-md text-body-md text-on-surface font-medium">
+<span th:text="${d.designation}"></span>
+<a class="ml-xs text-primary align-middle" th:href="@{'/uploads/' + ${d.justificatifPath}}" target="_blank" th:if="${d.justificatifPath != null}" title="Voir le justificatif">
+<span class="material-symbols-outlined text-[16px] align-middle">attach_file</span>
+</a>
+</td>
 <td class="p-md">
 <span class="px-sm py-0.5 rounded-full bg-blue-50 text-blue-700 text-label-sm font-bold" th:text="${d.categorie}"></span>
 </td>
@@ -259,7 +264,12 @@ Ajouter une Depense
 <p class="p-lg text-center text-secondary text-sm" th:if="${depenses.isEmpty()}">Aucune depense pour cette periode.</p>
 <div class="p-md" th:each="d : ${depenses}">
 <div class="flex justify-between items-start mb-xs">
-<p class="text-body-md text-on-surface font-medium" th:text="${d.designation}">Description</p>
+<p class="text-body-md text-on-surface font-medium">
+<span th:text="${d.designation}">Description</span>
+<a class="text-primary" th:href="@{'/uploads/' + ${d.justificatifPath}}" target="_blank" th:if="${d.justificatifPath != null}">
+<span class="material-symbols-outlined text-[16px] align-middle">attach_file</span>
+</a>
+</p>
 <span class="px-sm py-0.5 rounded-full bg-green-50 text-green-700 text-label-sm font-bold shrink-0" th:if="${d.statut == 'PAYE'}">Paye</span>
 <span class="px-sm py-0.5 rounded-full bg-amber-50 text-amber-700 text-label-sm font-bold shrink-0" th:if="${d.statut == 'EN_ATTENTE'}">En attente</span>
 </div>
@@ -356,7 +366,7 @@ Ajouter une Depense
 <span class="material-symbols-outlined">close</span>
 </button>
 </div>
-<form class="space-y-md" method="post" th:action="@{/finances/depenses}">
+<form class="space-y-md" enctype="multipart/form-data" method="post" th:action="@{/finances/depenses}">
 <div>
 <label class="text-label-sm text-secondary block mb-1">Description</label>
 <input class="w-full p-2 border border-outline-variant rounded-lg" name="designation" placeholder="Ex: Facture d'electricite" required="required" type="text"/>
@@ -394,6 +404,10 @@ Ajouter une Depense
 <option value="PAYE">Paye</option>
 <option value="EN_ATTENTE">En attente</option>
 </select>
+</div>
+<div>
+<label class="text-label-sm text-secondary block mb-1">Justificatif (facture, recu...)</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" name="justificatif" type="file"/>
 </div>
 <div class="flex justify-end gap-sm pt-md">
 <button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md" onclick="document.getElementById('modal-depense').classList.add('hidden')" type="button">Annuler</button>

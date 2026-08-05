@@ -130,6 +130,7 @@ public class PersonnelController {
         model.addAttribute("salaires",   salaireRepository.findByPersonnelIdOrderByAnneeDescMoisDesc(id));
         model.addAttribute("roleApplicatif", roleApplicatif);
         model.addAttribute("compteExistant", compteExistant);
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         return "personnel-fiche";
     }
 

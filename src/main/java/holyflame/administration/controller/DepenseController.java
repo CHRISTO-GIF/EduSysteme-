@@ -6,14 +6,17 @@ import holyflame.administration.model.LigneBudget;
 import holyflame.administration.repository.DepenseRepository;
 import holyflame.administration.repository.LigneBudgetRepository;
 import holyflame.administration.service.EtablissementService;
+import holyflame.administration.service.FileStorageService;
 import holyflame.administration.service.JournalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Comparator;
@@ -31,6 +34,7 @@ public class DepenseController {
     @Autowired private LigneBudgetRepository budgetRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private JournalService journalService;
+    @Autowired private FileStorageService fileStorageService;
 
     @GetMapping
     public String index(
@@ -279,7 +283,8 @@ public class DepenseController {
             @RequestParam Double montant,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDepense,
             @RequestParam(defaultValue = "PAYE") String statut,
-            RedirectAttributes ra) {
+            @RequestParam(required = false) MultipartFile justificatif,
+            RedirectAttributes ra) throws IOException {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
         Depense d = new Depense();
@@ -293,6 +298,11 @@ public class DepenseController {
             ? dateDepense.getYear() + "-" + (dateDepense.getYear() + 1)
             : (dateDepense.getYear() - 1) + "-" + dateDepense.getYear());
         d.setEtablissementId(etabId);
+        if (justificatif != null && !justificatif.isEmpty()) {
+            String chemin = fileStorageService.store(justificatif, "depenses");
+            d.setJustificatifPath(chemin);
+            d.setJustificatifNomOriginal(justificatif.getOriginalFilename());
+        }
         depenseRepository.save(d);
 
         journalService.log("DEPENSE_AJOUTÉE", "FINANCES", designation + " — " + montant + " F (" + beneficiaire + ")");
@@ -304,6 +314,7 @@ public class DepenseController {
     public String supprimerDepense(@PathVariable Long id, RedirectAttributes ra) {
         depenseRepository.findById(id).ifPresent(d -> {
             journalService.log("DEPENSE_SUPPRIMÉE", "FINANCES", d.getDesignation() + " — " + d.getMontant() + " F");
+            if (d.getJustificatifPath() != null) fileStorageService.delete(d.getJustificatifPath());
             depenseRepository.delete(d);
         });
         ra.addFlashAttribute("successMsg", "Depense supprimee.");

@@ -77,7 +77,7 @@
 <span class="material-symbols-outlined mr-md">school</span>
 <span class="font-body-md text-body-md">Academique</span>
 </a>
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/personnel}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/personnel}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'TRESORIER')}">
 <span class="material-symbols-outlined mr-md">badge</span>
 <span class="font-body-md text-body-md">Personnel</span>
 </a>

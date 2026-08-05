@@ -4,6 +4,7 @@ import holyflame.administration.service.UtilisateurDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,6 +40,12 @@ public class SecurityConfig {
                 .requestMatchers("/gestion-classes/**").hasRole("ADMIN")
                 .requestMatchers("/gestion-salles/**").hasRole("ADMIN")
                 .requestMatchers("/matieres/**").hasRole("ADMIN")
+                // Le secretariat peut enregistrer un nouveau personnel (creation uniquement,
+                // pas de modification/suppression/documents/comptes des fiches existantes)
+                .requestMatchers("/personnel/nouveau", "/personnel/nouveau/**").hasAnyRole("ADMIN", "SECRETAIRE")
+                // Le tresorier et le secretariat consultent les fiches personnel (lecture seule),
+                // sans acces a la modification/documents/comptes du personnel
+                .requestMatchers(HttpMethod.GET, "/personnel", "/personnel/*").hasAnyRole("ADMIN", "ENSEIGNANT", "TRESORIER", "SECRETAIRE")
                 .requestMatchers("/personnel").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/personnel/**").hasRole("ADMIN")
                 // Le surveillant peut signaler/consulter des absences, mais pas gerer les programmes de cours
@@ -57,6 +64,8 @@ public class SecurityConfig {
                 .requestMatchers("/tableau-eleve/**").hasAnyRole("ADMIN", "ELEVE")
                 .requestMatchers("/budget/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/inventaire/**").hasRole("ADMIN")
+                // Le versement des salaires est un acte de tresorerie ; contrats/conges restent reserves a l'ADMIN
+                .requestMatchers("/rh/salaires/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/rh/**").hasRole("ADMIN")
                 .requestMatchers("/communication/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 // /direction/** ouvert à tout authentifié — contrôle fin dans le controller

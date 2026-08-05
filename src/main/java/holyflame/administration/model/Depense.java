@@ -22,6 +22,9 @@ public class Depense {
     private String anneeScolaire;
     private Long etablissementId;
 
+    private String justificatifPath;
+    private String justificatifNomOriginal;
+
     public Depense() {}
 
     public Long getId() { return id; }
@@ -42,4 +45,8 @@ public class Depense {
     public void setAnneeScolaire(String anneeScolaire) { this.anneeScolaire = anneeScolaire; }
     public Long getEtablissementId() { return etablissementId; }
     public void setEtablissementId(Long etablissementId) { this.etablissementId = etablissementId; }
+    public String getJustificatifPath() { return justificatifPath; }
+    public void setJustificatifPath(String justificatifPath) { this.justificatifPath = justificatifPath; }
+    public String getJustificatifNomOriginal() { return justificatifNomOriginal; }
+    public void setJustificatifNomOriginal(String justificatifNomOriginal) { this.justificatifNomOriginal = justificatifNomOriginal; }
 }
