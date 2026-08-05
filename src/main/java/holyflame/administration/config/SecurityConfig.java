@@ -46,7 +46,6 @@ public class SecurityConfig {
                 // Le tresorier et le secretariat consultent les fiches personnel (lecture seule),
                 // sans acces a la modification/documents/comptes du personnel
                 .requestMatchers(HttpMethod.GET, "/personnel", "/personnel/*").hasAnyRole("ADMIN", "ENSEIGNANT", "TRESORIER", "SECRETAIRE")
-                .requestMatchers("/personnel").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/personnel/**").hasRole("ADMIN")
                 // Le surveillant peut signaler/consulter des absences, mais pas gerer les programmes de cours
                 .requestMatchers("/surveillance/programmes/**").hasAnyRole("ADMIN", "ENSEIGNANT")
@@ -66,6 +65,9 @@ public class SecurityConfig {
                 .requestMatchers("/inventaire/**").hasRole("ADMIN")
                 // Le versement des salaires est un acte de tresorerie ; contrats/conges restent reserves a l'ADMIN
                 .requestMatchers("/rh/salaires/**").hasAnyRole("ADMIN", "TRESORIER")
+                // Un enseignant peut demander/annuler son propre conge (fiche deduite de son compte,
+                // jamais transmise par le client) ; l'approbation reste reservee a l'ADMIN
+                .requestMatchers("/rh/conges/demander", "/rh/conges/*/annuler").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/rh/**").hasRole("ADMIN")
                 .requestMatchers("/communication/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 // /direction/** ouvert à tout authentifié — contrôle fin dans le controller

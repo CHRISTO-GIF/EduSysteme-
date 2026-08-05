@@ -376,38 +376,6 @@ public class PersonnelController {
         return sb.toString();
     }
 
-    @PostMapping
-    public String ajouter(
-            @RequestParam String nom, @RequestParam String prenom,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String telephone,
-            @RequestParam String fonction,
-            @RequestParam(required = false) String matiereEnseignee,
-            @RequestParam(required = false) String statut,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEmbauche,
-            @RequestParam(required = false) String adresse,
-            @RequestParam(required = false) String remarques,
-            RedirectAttributes ra) {
-
-        Personnel p = new Personnel();
-        p.setNom(nom.toUpperCase().trim());
-        p.setPrenom(prenom.trim());
-        p.setEmail(email != null && !email.isBlank() ? email.trim() : null);
-        p.setTelephone(telephone);
-        p.setFonction(fonction);
-        p.setMatiereEnseignee(matiereEnseignee);
-        p.setStatut(statut != null && !statut.isBlank() ? statut : "ACTIF");
-        p.setDateEmbauche(dateEmbauche);
-        p.setAdresse(adresse);
-        p.setRemarques(remarques);
-        p.setEtablissementId(etablissementService.getCurrentEtablissementId());
-        personnelRepository.save(p);
-
-        ra.addFlashAttribute("successMsg",
-            p.getNom() + " " + p.getPrenom() + " a été ajouté(e) avec succès.");
-        return "redirect:/personnel";
-    }
-
     @PostMapping("/{id}/modifier")
     public String modifier(
             @PathVariable Long id,

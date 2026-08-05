@@ -23,6 +23,8 @@ public class EnseignantController {
     @Autowired private ClasseRepository classeRepository;
     @Autowired private EleveRepository eleveRepository;
     @Autowired private AbsenceRepository absenceRepository;
+    @Autowired private PersonnelRepository personnelRepository;
+    @Autowired private CongeRepository congeRepository;
     @Autowired private EtablissementService etablissementService;
 
     @GetMapping
@@ -52,12 +54,25 @@ public class EnseignantController {
             model.addAttribute("totalClasses", mesClasseIds.size());
             model.addAttribute("totalMatieres", mesMatiereIds.size());
             model.addAttribute("totalEleves", totalEleves);
+
+            // Fiche personnel rattachee au compte (par email) : necessaire pour "Mes conges"
+            Personnel monPersonnel = currentUser.getEmail() != null && etabId != null
+                ? personnelRepository.findByEmailAndEtablissementId(currentUser.getEmail(), etabId).orElse(null)
+                : null;
+            model.addAttribute("personnelLie", monPersonnel != null);
+            model.addAttribute("mesConges", monPersonnel != null
+                ? congeRepository.findByPersonnelId(monPersonnel.getId()).stream()
+                    .sorted(Comparator.comparing(Conge::getDateDebut, Comparator.nullsLast(Comparator.reverseOrder())))
+                    .collect(Collectors.toList())
+                : List.of());
         } else {
             model.addAttribute("autorisations", List.of());
             model.addAttribute("hasAutorisations", false);
             model.addAttribute("totalClasses", 0);
             model.addAttribute("totalMatieres", 0);
             model.addAttribute("totalEleves", 0L);
+            model.addAttribute("personnelLie", false);
+            model.addAttribute("mesConges", List.of());
         }
 
         return "tableau-enseignant";

@@ -36,6 +36,21 @@ public class RHController {
         return p;
     }
 
+    // Retrouve la fiche personnel liee au compte de connexion actuellement authentifie
+    // (rattachement par email, cf. PersonnelController.creerCompte).
+    private Personnel personnelDeLUtilisateurConnecte() {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        var u = etablissementService.getCurrentUtilisateur();
+        if (u == null || etabId == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Utilisateur non authentifie.");
+        }
+        return personnelRepository.findByEmailAndEtablissementId(u.getEmail(), etabId)
+            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND,
+                "Aucune fiche personnel n'est associee a votre compte. Contactez l'administration."));
+    }
+
     // ===== CONTRATS =====
     @PostMapping("/contrats")
     public String ajouterContrat(
@@ -112,6 +127,37 @@ public class RHController {
             .map(c -> { congeRepository.delete(c); return c.getPersonnel().getId(); })
             .orElse(null);
         return pid != null ? "redirect:/personnel/" + pid + "#rh-conges" : "redirect:/personnel";
+    }
+
+    // ===== CONGÉS — auto-service enseignant =====
+    // Un enseignant demande son propre conge (la fiche personnel est deduite de son
+    // compte connecte, jamais transmise par le client) ; l'ADMIN garde la main pour
+    // approuver/refuser via les endpoints ci-dessus.
+    @PostMapping("/conges/demander")
+    public String demanderConge(
+            @RequestParam String typeConge,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebut,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFin,
+            @RequestParam(required = false) String motif) {
+
+        Personnel personnel = personnelDeLUtilisateurConnecte();
+        Conge c = new Conge();
+        c.setPersonnel(personnel);
+        c.setTypeConge(typeConge); c.setDateDebut(dateDebut); c.setDateFin(dateFin);
+        c.setJoursNombre((int) ChronoUnit.DAYS.between(dateDebut, dateFin) + 1);
+        c.setStatut("EN_ATTENTE"); c.setMotif(motif);
+        congeRepository.save(c);
+        return "redirect:/tableau-enseignant?saved=true#mes-conges";
+    }
+
+    @PostMapping("/conges/{id}/annuler")
+    public String annulerConge(@PathVariable Long id) {
+        Personnel personnel = personnelDeLUtilisateurConnecte();
+        congeRepository.findById(id)
+            .filter(c -> c.getPersonnel() != null && personnel.getId().equals(c.getPersonnel().getId()))
+            .filter(c -> "EN_ATTENTE".equals(c.getStatut()))
+            .ifPresent(congeRepository::delete);
+        return "redirect:/tableau-enseignant?saved=true#mes-conges";
     }
 
     // ===== SALAIRES =====

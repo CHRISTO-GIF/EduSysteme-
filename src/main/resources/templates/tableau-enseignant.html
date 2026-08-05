@@ -98,6 +98,46 @@
 </div>
 </section>
 
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md" id="mes-conges">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-sm"><span class="material-symbols-outlined text-primary">event_busy</span> Mes conges</h3>
+
+<div class="text-center text-on-surface-variant" th:unless="${personnelLie}">
+<p class="text-sm">Votre compte n'est rattache a aucune fiche personnel. Contactez l'administration.</p>
+</div>
+
+<div th:if="${personnelLie}">
+<form class="grid grid-cols-2 gap-sm mb-md p-sm bg-surface-container-low rounded-lg" method="post" th:action="@{/rh/conges/demander}">
+<select class="col-span-2 rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="typeConge" required="required">
+<option value="ANNUEL">Annuel</option>
+<option value="MALADIE">Maladie</option>
+<option value="MATERNITE">Maternite</option>
+<option value="PATERNITE">Paternite</option>
+<option value="SANS_SOLDE">Sans solde</option>
+<option value="AUTRE">Autre</option>
+</select>
+<input class="rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="dateDebut" placeholder="Debut" required="required" type="date"/>
+<input class="rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="dateFin" placeholder="Fin" required="required" type="date"/>
+<input class="col-span-2 rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="motif" placeholder="Motif (optionnel)"/>
+<button class="col-span-2 bg-primary text-on-primary font-label-md text-label-md px-lg py-2 rounded-lg flex items-center justify-center gap-xs" type="submit">
+<span class="material-symbols-outlined text-[18px]">add</span> Envoyer la demande
+</button>
+</form>
+
+<div class="space-y-sm" th:if="${!#lists.isEmpty(mesConges)}">
+<div class="flex items-center justify-between p-sm border border-outline-variant rounded-lg" th:each="cg : ${mesConges}">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${cg.typeConge}">Type</p>
+<p class="text-xs text-on-surface-variant truncate" th:text="${cg.dateDebut} + ' au ' + ${cg.dateFin}">dates</p>
+</div>
+<span class="px-sm py-0.5 rounded-full bg-amber-50 text-amber-700 text-label-sm font-bold shrink-0" th:if="${cg.statut == 'EN_ATTENTE'}">En attente</span>
+<span class="px-sm py-0.5 rounded-full bg-green-50 text-green-700 text-label-sm font-bold shrink-0" th:if="${cg.statut == 'APPROUVE'}">Approuve</span>
+<span class="px-sm py-0.5 rounded-full bg-red-50 text-red-700 text-label-sm font-bold shrink-0" th:if="${cg.statut == 'REFUSE'}">Refuse</span>
+</div>
+</div>
+<p class="text-center text-on-surface-variant text-sm py-sm" th:if="${#lists.isEmpty(mesConges)}">Aucune demande de conge pour le moment.</p>
+</div>
+</section>
+
 <section class="grid grid-cols-2 gap-sm">
 <a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center gap-sm" th:href="@{/tableau-enseignant/eleves}">
 <span class="material-symbols-outlined text-primary text-[24px]">group</span>
@@ -264,6 +304,65 @@
 </tr>
 </tbody>
 </table>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-xl" id="mes-conges">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center gap-sm"><span class="material-symbols-outlined text-primary">event_busy</span> Mes conges</h3>
+
+<div class="text-center text-on-surface-variant p-md" th:unless="${personnelLie}">
+<p class="text-sm">Votre compte n'est rattache a aucune fiche personnel. Contactez l'administration pour faire une demande de conge.</p>
+</div>
+
+<div th:if="${personnelLie}">
+<form class="grid grid-cols-2 md:grid-cols-4 gap-sm mb-lg p-md bg-surface-container-low rounded-lg items-end" method="post" th:action="@{/rh/conges/demander}">
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Type</label>
+<select class="rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="typeConge" required="required">
+<option value="ANNUEL">Annuel</option>
+<option value="MALADIE">Maladie</option>
+<option value="MATERNITE">Maternite</option>
+<option value="PATERNITE">Paternite</option>
+<option value="SANS_SOLDE">Sans solde</option>
+<option value="AUTRE">Autre</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Date de debut</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="dateDebut" required="required" type="date"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Date de fin</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="dateFin" required="required" type="date"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Motif</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 font-body-md text-body-md" name="motif" placeholder="Optionnel"/>
+</div>
+<button class="col-span-2 md:col-span-4 bg-primary text-on-primary font-label-md text-label-md px-lg py-2 rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-xs" type="submit">
+<span class="material-symbols-outlined text-[20px]">add</span> Envoyer la demande
+</button>
+</form>
+
+<div class="space-y-sm" th:if="${!#lists.isEmpty(mesConges)}">
+<div class="flex items-center justify-between p-md border border-outline-variant rounded-lg" th:each="cg : ${mesConges}">
+<div>
+<p class="font-label-md text-label-md text-on-surface" th:text="${cg.typeConge}">Type</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" th:text="${cg.dateDebut} + ' au ' + ${cg.dateFin} + ' (' + ${cg.joursNombre} + ' j)'">dates</p>
+</div>
+<div class="flex items-center gap-sm">
+<span class="px-sm py-0.5 rounded-full bg-amber-50 text-amber-700 text-label-sm font-bold" th:if="${cg.statut == 'EN_ATTENTE'}">En attente</span>
+<span class="px-sm py-0.5 rounded-full bg-green-50 text-green-700 text-label-sm font-bold" th:if="${cg.statut == 'APPROUVE'}">Approuve</span>
+<span class="px-sm py-0.5 rounded-full bg-red-50 text-red-700 text-label-sm font-bold" th:if="${cg.statut == 'REFUSE'}">Refuse</span>
+<form method="post" th:action="@{/rh/conges/{id}/annuler(id=${cg.id})}" th:if="${cg.statut == 'EN_ATTENTE'}">
+<button class="p-2 text-error hover:bg-error-container rounded-full transition-colors" title="Annuler" type="submit">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</form>
+</div>
+</div>
+</div>
+<p class="text-center text-on-surface-variant font-body-md text-body-md py-md" th:if="${#lists.isEmpty(mesConges)}">Aucune demande de conge enregistree pour le moment.</p>
+</div>
 </div>
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-md">
