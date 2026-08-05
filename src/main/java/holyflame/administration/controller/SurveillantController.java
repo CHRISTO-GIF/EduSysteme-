@@ -377,6 +377,22 @@ public class SurveillantController {
         return "redirect:/surveillant/zones";
     }
 
+    @PostMapping("/zones/{id}/supprimer")
+    public String supprimerZone(@PathVariable Long id, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Zone z = zoneRepository.findById(id).orElseThrow();
+        if (etabId == null || !etabId.equals(z.getEtablissementId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Zone introuvable dans cet établissement.");
+        }
+        if (pointageRepository.countByZoneId(id) > 0) {
+            ra.addFlashAttribute("erreurMsg", "Impossible de supprimer la zone \"" + z.getNom() + "\" : des pointages y sont deja enregistres.");
+            return "redirect:/surveillant/zones";
+        }
+        zoneRepository.deleteById(id);
+        ra.addFlashAttribute("successMsg", "Zone \"" + z.getNom() + "\" supprimee.");
+        return "redirect:/surveillant/zones";
+    }
+
     private void verifierProprietaire(Incident incident, Long etabId) {
         if (etabId == null || incident.getEtablissementId() == null || !etabId.equals(incident.getEtablissementId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Incident introuvable dans cet établissement.");

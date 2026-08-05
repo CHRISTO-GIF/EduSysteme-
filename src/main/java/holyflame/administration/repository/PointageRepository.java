@@ -17,4 +17,6 @@ public interface PointageRepository extends JpaRepository<Pointage, Long> {
 
     @Query("SELECT COUNT(p) FROM Pointage p WHERE p.etablissementId = :etabId AND p.dateHeure >= :depuis")
     long countByEtablissementIdDepuis(@Param("etabId") Long etabId, @Param("depuis") LocalDateTime depuis);
+
+    long countByZoneId(Long zoneId);
 }

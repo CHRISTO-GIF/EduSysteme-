@@ -40,6 +40,7 @@
 </header>
 <main class="px-md pt-md space-y-lg pb-8">
 <div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container text-sm" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="p-md rounded-lg bg-error-container text-error text-sm" th:text="${erreurMsg}"></div>
 
 <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
 <h3 class="font-headline-sm text-headline-sm mb-md">Ajouter une zone</h3>
@@ -64,9 +65,14 @@
 <span th:if="${z.zoneInterdite}" class="px-2 py-0.5 bg-error text-on-error rounded-full text-[10px] font-bold uppercase">Interdite</span>
 <span th:unless="${z.zoneInterdite}" class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase">Libre</span>
 </div>
+<div class="flex items-center gap-md shrink-0">
 <form method="post" th:action="@{/surveillant/zones/{id}/toggle(id=${z.id})}">
-<button class="text-primary font-label-md text-xs shrink-0" type="submit" th:text="${z.zoneInterdite} ? 'Rendre libre' : 'Marquer interdite'">Basculer</button>
+<button class="text-primary font-label-md text-xs" type="submit" th:text="${z.zoneInterdite} ? 'Rendre libre' : 'Marquer interdite'">Basculer</button>
 </form>
+<form method="post" th:action="@{/surveillant/zones/{id}/supprimer(id=${z.id})}" onsubmit="return confirm('Supprimer cette zone ? Cette action est irreversible.');">
+<button class="text-error font-label-md text-xs" type="submit">Supprimer</button>
+</form>
+</div>
 </div>
 <p th:if="${#lists.isEmpty(zones)}" class="text-center text-outline py-lg text-sm">Aucune zone enregistrée.</p>
 </section>
@@ -105,6 +111,7 @@
 
 <main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
 <div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-error font-body-md text-body-md" th:text="${erreurMsg}"></div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
 <section class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
@@ -121,9 +128,14 @@
 <span th:unless="${z.zoneInterdite}" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase">Libre</span>
 </td>
 <td class="px-lg py-4">
+<div class="flex items-center gap-md">
 <form method="post" th:action="@{/surveillant/zones/{id}/toggle(id=${z.id})}">
 <button class="text-primary font-label-md hover:underline text-[13px]" type="submit" th:text="${z.zoneInterdite} ? 'Rendre libre' : 'Marquer interdite'">Basculer</button>
 </form>
+<form method="post" th:action="@{/surveillant/zones/{id}/supprimer(id=${z.id})}" onsubmit="return confirm('Supprimer cette zone ? Cette action est irreversible.');">
+<button class="text-error font-label-md hover:underline text-[13px]" type="submit">Supprimer</button>
+</form>
+</div>
 </td>
 </tr>
 <tr th:if="${#lists.isEmpty(zones)}"><td class="px-lg py-6 text-center text-outline" colspan="3">Aucune zone enregistrée.</td></tr>
