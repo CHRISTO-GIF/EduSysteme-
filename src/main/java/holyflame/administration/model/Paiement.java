@@ -26,6 +26,7 @@ public class Paiement {
     private String recuNumero;
     private String description;
     private Long enregistreParId;
+    private String anneeScolaire;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -100,6 +101,14 @@ public class Paiement {
 
     public void setEnregistreParId(Long enregistreParId) {
         this.enregistreParId = enregistreParId;
+    }
+
+    public String getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(String anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
     }
 
     public Eleve getEleve() {

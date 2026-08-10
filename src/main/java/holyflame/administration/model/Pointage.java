@@ -24,6 +24,7 @@ public class Pointage {
     private boolean alerte;
     private Long enregistreParId;
     private Long etablissementId;
+    private String anneeScolaire;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -98,5 +99,13 @@ public class Pointage {
 
     public void setZone(Zone zone) {
         this.zone = zone;
+    }
+
+    public String getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(String anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
     }
 }

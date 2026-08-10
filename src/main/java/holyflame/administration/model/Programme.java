@@ -22,6 +22,7 @@ public class Programme {
     private String statut;  // BROUILLON, PUBLIE
     private String auteur;
     private Long etablissementId;
+    private String anneeScolaire;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classe_id")
@@ -76,4 +77,6 @@ public class Programme {
     public void setSyllabusPath(String syllabusPath) { this.syllabusPath = syllabusPath; }
     public String getSyllabusNomOriginal() { return syllabusNomOriginal; }
     public void setSyllabusNomOriginal(String syllabusNomOriginal) { this.syllabusNomOriginal = syllabusNomOriginal; }
+    public String getAnneeScolaire() { return anneeScolaire; }
+    public void setAnneeScolaire(String anneeScolaire) { this.anneeScolaire = anneeScolaire; }
 }

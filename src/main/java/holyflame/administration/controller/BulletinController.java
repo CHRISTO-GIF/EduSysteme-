@@ -36,6 +36,7 @@ public class BulletinController {
     @Autowired private ParametreRepository parametreRepository;
     @Autowired private ConduiteRepository conduiteRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private BulletinService bulletinService;
 
     @GetMapping
@@ -188,6 +189,7 @@ public class BulletinController {
             ra.addFlashAttribute("erreur", "Impossible d'enregistrer la conduite : aucune classe/annee scolaire associee.");
             return "redirect:/bulletins/" + eleveId + "?trimestre=" + trimestre;
         }
+        anneeScolaireService.verifierModifiable(anneeScolaire, eleve.getEtablissementId());
         Conduite conduite = conduiteRepository.findByEleveAndTrimestreAndAnneeScolaire(eleve, trimestre, anneeScolaire)
             .orElseGet(Conduite::new);
         conduite.setEleve(eleve);

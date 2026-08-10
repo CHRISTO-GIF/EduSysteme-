@@ -19,6 +19,7 @@ public class Personnel {
     @Column(nullable = false)
     private String prenom;
 
+    private String matricule;
     private String email;
     private String telephone;
     private String fonction; // ENSEIGNANT, DIRECTEUR, SECRETAIRE, SURVEILLANT, COMPTABLE, AUTRE
@@ -54,6 +55,8 @@ public class Personnel {
     public void setNom(String nom) { this.nom = nom; }
     public String getPrenom() { return prenom; }
     public void setPrenom(String prenom) { this.prenom = prenom; }
+    public String getMatricule() { return matricule; }
+    public void setMatricule(String matricule) { this.matricule = matricule; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public String getTelephone() { return telephone; }

@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Signaler une Absence - EduSystem Pro</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <script id="tailwind-config" th:inline="javascript">
         tailwind.config = {
           darkMode: "class",
@@ -51,7 +51,8 @@
     </style>
 </head>
 <body class="bg-background text-on-background min-h-screen flex">
-<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto">
+<div th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" th:replace="~{fragments/sidebar-admin :: admin('surveillance')}"></div>
+<aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto" th:unless="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">
 <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>

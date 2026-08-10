@@ -25,6 +25,7 @@ public class Incident {
     private LocalDateTime dateHeure;
     private Long auteurId;
     private Long etablissementId;
+    private String anneeScolaire;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -95,5 +96,13 @@ public class Incident {
 
     public void setEleve(Eleve eleve) {
         this.eleve = eleve;
+    }
+
+    public String getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(String anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
     }
 }

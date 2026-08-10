@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stock - Infirmerie</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#f2f4f6", "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
+            "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb",
+            "primary-fixed": "#dce1ff", "secondary-container": "#d0e1fb", "tertiary": [[${accentColor}]],
+            "outline": "#757682", "surface-variant": "#e0e3e5", "surface-container": "#eceef0",
+            "outline-variant": "#c5c5d3", "surface": "#f7f9fb", "secondary": "#505f76",
+            "on-background": "#191c1e", "on-surface": "#191c1e", "on-surface-variant": "#444651",
+            "success-container": "#c4f7d0", "tertiary-fixed-dim": "#bec6e0"
+          },
+          borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+          spacing: { gutter: "24px", xs: "4px", lg: "24px", xl: "32px", sm: "8px", "sidebar-width": "260px", md: "16px", "container-max": "1440px" },
+          fontFamily: { "label-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"] },
+          fontSize: {
+            "label-md": ["14px", {lineHeight: "20px", fontWeight: "600"}],
+            "headline-sm": ["18px", {lineHeight: "28px", fontWeight: "600"}],
+            "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700"}],
+            "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+            "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500"}]
+          }
+        }
+      }
+    }
+</script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<main class="max-w-container-max mx-auto p-lg">
+<div class="flex items-center text-outline font-label-sm text-label-sm mb-md">
+<a class="hover:underline" th:href="@{/infirmerie}">Infirmerie</a>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="text-primary font-bold">Stock</span>
+</div>
+
+<div class="mb-lg flex justify-between items-end">
+<h2 class="font-headline-lg text-headline-lg text-primary">État des Stocks</h2>
+<a th:href="@{/infirmerie}" class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour au tableau de bord
+</a>
+</div>
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+
+<div class="lg:col-span-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg h-fit">
+<h3 class="font-headline-sm text-headline-sm mb-md">Ajouter un article</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/infirmerie/stock}">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Désignation</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="designation" placeholder="Ex: Compresses stériles" required="required" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Unité</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="unite" placeholder="Ex: boîtes, unités..." type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Quantité actuelle</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" min="0" name="quantiteActuelle" required="required" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Stock de référence (max)</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" min="1" name="quantiteMax" required="required" type="number"/>
+</div>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-xs" type="submit">
+<span class="material-symbols-outlined text-[20px]">add</span> Ajouter au stock
+</button>
+</form>
+</div>
+
+<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden h-fit">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm">Articles suivis</h3>
+</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-lg py-md" th:each="s : ${stocks}">
+<div class="flex justify-between items-center mb-xs">
+<p class="font-label-md text-label-md" th:text="${s.designation}"></p>
+<p class="text-label-sm" th:classappend="${s.pourcentage <= 20 ? 'text-error font-bold' : 'text-on-surface-variant'}" th:text="${s.pourcentage + '% (' + s.quantiteActuelle + '/' + s.quantiteMax + (s.unite != null and !s.unite.isEmpty() ? ' ' + s.unite : '') + ')'}"></p>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden mb-sm">
+<div class="h-full rounded-full" th:classappend="${s.pourcentage <= 20 ? 'bg-error' : (s.pourcentage <= 50 ? 'bg-amber-500' : 'bg-green-500')}" th:style="'width: ' + ${s.pourcentage} + '%;'"></div>
+</div>
+<form class="flex items-center gap-sm" method="post" th:action="@{/infirmerie/stock/{id}/ajuster(id=${s.id})}">
+<input class="rounded-lg border-outline-variant px-md py-1 font-body-md text-body-md w-24" min="0" name="quantiteActuelle" th:value="${s.quantiteActuelle}" type="number"/>
+<button class="px-md py-1 rounded-lg bg-primary text-on-primary text-[12px] font-bold" type="submit">Mettre à jour</button>
+</form>
+</div>
+<p th:if="${#lists.isEmpty(stocks)}" class="px-lg py-lg text-center text-outline">Aucun article suivi.</p>
+</div>
+</div>
+
+</div>
+</main>
+</body>
+</html>

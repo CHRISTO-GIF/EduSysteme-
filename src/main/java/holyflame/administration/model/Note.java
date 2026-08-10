@@ -25,6 +25,7 @@ public class Note {
     private String type;       // DEVOIR, EXAMEN, PARTICIPATION
     private String titre;      // Libelle libre de l'evaluation (ex: "Devoir Surveille n°2")
     private Integer trimestre; // 1, 2, 3
+    private String anneeScolaire; // figee au moment de la saisie, independante de la classe actuelle de l'eleve
     private LocalDate dateEvaluation;
     private String commentaire;
 
@@ -56,6 +57,8 @@ public class Note {
     public void setTitre(String titre) { this.titre = titre; }
     public Integer getTrimestre() { return trimestre; }
     public void setTrimestre(Integer trimestre) { this.trimestre = trimestre; }
+    public String getAnneeScolaire() { return anneeScolaire; }
+    public void setAnneeScolaire(String anneeScolaire) { this.anneeScolaire = anneeScolaire; }
     public LocalDate getDateEvaluation() { return dateEvaluation; }
     public void setDateEvaluation(LocalDate dateEvaluation) { this.dateEvaluation = dateEvaluation; }
     public String getCommentaire() { return commentaire; }

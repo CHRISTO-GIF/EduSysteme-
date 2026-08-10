@@ -7,6 +7,7 @@ import holyflame.administration.service.FileStorageService;
 import holyflame.administration.service.JournalService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +42,10 @@ public class ParametreController {
     @Autowired private JournalService journalService;
     @Autowired private JournalActionRepository journalActionRepository;
     @Autowired private SignalementMessagerieRepository signalementMessagerieRepository;
+    @Autowired private PeriodeCalendrierRepository periodeCalendrierRepository;
+    @Autowired private holyflame.administration.service.CalendrierScolaireService calendrierScolaireService;
+    @Autowired private AnneeScolaireRepository anneeScolaireRepository;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
 
     private static final Set<String> CLES_ETABLISSEMENT = Set.of(
         "nomEtablissement", "anneeScolaire", "adresse", "langueSysteme", "fuseauHoraire", "couleurPrimaire");
@@ -58,7 +66,7 @@ public class ParametreController {
         model.addAttribute("frais", fraisRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId));
 
         // Classes année courante
-        String annee = p.getOrDefault("ANNEE_SCOLAIRE", "2025-2026");
+        String annee = etablissementService.getAnneeScolaireActive();
         model.addAttribute("classesAnnee", classeRepository.findByAnneeScolaireAndEtablissementId(annee, etabId));
 
         // ── Onglet Autorisations ──────────────────────────────────────────
@@ -312,8 +320,7 @@ public class ParametreController {
     @PostMapping("/classes/generer")
     public String genererClasses(RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
-        String annee = parametreRepository.findByCleAndEtablissementId("ANNEE_SCOLAIRE", etabId)
-            .map(Parametre::getValeur).orElse("2025-2026");
+        String annee = etablissementService.getAnneeScolaireActive();
 
         Map<String, List<String>> mapping = new LinkedHashMap<>();
         mapping.put("TYPE_MATERNELLE",   List.of("Petite Section", "Moyenne Section", "Grande Section"));
@@ -566,7 +573,7 @@ public class ParametreController {
     }
 
     // ── Gestion des roles ────────────────────────────────────────────
-    private static final List<String> ROLES_ASSIGNABLES = List.of("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER");
+    private static final List<String> ROLES_ASSIGNABLES = List.of("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR");
     private static final String JOURNAL_MODULE_ROLES = "UTILISATEURS";
 
     @GetMapping("/roles")
@@ -598,7 +605,7 @@ public class ParametreController {
         double tauxActivite = total > 0 ? Math.round(actifs * 1000.0 / total) / 10.0 : 0;
 
         Map<String, Long> comptesParRole = new LinkedHashMap<>();
-        for (String r : List.of("ADMIN", "ENSEIGNANT", "TRESORIER", "SECRETAIRE", "ELEVE")) {
+        for (String r : List.of("ADMIN", "ENSEIGNANT", "TRESORIER", "SECRETAIRE", "COORDONNATEUR", "ELEVE")) {
             comptesParRole.put(r, tousLesComptes.stream().filter(u -> r.equals(u.getRole())).count());
         }
 
@@ -616,7 +623,7 @@ public class ParametreController {
         model.addAttribute("historique", historique);
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         model.addAttribute("rolesDisponibles", ROLES_ASSIGNABLES);
-        model.addAttribute("rolesRecherche", List.of("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "SURVEILLANT", "ELEVE", "PARENT"));
+        model.addAttribute("rolesRecherche", List.of("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "SURVEILLANT", "COORDONNATEUR", "ELEVE", "PARENT"));
         return "parametres-roles";
     }
 
@@ -752,5 +759,229 @@ public class ParametreController {
             });
         p.setValeur(valeur);
         parametreRepository.save(p);
+    }
+
+    // ── Gestion des annees scolaires (cloture, activation, duplication de structure) ──
+    @GetMapping("/annees")
+    public String annees(Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        model.addAttribute("annees", anneeScolaireService.lister(etabId));
+        model.addAttribute("anneeActive", etablissementService.getAnneeScolaireActive());
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "parametres-annees";
+    }
+
+    @PostMapping("/annees/creer")
+    public String creerAnnee(@RequestParam String libelle,
+                              @RequestParam(required = false) String anneeSource,
+                              @RequestParam(defaultValue = "false") boolean dupliquerClasses,
+                              @RequestParam(defaultValue = "false") boolean dupliquerBudget,
+                              RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        try {
+            anneeScolaireService.creer(libelle.trim(), etabId,
+                (anneeSource != null && !anneeSource.isBlank()) ? anneeSource : null,
+                dupliquerClasses, dupliquerBudget);
+            ra.addFlashAttribute("successMsg", "Annee scolaire " + libelle + " creee" + (dupliquerClasses ? " (classes dupliquees)" : "") + ".");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("erreurMsg", e.getMessage());
+        }
+        return "redirect:/parametres/annees";
+    }
+
+    @PostMapping("/annees/{id}/activer")
+    public String activerAnnee(@PathVariable Long id, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        try {
+            anneeScolaireService.activer(id, etabId);
+            ra.addFlashAttribute("successMsg", "Annee scolaire activee : elle devient l'annee par defaut de l'application.");
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("erreurMsg", e.getMessage());
+        } catch (NoSuchElementException e) {
+            ra.addFlashAttribute("erreurMsg", "Annee scolaire introuvable.");
+        }
+        return "redirect:/parametres/annees";
+    }
+
+    @PostMapping("/annees/{id}/cloturer")
+    public String cloturerAnnee(@PathVariable Long id, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        var utilisateur = etablissementService.getCurrentUtilisateur();
+        try {
+            anneeScolaireService.cloturer(id, etabId, utilisateur != null ? utilisateur.getId() : null);
+            ra.addFlashAttribute("successMsg", "Annee scolaire cloturee : plus aucune modification n'est possible sur ses donnees.");
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("erreurMsg", e.getMessage());
+        } catch (NoSuchElementException e) {
+            ra.addFlashAttribute("erreurMsg", "Annee scolaire introuvable.");
+        }
+        return "redirect:/parametres/annees";
+    }
+
+    @PostMapping("/annees/{id}/reouvrir")
+    public String reouvrirAnnee(@PathVariable Long id, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        try {
+            anneeScolaireService.reouvrir(id, etabId);
+            ra.addFlashAttribute("successMsg", "Annee scolaire reouverte : les modifications sont de nouveau autorisees.");
+        } catch (NoSuchElementException e) {
+            ra.addFlashAttribute("erreurMsg", "Annee scolaire introuvable.");
+        }
+        return "redirect:/parametres/annees";
+    }
+
+    // ── Calendrier scolaire (trimestres / vacances / jours feries, pour un calcul d'assiduite fiable) ──
+    private static final Map<String, String> TYPES_PERIODE_CALENDRIER = new LinkedHashMap<>() {{
+        put("TRIMESTRE1", "Trimestre 1");
+        put("TRIMESTRE2", "Trimestre 2");
+        put("TRIMESTRE3", "Trimestre 3");
+        put("VACANCES", "Vacances");
+        put("FERIE", "Jour ferie");
+    }};
+
+    @GetMapping("/calendrier")
+    public String calendrier(@RequestParam(required = false) String annee, Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        String anneeActuelle = annee != null && !annee.isBlank() ? annee
+            : etablissementService.getAnneeScolaireActive();
+
+        List<PeriodeCalendrier> periodes = periodeCalendrierRepository
+            .findByEtablissementIdAndAnneeScolaireOrderByDateDebutAsc(etabId, anneeActuelle);
+
+        model.addAttribute("periodes", periodes);
+        model.addAttribute("anneeActuelle", anneeActuelle);
+        model.addAttribute("anneesExistantes", periodeCalendrierRepository.findDistinctAnneesScolaires(etabId));
+        model.addAttribute("typesDisponibles", TYPES_PERIODE_CALENDRIER);
+        model.addAttribute("apercuMensuel", construireApercuMensuel(anneeActuelle, periodes));
+        model.addAttribute("suiviTrimestres", construireSuiviTrimestres(periodes, etabId));
+        model.addAttribute("suiviAnnee", construireSuiviAnnee(periodes, etabId));
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "parametres-calendrier";
+    }
+
+    @PostMapping("/calendrier/periodes")
+    public String ajouterPeriode(@RequestParam(required = false) Long id,
+                                  @RequestParam String nom,
+                                  @RequestParam String type,
+                                  @RequestParam String anneeScolaire,
+                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebut,
+                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFin,
+                                  RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (dateFin.isBefore(dateDebut)) {
+            ra.addFlashAttribute("erreurMsg", "La date de fin doit etre posterieure a la date de debut.");
+            return "redirect:/parametres/calendrier?annee=" + anneeScolaire;
+        }
+        anneeScolaireService.verifierModifiable(anneeScolaire, etabId);
+
+        PeriodeCalendrier p = id != null
+            ? periodeCalendrierRepository.findById(id)
+                .filter(existante -> etabId != null && etabId.equals(existante.getEtablissementId()))
+                .orElseGet(PeriodeCalendrier::new)
+            : new PeriodeCalendrier();
+        p.setNom(nom); p.setType(type); p.setAnneeScolaire(anneeScolaire);
+        p.setDateDebut(dateDebut); p.setDateFin(dateFin); p.setEtablissementId(etabId);
+        periodeCalendrierRepository.save(p);
+
+        if (type.startsWith("TRIMESTRE")) {
+            String cle = "T" + type.charAt("TRIMESTRE".length());
+            upsertParam(cle + "_DEBUT", dateDebut.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), "Debut " + nom, "CALENDRIER");
+            upsertParam(cle + "_FIN", dateFin.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), "Fin " + nom, "CALENDRIER");
+        }
+
+        ra.addFlashAttribute("successMsg", "Calendrier mis a jour.");
+        return "redirect:/parametres/calendrier?annee=" + anneeScolaire;
+    }
+
+    @PostMapping("/calendrier/periodes/{id}/supprimer")
+    public String supprimerPeriode(@PathVariable Long id, @RequestParam String annee, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        periodeCalendrierRepository.findById(id)
+            .filter(p -> etabId != null && etabId.equals(p.getEtablissementId()))
+            .ifPresent(p -> {
+                periodeCalendrierRepository.delete(p);
+                // Une periode de type trimestre supprimee ne doit plus laisser de dates T{n}_DEBUT/FIN
+                // perimees dans les Parametre : ces cles sont sinon relues telles quelles par les
+                // rapports (Finances, Passage de classe) comme si le trimestre existait encore.
+                if (p.getType() != null && p.getType().startsWith("TRIMESTRE")) {
+                    String cle = "T" + p.getType().charAt("TRIMESTRE".length());
+                    parametreRepository.findByCleAndEtablissementId(cle + "_DEBUT", etabId).ifPresent(parametreRepository::delete);
+                    parametreRepository.findByCleAndEtablissementId(cle + "_FIN", etabId).ifPresent(parametreRepository::delete);
+                }
+            });
+        ra.addFlashAttribute("successMsg", "Periode supprimee.");
+        return "redirect:/parametres/calendrier?annee=" + annee;
+    }
+
+    private List<Map<String, Object>> construireApercuMensuel(String anneeScolaire, List<PeriodeCalendrier> periodes) {
+        String[] nomsMois = {"Septembre", "Octobre", "Novembre", "Decembre", "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout"};
+
+        List<Map<String, Object>> mois = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            int m = holyflame.administration.util.AnneeScolaireUtil.MOIS_ORDRE_SCOLAIRE[i];
+            int annee = holyflame.administration.util.AnneeScolaireUtil.anneeCalendairePourMois(anneeScolaire, m);
+            YearMonth ym = YearMonth.of(annee, m);
+            int decalage = ym.atDay(1).getDayOfWeek().getValue() - 1;
+
+            List<Map<String, Object>> jours = new ArrayList<>();
+            for (int d = 0; d < decalage; d++) jours.add(null);
+            long joursOuvresMois = 0, joursOuvrablesMois = 0;
+            for (int d = 1; d <= ym.lengthOfMonth(); d++) {
+                LocalDate date = ym.atDay(d);
+                String type = periodes.stream()
+                    .filter(p -> !date.isBefore(p.getDateDebut()) && !date.isAfter(p.getDateFin()))
+                    .sorted(Comparator.comparing(p -> !p.isExclusion()))
+                    .map(PeriodeCalendrier::getType)
+                    .findFirst().orElse(null);
+                DayOfWeek jourSemaine = date.getDayOfWeek();
+                boolean exclu = "VACANCES".equals(type) || "FERIE".equals(type);
+                boolean ouvrable = jourSemaine != DayOfWeek.SUNDAY;
+                boolean ouvre = ouvrable && jourSemaine != DayOfWeek.SATURDAY && !exclu;
+                if (ouvrable) joursOuvrablesMois++;
+                if (ouvre) joursOuvresMois++;
+                Map<String, Object> jour = new LinkedHashMap<>();
+                jour.put("numero", d);
+                jour.put("type", type);
+                jours.add(jour);
+            }
+
+            Map<String, Object> moisMap = new LinkedHashMap<>();
+            moisMap.put("nom", nomsMois[i]);
+            moisMap.put("annee", annee);
+            moisMap.put("jours", jours);
+            moisMap.put("joursOuvres", joursOuvresMois);
+            moisMap.put("joursOuvrables", joursOuvrablesMois);
+            mois.add(moisMap);
+        }
+        return mois;
+    }
+
+    private List<Map<String, Object>> construireSuiviTrimestres(List<PeriodeCalendrier> periodes, Long etabId) {
+        List<Map<String, Object>> suivi = new ArrayList<>();
+        for (PeriodeCalendrier p : periodes) {
+            if (p.getType() == null || !p.getType().startsWith("TRIMESTRE")) continue;
+            Map<String, Object> ligne = new LinkedHashMap<>();
+            ligne.put("nom", p.getNom());
+            ligne.put("dateDebut", p.getDateDebut());
+            ligne.put("dateFin", p.getDateFin());
+            ligne.put("joursCalendaires", calendrierScolaireService.joursCalendaires(p.getDateDebut(), p.getDateFin()));
+            ligne.put("joursOuvrables", calendrierScolaireService.joursOuvrables(p.getDateDebut(), p.getDateFin()));
+            ligne.put("joursOuvres", calendrierScolaireService.joursEcoleOuvres(p.getDateDebut(), p.getDateFin(), etabId));
+            suivi.add(ligne);
+        }
+        return suivi;
+    }
+
+    private Map<String, Object> construireSuiviAnnee(List<PeriodeCalendrier> periodes, Long etabId) {
+        if (periodes.isEmpty()) return null;
+        LocalDate debutAnnee = periodes.stream().map(PeriodeCalendrier::getDateDebut).min(LocalDate::compareTo).orElse(null);
+        LocalDate finAnnee = periodes.stream().map(PeriodeCalendrier::getDateFin).max(LocalDate::compareTo).orElse(null);
+        Map<String, Object> suivi = new LinkedHashMap<>();
+        suivi.put("dateDebut", debutAnnee);
+        suivi.put("dateFin", finAnnee);
+        suivi.put("joursCalendaires", calendrierScolaireService.joursCalendaires(debutAnnee, finAnnee));
+        suivi.put("joursOuvrables", calendrierScolaireService.joursOuvrables(debutAnnee, finAnnee));
+        suivi.put("joursOuvres", calendrierScolaireService.joursEcoleOuvres(debutAnnee, finAnnee, etabId));
+        return suivi;
     }
 }

@@ -4,9 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>EduSystem Pro - Inscription Eleve - Etape 2</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <script id="tailwind-config" th:inline="javascript">
         tailwind.config = {
             darkMode: "class",
@@ -81,7 +80,7 @@
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
 <div>
-<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Telephone</label>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Telephone (numero WhatsApp de preference, pour les relances)</label>
 <input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="pereTelephone" placeholder="+225 07 00 00 00 00" th:value="${donnees.pereTelephone}" type="tel"/>
 </div>
 <div>
@@ -119,7 +118,7 @@
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
 <div>
-<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Telephone</label>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Telephone (numero WhatsApp de preference, pour les relances)</label>
 <input class="w-full px-md py-sm rounded-lg border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md" name="mereTelephone" placeholder="+225 07 00 00 00 01" th:value="${donnees.mereTelephone}" type="tel"/>
 </div>
 <div>

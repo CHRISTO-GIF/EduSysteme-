@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'PV — ' + ${classe.nom}">Proces-Verbal</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed": "#dce1ff", "surface-dim": "#d8dadc", "outline": "#757682",
+            "surface-container-low": "#f2f4f6", "surface-container-lowest": "#ffffff", "outline-variant": "#c5c5d3",
+            "surface-bright": "#f7f9fb", "primary": "#00236f",
+            "on-surface": "#191c1e", "on-background": "#191c1e",
+            "on-primary": "#ffffff", "surface-container-highest": "#e0e3e5",
+            "surface-variant": "#e0e3e5", "on-secondary": "#ffffff",
+            "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
+            "background": "#f7f9fb",
+            "on-surface-variant": "#444651",
+            "error": "#ba1a1a",
+            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px", "sidebar-width": "260px"},
+          "fontFamily": {"headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+          "fontSize": {
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+</script>
+<style>
+    body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .print-area { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
+    @media print {
+        body { background: white; }
+        .no-print, .no-print * { display: none !important; }
+        .print-area { box-shadow: none; margin: 0; width: 100%; max-width: none; padding: 16px !important; }
+        @page { size: A4; margin: 10mm; }
+    }
+</style>
+</head>
+<body class="min-h-screen text-on-surface">
+<div class="flex min-h-screen">
+<main class="flex-1 flex flex-col items-center justify-start p-md md:p-xl">
+
+<nav class="no-print w-full max-w-[800px] mb-lg flex flex-wrap items-center justify-between gap-md bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant">
+<a class="flex items-center gap-xs text-secondary hover:text-primary transition-colors font-label-md text-label-md" th:href="@{/passage}">
+<span class="material-symbols-outlined">arrow_back</span> Retour aux délibérations
+</a>
+<button class="flex items-center gap-xs px-lg py-sm rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-all shadow-md font-label-md text-label-md" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer
+</button>
+</nav>
+
+<article class="print-area w-full max-w-[800px] bg-white border border-outline-variant p-xl flex flex-col gap-lg">
+
+<header class="flex flex-col md:flex-row justify-between items-start gap-lg border-b-2 border-primary pb-lg">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 bg-primary rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+<img class="w-full h-full object-contain" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
+<span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;" th:if="${logoPath == null}">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary uppercase tracking-wider" th:text="${nomEtab}">Établissement</h1>
+<p class="text-xs text-outline" th:if="${adresseEtab != null and !adresseEtab.isEmpty()}" th:text="${adresseEtab}">Adresse</p>
+</div>
+</div>
+<div class="text-right text-xs text-outline">
+<p th:text="'Réf: ' + ${seance.referencePv}">Reference</p>
+</div>
+</header>
+
+<section class="text-center py-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase tracking-wide" th:text="${seance.trimestre == null ? 'Procès-verbal de délibération annuelle' : ('Procès-verbal du conseil de classe — ' + seance.trimestre + 'er/e trimestre')}">Titre</h2>
+<p class="text-secondary font-body-md" th:text="'Année Scolaire : ' + ${seance.anneeScolaire}">Annee</p>
+</section>
+
+<section class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<h3 class="font-label-md text-label-md text-primary uppercase border-b border-outline-variant pb-xs">Informations de la classe</h3>
+<div class="flex justify-between text-sm pt-xs"><span class="text-secondary">Classe :</span><span class="font-semibold" th:text="${classe.nom}">--</span></div>
+<div class="flex justify-between text-sm"><span class="text-secondary">Effectif :</span><span class="font-semibold" th:text="${totalEleves} + ' élèves'">--</span></div>
+<div class="flex justify-between text-sm"><span class="text-secondary">Date du Conseil :</span><span class="font-semibold" th:text="${#temporals.format(seance.dateSeance, 'dd MMMM yyyy')}">--</span></div>
+</div>
+<div class="flex flex-col gap-xs">
+<h3 class="font-label-md text-label-md text-primary uppercase border-b border-outline-variant pb-xs">Membres du jury présents</h3>
+<div class="pt-xs text-sm space-y-xs">
+<p th:each="m : ${membres}" th:if="${m.statutPresence == 'PRESENT'}"><span class="font-semibold" th:text="${m.nomComplet}"></span> - <span th:text="${m.role}"></span></p>
+<p class="text-secondary" th:if="${#lists.isEmpty(membres)}">Aucun membre renseigné.</p>
+</div>
+</div>
+</section>
+
+<section class="grid grid-cols-2 md:grid-cols-4 gap-md text-center" th:if="${seance.trimestre == null}">
+<div class="p-md bg-success-container rounded-lg">
+<p class="text-2xl font-bold text-success" th:text="${nbAdmis}">0</p>
+<p class="text-xs text-success" th:text="'Admis (' + ${totalEleves > 0 ? #numbers.formatDecimal(nbAdmis*100.0/totalEleves,0,1) : 0} + '%)'">--</p>
+</div>
+<div class="p-md bg-amber-50 rounded-lg">
+<p class="text-2xl font-bold text-amber-700" th:text="${nbRedouble}">0</p>
+<p class="text-xs text-amber-700">Redoublants</p>
+</div>
+<div class="p-md bg-error-container rounded-lg">
+<p class="text-2xl font-bold text-error" th:text="${nbExclus}">0</p>
+<p class="text-xs text-error">Exclus</p>
+</div>
+<div class="p-md bg-primary text-on-primary rounded-lg">
+<p class="text-2xl font-bold" th:text="${moyenneClasse}">0</p>
+<p class="text-xs">Moyenne de classe</p>
+</div>
+</section>
+
+<section>
+<table class="w-full border-collapse text-sm">
+<thead>
+<tr class="bg-surface-container-low border-b-2 border-primary">
+<th class="p-sm text-left font-label-sm text-label-sm text-outline uppercase">N°</th>
+<th class="p-sm text-left font-label-sm text-label-sm text-outline uppercase">Nom &amp; Prénom</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-outline uppercase">Moyenne</th>
+<th class="p-sm text-left font-label-sm text-label-sm text-outline uppercase">Décision du Conseil</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="r, iter : ${resultats}">
+<td class="p-sm" th:text="${iter.count}"></td>
+<td class="p-sm font-medium" th:text="${#strings.toUpperCase(r.eleve.nom)} + ' ' + ${r.eleve.prenom}"></td>
+<td class="p-sm text-right" th:text="${r.moyenne}"></td>
+<td class="p-sm">
+<span class="px-sm py-0.5 rounded-full text-xs font-bold" th:text="${r.decision}">--</span>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section class="mt-xl grid grid-cols-2 gap-xl pt-xl">
+<div class="flex flex-col items-center gap-lg">
+<div class="h-20 w-full border-b border-dashed border-outline flex items-end justify-center pb-2">
+<span class="text-xs text-outline-variant italic">(Signature)</span>
+</div>
+<p class="font-label-sm text-label-sm text-outline uppercase text-center">Le Secrétaire de séance</p>
+<p class="text-sm font-semibold" th:text="${seance.rapporteurNom}"></p>
+</div>
+<div class="flex flex-col items-center gap-lg">
+<div class="h-20 w-full border-b border-dashed border-outline flex items-end justify-center pb-2">
+<span class="text-xs text-outline-variant italic">(Cachet de l'établissement)</span>
+</div>
+<p class="font-label-sm text-label-sm text-outline uppercase text-center">Le Président du Jury</p>
+</div>
+</section>
+
+</article>
+</main>
+</div>
+</body>
+</html>

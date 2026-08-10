@@ -26,6 +26,7 @@ public class Retard {
     private String motif;
     private LocalDateTime saisieAt;
     private Long saisieParId;
+    private String anneeScolaire;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -48,4 +49,6 @@ public class Retard {
     public void setSaisieParId(Long saisieParId) { this.saisieParId = saisieParId; }
     public Eleve getEleve() { return eleve; }
     public void setEleve(Eleve eleve) { this.eleve = eleve; }
+    public String getAnneeScolaire() { return anneeScolaire; }
+    public void setAnneeScolaire(String anneeScolaire) { this.anneeScolaire = anneeScolaire; }
 }

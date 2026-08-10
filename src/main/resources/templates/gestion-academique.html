@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Gestion Académique - EduSystem Pro</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <style>
         body { font-family: 'Inter', sans-serif; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
@@ -75,8 +75,13 @@
 <button class="flex-1 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant" id="tab-matieres-mobile" onclick="switchTabMobile('matieres')" type="button">Matières</button>
 </div>
 
-<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs" th:href="@{/notes/saisie}"><span class="material-symbols-outlined text-[18px]">grading</span> Saisie des notes</a>
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs" th:href="@{/secretariat}"><span class="material-symbols-outlined text-[18px]">group</span> Eleves</a>
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs -mt-sm" th:href="@{/notes/saisie}"><span class="material-symbols-outlined text-[18px]">grading</span> Saisie des notes</a>
 <a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs -mt-sm" th:href="@{/bulletins/options}"><span class="material-symbols-outlined text-[18px]">description</span> Bulletins</a>
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs -mt-sm" th:href="@{/examens}"><span class="material-symbols-outlined text-[18px]">quiz</span> Examens</a>
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs -mt-sm" th:href="@{/secretariat/cartes}"><span class="material-symbols-outlined text-[18px]">badge</span> Cartes d'identite</a>
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs -mt-sm" th:href="@{/emploi-du-temps}"><span class="material-symbols-outlined text-[18px]">calendar_month</span> Emploi du temps</a>
+<a class="flex items-center gap-xs text-primary font-label-md text-sm px-xs -mt-sm" th:href="@{/passage}"><span class="material-symbols-outlined text-[18px]">move_up</span> Passage de classe</a>
 
 <!-- Onglet Classes -->
 <div id="content-classes-mobile">
@@ -228,11 +233,26 @@ Aucune matière enregistrée. Cliquez sur « Nouvelle » pour commencer.
 <button class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all" id="tab-matieres" onclick="switchTab('matieres')" type="button">Matieres</button>
 </div>
 <div class="flex items-center">
+<a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/secretariat}">
+<span class="material-symbols-outlined text-[18px]">group</span> Eleves
+</a>
 <a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/notes/saisie}">
 <span class="material-symbols-outlined text-[18px]">grading</span> Notes
 </a>
 <a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/bulletins/options}">
 <span class="material-symbols-outlined text-[18px]">description</span> Bulletins
+</a>
+<a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/examens}">
+<span class="material-symbols-outlined text-[18px]">quiz</span> Examens
+</a>
+<a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/secretariat/cartes}">
+<span class="material-symbols-outlined text-[18px]">badge</span> Cartes d'identite
+</a>
+<a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/emploi-du-temps}">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span> Emploi du temps
+</a>
+<a class="px-lg py-md font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all flex items-center gap-xs" th:href="@{/passage}">
+<span class="material-symbols-outlined text-[18px]">move_up</span> Passage de classe
 </a>
 </div>
 </div>

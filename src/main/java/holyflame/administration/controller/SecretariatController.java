@@ -57,6 +57,7 @@ public class SecretariatController {
     @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
 
     @GetMapping
@@ -255,9 +256,12 @@ public class SecretariatController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         Eleve eleve = eleveRepository.findById(eleveId).orElseThrow();
         verifierProprietaire(eleve, etabId);
+        String anneeScolaireAbsence = holyflame.administration.util.AnneeScolaireUtil.pour(date);
+        anneeScolaireService.verifierModifiable(anneeScolaireAbsence, etabId);
         Absence absence = new Absence();
         absence.setEleve(eleve);
         absence.setDate(date);
+        absence.setAnneeScolaire(anneeScolaireAbsence);
         absence.setPeriode(periode);
         absence.setEstJustifiee(estJustifiee);
         absence.setMotif(motif);

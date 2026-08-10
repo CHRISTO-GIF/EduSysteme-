@@ -25,6 +25,7 @@ public class Retenue {
     private String motif;
     private String statutPresence;
     private Long etablissementId;
+    private String anneeScolaire;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -107,5 +108,13 @@ public class Retenue {
 
     public void setIncident(Incident incident) {
         this.incident = incident;
+    }
+
+    public String getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(String anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
     }
 }

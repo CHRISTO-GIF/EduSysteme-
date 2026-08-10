@@ -14,8 +14,14 @@ public class Depense {
     @Column(nullable = false)
     private String designation;
 
-    private String categorie;    // SERVICES_PUBLICS, MAINTENANCE, FOURNITURES, SALAIRES, LOYER, AUTRE
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categorie_comptable_id")
+    private CategorieComptable categorieComptable;
+
+    private String sens = "CHARGE"; // CHARGE, PRODUIT (recette diverse : don, subvention, pret...)
     private String beneficiaire; // nom du fournisseur / prestataire
+    private Double quantite;
+    private Double prixUnitaire;
     private Double montant;
     private LocalDate dateDepense;
     private String statut = "PAYE"; // PAYE, EN_ATTENTE
@@ -31,10 +37,16 @@ public class Depense {
     public void setId(Long id) { this.id = id; }
     public String getDesignation() { return designation; }
     public void setDesignation(String designation) { this.designation = designation; }
-    public String getCategorie() { return categorie; }
-    public void setCategorie(String categorie) { this.categorie = categorie; }
+    public CategorieComptable getCategorieComptable() { return categorieComptable; }
+    public void setCategorieComptable(CategorieComptable categorieComptable) { this.categorieComptable = categorieComptable; }
+    public String getSens() { return sens; }
+    public void setSens(String sens) { this.sens = sens; }
     public String getBeneficiaire() { return beneficiaire; }
     public void setBeneficiaire(String beneficiaire) { this.beneficiaire = beneficiaire; }
+    public Double getQuantite() { return quantite; }
+    public void setQuantite(Double quantite) { this.quantite = quantite; }
+    public Double getPrixUnitaire() { return prixUnitaire; }
+    public void setPrixUnitaire(Double prixUnitaire) { this.prixUnitaire = prixUnitaire; }
     public Double getMontant() { return montant; }
     public void setMontant(Double montant) { this.montant = montant; }
     public LocalDate getDateDepense() { return dateDepense; }

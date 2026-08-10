@@ -42,6 +42,7 @@ public class SurveillantController {
     @Autowired private ClasseRepository classeRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private EmailService emailService;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
 
     // ── Tableau de bord ───────────────────────────────────────────────────
     @GetMapping
@@ -90,11 +91,14 @@ public class SurveillantController {
         if (etabId == null || !etabId.equals(eleve.getEtablissementId()) || !etabId.equals(zone.getEtablissementId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Élève ou zone introuvable dans cet établissement.");
         }
+        anneeScolaireService.verifierModifiable(holyflame.administration.util.AnneeScolaireUtil.pour(LocalDate.now()), etabId);
+
         Pointage p = new Pointage();
         p.setEleve(eleve);
         p.setZone(zone);
         p.setTypeEvenement(typeEvenement);
         p.setDateHeure(LocalDateTime.now());
+        p.setAnneeScolaire(holyflame.administration.util.AnneeScolaireUtil.pour(LocalDate.now()));
         p.setAlerte(zone.isZoneInterdite());
         var utilisateur = etablissementService.getCurrentUtilisateur();
         if (utilisateur != null) p.setEnregistreParId(utilisateur.getId());
@@ -141,11 +145,19 @@ public class SurveillantController {
             return resultat;
         }
 
+        String anneeScolaireScan = holyflame.administration.util.AnneeScolaireUtil.pour(LocalDate.now());
+        if (anneeScolaireService.estCloturee(anneeScolaireScan, etabId)) {
+            resultat.put("succes", false);
+            resultat.put("message", "L'annee scolaire en cours est cloturee : aucun pointage n'est possible.");
+            return resultat;
+        }
+
         Pointage p = new Pointage();
         p.setEleve(eleve);
         p.setZone(zone);
         p.setTypeEvenement(typeEvenement);
         p.setDateHeure(LocalDateTime.now());
+        p.setAnneeScolaire(anneeScolaireScan);
         p.setAlerte(zone.isZoneInterdite());
         var utilisateur = etablissementService.getCurrentUtilisateur();
         if (utilisateur != null) p.setEnregistreParId(utilisateur.getId());
@@ -182,9 +194,14 @@ public class SurveillantController {
         if (etabId == null || !etabId.equals(eleve.getEtablissementId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Élève introuvable dans cet établissement.");
         }
+        LocalDate dateRetard = date != null ? date : LocalDate.now();
+        String anneeScolaireRetard = holyflame.administration.util.AnneeScolaireUtil.pour(dateRetard);
+        anneeScolaireService.verifierModifiable(anneeScolaireRetard, etabId);
+
         Retard r = new Retard();
         r.setEleve(eleve);
-        r.setDate(date != null ? date : LocalDate.now());
+        r.setDate(dateRetard);
+        r.setAnneeScolaire(anneeScolaireRetard);
         r.setHeureArrivee(heureArrivee);
         r.setMotif(motif);
         r.setSaisieAt(LocalDateTime.now());
@@ -225,12 +242,15 @@ public class SurveillantController {
         if (etabId == null || !etabId.equals(eleve.getEtablissementId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Élève introuvable dans cet établissement.");
         }
+        anneeScolaireService.verifierModifiable(holyflame.administration.util.AnneeScolaireUtil.pour(LocalDate.now()), etabId);
+
         Incident inc = new Incident();
         inc.setEleve(eleve);
         inc.setDescription(description);
         inc.setGravite(gravite);
         inc.setStatut("OUVERT");
         inc.setDateHeure(LocalDateTime.now());
+        inc.setAnneeScolaire(holyflame.administration.util.AnneeScolaireUtil.pour(LocalDate.now()));
         var utilisateur = etablissementService.getCurrentUtilisateur();
         if (utilisateur != null) inc.setAuteurId(utilisateur.getId());
         inc.setEtablissementId(etabId);
@@ -245,10 +265,15 @@ public class SurveillantController {
         Incident inc = incidentRepository.findById(id).orElseThrow();
         verifierProprietaire(inc, etabId);
 
+        LocalDate dateRetenueAuto = LocalDate.now().plusDays(2);
+        String anneeScolaireRetenueAuto = holyflame.administration.util.AnneeScolaireUtil.pour(dateRetenueAuto);
+        anneeScolaireService.verifierModifiable(anneeScolaireRetenueAuto, etabId);
+
         Retenue r = new Retenue();
         r.setEleve(inc.getEleve());
         r.setIncident(inc);
-        r.setDateRetenue(LocalDate.now().plusDays(2));
+        r.setDateRetenue(dateRetenueAuto);
+        r.setAnneeScolaire(anneeScolaireRetenueAuto);
         r.setHeureRetenue("16:00");
         r.setSalle("Salle de permanence");
         r.setMotif(inc.getDescription());
@@ -316,9 +341,13 @@ public class SurveillantController {
         if (etabId == null || !etabId.equals(eleve.getEtablissementId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Élève introuvable dans cet établissement.");
         }
+        String anneeScolaireRetenue = holyflame.administration.util.AnneeScolaireUtil.pour(dateRetenue);
+        anneeScolaireService.verifierModifiable(anneeScolaireRetenue, etabId);
+
         Retenue r = new Retenue();
         r.setEleve(eleve);
         r.setDateRetenue(dateRetenue);
+        r.setAnneeScolaire(anneeScolaireRetenue);
         r.setHeureRetenue(heureRetenue);
         r.setSalle(salle);
         r.setMotif(motif);

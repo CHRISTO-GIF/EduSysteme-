@@ -63,6 +63,7 @@ public class PortailController {
     @Autowired private EtablissementService etablissementService;
     @Autowired private BulletinService bulletinService;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private holyflame.administration.service.CalendrierScolaireService calendrierScolaireService;
 
     private static final String[] JOURS_NOMS = {"", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"};
 
@@ -147,8 +148,8 @@ public class PortailController {
         // ── Assiduite reelle ──
         List<holyflame.administration.model.Absence> absences = absenceRepository.findByEleveIdOrderByDateDesc(eleve.getId());
         long absencesNonJustifiees = absences.stream().filter(a -> !a.isEstJustifiee()).count();
-        long joursOuvres = compterJoursOuvres(
-            eleve.getDateInscription() != null ? eleve.getDateInscription() : aujourdHui.minusMonths(3), aujourdHui);
+        long joursOuvres = calendrierScolaireService.joursEcoleOuvres(
+            eleve.getDateInscription() != null ? eleve.getDateInscription() : aujourdHui.minusMonths(3), aujourdHui, etabId);
         double tauxAssiduite = joursOuvres > 0
             ? Math.max(0, Math.min(100, Math.round((100.0 - (absencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
             : 100;
@@ -468,8 +469,8 @@ public class PortailController {
         LocalDate aujourdHui = LocalDate.now();
         long absencesNonJustifiees = absenceRepository.findByEleveIdOrderByDateDesc(eleve.getId()).stream()
             .filter(a -> !a.isEstJustifiee()).count();
-        long joursOuvres = compterJoursOuvres(
-            eleve.getDateInscription() != null ? eleve.getDateInscription() : aujourdHui.minusMonths(3), aujourdHui);
+        long joursOuvres = calendrierScolaireService.joursEcoleOuvres(
+            eleve.getDateInscription() != null ? eleve.getDateInscription() : aujourdHui.minusMonths(3), aujourdHui, etabId);
         double tauxAssiduite = joursOuvres > 0
             ? Math.max(0, Math.min(100, Math.round((100.0 - (absencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
             : 100;
@@ -570,13 +571,4 @@ public class PortailController {
         return coef > 0 ? somme / coef : 0;
     }
 
-    private long compterJoursOuvres(LocalDate debut, LocalDate fin) {
-        long total = 0;
-        LocalDate d = debut;
-        while (!d.isAfter(fin)) {
-            if (d.getDayOfWeek() != DayOfWeek.SATURDAY && d.getDayOfWeek() != DayOfWeek.SUNDAY) total++;
-            d = d.plusDays(1);
-        }
-        return total;
-    }
 }

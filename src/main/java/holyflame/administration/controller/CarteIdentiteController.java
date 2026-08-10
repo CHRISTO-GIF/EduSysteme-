@@ -76,7 +76,7 @@ public class CarteIdentiteController {
 
         String anneeScolaire = selection != null && selection.getClasse() != null
             ? selection.getClasse().getAnneeScolaire()
-            : parametre(etabId, "ANNEE_SCOLAIRE", "2025-2026");
+            : etablissementService.getAnneeScolaireActive();
 
         model.addAttribute("eleves", eleves);
         model.addAttribute("photosParEleve", photosParEleve);

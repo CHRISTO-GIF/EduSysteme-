@@ -4,9 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>EduSystem Pro - Portail Parents</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <script id="tailwind-config" th:inline="javascript">
       tailwind.config = {
         darkMode: "class",
@@ -192,6 +191,10 @@
 <a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail-parent/paiements}">
 <span class="material-symbols-outlined mr-md">payments</span>
 <span class="font-label-md text-label-md">Paiements</span>
+</a>
+<a class="flex items-center px-lg py-md text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container transition-colors duration-200" th:href="@{/portail-parent/signalement}">
+<span class="material-symbols-outlined mr-md">flag</span>
+<span class="font-label-md text-label-md">Signaler un point</span>
 </a>
 </nav>
 <div class="mt-auto px-lg pt-lg border-t border-tertiary-container">

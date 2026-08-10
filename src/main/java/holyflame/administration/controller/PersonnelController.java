@@ -147,6 +147,7 @@ public class PersonnelController {
     public String enregistrerNouveau(
             @RequestParam String nom,
             @RequestParam String prenom,
+            @RequestParam(required = false) String matricule,
             @RequestParam String fonction,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String telephone,
@@ -175,6 +176,7 @@ public class PersonnelController {
         Personnel p = new Personnel();
         p.setNom(nom.trim().toUpperCase());
         p.setPrenom(prenom.trim());
+        p.setMatricule(matricule != null && !matricule.isBlank() ? matricule.trim() : null);
         p.setEmail(email != null && !email.isBlank() ? email.trim() : null);
         p.setTelephone(telephone);
         p.setFonction(fonction);
@@ -298,6 +300,7 @@ public class PersonnelController {
             case "TRESORIER", "COMPTABLE" -> "TRESORIER"; // le comptable utilise le meme espace finances que le tresorier
             case "SURVEILLANT" -> "SURVEILLANT";
             case "DIRECTEUR"   -> "ADMIN";
+            case "COORDONNATEUR" -> "COORDONNATEUR";
             default -> null; // AUTRE : fiche RH seule, pas de compte de connexion automatique
         };
     }
@@ -380,6 +383,7 @@ public class PersonnelController {
     public String modifier(
             @PathVariable Long id,
             @RequestParam String nom, @RequestParam String prenom,
+            @RequestParam(required = false) String matricule,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String telephone,
             @RequestParam String fonction,
@@ -395,6 +399,7 @@ public class PersonnelController {
         if (p.getEtablissementId() != null) verifierProprietaire(p, etabId);
         p.setNom(nom.toUpperCase().trim());
         p.setPrenom(prenom.trim());
+        p.setMatricule(matricule != null && !matricule.isBlank() ? matricule.trim() : null);
         p.setEmail(email != null && !email.isBlank() ? email.trim() : null);
         p.setTelephone(telephone);
         p.setFonction(fonction);

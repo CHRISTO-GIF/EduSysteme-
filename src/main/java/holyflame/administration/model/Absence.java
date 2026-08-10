@@ -25,6 +25,7 @@ public class Absence {
     private String motif;
     private String documentPath;
     private String documentNomOriginal;
+    private String anneeScolaire;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eleve_id", nullable = false)
@@ -95,5 +96,13 @@ public class Absence {
 
     public void setDocumentNomOriginal(String documentNomOriginal) {
         this.documentNomOriginal = documentNomOriginal;
+    }
+
+    public String getAnneeScolaire() {
+        return anneeScolaire;
+    }
+
+    public void setAnneeScolaire(String anneeScolaire) {
+        this.anneeScolaire = anneeScolaire;
     }
 }

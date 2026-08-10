@@ -4,7 +4,7 @@
 <!--
   Barre laterale des pages Finances/Tresorerie (ADMIN + TRESORIER).
   Usage : <div th:replace="~{fragments/sidebar-tresorier :: admin('financier')}"></div>
-  activePage : financier, budget.
+  activePage : financier (page unique /finances a onglets : Journal, Scolarite, Depenses, Budget, Rapports).
 -->
 <aside th:fragment="admin(activePage)" class="hidden md:flex fixed left-0 top-0 h-full w-[260px] bg-tertiary border-r border-outline-variant flex-col z-50">
 <div class="p-lg">
@@ -18,6 +18,10 @@
 </div>
 </div>
 <nav class="space-y-base">
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 mb-sm border-b border-tertiary-container/30 pb-sm" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined mr-md">arrow_back</span>
+<span class="font-body-md text-body-md">Retour à l'administration</span>
+</a>
 <a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/dashboard}">
 <span class="material-symbols-outlined mr-md">dashboard</span>
 <span class="font-body-md text-body-md">Tableau de bord</span>
@@ -28,11 +32,7 @@
 </a>
 <a th:class="'flex items-center px-md py-sm transition-all duration-200 ' + (${activePage == 'financier'} ? 'border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10' : 'rounded text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50')" th:href="@{/finances}">
 <span class="material-symbols-outlined mr-md">payments</span>
-<span class="font-body-md text-body-md">Financier</span>
-</a>
-<a th:class="'flex items-center px-md py-sm transition-all duration-200 ' + (${activePage == 'budget'} ? 'border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10' : 'rounded text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50')" th:href="@{/finances/budget}">
-<span class="material-symbols-outlined mr-md">bar_chart</span>
-<span class="font-body-md text-body-md">Budget previsionnel</span>
+<span class="font-body-md text-body-md">Comptabilite</span>
 </a>
 <a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/messagerie}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
 <span class="material-symbols-outlined mr-md">forum</span>

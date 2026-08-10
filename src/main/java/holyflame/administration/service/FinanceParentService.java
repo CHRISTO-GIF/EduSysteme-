@@ -1,14 +1,19 @@
 package holyflame.administration.service;
 
+import holyflame.administration.model.ArriereEleve;
 import holyflame.administration.model.Eleve;
 import holyflame.administration.model.FraisScolarite;
 import holyflame.administration.model.Paiement;
+import holyflame.administration.model.Parametre;
+import holyflame.administration.repository.ArriereEleveRepository;
 import holyflame.administration.repository.FraisScolariteRepository;
 import holyflame.administration.repository.PaiementRepository;
+import holyflame.administration.repository.ParametreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -29,8 +34,12 @@ public class FinanceParentService {
         Map.entry("novembre", 11), Map.entry("decembre", 12), Map.entry("décembre", 12)
     );
 
+    private static final DateTimeFormatter FMT_PARAM_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @Autowired private FraisScolariteRepository fraisScolariteRepository;
     @Autowired private PaiementRepository paiementRepository;
+    @Autowired private ArriereEleveRepository arriereEleveRepository;
+    @Autowired private ParametreRepository parametreRepository;
 
     public static class ResumeSolde {
         public List<Map<String, Object>> lignes = new ArrayList<>();
@@ -67,7 +76,7 @@ public class FinanceParentService {
                         && p.getFraisScolarite() != null && p.getFraisScolarite().getId().equals(f.getId()))
                     .mapToDouble(p -> p.getMontantVerse() != null ? p.getMontantVerse() : 0)
                     .sum();
-                LocalDate echeanceDate = calculerEcheance(f.getEcheance(), enfant.getClasse().getAnneeScolaire());
+                LocalDate echeanceDate = calculerEcheance(f.getEcheance(), enfant.getClasse().getAnneeScolaire(), etabId);
 
                 String statut;
                 if (montant > 0 && verse >= montant) statut = "PAYE";
@@ -97,6 +106,27 @@ public class FinanceParentService {
                     }
                 }
             }
+
+            for (ArriereEleve a : arriereEleveRepository.findByEleveIdOrderByAnneeScolaireOrigineDesc(enfant.getId())) {
+                double du = a.getMontant() != null ? a.getMontant() : 0;
+                double regle = a.getMontantRegle() != null ? a.getMontantRegle() : 0;
+                double reste = du - regle;
+                if (reste <= 0) continue;
+
+                Map<String, Object> ligne = new LinkedHashMap<>();
+                ligne.put("designation", "Arriérés " + a.getAnneeScolaireOrigine());
+                ligne.put("categorie", "ARRIERES");
+                ligne.put("enfant", enfant);
+                ligne.put("montant", du);
+                ligne.put("resteAPayer", reste);
+                ligne.put("echeanceDate", null);
+                ligne.put("statut", "EN_RETARD");
+                ligne.put("arriereId", a.getId());
+                ligne.put("eleveId", enfant.getId());
+                resume.lignes.add(ligne);
+                resume.soldeTotalARegler += reste;
+                resume.nbEnRetard++;
+            }
         }
 
         resume.lignes.sort(Comparator.comparing(
@@ -106,8 +136,20 @@ public class FinanceParentService {
         return resume;
     }
 
-    public LocalDate calculerEcheance(String echeance, String anneeScolaire) {
-        if (echeance == null || anneeScolaire == null) return null;
+    public LocalDate calculerEcheance(String echeance, String anneeScolaire, Long etabId) {
+        if (echeance == null) return null;
+        String cle = echeance.trim().toUpperCase();
+
+        // T1 / T2 / T3 : echeance derivee de la date de debut du trimestre configuree dans Parametres
+        if (etabId != null && ("T1".equals(cle) || "T2".equals(cle) || "T3".equals(cle))) {
+            return parametreRepository.findByCleAndEtablissementId(cle + "_DEBUT", etabId)
+                .map(Parametre::getValeur)
+                .map(v -> { try { return LocalDate.parse(v, FMT_PARAM_DATE); } catch (Exception e) { return null; } })
+                .orElse(null);
+        }
+
+        // Retro-compatibilite : echeance donnee comme un nom de mois en toutes lettres
+        if (anneeScolaire == null) return null;
         Integer mois = MOIS_FR.get(echeance.trim().toLowerCase());
         if (mois == null) return null;
         int anneeDebut;

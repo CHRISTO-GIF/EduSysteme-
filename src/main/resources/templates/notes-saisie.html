@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>EduSystem Pro - Gestion des Notes</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -89,6 +89,9 @@
 <!-- Contenu principal -->
 <main class="ml-0 md:ml-[260px] pt-16 p-md md:p-lg">
 <div class="max-w-[1440px] mx-auto">
+<a class="inline-flex items-center gap-xs text-primary font-label-md text-label-md hover:underline mb-md" th:href="@{/gestion-academique}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour a Gestion Academique
+</a>
 <div class="mb-lg">
 <nav class="flex text-label-sm text-on-surface-variant mb-xs gap-1 items-center">
 <a class="hover:text-primary transition-colors" href="/dashboard">Accueil</a>
