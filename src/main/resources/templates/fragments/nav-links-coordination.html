@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Liens de navigation de l'espace Coordination, extraits dans leur propre
+  fichier (voir le meme commentaire dans nav-links-tresorier.html pour la
+  raison : eviter un rendu en double de la nav quand elle est definie en
+  ligne dans le fragment qui l'englobe).
+  Usage : <div th:replace="~{fragments/nav-links-coordination :: liens(activePage)}"></div>
+-->
+<nav th:fragment="liens(activePage)" class="space-y-base">
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 mb-sm border-b border-tertiary-container/30 pb-sm" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined mr-md">arrow_back</span>
+<span class="font-body-md text-body-md">Retour à l'administration</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/dashboard}">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-body-md text-body-md">Tableau de bord</span>
+</a>
+<a th:class="'flex items-center px-md py-sm transition-all duration-200 ' + (${activePage == 'coordination'} ? 'border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10' : 'rounded text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50')" th:href="@{/coordination}">
+<span class="material-symbols-outlined mr-md">fact_check</span>
+<span class="font-body-md text-body-md">Fiches de controle</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/personnel}">
+<span class="material-symbols-outlined mr-md">badge</span>
+<span class="font-body-md text-body-md">Personnel</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/messagerie}">
+<span class="material-symbols-outlined mr-md">forum</span>
+<span class="font-body-md text-body-md">Messagerie</span>
+</a>
+</nav>
+</body>
+</html>

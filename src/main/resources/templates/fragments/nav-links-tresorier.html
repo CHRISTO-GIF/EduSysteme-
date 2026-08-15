@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Liens de navigation des pages Finances/Tresorerie, extraits dans leur
+  propre fichier (et non definis en ligne dans sidebar-tresorier.html) pour
+  eviter que Thymeleaf ne les rende deux fois : une fragment definie sur un
+  element qui reste par ailleurs dans le flux normal du fragment englobant
+  est rendue une premiere fois "sur place" (sans les classes hidden/md:flex
+  du wrapper qui la contient normalement) PUIS une seconde fois via son
+  th:replace explicite -- d'ou un menu fantome toujours visible en double.
+  Usage : <div th:replace="~{fragments/nav-links-tresorier :: liens(activePage)}"></div>
+-->
+<nav th:fragment="liens(activePage)" class="space-y-base">
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 mb-sm border-b border-tertiary-container/30 pb-sm" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined mr-md">arrow_back</span>
+<span class="font-body-md text-body-md">Retour à l'administration</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/dashboard}">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-body-md text-body-md">Tableau de bord</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/secretariat}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-md">group</span>
+<span class="font-body-md text-body-md">Eleves</span>
+</a>
+<a th:class="'flex items-center px-md py-sm transition-all duration-200 ' + (${activePage == 'financier'} ? 'border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10' : 'rounded text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50')" th:href="@{/finances}">
+<span class="material-symbols-outlined mr-md">payments</span>
+<span class="font-body-md text-body-md">Comptabilite</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/messagerie}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
+<span class="material-symbols-outlined mr-md">forum</span>
+<span class="font-body-md text-body-md">Messagerie</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/examens}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
+<span class="material-symbols-outlined mr-md">school</span>
+<span class="font-body-md text-body-md">Academique</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/personnel}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'TRESORIER')}">
+<span class="material-symbols-outlined mr-md">badge</span>
+<span class="font-body-md text-body-md">Personnel</span>
+</a>
+<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/journal(module='FINANCES')}">
+<span class="material-symbols-outlined mr-md">history</span>
+<span class="font-body-md text-body-md">Journal d'activite</span>
+</a>
+</nav>
+</body>
+</html>

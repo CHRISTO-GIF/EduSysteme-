@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Navigation mobile (< 768px) partagee par les pages "back-office" (meme
+  famille de roles que fragments/sidebar-admin.html). Barre fixe en bas avec
+  un raccourci Tableau de bord et un bouton Menu qui ouvre un panneau plein
+  ecran reprenant fragments/nav-links-admin.html -- les memes liens, les
+  memes regroupements et les memes droits d'acces que la sidebar desktop,
+  pour ne jamais avoir un mobile en retard sur le desktop.
+  Usage : <div th:replace="~{fragments/mobile-nav-admin :: nav(activePage)}"></div>
+-->
+<div th:fragment="nav(activePage)" class="md:hidden">
+<nav class="fixed bottom-0 left-0 w-full flex items-stretch h-14 bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a th:class="'flex-1 flex flex-col items-center justify-center gap-0.5 ' + (${activePage == 'dashboard'} ? 'text-primary font-semibold' : 'text-secondary')" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<button type="button" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-secondary" onclick="document.getElementById('mobile-more-panel').classList.remove('hidden')">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-label-sm text-label-sm">Menu</span>
+</button>
+</nav>
+
+<div id="mobile-more-panel" class="hidden fixed inset-0 bg-tertiary dark:bg-tertiary-container z-[60] flex flex-col">
+<div class="flex items-center justify-between px-lg py-md border-b border-tertiary-container/30 flex-shrink-0">
+<h2 class="font-headline-sm text-headline-sm text-on-primary-fixed font-bold" th:text="${nomEtablissement != null ? nomEtablissement : 'Menu'}">Menu</h2>
+<button type="button" class="text-on-tertiary-container p-xs" onclick="document.getElementById('mobile-more-panel').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto py-sm">
+<div th:replace="~{fragments/nav-links-admin :: links(activePage)}"></div>
+</div>
+<div class="px-lg border-t border-tertiary-container/30 py-lg space-y-xs flex-shrink-0">
+<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" href="/parametres">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Parametres</span>
+</a>
+<a class="flex items-center py-sm gap-md text-on-tertiary-container hover:text-on-tertiary transition-colors duration-200" href="#" onclick="document.getElementById('logout-form-mobile').submit(); return false;">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Deconnexion</span>
+</a>
+<form id="logout-form-mobile" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</div>
+</div>
+</body>
+</html>
