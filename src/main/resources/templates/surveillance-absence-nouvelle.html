@@ -52,6 +52,7 @@
 </head>
 <body class="bg-background text-on-background min-h-screen flex">
 <div th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" th:replace="~{fragments/sidebar-admin :: admin('surveillance')}"></div>
+<div th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" th:replace="~{fragments/mobile-nav-admin :: nav('surveillance')}"></div>
 <aside class="hidden md:flex w-sidebar-width h-screen fixed left-0 top-0 bg-tertiary flex-col py-lg z-50 overflow-y-auto" th:unless="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
 <div class="px-lg mb-xl">
 <div class="flex items-center gap-sm">

@@ -46,6 +46,7 @@
 <body class="bg-background text-on-background min-h-screen">
 <!-- Menu lateral -->
 <div th:replace="~{fragments/sidebar-admin :: admin('personnel')}"></div>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('personnel')}"></div>
 
 <main class="ml-[260px] pt-lg px-lg pb-xl max-w-container-max mx-auto">
 <nav class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant mb-md">
@@ -56,6 +57,7 @@
 
 <div th:if="${param.uploaded}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md">Document televerse avec succes.</div>
 <div th:if="${param.error}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md">Erreur lors du televersement du document.</div>
+<div th:if="${param.erreurSalaire != null and param.erreurSalaire[0] == 'doublon'}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md">Un bulletin de paie existe deja pour ce mois et cet employe. Supprimez-le d'abord (s'il n'est pas encore paye) avant d'en creer un nouveau.</div>
 <div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${successMsg}"></div>
 <div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
 

@@ -55,6 +55,7 @@
 <body class="bg-background text-on-background antialiased">
 <!-- Menu lateral -->
 <div th:replace="~{fragments/sidebar-admin :: admin('parametres')}"></div>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('parametres')}"></div>
 
 <!-- Barre superieure -->
 <header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-md md:px-lg w-full z-40">
@@ -91,21 +92,53 @@
 <h2 class="font-headline-lg text-headline-lg text-primary mb-1">Configuration Globale</h2>
 <p class="text-body-md text-on-surface-variant">Gerez les preferences de votre etablissement et les acces administratifs.</p>
 </div>
+<div class="flex flex-wrap gap-sm">
+<a class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" th:href="@{/gestion-academique}">
+<span class="material-symbols-outlined text-[18px]">school</span> Classes &amp; matieres
+</a>
 <a class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" th:href="@{/parametres/annees}">
 <span class="material-symbols-outlined text-[18px]">history_edu</span> Annees scolaires
 </a>
 <a class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" th:href="@{/parametres/calendrier}">
 <span class="material-symbols-outlined text-[18px]">event</span> Calendrier scolaire
 </a>
+<a class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" th:href="@{/parametres/roles}">
+<span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Roles &amp; comptes
+</a>
+<a class="relative flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" th:href="@{/parametres/signalements}">
+<span class="material-symbols-outlined text-[18px]">flag</span> Signalements
+<span class="ml-1 px-2 py-0.5 rounded-full bg-error text-on-error text-[11px] font-bold" th:if="${nbSignalementsOuverts > 0}" th:text="${nbSignalementsOuverts}">0</span>
+</a>
+</div>
 </div>
 
 <div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
 <div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
 
+<!-- Checklist de premiere configuration : n'apparait plus une fois toutes les etapes terminees -->
+<div class="mb-lg bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-lg" th:if="${checklistFaites < checklistTotal}">
+<div class="flex items-center justify-between mb-md">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Mise en route de l'etablissement</h4>
+<span class="font-label-md text-label-md text-secondary" th:text="${checklistFaites} + ' / ' + ${checklistTotal} + ' etapes'"></span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden mb-md">
+<div class="h-full bg-primary rounded-full" th:style="'width:' + (${checklistTotal > 0 ? (checklistFaites * 100 / checklistTotal) : 0}) + '%'"></div>
+</div>
+<div class="flex flex-wrap gap-sm">
+<a class="flex items-center gap-xs px-md py-xs rounded-lg font-label-sm text-label-sm transition-colors"
+   th:classappend="${etape.fait} ? 'bg-success-container text-on-success-container' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'"
+   th:each="etape : ${checklist}" th:href="${etape.lien}">
+<span class="material-symbols-outlined text-[16px]" th:text="${etape.fait} ? 'check_circle' : 'radio_button_unchecked'"></span>
+<span th:text="${etape.libelle}"></span>
+</a>
+</div>
+</div>
+
 <form id="form-logo" method="post" enctype="multipart/form-data" th:action="@{/parametres/logo}" style="display:none"></form>
 <form id="form-motdepasse" method="post" th:action="@{/parametres/mot-de-passe}" style="display:none"></form>
 <form id="form-verif-parent" method="post" th:action="@{/parametres/verification/parent}" style="display:none"></form>
 <form id="form-verif-personnel" method="post" th:action="@{/parametres/verification/personnel}" style="display:none"></form>
+<form id="form-delegation" method="post" th:action="@{/parametres/delegation}" style="display:none"></form>
 
 <form id="form-general" method="post" th:action="@{/parametres/update}">
 <input name="_tab" type="hidden" value="etablissement"/>
@@ -115,7 +148,7 @@
 <section class="lg:col-span-2 space-y-lg">
 
 <!-- Configuration Generale -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card" id="config-generale">
 <div class="flex items-center gap-md mb-xl">
 <div class="bg-primary-container/10 p-3 rounded-lg text-primary">
 <span class="material-symbols-outlined">school</span>
@@ -145,9 +178,36 @@
 <div class="space-y-1">
 <label class="font-label-md text-label-md text-on-surface-variant block">Fuseau Horaire</label>
 <select class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="fuseauHoraire">
-<option th:selected="${etablissement != null and etablissement.fuseauHoraire == '(GMT+00:00) Abidjan'}" value="(GMT+00:00) Abidjan">(GMT+00:00) Abidjan</option>
-<option th:selected="${etablissement != null and etablissement.fuseauHoraire == '(GMT+01:00) Paris'}" value="(GMT+01:00) Paris">(GMT+01:00) Paris</option>
+<option th:selected="${etablissement != null and etablissement.fuseauHoraire == '(GMT+00:00) Abidjan'}" value="(GMT+00:00) Abidjan">Afrique de l'Ouest — (GMT+00:00) Abidjan, Dakar, Accra</option>
+<option th:selected="${etablissement != null and etablissement.fuseauHoraire == '(GMT+01:00) N''Djamena'}" value="(GMT+01:00) N'Djamena">Afrique Centrale — (GMT+01:00) N'Djamena, Douala, Lagos</option>
+<option th:selected="${etablissement != null and etablissement.fuseauHoraire == '(GMT+03:00) Nairobi'}" value="(GMT+03:00) Nairobi">Afrique de l'Est — (GMT+03:00) Nairobi, Addis-Abeba</option>
 </select>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Devoirs autorises par matiere et par trimestre</label>
+<select class="w-full p-md border border-outline-variant rounded-lg text-body-md" name="NB_DEVOIRS_PAR_TRIMESTRE">
+<option th:selected="${p.get('NB_DEVOIRS_PAR_TRIMESTRE') == null or p.get('NB_DEVOIRS_PAR_TRIMESTRE') == '2'}" value="2">2 devoirs (Devoir 1 + Devoir 2)</option>
+<option th:selected="${p.get('NB_DEVOIRS_PAR_TRIMESTRE') == '3'}" value="3">3 devoirs (Devoir 1 + Devoir 2 + Devoir 3)</option>
+</select>
+<p class="text-label-sm text-on-surface-variant">Au-dela, un avertissement s'affiche a la saisie (l'enseignant peut confirmer pour passer outre). Un seul examen est toujours autorise par matiere et par trimestre. La moyenne des devoirs reellement saisis (2 ou 3) et la note d'examen comptent ensuite chacune pour moitie dans la moyenne de la matiere.</p>
+</div>
+<div class="md:col-span-2 space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Bonus Participation &amp; Travaux Pratiques</label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-md">
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Note minimale pour declencher un bonus (/20)</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" max="20" min="0" name="BONUS_PARTICIPATION_TP_SEUIL" step="0.5" th:value="${p.get('BONUS_PARTICIPATION_TP_SEUIL') ?: '14'}" type="number"/>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Bonus par note (points)</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" max="2" min="0" name="BONUS_PARTICIPATION_TP_PAR_NOTE" step="0.05" th:value="${p.get('BONUS_PARTICIPATION_TP_PAR_NOTE') ?: '0.25'}" type="number"/>
+</div>
+<div>
+<label class="text-label-sm text-on-surface-variant block mb-1">Bonus maximum par matiere (points)</label>
+<input class="w-full p-md border border-outline-variant rounded-lg text-body-md" max="5" min="0" name="BONUS_PARTICIPATION_TP_MAX" step="0.25" th:value="${p.get('BONUS_PARTICIPATION_TP_MAX') ?: '1'}" type="number"/>
+</div>
+</div>
+<p class="text-label-sm text-on-surface-variant">Chaque note de Participation ou de Travaux Pratiques dont la valeur atteint le seuil ajoute ce bonus a la moyenne de la matiere concernee, plafonne au maximum indique — jamais de malus si l'eleve n'a pas (encore) de note dans ces categories.</p>
 </div>
 </div>
 </div>
@@ -198,7 +258,7 @@
 </div>
 
 <!-- Frais et modalites d'inscription -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card" id="config-frais">
 <div class="flex items-center gap-md mb-xl">
 <div class="bg-primary-container/10 p-3 rounded-lg text-primary">
 <span class="material-symbols-outlined">payments</span>
@@ -367,7 +427,7 @@
 </div>
 
 <!-- Securite -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card" id="config-securite">
 <h4 class="font-label-md text-label-md text-on-surface-variant mb-xl uppercase tracking-widest">Securite</h4>
 <div class="space-y-md">
 <details>
@@ -428,6 +488,14 @@
 </div>
 <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
 </a>
+<div class="p-md border border-outline-variant rounded-lg flex items-center justify-between gap-md">
+<div>
+<p class="text-body-md">Deleguer le suivi pedagogique</p>
+<p class="text-label-sm text-secondary">Permet a un membre du personnel avec la fonction "Directeur" d'acceder au suivi des enseignants, sans etre administrateur.</p>
+</div>
+<input class="w-10 h-5 rounded-full bg-surface-variant border-none checked:bg-primary appearance-none relative transition-colors before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5.5 before:transition-all shrink-0"
+       form="form-delegation" name="delegationDirection" onchange="this.form.requestSubmit()" th:checked="${delegationActive}" type="checkbox" value="true"/>
+</div>
 </div>
 </div>
 
@@ -456,6 +524,103 @@
 </button>
 </div>
 </form>
+
+<!-- Generation rapide des classes standards -->
+<div class="mt-lg bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card" id="config-outils">
+<div class="flex items-center gap-md mb-md">
+<div class="bg-primary-container/10 p-3 rounded-lg text-primary">
+<span class="material-symbols-outlined">auto_fix_high</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Generation rapide des classes</h4>
+</div>
+<p class="text-label-sm text-secondary mb-lg">Cochez les niveaux proposes par votre etablissement, enregistrez, puis generez en un clic les classes standards (Petite Section... Terminale) pour l'annee active. Les classes deja existantes ne sont jamais dupliquees.</p>
+<div th:if="${classesGenerees != null}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md"
+     th:text="${classesGenerees > 0} ? (${classesGenerees} + ' classe(s) creee(s).') : 'Aucune nouvelle classe a creer : tout existe deja pour cette annee.'"></div>
+<form class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-md mb-lg" method="post" th:action="@{/parametres/update}">
+<input name="_tab" type="hidden" value="etablissement"/>
+<label class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<input name="TYPE_MATERNELLE" th:checked="${p.get('TYPE_MATERNELLE') == 'true'}" type="checkbox" value="true"/> Maternelle
+</label>
+<label class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<input name="TYPE_PRIMAIRE" th:checked="${p.get('TYPE_PRIMAIRE') == 'true'}" type="checkbox" value="true"/> Primaire
+</label>
+<label class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<input name="TYPE_COLLEGE" th:checked="${p.get('TYPE_COLLEGE') == 'true'}" type="checkbox" value="true"/> College
+</label>
+<label class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<input name="TYPE_LYCEE" th:checked="${p.get('TYPE_LYCEE') == 'true'}" type="checkbox" value="true"/> Lycee
+</label>
+<label class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<input name="TYPE_LYCEE_GENERAL" th:checked="${p.get('TYPE_LYCEE_GENERAL') == 'true'}" type="checkbox" value="true"/> Lycee general
+</label>
+<button class="col-span-2 sm:col-span-3 md:col-span-5 px-lg py-2 border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-all w-fit" type="submit">Enregistrer les niveaux</button>
+</form>
+<form method="post" th:action="@{/parametres/classes/generer}">
+<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md hover:opacity-90 transition-all flex items-center gap-xs" type="submit">
+<span class="material-symbols-outlined text-[20px]">add_task</span> Generer les classes standards maintenant
+</button>
+</form>
+</div>
+
+<!-- Affectations enseignant / matiere / classe -->
+<div class="mt-lg bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-xl settings-card" id="config-autorisations">
+<div class="flex items-center gap-md mb-md">
+<div class="bg-primary-container/10 p-3 rounded-lg text-primary">
+<span class="material-symbols-outlined">assignment_ind</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Affectations enseignant / matiere / classe</h4>
+</div>
+<p class="text-label-sm text-secondary mb-lg">Determine quel enseignant peut saisir des notes et des devoirs pour quelle matiere, dans quelle classe. A chaque nouvelle annee, ces affectations sont reconduites automatiquement si vous cochez "Reaffecter" lors de la creation de l'annee.</p>
+<div th:if="${autorisationMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${autorisationMsg}"></div>
+
+<form class="grid grid-cols-1 sm:grid-cols-4 gap-sm mb-lg items-end" method="post" th:action="@{/parametres/autorisations/ajouter}">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Enseignant</label>
+<select class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="enseignantId" required="required">
+<option th:each="e : ${enseignantsDisponibles}" th:text="${e.prenom} + ' ' + ${e.nom}" th:value="${e.id}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Matiere</label>
+<select class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="matiereId" required="required">
+<option th:each="m : ${matieres}" th:text="${m.nom}" th:value="${m.id}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Classe</label>
+<select class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="classeId" required="required">
+<option th:each="c : ${toutesClasses}" th:text="${c.nom} + ' (' + ${c.anneeScolaire} + ')'" th:value="${c.id}"></option>
+</select>
+</div>
+<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md" type="submit">Affecter</button>
+</form>
+
+<p class="text-body-md text-secondary text-center py-lg" th:if="${enseignantsDisponibles.isEmpty()}">Aucun compte enseignant pour le moment — creez-en un depuis la page Personnel.</p>
+<div class="overflow-x-auto" th:if="${!autorisationsAffichage.isEmpty()}">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider">Enseignant</th>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider">Matiere</th>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider">Classe</th>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="a : ${autorisationsAffichage}">
+<td class="px-md py-sm font-medium" th:text="${a.enseignantNom}"></td>
+<td class="px-md py-sm" th:text="${a.matiereNom}"></td>
+<td class="px-md py-sm" th:text="${a.classeNom}"></td>
+<td class="px-md py-sm text-right">
+<form method="post" th:action="@{/parametres/autorisations/{id}/supprimer(id=${a.id})}">
+<button class="text-error font-label-sm hover:underline" type="submit">Retirer</button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 </div>
 </main>
@@ -488,6 +653,17 @@
                 formFrais.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
         });
+    })();
+
+    // Ramene l'utilisateur pres de la section concernee apres une action (au lieu du haut de page) :
+    // ancien systeme d'onglets ?tab=xxx conserve pour compatibilite avec les redirections existantes.
+    (function () {
+        var tab = new URLSearchParams(window.location.search).get('tab');
+        var cible = { etablissement: 'config-generale', frais: 'config-frais', securite: 'config-securite', autorisations: 'config-autorisations' }[tab];
+        if (cible) {
+            var el = document.getElementById(cible);
+            if (el) setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+        }
     })();
 </script>
 </body>

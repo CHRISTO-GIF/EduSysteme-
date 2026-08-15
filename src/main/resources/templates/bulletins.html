@@ -51,7 +51,13 @@
     </style>
 </head>
 <body class="bg-surface text-on-surface">
+<th:block th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'PARENT'}">
+<div th:replace="~{fragments/sidebar-parent :: parent('bulletins', ${utilisateurConnecte})}"></div>
+</th:block>
+<th:block th:unless="${utilisateurConnecte != null and utilisateurConnecte.role == 'PARENT'}">
 <div th:replace="~{fragments/sidebar-admin :: admin('bulletins')}"></div>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('bulletins')}"></div>
+</th:block>
 
 <header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface border-b border-outline-variant flex justify-between items-center px-md md:px-lg z-40">
 <div class="flex items-center w-1/2 md:w-1/3">
@@ -84,7 +90,7 @@
 <h2 class="font-headline-lg text-headline-lg text-primary">Bulletins</h2>
 <p class="text-body-md text-secondary">Consultez et imprimez le bulletin de chaque eleve.</p>
 </div>
-<div class="flex gap-sm">
+<div class="flex gap-sm" th:if="${utilisateurConnecte == null or utilisateurConnecte.role != 'PARENT'}">
 <a class="px-lg py-2.5 bg-primary text-on-primary font-label-md text-label-md rounded-lg flex items-center gap-2 hover:shadow-lg transition-all" th:href="@{/bulletins/impression(classeId=${classeId})}">
 <span class="material-symbols-outlined">print</span> Impression par classe
 </a>
@@ -97,11 +103,11 @@
 <span class="material-symbols-outlined">groups</span>
 </div>
 <div>
-<p class="text-label-sm text-secondary uppercase tracking-wider" th:text="${classeId != null ? 'Eleves de la classe' : 'Total eleves'}">Total eleves</p>
+<p class="text-label-sm text-secondary uppercase tracking-wider" th:text="${utilisateurConnecte != null and utilisateurConnecte.role == 'PARENT' ? 'Mes enfants' : (classeId != null ? 'Eleves de la classe' : 'Total eleves')}">Total eleves</p>
 <h3 class="font-headline-md text-headline-md text-on-surface" th:text="${eleves.size()}">0</h3>
 </div>
 </div>
-<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center gap-lg" th:if="${utilisateurConnecte == null or utilisateurConnecte.role != 'PARENT'}">
 <div class="w-12 h-12 bg-secondary-fixed flex items-center justify-center rounded-full text-on-secondary-fixed-variant">
 <span class="material-symbols-outlined">account_tree</span>
 </div>
@@ -115,7 +121,7 @@
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
 <div class="px-lg py-md border-b border-outline-variant flex justify-between items-center flex-wrap gap-sm">
 <h4 class="font-headline-sm text-headline-sm text-primary">Liste des eleves</h4>
-<form class="flex items-center gap-sm" method="get" th:action="@{/bulletins}">
+<form class="flex items-center gap-sm" method="get" th:action="@{/bulletins}" th:if="${utilisateurConnecte == null or utilisateurConnecte.role != 'PARENT'}">
 <input name="q" th:value="${q}" type="hidden"/>
 <select class="bg-surface-container-low border-none text-label-sm rounded-lg py-1 px-3 focus:ring-1 focus:ring-primary" name="classeId" onchange="this.form.submit()">
 <option value="">Toutes les classes</option>

@@ -42,7 +42,9 @@
     </style>
 </head>
 <body class="bg-surface text-on-surface">
+<div th:if="${erreurMsg}" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-error-container text-on-error-container px-lg py-sm rounded-lg shadow-lg font-label-md text-label-md" th:text="${erreurMsg}"></div>
 <div th:replace="~{fragments/sidebar-admin :: admin('messagerie')}"></div>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('messagerie')}"></div>
 
 <header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface border-b border-outline-variant flex items-center gap-sm px-md md:px-lg z-40">
 <a class="md:hidden" th:if="${correspondantActif != null}" th:href="@{/messagerie}"><span class="material-symbols-outlined text-primary">arrow_back</span></a>

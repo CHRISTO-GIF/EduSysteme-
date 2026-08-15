@@ -2,11 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <!--
-  Barre laterale des pages Finances/Tresorerie (ADMIN + TRESORIER).
+  Navigation des pages Finances/Tresorerie (ADMIN + TRESORIER).
   Usage : <div th:replace="~{fragments/sidebar-tresorier :: admin('financier')}"></div>
   activePage : financier (page unique /finances a onglets : Journal, Scolarite, Depenses, Budget, Rapports).
+  Les liens sont definis une seule fois (fragment "liens") et reutilises par
+  la sidebar desktop et le panneau de menu mobile, pour eviter que les deux
+  divergent.
 -->
-<aside th:fragment="admin(activePage)" class="hidden md:flex fixed left-0 top-0 h-full w-[260px] bg-tertiary border-r border-outline-variant flex-col z-50">
+<div th:fragment="admin(activePage)">
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-[260px] bg-tertiary border-r border-outline-variant flex-col z-50">
 <div class="p-lg">
 <div class="flex items-center gap-sm mb-xl">
 <div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center">
@@ -17,40 +21,7 @@
 <p class="text-label-sm text-on-tertiary/60" th:text="(${utilisateurConnecte != null and utilisateurConnecte.role == 'TRESORIER'}) ? 'Portail Tresorerie' : 'Portail Admin'">Portail Admin</p>
 </div>
 </div>
-<nav class="space-y-base">
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50 mb-sm border-b border-tertiary-container/30 pb-sm" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
-<span class="material-symbols-outlined mr-md">arrow_back</span>
-<span class="font-body-md text-body-md">Retour à l'administration</span>
-</a>
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/dashboard}">
-<span class="material-symbols-outlined mr-md">dashboard</span>
-<span class="font-body-md text-body-md">Tableau de bord</span>
-</a>
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/secretariat}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined mr-md">group</span>
-<span class="font-body-md text-body-md">Eleves</span>
-</a>
-<a th:class="'flex items-center px-md py-sm transition-all duration-200 ' + (${activePage == 'financier'} ? 'border-l-4 border-primary text-on-tertiary bg-on-tertiary-fixed-variant/10' : 'rounded text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50')" th:href="@{/finances}">
-<span class="material-symbols-outlined mr-md">payments</span>
-<span class="font-body-md text-body-md">Comptabilite</span>
-</a>
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/messagerie}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
-<span class="material-symbols-outlined mr-md">forum</span>
-<span class="font-body-md text-body-md">Messagerie</span>
-</a>
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/examens}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined mr-md">school</span>
-<span class="font-body-md text-body-md">Academique</span>
-</a>
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/personnel}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'TRESORIER')}">
-<span class="material-symbols-outlined mr-md">badge</span>
-<span class="font-body-md text-body-md">Personnel</span>
-</a>
-<a class="flex items-center px-md py-sm rounded transition-all duration-200 text-on-tertiary-container/70 hover:text-on-tertiary hover:bg-tertiary-container/50" th:href="@{/journal}">
-<span class="material-symbols-outlined mr-md">analytics</span>
-<span class="font-body-md text-body-md">Rapports</span>
-</a>
-</nav>
+<div th:replace="~{fragments/nav-links-tresorier :: liens(activePage)}"></div>
 </div>
 <div class="mt-auto p-lg border-t border-outline-variant/20">
 <a class="w-full bg-primary text-white py-sm rounded-lg font-label-md flex items-center justify-center gap-base active:scale-95 transition-all mb-lg" th:href="@{/finances/nouvelle-transaction}">
@@ -69,5 +40,30 @@ Nouvelle Transaction
 </div>
 </div>
 </aside>
+
+<div class="md:hidden">
+<nav class="fixed bottom-0 left-0 w-full flex items-stretch h-14 bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
+<a class="flex-1 flex flex-col items-center justify-center gap-0.5 text-secondary" th:href="@{/dashboard}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Tableau</span>
+</a>
+<button type="button" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-primary font-semibold" onclick="document.getElementById('mobile-more-panel-financier').classList.remove('hidden')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-label-sm text-label-sm">Comptabilite</span>
+</button>
+</nav>
+<div id="mobile-more-panel-financier" class="hidden fixed inset-0 bg-tertiary z-[60] flex flex-col">
+<div class="flex items-center justify-between px-lg py-md border-b border-tertiary-container/30 flex-shrink-0">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-tertiary">Menu</h2>
+<button type="button" class="text-on-tertiary-container p-xs" onclick="document.getElementById('mobile-more-panel-financier').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto px-lg py-md">
+<div th:replace="~{fragments/nav-links-tresorier :: liens(activePage)}"></div>
+</div>
+</div>
+</div>
+</div>
 </body>
 </html>

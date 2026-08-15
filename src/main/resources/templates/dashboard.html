@@ -209,24 +209,7 @@
 </div>
 </section>
 </main>
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
-<a class="flex flex-col items-center justify-center text-primary font-semibold" href="/dashboard">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
-<span class="font-label-sm text-label-sm">Tableau</span>
-</a>
-<a class="flex flex-col items-center justify-center text-secondary" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined">group</span>
-<span class="font-label-sm text-label-sm">Eleves</span>
-</a>
-<a class="flex flex-col items-center justify-center text-secondary" href="/personnel" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT')}">
-<span class="material-symbols-outlined">school</span>
-<span class="font-label-sm text-label-sm">Personnel</span>
-</a>
-<a class="flex flex-col items-center justify-center text-secondary" href="/emploi-du-temps">
-<span class="material-symbols-outlined">calendar_today</span>
-<span class="font-label-sm text-label-sm">Planning</span>
-</a>
-</nav>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('dashboard')}"></div>
 </div>
 <!-- ===================== VERSION DESKTOP ===================== -->
 <div class="hidden md:contents">

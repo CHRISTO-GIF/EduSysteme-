@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Salaires</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#dae2fd", "primary-fixed-dim": "#b6c4ff", "tertiary": [[${accentColor}]],
+                    "on-primary-fixed-variant": "#264191", "surface-container-low": "#f2f4f6", "surface-container": "#eceef0",
+                    "surface-container-highest": "#e0e3e5", "surface-container-lowest": "#ffffff", "surface": "#f7f9fb",
+                    "outline-variant": "#c5c5d3", "primary": "#00236f", "on-background": "#191c1e",
+                    "surface-bright": "#f7f9fb", "error-container": "#ffdad6", "surface-variant": "#e0e3e5",
+                    "background": "#f7f9fb", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                    "on-error-container": "#93000a", "tertiary-container": "#384055", "secondary": "#505f76",
+                    "on-primary": "#ffffff", "error": "#ba1a1a", "on-tertiary-container": "#a4acc5",
+                    "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a", "surface-dim": "#d8dadc",
+                    "on-surface-variant": "#444651", "on-secondary-container": "#54647a", "surface-container-high": "#e6e8ea",
+                    "outline": "#757682", "on-error": "#ffffff", "success": "#15803d", "success-container": "#dcfce7"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "base": "4px", "lg": "24px", "xs": "4px", "xl": "32px", "gutter": "24px", "md": "16px", "container-max": "1440px", "sm": "8px"},
+            "fontFamily": {"headline-sm": ["Inter"], "body-lg": ["Inter"], "code": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"]},
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; line-height: 1; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<div th:replace="~{fragments/sidebar-admin :: admin('personnel')}"></div>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('personnel')}"></div>
+
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<header class="sticky top-0 z-40 bg-surface border-b border-outline-variant flex justify-between items-center h-16 px-gutter">
+<div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<a class="hover:underline" th:href="@{/personnel}">Personnel</a>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="text-primary font-bold">Salaires</span>
+</div>
+</header>
+
+<div class="flex-1 p-gutter max-w-container-max mx-auto w-full">
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-success font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${infoMsg}" class="mb-lg p-md rounded-lg bg-surface-container-low text-on-surface-variant font-body-md text-body-md" th:text="${infoMsg}"></div>
+<div class="mb-lg flex flex-wrap items-end justify-between gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Salaires du mois</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Vue d'ensemble de la paie : plus besoin d'ouvrir chaque fiche personnel une par une.</p>
+</div>
+<div class="flex flex-wrap items-end gap-sm">
+<form class="flex flex-wrap items-end gap-sm" method="get" th:action="@{/rh/salaires}">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Mois</label>
+<select class="rounded-lg border-outline-variant px-md py-2 text-body-md" name="mois" onchange="this.form.submit()">
+<option th:each="m, iter : ${nomsMois}" th:selected="${iter.index + 1 == moisFiltre}" th:text="${m}" th:value="${iter.index + 1}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Annee</label>
+<input class="rounded-lg border-outline-variant px-md py-2 text-body-md w-24" name="annee" onchange="this.form.submit()" th:value="${anneeFiltre}" type="number"/>
+</div>
+</form>
+<form method="post" th:action="@{/rh/salaires/lancer-mois}" th:if="${!personnelSansBulletin.isEmpty()}">
+<input name="mois" th:value="${moisFiltre}" type="hidden"/>
+<input name="annee" th:value="${anneeFiltre}" type="hidden"/>
+<button class="px-lg py-2.5 bg-primary text-on-primary font-label-md text-label-md rounded-lg flex items-center gap-2 hover:shadow-lg transition-all" type="submit">
+<span class="material-symbols-outlined">bolt</span> Lancer la paie du mois
+</button>
+</form>
+</div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg mb-lg">
+<div class="bg-white border border-outline-variant p-lg rounded-xl">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Net a payer (en attente)</p>
+<h3 class="text-headline-md font-bold text-error" th:text="${#numbers.formatDecimal(totalEnAttente, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+</div>
+<div class="bg-white border border-outline-variant p-lg rounded-xl">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Deja paye ce mois</p>
+<h3 class="text-headline-md font-bold text-success" th:text="${#numbers.formatDecimal(totalPaye, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+</div>
+<div class="bg-white border border-outline-variant p-lg rounded-xl">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Bulletins en attente</p>
+<h3 class="text-headline-md font-bold text-on-surface" th:text="${nbEnAttente}">0</h3>
+</div>
+<div class="bg-white border border-outline-variant p-lg rounded-xl">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Personnel sans bulletin</p>
+<h3 class="text-headline-md font-bold text-on-surface" th:text="${personnelSansBulletin.size()}">0</h3>
+</div>
+</div>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-lg" th:if="${!personnelSansBulletin.isEmpty()}">
+<div class="p-md bg-amber-50 border-b border-outline-variant flex items-center gap-sm">
+<span class="material-symbols-outlined text-amber-700">warning</span>
+<span class="font-label-md text-label-md text-amber-800">Personnel actif sans bulletin pour ce mois</span>
+</div>
+<div class="divide-y divide-outline-variant/30">
+<div class="p-md flex items-center justify-between gap-md" th:each="p : ${personnelSansBulletin}">
+<div>
+<p class="font-medium" th:text="${p.prenom} + ' ' + ${p.nom}"></p>
+<p class="text-label-sm text-secondary" th:text="${p.fonction}"></p>
+</div>
+<a class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-sm flex items-center gap-xs" th:href="@{/rh/salaires/nouveau(personnelId=${p.id}, mois=${moisFiltre}, annee=${anneeFiltre})}">
+<span class="material-symbols-outlined text-[18px]">add</span> Etablir le bulletin
+</a>
+</div>
+</div>
+</div>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Employe</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Fonction</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Net a payer</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Statut</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr th:each="s : ${salaires}">
+<td class="px-lg py-sm font-medium" th:text="${s.personnel.prenom} + ' ' + ${s.personnel.nom}"></td>
+<td class="px-lg py-sm text-secondary" th:text="${s.personnel.fonction}"></td>
+<td class="px-lg py-sm text-right font-bold" th:text="${#numbers.formatDecimal(s.netAPayer, 0, 'COMMA', 0, 'POINT')} + ' F'"></td>
+<td class="px-lg py-sm">
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-success-container text-success" th:if="${s.statut == 'PAYE'}">Paye</span>
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-amber-50 text-amber-700" th:if="${s.statut == 'EN_ATTENTE'}">En attente</span>
+</td>
+<td class="px-lg py-sm text-right">
+<div class="flex items-center justify-end gap-md">
+<a class="text-primary font-label-sm hover:underline" target="_blank" th:href="@{/rh/salaires/{id}/bulletin(id=${s.id})}">Voir</a>
+<form method="post" th:action="@{/rh/salaires/{id}/payer(id=${s.id})}" th:if="${s.statut == 'EN_ATTENTE'}">
+<button class="text-success font-label-sm hover:underline" type="submit">Marquer paye</button>
+</form>
+</div>
+</td>
+</tr>
+<tr th:if="${salaires.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="5">Aucun bulletin pour cette periode.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+</main>
+</body>
+</html>

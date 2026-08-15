@@ -112,24 +112,7 @@ Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
 <a class="fixed right-lg bottom-20 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all z-40" href="/personnel/nouveau">
 <span class="material-symbols-outlined">person_add</span>
 </a>
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50">
-<a class="flex flex-col items-center justify-center text-secondary" href="/dashboard">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-label-sm text-label-sm">Tableau</span>
-</a>
-<a class="flex flex-col items-center justify-center text-secondary" href="/secretariat" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'SECRETAIRE')}">
-<span class="material-symbols-outlined">group</span>
-<span class="font-label-sm text-label-sm">Eleves</span>
-</a>
-<a class="flex flex-col items-center justify-center text-primary font-semibold" href="/personnel">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
-<span class="font-label-sm text-label-sm">Personnel</span>
-</a>
-<a class="flex flex-col items-center justify-center text-secondary" href="/emploi-du-temps">
-<span class="material-symbols-outlined">calendar_today</span>
-<span class="font-label-sm text-label-sm">Planning</span>
-</a>
-</nav>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('personnel')}"></div>
 </div>
 <!-- ===================== VERSION DESKTOP ===================== -->
 <div class="hidden md:contents">
@@ -178,9 +161,15 @@ Filtres <span class="material-symbols-outlined text-[18px]">filter_list</span>
 <h2 class="font-headline-lg text-headline-lg text-on-surface">Gestion du Personnel</h2>
 <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Gerez les membres du personnel de votre etablissement, leurs fonctions et leurs classes assignees.</p>
 </div>
+<div class="flex items-center gap-sm">
+<a class="bg-white border border-outline-variant text-on-surface font-label-md text-label-md px-lg py-md rounded-lg flex items-center gap-sm hover:bg-surface-container-low active:scale-95 transition-all"
+   th:href="@{/rh/salaires}" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'TRESORIER')}">
+<span class="material-symbols-outlined">payments</span> Salaires
+</a>
 <a class="bg-primary text-on-primary font-label-md text-label-md px-lg py-md rounded-lg flex items-center gap-sm hover:opacity-90 active:scale-95 transition-all shadow-sm" href="/personnel/nouveau">
 <span class="material-symbols-outlined">person_add</span> Ajouter un membre
 </a>
+</div>
 </div>
 
 <!-- Filtres -->
