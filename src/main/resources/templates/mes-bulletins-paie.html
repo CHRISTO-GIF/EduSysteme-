@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mes bulletins de paie - EduSystem Pro</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed": "#dce1ff", "surface-dim": "#d8dadc", "outline": "#757682",
+            "surface-container-low": "#f2f4f6", "surface-container-lowest": "#ffffff", "outline-variant": "#c5c5d3",
+            "surface-bright": "#f7f9fb", "primary": "#00236f",
+            "on-surface": "#191c1e", "on-background": "#191c1e",
+            "on-primary": "#ffffff", "surface-container-highest": "#e0e3e5",
+            "surface-variant": "#e0e3e5", "on-secondary": "#ffffff",
+            "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
+            "background": "#f7f9fb",
+            "on-surface-variant": "#444651",
+            "error": "#ba1a1a",
+            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px"},
+          "fontFamily": {"headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+          "fontSize": {
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+</script>
+<style>
+    body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+</style>
+</head>
+<body class="min-h-screen text-on-surface">
+<main class="max-w-[800px] mx-auto p-md md:p-xl">
+
+<nav class="mb-lg flex items-center justify-between gap-md bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant">
+<a class="flex items-center gap-xs text-secondary hover:text-primary transition-colors font-label-md text-label-md" th:href="@{/tableau-enseignant}">
+<span class="material-symbols-outlined">arrow_back</span> Retour
+</a>
+</nav>
+
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-xs">Mes bulletins de paie</h2>
+<p class="font-body-md text-body-md text-secondary mb-lg" th:text="${personnel.prenom} + ' ' + ${personnel.nom} + ' — ' + ${personnel.fonction}">Employe</p>
+
+<div class="divide-y divide-outline-variant" th:if="${!salaires.isEmpty()}">
+<div class="py-md flex items-center justify-between gap-md flex-wrap" th:each="s : ${salaires}">
+<div>
+<p class="font-label-md text-label-md text-on-surface" th:text="${s.mois} + '/' + ${s.annee}">Periode</p>
+<p class="font-body-md text-body-md text-secondary" th:text="${#numbers.formatDecimal(s.netAPayer, 0, 'COMMA', 0, 'POINT')} + ' F net'">Net</p>
+</div>
+<div class="flex items-center gap-md">
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-success-container text-success" th:if="${s.statut == 'PAYE'}">Paye</span>
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-amber-50 text-amber-700" th:if="${s.statut == 'EN_ATTENTE'}">En attente</span>
+<a class="text-primary font-label-sm hover:underline" th:href="@{/rh/mes-bulletins/{id}(id=${s.id})}">Voir / Imprimer</a>
+</div>
+</div>
+</div>
+
+<p class="text-center text-secondary py-xl" th:if="${salaires.isEmpty()}">Aucun bulletin de paie enregistre pour le moment.</p>
+</div>
+
+</main>
+</body>
+</html>

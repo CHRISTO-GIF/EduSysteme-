@@ -24,6 +24,10 @@
 
 <div class="p-3 rounded-xl bg-red-100 text-red-800 text-sm mb-5" th:if="${erreur}" th:text="${erreur}"></div>
 <div class="p-3 rounded-xl bg-green-100 text-green-800 text-sm mb-5" th:if="${succes}" th:text="${succes}"></div>
+<div class="p-3 rounded-xl bg-blue-50 text-blue-900 text-sm mb-5 break-all" th:if="${lienConfirmation}">
+  Envoi d'email non configure sur cet environnement — lien de confirmation :
+  <a class="underline font-semibold" th:href="${lienConfirmation}" th:text="${lienConfirmation}">lien</a>
+</div>
 
 <form class="space-y-5" method="post" th:action="@{/inscription-parent}" th:if="${succes == null}">
 <div class="flex flex-col gap-1.5">

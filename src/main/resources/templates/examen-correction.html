@@ -90,6 +90,7 @@ Suivant <span class="material-symbols-outlined text-[20px]">chevron_right</span>
 </div>
 
 <div th:if="${successMsg}" class="mx-xl mt-md p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurAuth}" class="mx-xl mt-md p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurAuth}"></div>
 
 <div class="flex-1 overflow-auto p-md md:p-xl flex justify-center">
 <div class="w-full max-w-3xl bg-white rounded-xl border border-outline-variant p-md md:p-xl">

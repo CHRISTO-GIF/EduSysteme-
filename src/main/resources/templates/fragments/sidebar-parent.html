@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="parent(active, utilisateurConnecte)">
+
+<!-- ===================== VERSION MOBILE ===================== -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-14 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50 md:hidden">
+<a class="flex flex-col items-center justify-center" th:classappend="${active == 'mes-enfants'} ? 'text-primary font-semibold' : 'text-secondary'" th:href="@{/portail-parent}">
+<span class="material-symbols-outlined">family_restroom</span>
+<span class="font-label-sm text-label-sm">Mes Enfants</span>
+</a>
+<a class="flex flex-col items-center justify-center" th:classappend="${active == 'calendrier'} ? 'text-primary font-semibold' : 'text-secondary'" th:href="@{/portail-parent/calendrier}">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendrier</span>
+</a>
+<a class="flex flex-col items-center justify-center" th:classappend="${active == 'messagerie'} ? 'text-primary font-semibold' : 'text-secondary'" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-label-sm text-label-sm">Messagerie</span>
+</a>
+<a class="flex flex-col items-center justify-center" th:classappend="${active == 'paiements'} ? 'text-primary font-semibold' : 'text-secondary'" th:href="@{/portail-parent/paiements}">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-sm text-label-sm">Paiements</span>
+</a>
+<a class="flex flex-col items-center justify-center" th:classappend="${active == 'bulletins'} ? 'text-primary font-semibold' : 'text-secondary'" th:href="@{/bulletins}">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-sm text-label-sm">Bulletins</span>
+</a>
+</nav>
+
+<!-- ===================== VERSION DESKTOP ===================== -->
+<aside class="hidden md:flex w-sidebar-width h-full fixed left-0 top-0 bg-tertiary flex-col py-lg border-r border-outline-variant z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-tertiary">EduSystem Pro</h1>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase tracking-widest mt-xs">Portail Parent</p>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'mes-enfants'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/portail-parent}">
+<span class="material-symbols-outlined mr-md">family_restroom</span>
+<span class="font-label-md text-label-md">Mes Enfants</span>
+</a>
+<a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'calendrier'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/portail-parent/calendrier}">
+<span class="material-symbols-outlined mr-md">calendar_today</span>
+<span class="font-label-md text-label-md">Calendrier</span>
+</a>
+<a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'messagerie'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/portail-parent/messages}">
+<span class="material-symbols-outlined mr-md">forum</span>
+<span class="font-label-md text-label-md">Messagerie</span>
+</a>
+<a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'paiements'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/portail-parent/paiements}">
+<span class="material-symbols-outlined mr-md">payments</span>
+<span class="font-label-md text-label-md">Paiements</span>
+</a>
+<a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'bulletins'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/bulletins}">
+<span class="material-symbols-outlined mr-md">school</span>
+<span class="font-label-md text-label-md">Bulletins</span>
+</a>
+<a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'signalement'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/portail-parent/signalement}">
+<span class="material-symbols-outlined mr-md">flag</span>
+<span class="font-label-md text-label-md">Signaler un point</span>
+</a>
+</nav>
+<div class="mt-auto px-lg pt-lg border-t border-tertiary-container">
+<div class="flex items-center space-x-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-tertiary font-bold" th:text="${utilisateurConnecte != null and !#strings.isEmpty(utilisateurConnecte.email) ? #strings.substring(utilisateurConnecte.email,0,1) : 'P'}">P</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-tertiary truncate" th:text="${utilisateurConnecte != null ? utilisateurConnecte.email : ''}">parent@mail.com</p>
+</div>
+</div>
+</div>
+</aside>
+
+</div>
+
+</body>
+</html>

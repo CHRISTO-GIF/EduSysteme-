@@ -1,156 +1,225 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Notes - EduSystem Pro</title>
-<link rel="stylesheet" href="/css/fonts.css">
-<script src="/js/tailwind.js"></script>
-<style>
-    body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-</style>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Notes - EduSystem Pro</title>
+    <link rel="stylesheet" href="/css/fonts.css">
+    <script src="/js/tailwind.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
 </head>
+
 <body class="bg-gray-50 text-gray-900">
-<header class="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-md">
-<div>
-<h1 class="text-xl font-bold text-blue-900">Notes</h1>
-<p class="text-gray-500 text-sm">Liste complete des notes saisies.</p>
-</div>
-<div class="flex gap-2 flex-wrap">
-<a class="border border-gray-300 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2" href="/notes/saisie">
-<span class="material-symbols-outlined text-[18px]">edit_note</span> Saisie rapide
-</a>
-<button class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2" onclick="document.getElementById('modal-note').classList.remove('hidden')" type="button">
-<span class="material-symbols-outlined text-[18px]">add</span> Ajouter une note
-</button>
-</div>
-</header>
+    <header
+        class="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-md">
+        <div>
+            <h1 class="text-xl font-bold text-blue-900">Notes</h1>
+            <p class="text-gray-500 text-sm">Liste complete des notes saisies.</p>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+            <a class="border border-gray-300 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2"
+                href="/notes/saisie">
+                <span class="material-symbols-outlined text-[18px]">edit_note</span> Saisie rapide
+            </a>
+            <button
+                class="bg-blue-900 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2"
+                onclick="document.getElementById('modal-note').classList.remove('hidden')" type="button">
+                <span class="material-symbols-outlined text-[18px]">add</span> Ajouter une note
+            </button>
+        </div>
+    </header>
 
-<main class="max-w-6xl mx-auto px-4 md:px-8 py-4 md:py-8">
+    <main class="max-w-6xl mx-auto px-4 md:px-8 py-4 md:py-8">
 
-<div th:if="${erreurAuth}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 font-medium" th:text="${erreurAuth}"></div>
+        <div th:if="${erreurAuth}" class="mb-lg p-md rounded-lg bg-red-100 text-red-800 font-medium"
+            th:text="${erreurAuth}"></div>
 
-<form class="bg-white border border-gray-200 rounded-xl p-lg mb-lg flex items-end gap-md" method="get">
-<div>
-<label class="text-xs text-gray-500 block mb-1">Trimestre</label>
-<select class="p-2 border border-gray-300 rounded-lg" name="trimestre" onchange="this.form.submit()">
-<option value="">Tous</option>
-<option th:selected="${trimestreFiltre == 1}" value="1">Trimestre 1</option>
-<option th:selected="${trimestreFiltre == 2}" value="2">Trimestre 2</option>
-<option th:selected="${trimestreFiltre == 3}" value="3">Trimestre 3</option>
-</select>
-</div>
-</form>
+        <form class="bg-white border border-gray-200 rounded-xl p-lg mb-lg flex items-end gap-md" method="get">
+            <div>
+                <label class="text-xs text-gray-500 block mb-1">Trimestre</label>
+                <select class="p-2 border border-gray-300 rounded-lg" name="trimestre" onchange="this.form.submit()">
+                    <option value="">Tous</option>
+                    <option th:selected="${trimestreFiltre == 1}" value="1">Trimestre 1</option>
+                    <option th:selected="${trimestreFiltre == 2}" value="2">Trimestre 2</option>
+                    <option th:selected="${trimestreFiltre == 3}" value="3">Trimestre 3</option>
+                </select>
+            </div>
+        </form>
 
-<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-<table class="w-full text-left text-sm hidden md:table">
-<thead class="bg-gray-50 text-gray-500 uppercase text-xs">
-<tr><th class="px-5 py-3">Eleve</th><th class="px-5 py-3">Matiere</th><th class="px-5 py-3">Type</th><th class="px-5 py-3">Trim.</th><th class="px-5 py-3">Note</th><th class="px-5 py-3">Date</th><th class="px-5 py-3">Statut</th><th class="px-5 py-3 text-right">Actions</th></tr>
-</thead>
-<tbody class="divide-y divide-gray-100">
-<tr th:if="${notes.isEmpty()}">
-<td class="px-5 py-8 text-center text-gray-500" colspan="8">Aucune note enregistree.</td>
-</tr>
-<tr th:each="n : ${notes}">
-<td class="px-5 py-3 font-medium" th:text="${n.eleve != null ? n.eleve.prenom + ' ' + n.eleve.nom : '?'}">Eleve</td>
-<td class="px-5 py-3" th:text="${n.matiere != null ? n.matiere.nom : '?'}">Matiere</td>
-<td class="px-5 py-3 text-gray-500" th:text="${n.type}">Type</td>
-<td class="px-5 py-3" th:text="${n.trimestre}">1</td>
-<td class="px-5 py-3 font-bold text-blue-900" th:text="${n.valeur} + '/20'">--</td>
-<td class="px-5 py-3 text-gray-500" th:text="${n.dateEvaluation != null ? #temporals.format(n.dateEvaluation, 'dd/MM/yyyy') : '--'}">--</td>
-<td class="px-5 py-3">
-<span class="px-2 py-0.5 rounded-full text-xs font-medium" th:classappend="${n.statut == 'PUBLIE'} ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'" th:text="${n.statut}">Statut</span>
-</td>
-<td class="px-5 py-3 text-right">
-<form method="post" th:action="@{/notes/{id}/supprimer(id=${n.id})}" onsubmit="return confirm('Supprimer cette note ?');">
-<button class="text-red-600 hover:underline text-xs" type="submit">Supprimer</button>
-</form>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="md:hidden divide-y divide-gray-100">
-<p class="p-lg text-center text-gray-500 text-sm" th:if="${notes.isEmpty()}">Aucune note enregistree.</p>
-<div class="p-md" th:each="n : ${notes}">
-<div class="flex justify-between items-start mb-xs">
-<p class="font-medium text-sm" th:text="${n.eleve != null ? n.eleve.prenom + ' ' + n.eleve.nom : '?'}">Eleve</p>
-<span class="font-bold text-blue-900 text-sm shrink-0" th:text="${n.valeur} + '/20'">--</span>
-</div>
-<p class="text-xs text-gray-500 mb-sm" th:text="(${n.matiere != null ? n.matiere.nom : '?'}) + ' — ' + ${n.type} + ' — Trim. ' + ${n.trimestre} + (${n.dateEvaluation != null} ? ' — ' + ${#temporals.format(n.dateEvaluation, 'dd/MM/yyyy')} : '')">Details</p>
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded-full text-xs font-medium" th:classappend="${n.statut == 'PUBLIE'} ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'" th:text="${n.statut}">Statut</span>
-<form method="post" th:action="@{/notes/{id}/supprimer(id=${n.id})}" onsubmit="return confirm('Supprimer cette note ?');">
-<button class="text-red-600 text-xs font-bold uppercase" type="submit">Supprimer</button>
-</form>
-</div>
-</div>
-</div>
-</div>
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <table class="w-full text-left text-sm hidden md:table">
+                <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                    <tr>
+                        <th class="px-5 py-3">Eleve</th>
+                        <th class="px-5 py-3">Matiere</th>
+                        <th class="px-5 py-3">Type</th>
+                        <th class="px-5 py-3">Trim.</th>
+                        <th class="px-5 py-3">Note</th>
+                        <th class="px-5 py-3">Date</th>
+                        <th class="px-5 py-3">Statut</th>
+                        <th class="px-5 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr th:if="${notes.isEmpty()}">
+                        <td class="px-5 py-8 text-center text-gray-500" colspan="8">Aucune note enregistree.</td>
+                    </tr>
+                    <tr th:each="n : ${notes}">
+                        <td class="px-5 py-3 font-medium"
+                            th:text="${n.eleve != null ? n.eleve.prenom + ' ' + n.eleve.nom : '?'}">Eleve</td>
+                        <td class="px-5 py-3" th:text="${n.matiere != null ? n.matiere.nom : '?'}">Matiere</td>
+                        <td class="px-5 py-3 text-gray-500" th:text="${n.type}">Type</td>
+                        <td class="px-5 py-3" th:text="${n.trimestre}">1</td>
+                        <td class="px-5 py-3 font-bold text-blue-900" th:text="${n.valeur} + '/20'">--</td>
+                        <td class="px-5 py-3 text-gray-500"
+                            th:text="${n.dateEvaluation != null ? #temporals.format(n.dateEvaluation, 'dd/MM/yyyy') : '--'}">
+                            --</td>
+                        <td class="px-5 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                th:classappend="${n.statut == 'PUBLIE'} ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'"
+                                th:text="${n.statut}">Statut</span>
+                        </td>
+                        <td class="px-5 py-3 text-right">
+                            <form method="post" th:action="@{/notes/{id}/supprimer(id=${n.id})}"
+                                onsubmit="return confirm('Supprimer cette note ?');">
+                                <button class="text-red-600 hover:underline text-xs" type="submit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="md:hidden divide-y divide-gray-100">
+                <p class="p-lg text-center text-gray-500 text-sm" th:if="${notes.isEmpty()}">Aucune note enregistree.
+                </p>
+                <div class="p-md" th:each="n : ${notes}">
+                    <div class="flex justify-between items-start mb-xs">
+                        <p class="font-medium text-sm"
+                            th:text="${n.eleve != null ? n.eleve.prenom + ' ' + n.eleve.nom : '?'}">Eleve</p>
+                        <span class="font-bold text-blue-900 text-sm shrink-0" th:text="${n.valeur} + '/20'">--</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-sm"
+                        th:text="(${n.matiere != null ? n.matiere.nom : '?'}) + ' — ' + ${n.type} + ' — Trim. ' + ${n.trimestre} + (${n.dateEvaluation != null} ? ' — ' + ${#temporals.format(n.dateEvaluation, 'dd/MM/yyyy')} : '')">
+                        Details</p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                            th:classappend="${n.statut == 'PUBLIE'} ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'"
+                            th:text="${n.statut}">Statut</span>
+                        <form method="post" th:action="@{/notes/{id}/supprimer(id=${n.id})}"
+                            onsubmit="return confirm('Supprimer cette note ?');">
+                            <button class="text-red-600 text-xs font-bold uppercase" type="submit">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-</main>
+    </main>
 
-<div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-note">
-<div class="bg-white rounded-xl p-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-<div class="flex justify-between items-center mb-lg">
-<h3 class="font-bold text-lg">Ajouter une note</h3>
-<button onclick="document.getElementById('modal-note').classList.add('hidden')" type="button"><span class="material-symbols-outlined">close</span></button>
-</div>
-<form class="space-y-3" method="post" th:action="@{/notes}">
-<div>
-<label class="text-xs text-gray-500 block mb-1">Eleve</label>
-<select class="w-full p-2 border border-gray-300 rounded-lg" name="eleveId" required="required">
-<option th:each="e : ${eleves}" th:text="${e.nom} + ' ' + ${e.prenom} + ' (' + ${e.matricule} + ')'" th:value="${e.id}"></option>
-</select>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Matiere</label>
-<select class="w-full p-2 border border-gray-300 rounded-lg" name="matiereId" required="required">
-<option th:each="m : ${matieres}" th:text="${m.nom}" th:value="${m.id}"></option>
-</select>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-<div>
-<label class="text-xs text-gray-500 block mb-1">Note (/20)</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" max="20" min="0" name="valeur" required="required" step="0.25" type="number"/>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Coefficient</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" min="0" name="coefficient" step="0.5" type="number"/>
-</div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-<div>
-<label class="text-xs text-gray-500 block mb-1">Type</label>
-<select class="w-full p-2 border border-gray-300 rounded-lg" name="type">
-<option value="DEVOIR">Devoir</option>
-<option value="EXAMEN">Examen</option>
-<option value="PARTICIPATION">Participation</option>
-</select>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Trimestre</label>
-<select class="w-full p-2 border border-gray-300 rounded-lg" name="trimestre">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-</select>
-</div>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Date d'evaluation</label>
-<input class="w-full p-2 border border-gray-300 rounded-lg" name="dateEvaluation" type="date"/>
-</div>
-<div>
-<label class="text-xs text-gray-500 block mb-1">Commentaire</label>
-<textarea class="w-full p-2 border border-gray-300 rounded-lg" name="commentaire" rows="2"></textarea>
-</div>
-<div class="flex justify-end gap-2 pt-2">
-<button class="px-4 py-2 border border-gray-300 rounded-lg" onclick="document.getElementById('modal-note').classList.add('hidden')" type="button">Annuler</button>
-<button class="px-4 py-2 bg-blue-900 text-white rounded-lg" type="submit">Enregistrer</button>
-</div>
-</form>
-</div>
-</div>
+    <div class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-lg" id="modal-note">
+        <div class="bg-white rounded-xl p-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-lg">
+                <h3 class="font-bold text-lg">Ajouter une note</h3>
+                <button onclick="document.getElementById('modal-note').classList.add('hidden')" type="button"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <form class="space-y-3" method="post" th:action="@{/notes}">
+                <div>
+                    <label class="text-xs text-gray-500 block mb-1">Eleve</label>
+                    <select class="w-full p-2 border border-gray-300 rounded-lg" name="eleveId" required="required">
+                        <option th:each="e : ${eleves}"
+                            th:text="${e.nom} + ' ' + ${e.prenom} + ' (' + ${e.matricule} + ')'" th:value="${e.id}">
+                        </option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 block mb-1">Matiere</label>
+                    <select id="matiere-select-notes" class="w-full p-2 border border-gray-300 rounded-lg" name="matiereId" required="required">
+                        <option th:each="m : ${matieres}"
+                            th:attr="data-coefficient=${m.coefficient != null ? m.coefficient : 1}"
+                            th:text="${m.nom}" th:value="${m.id}"></option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Note (/20)</label>
+                        <input class="w-full p-2 border border-gray-300 rounded-lg" max="20" min="0" name="valeur"
+                            required="required" step="0.25" type="number" />
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Coefficient</label>
+                        <input id="coefficient-input-notes" class="w-full p-2 border border-gray-300 rounded-lg" min="0" name="coefficient"
+                            step="0.5" type="number" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Type</label>
+                        <select class="w-full p-2 border border-gray-300 rounded-lg" name="type">
+                            <option value="DEVOIR">Devoir 1</option>
+                            <option value="DEVOIR2">Devoir 2</option>
+                            <option value="DEVOIR3">Devoir 3</option>
+                            <option value="EXAMEN">Examen</option>
+                            <option value="PARTICIPATION">Participation</option>
+                            <option value="TP">Travaux pratiques</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Trimestre</label>
+                        <select class="w-full p-2 border border-gray-300 rounded-lg" name="trimestre">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 block mb-1">Date d'evaluation</label>
+                    <input class="w-full p-2 border border-gray-300 rounded-lg" name="dateEvaluation"
+                        th:value="${T(java.time.LocalDate).now()}" type="date" />
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 block mb-1">Commentaire</label>
+                    <textarea class="w-full p-2 border border-gray-300 rounded-lg" name="commentaire"
+                        rows="2"></textarea>
+                </div>
+                <label class="flex items-center gap-2 text-xs text-amber-800 bg-amber-50 rounded-lg p-2 cursor-pointer">
+                    <input name="confirmerQuota" type="checkbox" value="true" />
+                    Cette matière a déjà atteint son quota de devoirs/examen ce trimestre — enregistrer quand même.
+                </label>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button class="px-4 py-2 border border-gray-300 rounded-lg"
+                        onclick="document.getElementById('modal-note').classList.add('hidden')"
+                        type="button">Annuler</button>
+                    <button class="px-4 py-2 bg-blue-900 text-white rounded-lg" type="submit">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        (function () {
+            var select = document.getElementById('matiere-select-notes');
+            var coef = document.getElementById('coefficient-input-notes');
+            if (!select || !coef) return;
+            function majCoefficient() {
+                var opt = select.options[select.selectedIndex];
+                var c = opt ? opt.getAttribute('data-coefficient') : null;
+                if (c) coef.value = c;
+            }
+            select.addEventListener('change', majCoefficient);
+            majCoefficient();
+        })();
+    </script>
 </body>
+
 </html>

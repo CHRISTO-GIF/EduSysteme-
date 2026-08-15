@@ -44,6 +44,7 @@
     </style>
 </head>
 <body class="bg-background font-body-md text-on-surface antialiased overflow-hidden">
+<div th:if="${erreurMsg}" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-error-container text-on-error-container px-lg py-sm rounded-lg shadow-lg font-label-md text-label-md" th:text="${erreurMsg}"></div>
 <!-- ===================== VERSION MOBILE ===================== -->
 <div class="md:hidden bg-background min-h-screen flex flex-col" id="messagerie-mobile-section" style="height:100dvh;">
 
@@ -391,7 +392,7 @@
 <div th:if="${!#strings.isEmpty(ligne.message.contenu)}" class="flex gap-md max-w-[80%]"
      th:classappend="${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent)} ? 'self-end flex-row-reverse' : ''">
 <div class="w-8 h-8 rounded-full bg-secondary-container shrink-0 flex items-center justify-center self-end border border-outline-variant">
-<span class="material-symbols-outlined text-[16px] text-on-secondary-container" th:text="${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent)} ? 'person' : (contactActif != null and contactActif.role == 'Secretariat' ? 'account_balance' : 'person')">person</span>
+<span class="material-symbols-outlined text-[16px] text-on-secondary-container" th:text="${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent) ? 'person' : (contactActif != null and contactActif.role == 'Secretariat' ? 'account_balance' : 'person')}">person</span>
 </div>
 <div class="flex flex-col gap-xs" th:classappend="${#strings.equalsIgnoreCase(ligne.message.expediteurEmail, emailParent)} ? 'items-end' : ''">
 <div class="p-md rounded-xl shadow-sm"
@@ -482,7 +483,7 @@
 <span class="material-symbols-outlined text-[48px] text-on-secondary-container" th:text="${contactActif != null and contactActif.role == 'Secretariat'} ? 'account_balance' : 'person'">person</span>
 </div>
 <h3 class="font-headline-sm text-headline-sm text-on-surface" th:text="${contactActif != null ? contactActif.nom : correspondantActif}">Nom</h3>
-<p class="text-label-sm text-on-surface-variant uppercase tracking-tighter" th:text="${contactActif != null and contactActif.role == 'Secretariat'} ? 'Etablissement' : (contactActif != null ? contactActif.role : '')">Role</p>
+<p class="text-label-sm text-on-surface-variant uppercase tracking-tighter" th:text="${contactActif != null and contactActif.role == 'Secretariat' ? 'Etablissement' : (contactActif != null ? contactActif.role : '')}">Role</p>
 </div>
 <div class="space-y-xl flex-1 overflow-y-auto">
 <div>

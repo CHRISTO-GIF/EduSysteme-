@@ -59,7 +59,7 @@
 <span class="font-headline-sm text-headline-sm font-bold text-primary">Comptabilite</span>
 </div>
 <div class="flex items-center gap-md md:gap-lg">
-<a class="hidden sm:flex bg-primary-container text-on-primary-container px-md py-sm rounded font-label-md hover:opacity-90 transition-all items-center gap-xs" th:href="@{/export/notes/excel(trimestre=1)}">
+<a class="hidden sm:flex bg-primary-container text-on-primary-container px-md py-sm rounded font-label-md hover:opacity-90 transition-all items-center gap-xs" th:href="@{/export/paiements/excel}">
 <span class="material-symbols-outlined text-[18px]">download</span>
 Exporter
 </a>
@@ -75,12 +75,29 @@ Exporter
 
 <!-- Barre d'onglets -->
 <div class="no-print flex gap-lg border-b border-outline-variant overflow-x-auto">
-<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="journal" onclick="finSwitchTab('journal')" type="button">Journal de caisse</button>
-<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="scolarite" onclick="finSwitchTab('scolarite')" type="button">Scolarite &amp; Arrieres</button>
-<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="depenses" onclick="finSwitchTab('depenses')" type="button">Depenses</button>
-<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="budget" onclick="finSwitchTab('budget')" type="button">Budget</button>
-<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="rapports" onclick="finSwitchTab('rapports')" type="button">Rapports</button>
+<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="journal" onclick="finSwitchTab('journal')" type="button">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span> Journal de caisse
+</button>
+<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="scolarite" onclick="finSwitchTab('scolarite')" type="button">
+<span class="material-symbols-outlined text-[16px]">school</span> Scolarite &amp; Arrieres
+</button>
+<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="depenses" onclick="finSwitchTab('depenses')" type="button">
+<span class="material-symbols-outlined text-[16px]">shopping_cart</span> Depenses
+</button>
+<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="budget" onclick="finSwitchTab('budget')" type="button">
+<span class="material-symbols-outlined text-[16px]">account_balance_wallet</span> Budget
+</button>
+<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="rapports" onclick="finSwitchTab('rapports')" type="button">
+<span class="material-symbols-outlined text-[16px]">description</span> Rapports
+</button>
+<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="statistiques" onclick="finSwitchTab('statistiques')" type="button">
+<span class="material-symbols-outlined text-[16px]">bar_chart</span> Statistiques
+</button>
+<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="parametrage" onclick="finSwitchTab('parametrage')" type="button">
+<span class="material-symbols-outlined text-[16px]">tune</span> Parametrage
+</button>
 </div>
+<p class="no-print text-label-sm text-secondary mt-xs" id="fin-tab-aide">Enregistrez ici les paiements des eleves et les depenses du jour.</p>
 
 <!-- ================= ONGLET JOURNAL DE CAISSE ================= -->
 <div class="fin-tab-panel space-y-lg" data-panel="journal" id="panel-journal">
@@ -110,9 +127,12 @@ Exporter
 <form class="grid grid-cols-2 md:grid-cols-6 gap-sm items-end" id="form-saisie-entree" method="post" th:action="@{/finances/paiements}">
 <div class="flex flex-col gap-xs col-span-2">
 <label class="text-label-sm text-secondary">Eleve</label>
-<select class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="eleveId" required="required">
-<option th:each="e : ${eleves}" th:text="${e.nom} + ' ' + ${e.prenom} + (${e.classe} != null ? ' (' + ${e.classe.niveau} + ')' : '')" th:value="${e.id}"></option>
-</select>
+<input autocomplete="off" class="rounded-lg border-outline-variant px-sm py-2 text-body-md" id="paiement-eleve-recherche" list="liste-eleves-actifs" oninput="finResoudreEleveActif()" placeholder="Tapez un nom..." required="required" type="text"/>
+<input id="paiement-eleve-id" name="eleveId" type="hidden"/>
+<datalist id="liste-eleves-actifs">
+<option th:each="e : ${eleves}" th:value="${e.nom} + ' ' + ${e.prenom} + (${e.classe} != null ? ' (' + ${e.classe.niveau} + ')' : '')"></option>
+</datalist>
+<p class="text-label-sm text-error hidden" id="paiement-eleve-erreur">Choisissez un eleve dans la liste de suggestions.</p>
 </div>
 <div class="flex flex-col gap-xs">
 <label class="text-label-sm text-secondary">Type</label>
@@ -250,7 +270,7 @@ Exporter
 <label class="text-label-sm text-secondary">Eleve</label>
 <input autocomplete="off" class="rounded-lg border-outline-variant px-sm py-2 text-body-md" id="arriere-eleve-recherche" list="liste-eleves" oninput="finResoudreEleve()" placeholder="Tapez un nom..." required="required" type="text"/>
 <datalist id="liste-eleves">
-<option th:each="e : ${eleves}" th:value="${e.nom} + ' ' + ${e.prenom} + (${e.classe} != null ? ' (' + ${e.classe.niveau} + ')' : '')"></option>
+<option th:each="e : ${elevesRecherche}" th:value="${e.nom} + ' ' + ${e.prenom} + (${e.classe} != null ? ' (' + ${e.classe.niveau} + ')' : '')"></option>
 </datalist>
 <p class="text-label-sm text-error hidden" id="arriere-eleve-erreur">Choisissez un eleve dans la liste de suggestions.</p>
 </div>
@@ -299,6 +319,7 @@ Exporter
 </div>
 </div>
 
+<p class="text-label-sm text-secondary" th:text="'Suivi limite aux eleves de l annee scolaire active (' + ${annee} + '). Les arrieres reportes des annees precedentes restent visibles ci-dessus.'"></p>
 <div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden" th:each="entry : ${scolariteParClasse}">
 <div class="p-md bg-surface-container-low border-b border-outline-variant font-headline-sm text-on-surface" th:text="${entry.key}"></div>
 <div class="overflow-x-auto">
@@ -310,7 +331,7 @@ Exporter
 <th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Percu</th>
 <th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Reste</th>
 <th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Statut</th>
-<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Relance</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Actions</th>
 </tr>
 </thead>
 <tbody class="divide-y divide-outline-variant/30">
@@ -325,10 +346,17 @@ Exporter
 <span class="px-sm py-xs rounded-full text-label-sm font-bold bg-red-50 text-red-700" th:if="${l.statut == 'EN_RETARD'}">En retard</span>
 </td>
 <td class="px-lg py-sm">
+<div class="flex items-center gap-md flex-wrap">
+<button class="btn-regler-eleve flex items-center gap-xs text-primary hover:underline text-label-sm font-bold" th:data-eleve-id="${l.eleve.id}"
+        th:data-eleve-label="${l.eleve.nom} + ' ' + ${l.eleve.prenom} + (${l.eleve.classe} != null ? ' (' + ${l.eleve.classe.niveau} + ')' : '')"
+        th:if="${l.reste > 0}" type="button">
+<span class="material-symbols-outlined text-[16px]">payments</span> Regler
+</button>
 <a class="flex items-center gap-xs text-green-700 hover:underline text-label-sm font-bold" th:href="${l.lienWhatsapp}" th:if="${l.reste > 0 and l.lienWhatsapp != null}" target="_blank">
 <span class="material-symbols-outlined text-[16px]">chat</span> Relancer
 </a>
 <span class="text-label-sm text-secondary" th:if="${l.reste > 0 and l.lienWhatsapp == null}">Pas de numero</span>
+</div>
 </td>
 </tr>
 </tbody>
@@ -595,15 +623,11 @@ Rapport detaille
 <p class="text-label-sm text-secondary uppercase tracking-wider">Solde theorique (a ce jour)</p>
 <p class="font-bold text-headline-sm text-on-surface" th:text="${#numbers.formatDecimal(rapportSoldeTheorique, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</p>
 </div>
-<form class="flex items-end gap-sm" method="post" th:action="@{/finances/parametres/solde-initial}">
-<input name="tab" type="hidden" value="rapports"/>
-<input id="solde-initial-brut" name="montant" th:value="${#numbers.formatDecimal(soldeInitialCaisse, 1, 'NONE', 0, 'POINT')}" type="hidden"/>
-<div class="flex flex-col gap-xs">
-<label class="text-label-sm text-secondary">Solde initial de caisse (debut d'annee)</label>
-<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md w-64" inputmode="numeric" oninput="finFormatMontant(this, 'solde-initial-brut')" th:value="${#numbers.formatDecimal(soldeInitialCaisse, 0, 'COMMA', 0, 'POINT')}" type="text"/>
+<div>
+<p class="text-label-sm text-secondary uppercase tracking-wider">Solde initial de caisse (debut d'annee)</p>
+<p class="font-bold text-headline-sm text-on-surface" th:text="${#numbers.formatDecimal(soldeInitialCaisse, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</p>
+<a class="text-label-sm text-primary hover:underline" th:href="@{/finances(tab='parametrage')}">Modifier dans Parametrage</a>
 </div>
-<button class="px-md py-2 bg-secondary text-on-secondary rounded-lg font-label-md" type="submit">Mettre a jour</button>
-</form>
 </div>
 <form class="flex flex-wrap items-end gap-sm mb-lg" method="post" th:action="@{/finances/comptages}">
 <input id="comptage-solde-brut" name="soldeCompte" type="hidden"/>
@@ -868,10 +892,147 @@ Rapport detaille
 </div>
 </div>
 
-<!-- Classification des postes comptables (Fournitures scolaires / Entretien-Salubrite / Fonctionnement / Investissement) -->
-<div class="no-print bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
-<h4 class="font-headline-sm text-on-surface mb-xs">Classification des postes (rapport econome)</h4>
-<p class="text-label-sm text-secondary mb-md">Determine dans quel groupe chaque poste comptable apparait dans le rapport trimestriel ci-dessus. Modifiable a tout moment.</p>
+<p class="text-label-sm text-secondary" th:if="${!categoriesCharges.isEmpty()}">
+La classification des postes comptables (utilisee pour ce rapport trimestriel) se configure desormais dans
+<a class="text-primary hover:underline" th:href="@{/finances(tab='parametrage')}">l'onglet Parametrage</a>.
+</p>
+
+</div>
+
+<!-- ================= ONGLET STATISTIQUES ================= -->
+<div class="fin-tab-panel hidden space-y-lg" data-panel="statistiques" id="panel-statistiques">
+
+<div>
+<h3 class="font-headline-sm text-on-surface">Vue d'ensemble visuelle</h3>
+<p class="text-body-md text-secondary" th:text="'Annee scolaire ' + ${annee} + ' — courbe de tresorerie, entrees/sorties et repartition des depenses, visibles en un instant.'">Vue d'ensemble</p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Solde de caisse actuel</p>
+<h3 class="text-headline-md font-bold" th:classappend="${statSoldeActuel >= 0} ? 'text-on-surface' : 'text-error'" th:text="${#numbers.formatDecimal(statSoldeActuel, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Total produits (annee)</p>
+<h3 class="text-headline-md font-bold text-green-700" th:text="${#numbers.formatDecimal(totalProduitsAnnee, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Total charges (annee)</p>
+<h3 class="text-headline-md font-bold text-error" th:text="${#numbers.formatDecimal(totalChargesAnnee, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</h3>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Budget utilise</p>
+<h3 class="text-headline-md font-bold text-on-surface" th:text="${tauxBudgetUtiliseDep} + ' %'">0 %</h3>
+</div>
+</div>
+
+<!-- Courbe : evolution du solde de caisse -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h4 class="font-headline-sm text-on-surface mb-xs">Courbe — Evolution du solde de caisse</h4>
+<p class="text-label-sm text-secondary mb-md">Solde de caisse cumule, mois par mois, sur l'annee scolaire.</p>
+<div class="relative h-64">
+<div class="absolute top-0 left-0 text-label-sm text-secondary" th:text="${#numbers.formatDecimal(statSoldeMax, 0, 'COMMA', 0, 'POINT')} + ' F'"></div>
+<div class="absolute bottom-8 left-0 text-label-sm text-secondary" th:text="${#numbers.formatDecimal(statSoldeMin, 0, 'COMMA', 0, 'POINT')} + ' F'"></div>
+<svg class="w-full h-56" preserveAspectRatio="none" viewBox="0 0 100 40">
+<polygon fill="#00236f" opacity="0.08" th:points="${statCourbePoints} + ' 100,40 0,40'"></polygon>
+<polyline fill="none" stroke="#00236f" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" th:points="${statCourbePoints}" vector-effect="non-scaling-stroke"></polyline>
+</svg>
+<div class="flex justify-between mt-xs">
+<span class="text-label-sm text-secondary flex-1 text-center" th:each="p : ${evolutionAnnuelle}" th:text="${p.mois}"></span>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<!-- Histogramme : entrees vs sorties -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h4 class="font-headline-sm text-on-surface mb-md">Histogramme — Entrees vs Sorties par mois</h4>
+<div class="h-56 flex items-end justify-between gap-xs">
+<div class="flex-1 flex flex-col items-center gap-xs h-full justify-end" th:each="p : ${evolutionAnnuelle}">
+<div class="w-full flex gap-1 items-end justify-center h-full pb-base">
+<div class="w-3 bg-primary rounded-t-sm" th:style="'height:' + (${p.entrees} / ${maxEvolutionAnnuelle} * 100) + '%'" th:title="${p.mois} + ' Entrees : ' + ${#numbers.formatDecimal(p.entrees, 0, 'COMMA', 0, 'POINT')} + ' F'"></div>
+<div class="w-3 bg-error rounded-t-sm" th:style="'height:' + (${p.sorties} / ${maxEvolutionAnnuelle} * 100) + '%'" th:title="${p.mois} + ' Sorties : ' + ${#numbers.formatDecimal(p.sorties, 0, 'COMMA', 0, 'POINT')} + ' F'"></div>
+</div>
+<span class="text-label-sm" th:text="${p.mois}"></span>
+</div>
+</div>
+<div class="flex items-center gap-lg mt-md justify-center">
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-primary"></span><span class="text-label-sm text-secondary">Entrees</span></div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-error"></span><span class="text-label-sm text-secondary">Sorties</span></div>
+</div>
+</div>
+
+<!-- Secteur : repartition des depenses -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h4 class="font-headline-sm text-on-surface mb-md">Secteur — Repartition des depenses par categorie</h4>
+<p class="text-body-md text-secondary text-center" th:if="${repartitionChargesAnnee.isEmpty()}">Aucune charge enregistree cette annee.</p>
+<div class="relative w-40 h-40 mx-auto mb-md" th:if="${!repartitionChargesAnnee.isEmpty()}">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#e2e8f0" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" th:attr="stroke=${iter.index == 0 ? '#00236f' : (iter.index == 1 ? '#12b5c9' : (iter.index == 2 ? '#f5a623' : (iter.index == 3 ? '#ba1a1a' : (iter.index == 4 ? '#1e3a8a' : '#757682'))))}, stroke-dasharray=${r.pourcentage + ' ' + (100 - r.pourcentage)}, stroke-dashoffset=${r.offsetCumule}" stroke-width="4" th:each="r, iter : ${repartitionChargesAnnee}"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-label-sm text-outline">Charges</span>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex items-center justify-between text-label-sm" th:each="r, iter : ${repartitionChargesAnnee}">
+<div class="flex items-center gap-xs">
+<span class="w-2.5 h-2.5 rounded-full shrink-0" th:style="'background:' + (${iter.index} == 0 ? '#00236f' : (${iter.index} == 1 ? '#12b5c9' : (${iter.index} == 2 ? '#f5a623' : (${iter.index} == 3 ? '#ba1a1a' : (${iter.index} == 4 ? '#1e3a8a' : '#757682')))))"></span>
+<span th:text="${r.categorie}"></span>
+</div>
+<span class="font-bold" th:text="${#numbers.formatDecimal(r.montant, 0, 'COMMA', 0, 'POINT')} + ' F'"></span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Budget : prevu vs realise -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h4 class="font-headline-sm text-on-surface mb-md">Budget de l'annee — Prevu vs realise</h4>
+<div class="space-y-md">
+<div>
+<div class="flex justify-between text-label-sm mb-xs">
+<span class="text-secondary">Depenses realisees</span>
+<span class="font-bold" th:text="${#numbers.formatDecimal(depenseAnnuelleTotale, 0, 'COMMA', 0, 'POINT')} + ' F sur ' + ${#numbers.formatDecimal(budgetAnnuelPrevu, 0, 'COMMA', 0, 'POINT')} + ' F prevus'"></span>
+</div>
+<div class="w-full h-3 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full rounded-full" th:classappend="${tauxBudgetUtiliseDep <= 100} ? 'bg-primary' : 'bg-error'" th:style="'width:' + (${tauxBudgetUtiliseDep <= 100 ? tauxBudgetUtiliseDep : 100}) + '%'"></div>
+</div>
+</div>
+<p class="text-label-sm text-secondary" th:text="${tauxBudgetUtiliseDep} + '% du budget annuel deja depense. Budget restant : ' + ${#numbers.formatDecimal(budgetRestant, 0, 'COMMA', 0, 'POINT')} + ' F.'"></p>
+</div>
+</div>
+
+</div>
+
+<!-- ================= ONGLET PARAMETRAGE ================= -->
+<div class="fin-tab-panel hidden space-y-lg" data-panel="parametrage" id="panel-parametrage">
+
+<div>
+<h3 class="font-headline-sm text-on-surface">Parametrage de la tresorerie</h3>
+<p class="text-body-md text-secondary">Ces reglages s'appliquent a l'ensemble du module Finances — inutile de demander a l'administrateur pour ces actions courantes.</p>
+</div>
+
+<!-- Solde initial de caisse -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h4 class="font-headline-sm text-on-surface mb-xs">Solde initial de caisse</h4>
+<p class="text-label-sm text-secondary mb-md">Le montant en caisse au tout debut de l'annee scolaire, utilise comme point de depart pour calculer le solde theorique dans l'onglet Rapports.</p>
+<form class="flex flex-wrap items-end gap-sm" method="post" th:action="@{/finances/parametres/solde-initial}">
+<input name="tab" type="hidden" value="parametrage"/>
+<input id="param-solde-initial-brut" name="montant" th:value="${#numbers.formatDecimal(soldeInitialCaisse, 1, 'NONE', 0, 'POINT')}" type="hidden"/>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Montant</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md w-64" inputmode="numeric" oninput="finFormatMontant(this, 'param-solde-initial-brut')" th:value="${#numbers.formatDecimal(soldeInitialCaisse, 0, 'COMMA', 0, 'POINT')}" type="text"/>
+</div>
+<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md" type="submit">Mettre a jour</button>
+</form>
+</div>
+
+<!-- Classification des postes comptables -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h4 class="font-headline-sm text-on-surface mb-xs">Classification des postes comptables</h4>
+<p class="text-label-sm text-secondary mb-md">Determine dans quel groupe chaque poste comptable apparait dans le rapport trimestriel de l'econome. Modifiable a tout moment, sans effet retroactif sur les depenses deja classees.</p>
 <div class="overflow-x-auto border border-outline-variant rounded-lg max-h-96 overflow-y-auto">
 <table class="w-full text-left border-collapse text-sm">
 <thead class="bg-surface-container-low sticky top-0">
@@ -901,6 +1062,41 @@ Rapport detaille
 </div>
 </div>
 
+<!-- Taux de paie par defaut -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h4 class="font-headline-sm text-on-surface mb-xs">Taux de paie par defaut</h4>
+<p class="text-label-sm text-secondary mb-md">Pre-remplissent automatiquement chaque nouveau bulletin de paie (Personnel &gt; Salaires). A ajuster si la reglementation CNPS/IRPP change — sinon, ils restent modifiables au cas par cas sur chaque bulletin.</p>
+<form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-lg" method="post" th:action="@{/finances/parametres/taux-paie}">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">CNPS employe — % du brut (retenue salariale)</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="TAUX_CNPS_EMPLOYE" step="0.1" th:value="${tauxPaie.get('TAUX_CNPS_EMPLOYE')}" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">IRPP — % du net soumis (retenue salariale)</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="TAUX_IRPP" step="0.1" th:value="${tauxPaie.get('TAUX_IRPP')}" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Taxe d'apprentissage — % (charge patronale)</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="TAUX_TAXE_APPRENTISSAGE" step="0.1" th:value="${tauxPaie.get('TAUX_TAXE_APPRENTISSAGE')}" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">Taxe forfaitaire — % (charge patronale)</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="TAUX_TAXE_FORFAITAIRE" step="0.1" th:value="${tauxPaie.get('TAUX_TAXE_FORFAITAIRE')}" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">CNPS accident de travail — % du brut (charge patronale)</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="TAUX_CNPS_ACCIDENT_TRAVAIL" step="0.1" th:value="${tauxPaie.get('TAUX_CNPS_ACCIDENT_TRAVAIL')}" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">CNPS allocations familiales — % du brut (charge patronale)</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="TAUX_CNPS_ALLOCATIONS_FAMILIALES" step="0.1" th:value="${tauxPaie.get('TAUX_CNPS_ALLOCATIONS_FAMILIALES')}" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-secondary">CNPS pension vieillesse — % du brut (charge patronale)</label>
+<input class="rounded-lg border-outline-variant px-sm py-2 text-body-md" name="TAUX_CNPS_PENSION_VIEILLESSE" step="0.1" th:value="${tauxPaie.get('TAUX_CNPS_PENSION_VIEILLESSE')}" type="number"/>
+</div>
+<button class="col-span-1 sm:col-span-2 lg:col-span-3 px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md w-fit" type="submit">Enregistrer les taux</button>
+</form>
 </div>
 
 </div>
@@ -908,14 +1104,59 @@ Rapport detaille
 </div>
 
 <script th:inline="javascript">
-    const FIN_TABS = ['journal', 'scolarite', 'depenses', 'budget', 'rapports'];
+    const FIN_TABS = ['journal', 'scolarite', 'depenses', 'budget', 'rapports', 'statistiques', 'parametrage'];
 
     // ----- Recherche intelligente d'eleve (arrieres) -----
     const ELEVES_ARRIERE = [
+        /*[# th:each="e : ${elevesRecherche}"]*/
+        { id: [[${e.id}]], label: [[${e.nom} + ' ' + ${e.prenom} + (${e.classe} != null ? ' (' + ${e.classe.niveau} + ')' : '')]] },
+        /*[/]*/
+    ];
+
+    const ELEVES_ACTIFS = [
         /*[# th:each="e : ${eleves}"]*/
         { id: [[${e.id}]], label: [[${e.nom} + ' ' + ${e.prenom} + (${e.classe} != null ? ' (' + ${e.classe.niveau} + ')' : '')]] },
         /*[/]*/
     ];
+
+    function finResoudreEleveActif() {
+        const input = document.getElementById('paiement-eleve-recherche');
+        const hidden = document.getElementById('paiement-eleve-id');
+        const erreur = document.getElementById('paiement-eleve-erreur');
+        if (!input || !hidden || !erreur) return;
+        const match = ELEVES_ACTIFS.find(function (e) { return e.label === input.value; });
+        hidden.value = match ? match.id : '';
+        erreur.classList.toggle('hidden', !!match || input.value === '');
+    }
+
+    const finFormSaisieEntree = document.getElementById('form-saisie-entree');
+    if (finFormSaisieEntree) {
+        finFormSaisieEntree.addEventListener('submit', function (evt) {
+            const hidden = document.getElementById('paiement-eleve-id');
+            const erreur = document.getElementById('paiement-eleve-erreur');
+            if (hidden && !hidden.value) {
+                evt.preventDefault();
+                if (erreur) erreur.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Bouton "Regler" depuis l'onglet Scolarite : bascule vers le Journal avec l'eleve deja
+    // renseigne dans le formulaire de saisie, pour eviter de le rechercher une seconde fois.
+    document.querySelectorAll('.btn-regler-eleve').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            finSwitchTab('journal');
+            finSaisieMode('entree');
+            const input = document.getElementById('paiement-eleve-recherche');
+            const hidden = document.getElementById('paiement-eleve-id');
+            const erreur = document.getElementById('paiement-eleve-erreur');
+            const form = document.getElementById('form-saisie-entree');
+            if (input) input.value = btn.dataset.eleveLabel;
+            if (hidden) hidden.value = btn.dataset.eleveId;
+            if (erreur) erreur.classList.add('hidden');
+            if (form) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
 
     function finResoudreEleve() {
         const input = document.getElementById('arriere-eleve-recherche');
@@ -948,10 +1189,21 @@ Rapport detaille
         }
     }
 
+    const FIN_TAB_AIDE = {
+        journal: 'Enregistrez ici les paiements des eleves et les depenses du jour.',
+        scolarite: 'Qui doit encore payer, combien, et relancez-le en un clic.',
+        depenses: 'Historique des sorties d argent, classees par categorie comptable.',
+        budget: 'Comparez le budget prevu en debut d annee au budget reellement realise.',
+        rapports: 'Etat de la caisse, comptages physiques et rapports trimestriels a imprimer.',
+        statistiques: 'Courbes et graphiques pour visualiser la sante financiere en un coup d oeil.',
+        parametrage: 'Solde de depart, classification comptable et taux de paie par defaut.'
+    };
+
     function finSwitchTab(tab) {
         FIN_TABS.forEach(function (t) {
             const btn = document.querySelector('.fin-tab-btn[data-tab="' + t + '"]');
             const panel = document.getElementById('panel-' + t);
+            if (!btn || !panel) return;
             if (t === tab) {
                 btn.classList.add('active-tab');
                 panel.classList.remove('hidden');
@@ -960,6 +1212,8 @@ Rapport detaille
                 panel.classList.add('hidden');
             }
         });
+        const aide = document.getElementById('fin-tab-aide');
+        if (aide && FIN_TAB_AIDE[tab]) aide.textContent = FIN_TAB_AIDE[tab];
         const url = new URL(window.location);
         url.searchParams.set('tab', tab);
         window.history.replaceState({}, '', url);

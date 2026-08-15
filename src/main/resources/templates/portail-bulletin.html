@@ -100,9 +100,9 @@
 <p class="font-body-md text-body-md text-secondary mt-xs" th:text="'Trimestre ' + ${trimestre} + (${anneeScolaire != null} ? ' — Annee ' + ${anneeScolaire} : '')">Periode</p>
 </div>
 <div class="flex gap-md">
-<button class="flex items-center gap-xs px-md py-sm bg-surface-container-lowest border border-outline text-secondary font-label-md text-label-sm rounded-lg hover:bg-surface-container-low transition-colors" onclick="window.print()" type="button">
+<a class="flex items-center gap-xs px-md py-sm bg-surface-container-lowest border border-outline text-secondary font-label-md text-label-sm rounded-lg hover:bg-surface-container-low transition-colors" th:href="@{/portail/bulletin/pdf(trimestre=${trimestre})}">
 <span class="material-symbols-outlined text-[18px]">download</span> Exporter en PDF
-</button>
+</a>
 <div class="flex bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
 <a class="px-lg py-2 font-label-md text-label-md transition-colors" th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/portail/bulletin(trimestre=1)}">T1</a>
 <a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{/portail/bulletin(trimestre=2)}">T2</a>
@@ -161,7 +161,10 @@
 <td class="px-lg py-md font-label-md text-label-md text-primary" th:text="${ligne.matiere.nom}">Matiere</td>
 <td class="px-lg py-md text-center" th:text="${ligne.moyenneControleContinu != null} ? ${ligne.moyenneControleContinu} + '/20' : '—'">--</td>
 <td class="px-lg py-md text-center" th:text="${ligne.moyenneExamens != null} ? ${ligne.moyenneExamens} + '/20' : '—'">--</td>
-<td class="px-lg py-md text-center font-bold" th:text="${ligne.moyenne} + '/20'">--</td>
+<td class="px-lg py-md text-center font-bold">
+<div th:text="${ligne.moyenne} + '/20'">--</div>
+<div class="text-[11px] font-normal text-primary" th:if="${ligne.bonus != null}" th:text="'+' + ${ligne.bonus} + ' participation/TP'">+0.25 participation/TP</div>
+</td>
 <td class="px-lg py-md text-center">
 <span class="px-2 py-1 rounded font-bold text-label-sm" th:classappend="${ligne.moyenne >= 12} ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-high text-secondary'" th:text="${ligne.mention}">--</span>
 </td>

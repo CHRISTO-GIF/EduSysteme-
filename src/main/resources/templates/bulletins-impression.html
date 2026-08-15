@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Impression des Bulletins - EduSystem Pro</title>
-<link rel="stylesheet" href="/css/fonts.css">
-<script src="/js/tailwind.js"></script>
-<script id="tailwind-config" th:inline="javascript">
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Impression des Bulletins - EduSystem Pro</title>
+  <link rel="stylesheet" href="/css/fonts.css">
+  <script src="/js/tailwind.js"></script>
+  <script id="tailwind-config" th:inline="javascript">
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -20,278 +21,474 @@
             "on-tertiary": "#ffffff", "on-secondary-fixed": "#0b1c30", "surface-container-highest": "#e0e3e5",
             "surface-variant": "#e0e3e5", "inverse-primary": "#b6c4ff", "on-secondary": "#ffffff",
             "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
-            "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "tertiary": [[${accentColor}]],
+            "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "tertiary": [[${ accentColor }]],
             "surface-tint": "#4059aa", "background": "#f7f9fb", "inverse-surface": "#2d3133",
             "on-tertiary-container": "#a4acc5", "on-surface-variant": "#444651", "tertiary-fixed": "#dae2fd",
             "secondary-fixed-dim": "#b7c8e1", "on-secondary-fixed-variant": "#38485d", "tertiary-fixed-dim": "#bec6e0",
             "error": "#ba1a1a", "primary-fixed-dim": "#b6c4ff", "primary-container": "#1e3a8a",
             "on-primary-container": "#90a8ff", "secondary-fixed": "#d3e4fe", "secondary-container": "#d0e1fb",
-            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d"
+            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d",
+            "on-primary": "#ffffff"
           },
-          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
-          "spacing": {"container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px", "sidebar-width": "260px"},
-          "fontFamily": {"headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+          "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+          "spacing": { "container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px", "sidebar-width": "260px" },
+          "fontFamily": { "headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"] },
           "fontSize": {
-            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
-            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
-            "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
-            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
-            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "headline-sm": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
           }
         }
       }
     }
-</script>
-<style>
-    body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-    .print-area { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); page-break-after: always; }
-    .print-area:last-child { page-break-after: auto; }
-    @media print {
-        body { background: white; padding: 0 !important; margin: 0 !important; }
-        .no-print { display: none !important; }
-        .print-area {
-            box-shadow: none; margin: 0 auto !important; width: 100%; max-width: none;
-            padding: 14px !important;
-        }
-        .print-area .mb-xl { margin-bottom: 6px !important; }
-        .print-area .pb-lg { padding-bottom: 6px !important; }
-        .print-area .p-lg { padding: 6px !important; }
-        .print-area .p-md { padding: 5px !important; }
-        .print-area .gap-xl { gap: 6px !important; }
-        .print-area .gap-lg { gap: 6px !important; }
-        .print-area .space-y-lg > * + * { margin-top: 5px !important; }
-        .print-area .space-y-md > * + * { margin-top: 3px !important; }
-        .print-area .space-y-xs > * + * { margin-top: 1px !important; }
-        .print-area table th, .print-area table td { padding: 3px 8px !important; font-size: 11px !important; }
-        .print-area .pt-xl { padding-top: 6px !important; }
-        .print-area .mt-xl { margin-top: 6px !important; }
-        .print-area .mt-md { margin-top: 4px !important; }
-        .print-area .mb-8, .print-area .mb-lg { margin-bottom: 3px !important; }
-        .print-area .h-16 { height: 20px !important; }
-        .print-area .w-20, .print-area .h-20 { width: 44px !important; height: 44px !important; }
-        .print-area .text-4xl { font-size: 22px !important; line-height: 1.1 !important; }
-        .print-area .text-lg { font-size: 13px !important; }
-        .print-area [class*="text-headline-md"] { font-size: 16px !important; line-height: 1.2 !important; }
-        .print-area [class*="text-headline-sm"] { font-size: 13px !important; line-height: 1.2 !important; }
-        .print-area [class*="text-body-md"] { font-size: 11px !important; }
-        .print-area [class*="text-body-lg"] { font-size: 12px !important; }
-        .print-area [class*="text-label-md"] { font-size: 10px !important; }
-        .print-area [class*="text-label-sm"] { font-size: 9px !important; }
-        .print-area .border-2 { border-width: 1px !important; }
-        .print-area .rounded-xl { border-radius: 6px !important; }
-        .print-area p { margin: 0 !important; }
-        @page { size: A4; margin: 8mm; }
+  </script>
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
     }
-</style>
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    .print-area {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      page-break-after: always;
+    }
+
+    .print-area:last-child {
+      page-break-after: auto;
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body {
+        background: white;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .print-area {
+        box-shadow: none;
+        margin: 0 auto !important;
+        width: 100%;
+        max-width: none;
+        padding: 14px !important;
+      }
+
+      .print-area .mb-xl {
+        margin-bottom: 6px !important;
+      }
+
+      .print-area .pb-lg {
+        padding-bottom: 6px !important;
+      }
+
+      .print-area .p-lg {
+        padding: 6px !important;
+      }
+
+      .print-area .p-md {
+        padding: 5px !important;
+      }
+
+      .print-area .gap-xl {
+        gap: 6px !important;
+      }
+
+      .print-area .gap-lg {
+        gap: 6px !important;
+      }
+
+      .print-area .space-y-lg>*+* {
+        margin-top: 5px !important;
+      }
+
+      .print-area .space-y-md>*+* {
+        margin-top: 3px !important;
+      }
+
+      .print-area .space-y-xs>*+* {
+        margin-top: 1px !important;
+      }
+
+      .print-area table th,
+      .print-area table td {
+        padding: 3px 8px !important;
+        font-size: 11px !important;
+      }
+
+      .print-area .pt-xl {
+        padding-top: 6px !important;
+      }
+
+      .print-area .mt-xl {
+        margin-top: 6px !important;
+      }
+
+      .print-area .mt-md {
+        margin-top: 4px !important;
+      }
+
+      .print-area .mb-8,
+      .print-area .mb-lg {
+        margin-bottom: 3px !important;
+      }
+
+      .print-area .h-16 {
+        height: 20px !important;
+      }
+
+      .print-area .w-20,
+      .print-area .h-20 {
+        width: 44px !important;
+        height: 44px !important;
+      }
+
+      .print-area .text-4xl {
+        font-size: 22px !important;
+        line-height: 1.1 !important;
+      }
+
+      .print-area .text-lg {
+        font-size: 13px !important;
+      }
+
+      .print-area [class*="text-headline-md"] {
+        font-size: 16px !important;
+        line-height: 1.2 !important;
+      }
+
+      .print-area [class*="text-headline-sm"] {
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+      }
+
+      .print-area [class*="text-body-md"] {
+        font-size: 11px !important;
+      }
+
+      .print-area [class*="text-body-lg"] {
+        font-size: 12px !important;
+      }
+
+      .print-area [class*="text-label-md"] {
+        font-size: 10px !important;
+      }
+
+      .print-area [class*="text-label-sm"] {
+        font-size: 9px !important;
+      }
+
+      .print-area .border-2 {
+        border-width: 1px !important;
+      }
+
+      .print-area .rounded-xl {
+        border-radius: 6px !important;
+      }
+
+      .print-area p {
+        margin: 0 !important;
+      }
+
+      @page {
+        size: A4;
+        margin: 8mm;
+      }
+    }
+  </style>
 </head>
+
 <body class="min-h-screen py-lg text-on-surface">
 
-<!-- Barre d'actions (non imprimee) -->
-<div class="max-w-[1000px] mx-auto px-lg no-print flex flex-wrap justify-between items-center gap-md mb-md">
-<a class="text-primary font-bold flex items-center gap-xs hover:underline" th:href="@{/bulletins/options}">
-<span class="material-symbols-outlined">arrow_back</span> Retour
-</a>
-<form class="flex items-end gap-sm bg-surface-container-lowest border border-outline-variant rounded-lg p-sm" method="get">
-<div>
-<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Classe</label>
-<select class="p-2 border border-outline-variant rounded-lg font-body-md text-body-md" name="classeId" onchange="this.form.submit()">
-<option value="">Toutes les classes</option>
-<option th:each="c : ${classes}" th:selected="${classeId != null and classeId == c.id}" th:text="${c.nom}" th:value="${c.id}"></option>
-</select>
-</div>
-<div>
-<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Trimestre</label>
-<select class="p-2 border border-outline-variant rounded-lg font-body-md text-body-md" name="trimestre" onchange="this.form.submit()">
-<option th:each="t : ${trimestres}" th:selected="${trimestre == t}" th:text="'Trimestre ' + ${t}" th:value="${t}"></option>
-</select>
-</div>
-</form>
-<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center gap-xs hover:opacity-90 transition-all shadow-sm" onclick="window.print()" type="button">
-<span class="material-symbols-outlined text-[18px]">print</span> Imprimer tout (<span th:text="${bulletins.size()}">0</span>)
-</button>
-</div>
+  <!-- Barre d'actions (non imprimee) -->
+  <div class="max-w-[1000px] mx-auto px-lg no-print flex flex-wrap justify-between items-center gap-md mb-md">
+    <a class="text-primary font-bold flex items-center gap-xs hover:underline" th:href="@{/bulletins/options}">
+      <span class="material-symbols-outlined">arrow_back</span> Retour
+    </a>
+    <form class="flex items-end gap-sm bg-surface-container-lowest border border-outline-variant rounded-lg p-sm"
+      method="get">
+      <div>
+        <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Classe</label>
+        <select class="p-2 border border-outline-variant rounded-lg font-body-md text-body-md" name="classeId"
+          onchange="this.form.submit()">
+          <option value="">Toutes les classes</option>
+          <option th:each="c : ${classes}" th:selected="${classeId != null and classeId == c.id}" th:text="${c.nom}"
+            th:value="${c.id}"></option>
+        </select>
+      </div>
+      <div>
+        <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Trimestre</label>
+        <select class="p-2 border border-outline-variant rounded-lg font-body-md text-body-md" name="trimestre"
+          onchange="this.form.submit()">
+          <option th:each="t : ${trimestres}" th:selected="${trimestre == t}" th:text="'Trimestre ' + ${t}"
+            th:value="${t}"></option>
+        </select>
+      </div>
+    </form>
+    <button
+      class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center gap-xs hover:opacity-90 transition-all shadow-sm"
+      onclick="window.print()" type="button">
+      <span class="material-symbols-outlined text-[18px]">print</span> Imprimer tout (<span
+        th:text="${bulletins.size()}">0</span>)
+    </button>
+  </div>
 
-<div th:if="${bulletins.isEmpty()}" class="max-w-[1000px] mx-auto bg-white border border-outline-variant rounded-xl p-xl text-center text-on-surface-variant">
-Aucun élève trouvé pour cette sélection.
-</div>
+  <div th:if="${bulletins.isEmpty()}"
+    class="max-w-[1000px] mx-auto bg-white border border-outline-variant rounded-xl p-xl text-center text-on-surface-variant">
+    Aucun élève trouvé pour cette sélection.
+  </div>
 
-<!-- Un bulletin complet par eleve, meme format que le bulletin individuel -->
-<div class="max-w-[1000px] mx-auto bg-white border border-outline-variant p-xl print-area relative overflow-hidden mb-lg" th:each="b : ${bulletins}">
+  <!-- Un bulletin complet par eleve, meme format que le bulletin individuel -->
+  <div
+    class="max-w-[1000px] mx-auto bg-white border border-outline-variant p-xl print-area relative overflow-hidden mb-lg"
+    th:each="b : ${bulletins}">
 
-<!-- Entete etablissement -->
-<div class="flex flex-col md:flex-row justify-between items-start gap-lg mb-xl border-b-2 border-primary pb-lg">
-<div class="flex items-center gap-lg">
-<div class="w-20 h-20 bg-primary rounded-xl flex items-center justify-center overflow-hidden shrink-0">
-<img class="w-full h-full object-contain" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
-<span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;" th:if="${logoPath == null}">school</span>
-</div>
-<div>
-<h2 class="font-headline-md text-headline-md text-primary tracking-tight" th:text="${#strings.toUpperCase(nomEtab)}">ETABLISSEMENT</h2>
-<p class="font-body-md text-body-md text-on-surface-variant italic mb-1" th:if="${devise != null and !devise.isEmpty()}" th:text="'« ' + ${devise} + ' »'">Devise</p>
-<p class="font-label-md text-label-md text-on-surface-variant" th:if="${adresseEtab != null and !adresseEtab.isEmpty()}" th:text="${adresseEtab} + (${emailEtab != null and !emailEtab.isEmpty()} ? ' • ' + emailEtab : '')">Adresse</p>
-</div>
-</div>
-<div class="text-left md:text-right shrink-0">
-<h3 class="font-headline-sm text-headline-sm text-on-surface" th:text="'ANNÉE SCOLAIRE ' + ${b.anneeScolaire}">Annee</h3>
-<div class="inline-block mt-1 px-md py-1 bg-secondary-container text-on-secondary-container rounded font-label-md text-label-md" th:text="${trimestre == 1 ? 'PREMIER' : (trimestre == 2 ? 'DEUXIEME' : 'TROISIEME')} + ' TRIMESTRE'">TRIMESTRE</div>
-</div>
-</div>
+    <!-- Entete etablissement -->
+    <div class="flex flex-col md:flex-row justify-between items-start gap-lg mb-xl border-b-2 border-primary pb-lg">
+      <div class="flex items-center gap-lg">
+        <div class="w-20 h-20 bg-primary rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+          <img class="w-full h-full object-contain" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}" />
+          <span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;"
+            th:if="${logoPath == null}">school</span>
+        </div>
+        <div>
+          <h2 class="font-headline-md text-headline-md text-primary tracking-tight"
+            th:text="${#strings.toUpperCase(nomEtab)}">ETABLISSEMENT</h2>
+          <p class="font-body-md text-body-md text-on-surface-variant italic mb-1"
+            th:if="${devise != null and !devise.isEmpty()}" th:text="'« ' + ${devise} + ' »'">Devise</p>
+          <p class="font-label-md text-label-md text-on-surface-variant"
+            th:if="${adresseEtab != null and !adresseEtab.isEmpty()}"
+            th:text="${adresseEtab} + (${emailEtab != null and !emailEtab.isEmpty()} ? ' • ' + emailEtab : '')">Adresse
+          </p>
+        </div>
+      </div>
+      <div class="text-left md:text-right shrink-0">
+        <h3 class="font-headline-sm text-headline-sm text-on-surface" th:text="'ANNÉE SCOLAIRE ' + ${b.anneeScolaire}">
+          Annee</h3>
+        <div
+          class="inline-block mt-1 px-md py-1 bg-secondary-container text-on-secondary-container rounded font-label-md text-label-md"
+          th:text="${trimestre == 1 ? 'PREMIER' : (trimestre == 2 ? 'DEUXIEME' : 'TROISIEME')} + ' TRIMESTRE'">TRIMESTRE
+        </div>
+      </div>
+    </div>
 
-<!-- Profil eleve -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-xl mb-xl bg-surface-container-low p-lg rounded-xl border border-outline-variant/30">
-<div class="md:col-span-2 flex gap-lg">
-<div class="w-20 h-20 bg-white rounded-lg border border-outline-variant overflow-hidden shrink-0 flex items-center justify-center">
-<img class="w-full h-full object-cover" th:if="${b.photoPath != null}" th:src="@{'/uploads/' + ${b.photoPath}}"/>
-<span class="material-symbols-outlined text-outline text-4xl" th:if="${b.photoPath == null}">account_circle</span>
-</div>
-<div class="space-y-xs">
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block">Élève</span>
-<span class="font-headline-sm text-headline-sm font-bold" th:text="${#strings.toUpperCase(b.eleve.nom)} + ' ' + ${b.eleve.prenom}">Eleve</span>
-</div>
-<div class="flex flex-wrap gap-xl mt-1">
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Né(e) le</span>
-<span class="font-body-md text-body-md" th:text="${b.eleve.dateNaissance != null ? #temporals.format(b.eleve.dateNaissance, 'dd/MM/yyyy') : '--'}">--</span>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Sexe</span>
-<span class="font-body-md text-body-md" th:text="${b.eleve.genre != null and !#strings.isEmpty(b.eleve.genre) ? #strings.substring(b.eleve.genre,0,1) : '--'}">--</span>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Identifiant</span>
-<span class="font-body-md text-body-md font-mono" th:text="${b.eleve.matricule}">--</span>
-</div>
-</div>
-</div>
-</div>
-<div class="border-l-0 md:border-l border-outline-variant pl-0 md:pl-lg space-y-md">
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Classe</span>
-<span class="font-headline-sm text-headline-sm" th:text="${b.eleve.classe != null ? b.eleve.classe.nom : '?'}">Classe</span>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Professeur Titulaire</span>
-<span class="font-body-md text-body-md font-semibold" th:text="${b.professeurTitulaire != null ? b.professeurTitulaire.prenom + ' ' + b.professeurTitulaire.nom : 'Non assigné'}">--</span>
-</div>
-</div>
-</div>
+    <!-- Profil eleve -->
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-xl mb-xl bg-surface-container-low p-lg rounded-xl border border-outline-variant/30">
+      <div class="md:col-span-2 flex gap-lg">
+        <div
+          class="w-20 h-20 bg-white rounded-lg border border-outline-variant overflow-hidden shrink-0 flex items-center justify-center">
+          <img class="w-full h-full object-cover" th:if="${b.photoPath != null}"
+            th:src="@{'/uploads/' + ${b.photoPath}}" />
+          <span class="material-symbols-outlined text-outline text-4xl"
+            th:if="${b.photoPath == null}">account_circle</span>
+        </div>
+        <div class="space-y-xs">
+          <div>
+            <span class="font-label-sm text-label-sm text-outline uppercase block">Élève</span>
+            <span class="font-headline-sm text-headline-sm font-bold"
+              th:text="${#strings.toUpperCase(b.eleve.nom)} + ' ' + ${b.eleve.prenom}">Eleve</span>
+          </div>
+          <div class="flex flex-wrap gap-xl mt-1">
+            <div>
+              <span class="font-label-sm text-label-sm text-outline block">Né(e) le</span>
+              <span class="font-body-md text-body-md"
+                th:text="${b.eleve.dateNaissance != null ? #temporals.format(b.eleve.dateNaissance, 'dd/MM/yyyy') : '--'}">--</span>
+            </div>
+            <div>
+              <span class="font-label-sm text-label-sm text-outline block">Sexe</span>
+              <span class="font-body-md text-body-md"
+                th:text="${b.eleve.genre != null and !#strings.isEmpty(b.eleve.genre) ? #strings.substring(b.eleve.genre,0,1) : '--'}">--</span>
+            </div>
+            <div>
+              <span class="font-label-sm text-label-sm text-outline block">Identifiant</span>
+              <span class="font-body-md text-body-md font-mono" th:text="${b.eleve.matricule}">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="border-l-0 md:border-l border-outline-variant pl-0 md:pl-lg space-y-md">
+        <div>
+          <span class="font-label-sm text-label-sm text-outline block">Classe</span>
+          <span class="font-headline-sm text-headline-sm"
+            th:text="${b.eleve.classe != null ? b.eleve.classe.nom : '?'}">Classe</span>
+        </div>
+        <div>
+          <span class="font-label-sm text-label-sm text-outline block">Professeur Titulaire</span>
+          <span class="font-body-md text-body-md font-semibold"
+            th:text="${b.professeurTitulaire != null ? b.professeurTitulaire.prenom + ' ' + b.professeurTitulaire.nom : 'Non assigné'}">--</span>
+        </div>
+      </div>
+    </div>
 
-<!-- Tableau des notes, regroupe par pole -->
-<div class="mb-xl overflow-x-auto rounded-lg border border-outline-variant">
-<table class="w-full text-left border-collapse min-w-[640px]">
-<thead class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm uppercase">
-<tr>
-<th class="px-md py-sm border-b border-outline-variant">Matières</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Coef</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Note /20</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Moy. Cl.</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Min / Max</th>
-<th class="px-md py-sm border-b border-outline-variant">Appréciation des professeurs</th>
-</tr>
-</thead>
-<tbody class="font-body-md text-body-md divide-y divide-outline-variant/30">
-<th:block th:each="entree : ${b.poles}">
-<tr class="bg-surface-container-low font-label-sm text-label-sm uppercase text-primary">
-<td class="px-md py-xs font-bold tracking-wider" colspan="6" th:text="${entree.key}">Pole</td>
-</tr>
-<tr class="hover:bg-surface-bright transition-colors" th:each="ligne : ${entree.value}">
-<td class="px-md py-sm font-semibold" th:text="${ligne.matiere.nom}">Matiere</td>
-<td class="px-md py-sm text-center" th:text="${ligne.matiere.coefficient}">--</td>
-<td class="px-md py-sm text-center font-bold" th:text="${ligne.moyenne}">--</td>
-<td class="px-md py-sm text-center" th:text="${ligne.moyenneClasse}">--</td>
-<td class="px-md py-sm text-center font-label-sm text-label-sm text-on-surface-variant" th:text="${ligne.min} + ' / ' + ${ligne.max}">--</td>
-<td class="px-md py-sm italic text-on-surface-variant" th:text="${#strings.isEmpty(ligne.appreciation) ? '—' : ligne.appreciation}">--</td>
-</tr>
-</th:block>
-<tr th:if="${b.poles.isEmpty()}">
-<td class="px-md py-8 text-center text-outline" colspan="6">Aucune note publiée pour ce trimestre.</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <!-- Tableau des notes, regroupe par pole -->
+    <div class="mb-xl overflow-x-auto rounded-lg border border-outline-variant">
+      <table class="w-full text-left border-collapse min-w-[640px]">
+        <thead class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm uppercase">
+          <tr>
+            <th class="px-md py-sm border-b border-outline-variant">Matières</th>
+            <th class="px-md py-sm border-b border-outline-variant text-center">Coef</th>
+            <th class="px-md py-sm border-b border-outline-variant text-center">DEV 1</th>
+            <th class="px-md py-sm border-b border-outline-variant text-center">DEV 2</th>
+            <th class="px-md py-sm border-b border-outline-variant text-center">DEV 3</th>
+            <th class="px-md py-sm border-b border-outline-variant text-center">EXAMEN</th>
+            <th class="px-md py-sm border-b border-outline-variant text-center">Note /20</th>
+            <th class="px-md py-sm border-b border-outline-variant text-center">Moy. Cl.</th>
+            <th class="px-md py-sm border-b border-outline-variant">Appréciation</th>
+          </tr>
+        </thead>
+        <tbody class="font-body-md text-body-md divide-y divide-outline-variant/30">
+          <th:block th:each="entree : ${b.poles}">
+            <tr class="bg-surface-container-low font-label-sm text-label-sm uppercase text-primary">
+              <td class="px-md py-xs font-bold tracking-wider" colspan="9" th:text="${entree.key}">Pole</td>
+            </tr>
+            <tr class="hover:bg-surface-bright transition-colors" th:each="ligne : ${entree.value}">
+              <td class="px-md py-sm font-semibold" th:text="${ligne.matiere.nom}">Matiere</td>
+              <td class="px-md py-sm text-center" th:text="${ligne.matiere.coefficient}">--</td>
+              <td class="px-md py-sm text-center font-bold"
+                th:text="${ligne.moyenneDevoir1 != null ? ligne.moyenneDevoir1 : '—'}">--</td>
+              <td class="px-md py-sm text-center font-bold"
+                th:text="${ligne.moyenneDevoir2 != null ? ligne.moyenneDevoir2 : '—'}">--</td>
+              <td class="px-md py-sm text-center font-bold"
+                th:text="${ligne.moyenneDevoir3 != null ? ligne.moyenneDevoir3 : '—'}">--</td>
+              <td class="px-md py-sm text-center font-bold"
+                th:text="${ligne.moyenneExamens != null ? ligne.moyenneExamens : '—'}">--</td>
+              <td class="px-md py-sm text-center font-bold">
+                <span th:text="${ligne.moyenne}">--</span>
+                <span class="block text-[9px] font-normal text-emerald-700" th:if="${ligne.bonus != null}" th:text="'+' + ${ligne.bonus}">+0.25</span>
+              </td>
+              <td class="px-md py-sm text-center" th:text="${ligne.moyenneClasse}">--</td>
+              <td class="px-md py-sm italic text-on-surface-variant"
+                th:text="${#strings.isEmpty(ligne.appreciation) ? '—' : ligne.appreciation}">--</td>
+            </tr>
+          </th:block>
+          <tr th:if="${b.poles.isEmpty()}">
+            <td class="px-md py-8 text-center text-outline" colspan="9">Aucune note publiée pour ce trimestre.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<!-- Synthese -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-xl mb-xl">
-<div class="space-y-lg">
-<div class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between">
-<div>
-<span class="font-label-sm text-label-sm opacity-80 block">MOYENNE GÉNÉRALE</span>
-<span class="text-4xl font-bold" th:text="${b.moyenneGenerale} + ' / 20'">--</span>
-<span class="block mt-1 px-sm py-0.5 bg-white/15 rounded font-label-sm text-label-sm w-fit" th:text="${b.mention}">--</span>
-</div>
-<div class="text-right">
-<span class="font-label-sm text-label-sm opacity-80 block">RANG</span>
-<span class="text-4xl font-bold" th:text="${b.rang}">--</span><span class="text-lg font-normal" th:text="' / ' + ${b.effectif}">/--</span>
-</div>
-</div>
-<div class="border border-outline-variant p-md rounded-xl space-y-sm bg-surface-bright">
-<div class="flex justify-between font-label-md text-label-md">
-<span>Absences justifiées :</span>
-<span class="font-bold" th:text="${b.absencesJustifiees} + (${b.absencesJustifiees > 1} ? ' jours' : ' jour')">0</span>
-</div>
-<div class="flex justify-between font-label-md text-label-md">
-<span>Absences non justifiées :</span>
-<span class="font-bold" th:classappend="${b.absencesNonJustifiees > 0} ? 'text-error' : ''" th:text="${b.absencesNonJustifiees} + (${b.absencesNonJustifiees > 1} ? ' jours' : ' jour')">0</span>
-</div>
-<div class="flex justify-between font-label-md text-label-md">
-<span>Conduite &amp; Comportement :</span>
-<span class="text-primary font-bold" th:text="${b.conduite != null ? b.conduite.evaluation : 'Non renseignée'}">--</span>
-</div>
-<div class="flex justify-between font-label-md text-label-md">
-<span>Moyenne Classe :</span>
-<span class="font-semibold" th:text="${b.moyenneClasseGenerale} + ' / 20'">--</span>
-</div>
-</div>
-</div>
+    <!-- Synthese -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-xl mb-xl">
+      <div class="space-y-lg">
+        <div class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between">
+          <div>
+            <span class="font-label-sm text-label-sm opacity-80 block">MOYENNE GÉNÉRALE</span>
+            <span class="text-4xl font-bold" th:text="${b.moyenneGenerale} + ' / 20'">--</span>
+            <span class="block mt-1 px-sm py-0.5 bg-white/15 rounded font-label-sm text-label-sm w-fit"
+              th:text="${b.mention}">--</span>
+          </div>
+          <div class="text-right">
+            <span class="font-label-sm text-label-sm opacity-80 block">RANG</span>
+            <span class="text-4xl font-bold" th:text="${b.rang}">--</span><span class="text-lg font-normal"
+              th:text="' / ' + ${b.effectif}">/--</span>
+          </div>
+        </div>
+        <div class="border border-outline-variant p-md rounded-xl space-y-sm bg-surface-bright">
+          <div class="flex justify-between font-label-md text-label-md">
+            <span>Moyenne devoirs / contrôle continu :</span>
+            <span class="font-bold"
+              th:text="${b.moyenneControleContinu != null ? b.moyenneControleContinu + ' / 20' : '—'}">—</span>
+          </div>
+          <div class="flex justify-between font-label-md text-label-md">
+            <span>Moyenne examens :</span>
+            <span class="font-bold" th:text="${b.moyenneExamens != null ? b.moyenneExamens + ' / 20' : '—'}">—</span>
+          </div>
+          <div class="flex justify-between font-label-md text-label-md">
+            <span>Absences justifiées :</span>
+            <span class="font-bold"
+              th:text="${b.absencesJustifiees} + (${b.absencesJustifiees > 1} ? ' jours' : ' jour')">0</span>
+          </div>
+          <div class="flex justify-between font-label-md text-label-md">
+            <span>Absences non justifiées :</span>
+            <span class="font-bold" th:classappend="${b.absencesNonJustifiees > 0 ? 'text-error' : ''}"
+              th:text="${b.absencesNonJustifiees} + (${b.absencesNonJustifiees > 1} ? ' jours' : ' jour')">0</span>
+          </div>
+          <div class="flex justify-between font-label-md text-label-md">
+            <span>Conduite &amp; Comportement :</span>
+            <span class="text-primary font-bold"
+              th:text="${b.conduite != null ? b.conduite.evaluation : 'Non renseignée'}">--</span>
+          </div>
+          <div class="flex justify-between font-label-md text-label-md">
+            <span>Moyenne Classe :</span>
+            <span class="font-semibold" th:text="${b.moyenneClasseGenerale} + ' / 20'">--</span>
+          </div>
+        </div>
+      </div>
 
-<div class="border-2 border-primary/20 p-lg rounded-xl relative">
-<span class="absolute -top-3 left-6 bg-white px-md font-label-md text-label-md text-primary uppercase font-bold">Observations du Conseil</span>
-<p class="font-body-md text-body-md leading-relaxed mt-2 text-on-surface-variant" th:text="${b.appreciation}">Appreciation</p>
-<div class="mt-lg flex gap-2 flex-wrap" th:if="${b.felicitations or b.tableauHonneur}">
-<span class="px-md py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-label-sm text-label-sm" th:if="${b.felicitations}">Félicitations</span>
-<span class="px-md py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full font-label-sm text-label-sm" th:if="${b.tableauHonneur}">Tableau d'Honneur</span>
-</div>
-</div>
-</div>
+      <div class="border-2 border-primary/20 p-lg rounded-xl relative">
+        <span
+          class="absolute -top-3 left-6 bg-white px-md font-label-md text-label-md text-primary uppercase font-bold">Observations
+          du Conseil</span>
+        <p class="font-body-md text-body-md leading-relaxed mt-2 text-on-surface-variant" th:text="${b.appreciation}">
+          Appreciation</p>
+        <div class="mt-lg flex gap-2 flex-wrap" th:if="${b.felicitations or b.tableauHonneur}">
+          <span
+            class="px-md py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-label-sm text-label-sm"
+            th:if="${b.felicitations}">Félicitations</span>
+          <span
+            class="px-md py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full font-label-sm text-label-sm"
+            th:if="${b.tableauHonneur}">Tableau d'Honneur</span>
+        </div>
+      </div>
+    </div>
 
-<!-- Signatures -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-xl pt-xl border-t border-outline-variant text-center">
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block mb-8">L'Élève / Parent</span>
-<div class="h-16 flex items-center justify-center">
-<span class="font-label-sm text-label-sm text-outline-variant italic">(Signature)</span>
-</div>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block mb-8">Le Professeur Titulaire</span>
-<div class="h-16 flex flex-col items-center justify-center">
-<span class="font-label-sm text-label-sm text-outline-variant italic" th:if="${b.professeurTitulaire == null}">(Signature)</span>
-<span class="font-medium mt-2" th:if="${b.professeurTitulaire != null}" th:text="${b.professeurTitulaire.prenom} + ' ' + ${b.professeurTitulaire.nom}">--</span>
-</div>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block mb-8">Le Chef d'Établissement</span>
-<div class="h-16 flex flex-col items-center justify-center">
-<span class="font-label-sm text-label-sm text-outline-variant italic" th:if="${chefEtablissement == null}">(Signature)</span>
-<span class="font-bold mt-2" th:if="${chefEtablissement != null}" th:text="${chefEtablissement}">--</span>
-</div>
-</div>
-</div>
+    <!-- Signatures -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-xl pt-xl border-t border-outline-variant text-center">
+      <div>
+        <span class="font-label-sm text-label-sm text-outline uppercase block mb-8">L'Élève / Parent</span>
+        <div class="h-16 flex items-center justify-center">
+          <span class="font-label-sm text-label-sm text-outline-variant italic">(Signature)</span>
+        </div>
+      </div>
+      <div>
+        <span class="font-label-sm text-label-sm text-outline uppercase block mb-8">Le Professeur Titulaire</span>
+        <div class="h-16 flex flex-col items-center justify-center">
+          <span class="font-label-sm text-label-sm text-outline-variant italic"
+            th:if="${b.professeurTitulaire == null}">(Signature)</span>
+          <span class="font-medium mt-2" th:if="${b.professeurTitulaire != null}"
+            th:text="${b.professeurTitulaire.prenom} + ' ' + ${b.professeurTitulaire.nom}">--</span>
+        </div>
+      </div>
+      <div>
+        <span class="font-label-sm text-label-sm text-outline uppercase block mb-8">Le Chef d'Établissement</span>
+        <div class="h-16 flex flex-col items-center justify-center">
+          <span class="font-label-sm text-label-sm text-outline-variant italic"
+            th:if="${chefEtablissement == null}">(Signature)</span>
+          <span class="font-bold mt-2" th:if="${chefEtablissement != null}" th:text="${chefEtablissement}">--</span>
+        </div>
+      </div>
+    </div>
 
-<!-- Pied de page -->
-<div class="mt-xl pt-md border-t border-outline-variant/30 flex flex-col sm:flex-row justify-between items-center gap-xs font-label-sm text-label-sm text-outline">
-<span th:text="'Émis le : ' + ${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy à HH:mm')}">--</span>
-<span class="font-mono" th:text="'VERIF: ' + ${b.codeVerification}">--</span>
-<div class="flex items-center gap-1">
-<span class="material-symbols-outlined text-sm">shield_lock</span>
-Authentifié par EduSystem Pro
-</div>
-</div>
-</div>
+    <!-- Pied de page -->
+    <div
+      class="mt-xl pt-md border-t border-outline-variant/30 flex flex-col sm:flex-row justify-between items-center gap-xs font-label-sm text-label-sm text-outline">
+      <span th:text="'Émis le : ' + ${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy à HH:mm')}">--</span>
+      <span class="font-mono" th:text="'VERIF: ' + ${b.codeVerification}">--</span>
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-sm">shield_lock</span>
+        Authentifié par EduSystem Pro
+      </div>
+    </div>
+  </div>
 
 </body>
+
 </html>

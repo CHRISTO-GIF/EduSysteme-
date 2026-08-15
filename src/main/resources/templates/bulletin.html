@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title th:text="'Bulletin — ' + ${eleve.prenom} + ' ' + ${eleve.nom}">Bulletin</title>
-<link rel="stylesheet" href="/css/fonts.css">
-<script src="/js/tailwind.js"></script>
-<script id="tailwind-config" th:inline="javascript">
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title th:text="'Bulletin — ' + ${eleve.prenom} + ' ' + ${eleve.nom}">Bulletin</title>
+  <link rel="stylesheet" href="/css/fonts.css">
+  <script src="/js/tailwind.js"></script>
+  <script id="tailwind-config" th:inline="javascript">
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -20,286 +21,380 @@
             "on-tertiary": "#ffffff", "on-secondary-fixed": "#0b1c30", "surface-container-highest": "#e0e3e5",
             "surface-variant": "#e0e3e5", "inverse-primary": "#b6c4ff", "on-secondary": "#ffffff",
             "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
-            "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "tertiary": [[${accentColor}]],
+            "on-secondary-container": "#54647a", "on-primary-fixed": "#00164e", "tertiary": [[${ accentColor }]],
             "surface-tint": "#4059aa", "background": "#f7f9fb", "inverse-surface": "#2d3133",
             "on-tertiary-container": "#a4acc5", "on-surface-variant": "#444651", "tertiary-fixed": "#dae2fd",
             "secondary-fixed-dim": "#b7c8e1", "on-secondary-fixed-variant": "#38485d", "tertiary-fixed-dim": "#bec6e0",
             "error": "#ba1a1a", "primary-fixed-dim": "#b6c4ff", "primary-container": "#1e3a8a",
             "on-primary-container": "#90a8ff", "secondary-fixed": "#d3e4fe", "secondary-container": "#d0e1fb",
-            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d"
+            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d",
+            "on-primary": "#ffffff"
           },
-          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
-          "spacing": {"container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px", "sidebar-width": "260px"},
-          "fontFamily": {"headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+          "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+          "spacing": { "container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px", "sidebar-width": "260px" },
+          "fontFamily": { "headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"] },
           "fontSize": {
-            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
-            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
-            "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
-            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
-            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "headline-sm": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
           }
         }
       }
     }
-</script>
-<style>
-    body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-    .print-area { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
-    @media print {
-        body { background: white; font-size: 12px; }
-        .no-print { display: none !important; }
-        .print-area {
-            box-shadow: none; margin: 0; width: 100%; max-width: none;
-            padding: 14px !important;
-        }
-        .print-area .mb-xl { margin-bottom: 6px !important; }
-        .print-area .pb-lg { padding-bottom: 6px !important; }
-        .print-area .p-lg { padding: 6px !important; }
-        .print-area .p-md { padding: 5px !important; }
-        .print-area .gap-xl { gap: 6px !important; }
-        .print-area .gap-lg { gap: 6px !important; }
-        .print-area .space-y-lg > * + * { margin-top: 5px !important; }
-        .print-area .space-y-md > * + * { margin-top: 3px !important; }
-        .print-area .space-y-xs > * + * { margin-top: 1px !important; }
-        .print-area table th, .print-area table td { padding: 3px 8px !important; font-size: 11px !important; }
-        .print-area .pt-xl { padding-top: 6px !important; }
-        .print-area .mt-xl { margin-top: 6px !important; }
-        .print-area .mt-md { margin-top: 4px !important; }
-        body { padding: 0 !important; margin: 0 !important; }
-        .print-area .border-t { padding-top: 4px !important; }
-        .print-area p { margin: 0 !important; }
-        .print-area .mb-8, .print-area .mb-lg { margin-bottom: 3px !important; }
-        .print-area .h-16 { height: 20px !important; }
-        .print-area .w-20, .print-area .h-20 { width: 44px !important; height: 44px !important; }
-        .print-area .text-4xl { font-size: 22px !important; line-height: 1.1 !important; }
-        .print-area .text-lg { font-size: 13px !important; }
-        .print-area .headline-md, .print-area [class*="text-headline-md"] { font-size: 16px !important; line-height: 1.2 !important; }
-        .print-area [class*="text-headline-sm"] { font-size: 13px !important; line-height: 1.2 !important; }
-        .print-area [class*="text-body-md"] { font-size: 11px !important; }
-        .print-area [class*="text-body-lg"] { font-size: 12px !important; }
-        .print-area [class*="text-label-md"] { font-size: 10px !important; }
-        .print-area [class*="text-label-sm"] { font-size: 9px !important; }
-        .print-area .border-2 { border-width: 1px !important; }
-        .print-area .rounded-xl { border-radius: 6px !important; }
-        @page { size: A4; margin: 8mm; }
+  </script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #eef4f8 0%, #eef6f1 100%);
+      font-family: 'Inter', sans-serif;
+      color: #172337;
     }
-</style>
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    .print-area {
+      box-shadow: 0 12px 40px rgba(30, 54, 93, 0.12);
+      border-radius: 16px;
+      background: white;
+    }
+
+    .bulletin-surface {
+      background: #fff;
+    }
+
+    .report-title {
+      letter-spacing: 0.04em;
+    }
+
+    .light-divider {
+      border-color: #cbd5e1;
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body {
+        background: white;
+        font-size: 12px;
+        padding: 0;
+        margin: 0;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .print-area {
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        margin: 0;
+        width: 100%;
+        max-width: none;
+        padding: 12px !important;
+      }
+
+      .print-area table th,
+      .print-area table td {
+        padding: 4px 6px !important;
+        font-size: 10px !important;
+      }
+
+      .print-area .text-4xl {
+        font-size: 22px !important;
+        line-height: 1.12 !important;
+      }
+
+      @page {
+        size: A4;
+        margin: 8mm;
+      }
+    }
+  </style>
 </head>
+
 <body class="min-h-screen py-lg text-on-surface">
 
-<!-- Barre d'actions (non imprimee) -->
-<div class="max-w-[1000px] mx-auto px-lg no-print flex flex-wrap justify-between items-center gap-md mb-md">
-<a class="text-primary font-bold flex items-center gap-xs hover:underline" th:href="@{${retourUrl}}">
-<span class="material-symbols-outlined">arrow_back</span> Retour
-</a>
-<div class="flex gap-sm items-center">
-<div class="flex bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
-<a class="px-lg py-2 font-label-md text-label-md transition-colors" th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{${baseUrl}(trimestre=1)}">T1</a>
-<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{${baseUrl}(trimestre=2)}">T2</a>
-<a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant" th:classappend="${trimestre == 3} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'" th:href="@{${baseUrl}(trimestre=3)}">T3</a>
-</div>
-<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center gap-xs hover:opacity-90 transition-all shadow-sm" onclick="window.print()" type="button">
-<span class="material-symbols-outlined text-[18px]">print</span> Imprimer le bulletin
-</button>
-</div>
-</div>
+  <div class="max-w-[1100px] mx-auto px-lg no-print flex flex-wrap justify-between items-center gap-md mb-md">
+    <a class="text-primary font-bold flex items-center gap-xs hover:underline" th:href="@{${retourUrl}}">
+      <span class="material-symbols-outlined">arrow_back</span> Retour
+    </a>
+    <div class="flex gap-sm items-center">
+      <div class="flex bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+        <a class="px-lg py-2 font-label-md text-label-md transition-colors"
+          th:classappend="${trimestre == 1} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'"
+          th:href="@{${baseUrl}(trimestre=1)}">T1</a>
+        <a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant"
+          th:classappend="${trimestre == 2} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'"
+          th:href="@{${baseUrl}(trimestre=2)}">T2</a>
+        <a class="px-lg py-2 font-label-md text-label-md transition-colors border-l border-outline-variant"
+          th:classappend="${trimestre == 3} ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'"
+          th:href="@{${baseUrl}(trimestre=3)}">T3</a>
+      </div>
+      <a class="px-lg py-2 border border-outline text-on-surface rounded-lg font-label-md text-label-md flex items-center gap-xs hover:bg-surface-container-low transition-all"
+        th:href="@{${baseUrl} + '/pdf'(trimestre=${trimestre})}">
+        <span class="material-symbols-outlined text-[18px]">download</span> Télécharger en PDF
+      </a>
+      <button
+        class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center gap-xs hover:opacity-90 transition-all shadow-sm"
+        onclick="window.print()" type="button">
+        <span class="material-symbols-outlined text-[18px]">print</span> Imprimer le bulletin
+      </button>
+    </div>
+  </div>
 
-<!-- Bulletin -->
-<div class="max-w-[1000px] mx-auto bg-white border border-outline-variant p-xl print-area relative overflow-hidden">
+  <div class="max-w-[1100px] mx-auto print-area bulletin-surface relative overflow-hidden">
 
-<!-- Entete etablissement -->
-<div class="flex flex-col md:flex-row justify-between items-start gap-lg mb-xl border-b-2 border-primary pb-lg">
-<div class="flex items-center gap-lg">
-<div class="w-20 h-20 bg-primary rounded-xl flex items-center justify-center overflow-hidden shrink-0">
-<img class="w-full h-full object-contain" th:if="${logoPath != null}" th:src="@{'/uploads/' + ${logoPath}}"/>
-<span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;" th:if="${logoPath == null}">school</span>
-</div>
-<div>
-<h2 class="font-headline-md text-headline-md text-primary tracking-tight" th:text="${#strings.toUpperCase(nomEtab)}">ETABLISSEMENT</h2>
-<p class="font-body-md text-body-md text-on-surface-variant italic mb-1" th:if="${devise != null and !devise.isEmpty()}" th:text="'« ' + ${devise} + ' »'">Devise</p>
-<p class="font-label-md text-label-md text-on-surface-variant" th:if="${adresseEtab != null and !adresseEtab.isEmpty()}" th:text="${adresseEtab} + (${emailEtab != null and !emailEtab.isEmpty()} ? ' • ' + emailEtab : '')">Adresse</p>
-</div>
-</div>
-<div class="text-left md:text-right shrink-0">
-<h3 class="font-headline-sm text-headline-sm text-on-surface" th:text="'ANNÉE SCOLAIRE ' + ${anneeScolaire}">Annee</h3>
-<div class="inline-block mt-1 px-md py-1 bg-secondary-container text-on-secondary-container rounded font-label-md text-label-md" th:text="${trimestre == 1 ? 'PREMIER' : (trimestre == 2 ? 'DEUXIEME' : 'TROISIEME')} + ' TRIMESTRE'">TRIMESTRE</div>
-</div>
-</div>
+    <div class="px-xl py-lg border-b border-slate-300 bg-gradient-to-r from-sky-50 to-white">
+      <div class="flex flex-col md:flex-row justify-between gap-xl items-start">
+        <div class="flex items-center gap-lg">
+          <div
+            class="w-24 h-24 rounded-2xl bg-primary flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm">
+            <img class="w-full h-full object-contain" th:if="${logoPath != null}"
+              th:src="@{'/uploads/' + ${logoPath}}" />
+            <span class="material-symbols-outlined text-on-primary text-5xl" style="font-variation-settings: 'FILL' 1;"
+              th:if="${logoPath == null}">school</span>
+          </div>
+          <div>
+            <div class="text-primary font-bold uppercase text-sm tracking-[0.2em]">Bulletin Scolaire</div>
+            <h1 class="report-title text-4xl font-bold text-primary mt-1" th:text="${#strings.toUpperCase(nomEtab)}">Nom
+              Etablissement</h1>
+            <div class="mt-2 text-sm text-slate-500" th:if="${adresseEtab != null and !adresseEtab.isEmpty()}"
+              th:text="${adresseEtab}">Adresse</div>
+            <div class="text-sm text-slate-500" th:if="${emailEtab != null and !emailEtab.isEmpty()}"
+              th:text="${emailEtab}">Email</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Année scolaire</div>
+          <div class="text-xl font-bold text-slate-800 mt-2" th:text="${anneeScolaire}">2026-2027</div>
+          <div class="inline-block mt-3 rounded-full bg-primary px-4 py-2 text-xs font-bold uppercase text-white"
+            th:text="${trimestre == 1 ? 'Premier trimestre' : (trimestre == 2 ? 'Deuxième trimestre' : 'Troisième trimestre')}">
+            Trimestre</div>
+        </div>
+      </div>
+    </div>
 
-<!-- Profil eleve -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-xl mb-xl bg-surface-container-low p-lg rounded-xl border border-outline-variant/30">
-<div class="md:col-span-2 flex gap-lg">
-<div class="w-20 h-20 bg-white rounded-lg border border-outline-variant overflow-hidden shrink-0 flex items-center justify-center">
-<img class="w-full h-full object-cover" th:if="${photoPath != null}" th:src="@{'/uploads/' + ${photoPath}}"/>
-<span class="material-symbols-outlined text-outline text-4xl" th:if="${photoPath == null}">account_circle</span>
-</div>
-<div class="space-y-xs">
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block">Élève</span>
-<span class="font-headline-sm text-headline-sm font-bold" th:text="${#strings.toUpperCase(eleve.nom)} + ' ' + ${eleve.prenom}">Eleve</span>
-</div>
-<div class="flex flex-wrap gap-xl mt-1">
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Né(e) le</span>
-<span class="font-body-md text-body-md" th:text="${eleve.dateNaissance != null ? #temporals.format(eleve.dateNaissance, 'dd/MM/yyyy') : '--'}">--</span>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Sexe</span>
-<span class="font-body-md text-body-md" th:text="${eleve.genre != null and !#strings.isEmpty(eleve.genre) ? #strings.substring(eleve.genre,0,1) : '--'}">--</span>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Identifiant</span>
-<span class="font-body-md text-body-md font-mono" th:text="${eleve.matricule}">--</span>
-</div>
-</div>
-</div>
-</div>
-<div class="border-l-0 md:border-l border-outline-variant pl-0 md:pl-lg space-y-md">
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Classe</span>
-<span class="font-headline-sm text-headline-sm" th:text="${eleve.classe != null ? eleve.classe.nom : '?'}">Classe</span>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline block">Professeur Titulaire</span>
-<span class="font-body-md text-body-md font-semibold" th:text="${professeurTitulaire != null ? professeurTitulaire.prenom + ' ' + professeurTitulaire.nom : 'Non assigné'}">--</span>
-</div>
-</div>
-</div>
+    <section class="px-xl py-xl">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-xl items-center border-b border-slate-200 pb-xl">
+        <div class="md:col-span-3 flex items-center gap-lg">
+          <div
+            class="w-24 h-24 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+            <img class="w-full h-full object-cover" th:if="${photoPath != null}"
+              th:src="@{'/uploads/' + ${photoPath}}" />
+            <span class="material-symbols-outlined text-slate-400 text-5xl"
+              th:if="${photoPath == null}">account_circle</span>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Élève</div>
+            <div class="text-2xl font-bold text-slate-900 mt-1"
+              th:text="${#strings.toUpperCase(eleve.nom)} + ' ' + ${eleve.prenom}">Nom Prénom</div>
+            <div class="mt-3 grid grid-cols-2 md:grid-cols-4 gap-md text-sm">
+              <div>
+                <div class="text-slate-500 uppercase text-[10px] font-bold tracking-wider">Né(e) le</div>
+                <div class="font-semibold text-slate-700"
+                  th:text="${eleve.dateNaissance != null ? #temporals.format(eleve.dateNaissance, 'dd/MM/yyyy') : '--'}">
+                  --</div>
+              </div>
+              <div>
+                <div class="text-slate-500 uppercase text-[10px] font-bold tracking-wider">Sexe</div>
+                <div class="font-semibold text-slate-700"
+                  th:text="${eleve.genre != null and !#strings.isEmpty(eleve.genre) ? #strings.substring(eleve.genre,0,1) : '--'}">
+                  --</div>
+              </div>
+              <div>
+                <div class="text-slate-500 uppercase text-[10px] font-bold tracking-wider">Matricule</div>
+                <div class="font-semibold text-slate-700 font-mono" th:text="${eleve.matricule}">--</div>
+              </div>
+              <div>
+                <div class="text-slate-500 uppercase text-[10px] font-bold tracking-wider">Classe</div>
+                <div class="font-semibold text-slate-700" th:text="${eleve.classe != null ? eleve.classe.nom : '?'}">
+                  Classe</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-slate-50 border border-slate-200 p-lg">
+          <div class="text-xs uppercase font-bold tracking-[0.2em] text-slate-500">Professeur titulaire</div>
+          <div class="text-sm font-bold text-slate-900 mt-2"
+            th:text="${professeurTitulaire != null ? professeurTitulaire.prenom + ' ' + professeurTitulaire.nom : 'Non assigné'}">
+            --</div>
+        </div>
+      </div>
+    </section>
 
-<!-- Tableau des notes, regroupe par pole -->
-<div class="mb-xl overflow-x-auto rounded-lg border border-outline-variant">
-<table class="w-full text-left border-collapse min-w-[640px]">
-<thead class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm uppercase">
-<tr>
-<th class="px-md py-sm border-b border-outline-variant">Matières</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Coef</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Note /20</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Moy. Cl.</th>
-<th class="px-md py-sm border-b border-outline-variant text-center">Min / Max</th>
-<th class="px-md py-sm border-b border-outline-variant">Appréciation des professeurs</th>
-</tr>
-</thead>
-<tbody class="font-body-md text-body-md divide-y divide-outline-variant/30">
-<th:block th:each="entree : ${poles}">
-<tr class="bg-surface-container-low font-label-sm text-label-sm uppercase text-primary">
-<td class="px-md py-xs font-bold tracking-wider" colspan="6" th:text="${entree.key}">Pole</td>
-</tr>
-<tr class="hover:bg-surface-bright transition-colors" th:each="ligne : ${entree.value}">
-<td class="px-md py-sm font-semibold" th:text="${ligne.matiere.nom}">Matiere</td>
-<td class="px-md py-sm text-center" th:text="${ligne.matiere.coefficient}">--</td>
-<td class="px-md py-sm text-center font-bold" th:text="${ligne.moyenne}">--</td>
-<td class="px-md py-sm text-center" th:text="${ligne.moyenneClasse}">--</td>
-<td class="px-md py-sm text-center font-label-sm text-label-sm text-on-surface-variant" th:text="${ligne.min} + ' / ' + ${ligne.max}">--</td>
-<td class="px-md py-sm italic text-on-surface-variant" th:text="${#strings.isEmpty(ligne.appreciation) ? '—' : ligne.appreciation}">--</td>
-</tr>
-</th:block>
-<tr th:if="${poles.isEmpty()}">
-<td class="px-md py-8 text-center text-outline" colspan="6">Aucune note publiée pour ce trimestre.</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <section class="px-xl pb-xl">
+      <div class="overflow-x-auto rounded-2xl border border-slate-200">
+        <table class="w-full border-collapse">
+          <thead class="bg-slate-900 text-white">
+            <tr>
+              <th class="px-md py-sm text-left text-xs uppercase tracking-wider">Matières</th>
+              <th class="px-md py-sm text-center text-xs uppercase tracking-wider">Coef</th>
+              <th class="px-md py-sm text-center text-xs uppercase tracking-wider">DEV 1</th>
+              <th class="px-md py-sm text-center text-xs uppercase tracking-wider">DEV 2</th>
+              <th class="px-md py-sm text-center text-xs uppercase tracking-wider">DEV 3</th>
+              <th class="px-md py-sm text-center text-xs uppercase tracking-wider">EXAMEN</th>
+              <th class="px-md py-sm text-center text-xs uppercase tracking-wider">Note /20</th>
+              <th class="px-md py-sm text-center text-xs uppercase tracking-wider">Moy. Cl.</th>
+              <th class="px-md py-sm text-left text-xs uppercase tracking-wider">Appréciation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <th:block th:each="entree : ${poles}">
+              <tr class="bg-slate-100">
+                <td class="px-md py-sm font-bold uppercase text-primary text-xs" colspan="9" th:text="${entree.key}">
+                  Pôle</td>
+              </tr>
+              <tr class="hover:bg-slate-50" th:each="ligne : ${entree.value}">
+                <td class="px-md py-sm font-semibold text-slate-900" th:text="${ligne.matiere.nom}">Matière</td>
+                <td class="px-md py-sm text-center text-slate-700" th:text="${ligne.matiere.coefficient}">--</td>
+                <td class="px-md py-sm text-center font-bold text-slate-900"
+                  th:text="${ligne.moyenneDevoir1 != null ? ligne.moyenneDevoir1 : '—'}">--</td>
+                <td class="px-md py-sm text-center font-bold text-slate-900"
+                  th:text="${ligne.moyenneDevoir2 != null ? ligne.moyenneDevoir2 : '—'}">--</td>
+                <td class="px-md py-sm text-center font-bold text-slate-900"
+                  th:text="${ligne.moyenneDevoir3 != null ? ligne.moyenneDevoir3 : '—'}">--</td>
+                <td class="px-md py-sm text-center font-bold text-slate-900"
+                  th:text="${ligne.moyenneExamens != null ? ligne.moyenneExamens : '—'}">--</td>
+                <td class="px-md py-sm text-center font-bold text-slate-900">
+                  <span th:text="${ligne.moyenne}">--</span>
+                  <span class="block text-[10px] font-normal text-emerald-700 normal-case" th:if="${ligne.bonus != null}"
+                    th:text="'+' + ${ligne.bonus} + ' participation/TP'">+0.25 participation/TP</span>
+                </td>
+                <td class="px-md py-sm text-center text-slate-700" th:text="${ligne.moyenneClasse}">--</td>
+                <td class="px-md py-sm italic text-slate-600"
+                  th:text="${#strings.isEmpty(ligne.appreciation) ? '—' : ligne.appreciation}">--</td>
+              </tr>
+            </th:block>
+            <tr th:if="${poles.isEmpty()}">
+              <td class="px-md py-8 text-center text-slate-500" colspan="9">Aucune note publiée pour ce trimestre.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-<!-- Synthese -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-xl mb-xl">
-<div class="space-y-lg">
-<div class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between">
-<div>
-<span class="font-label-sm text-label-sm opacity-80 block">MOYENNE GÉNÉRALE</span>
-<span class="text-4xl font-bold" th:text="${moyenneGenerale} + ' / 20'">--</span>
-<span class="block mt-1 px-sm py-0.5 bg-white/15 rounded font-label-sm text-label-sm w-fit" th:text="${mention}">--</span>
-</div>
-<div class="text-right">
-<span class="font-label-sm text-label-sm opacity-80 block">RANG</span>
-<span class="text-4xl font-bold" th:text="${rang}">--</span><span class="text-lg font-normal" th:text="' / ' + ${effectif}">/--</span>
-</div>
-</div>
-<div class="border border-outline-variant p-md rounded-xl space-y-sm bg-surface-bright">
-<div class="flex justify-between font-label-md text-label-md">
-<span>Absences justifiées :</span>
-<span class="font-bold" th:text="${absencesJustifiees} + (${absencesJustifiees > 1} ? ' jours' : ' jour')">0</span>
-</div>
-<div class="flex justify-between font-label-md text-label-md">
-<span>Absences non justifiées :</span>
-<span class="font-bold" th:classappend="${absencesNonJustifiees > 0} ? 'text-error' : ''" th:text="${absencesNonJustifiees} + (${absencesNonJustifiees > 1} ? ' jours' : ' jour')">0</span>
-</div>
-<div class="flex justify-between font-label-md text-label-md">
-<span>Conduite &amp; Comportement :</span>
-<span class="text-primary font-bold" th:text="${conduite != null ? conduite.evaluation : 'Non renseignée'}">--</span>
-</div>
-<div class="flex justify-between font-label-md text-label-md">
-<span>Moyenne Classe :</span>
-<span class="font-semibold" th:text="${moyenneClasseGenerale} + ' / 20'">--</span>
-</div>
-</div>
+    <section class="px-xl pb-xl grid grid-cols-1 md:grid-cols-2 gap-xl">
+      <div class="rounded-2xl bg-primary text-white p-xl">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-[10px] font-bold uppercase tracking-[0.25em] opacity-80">Moyenne générale</div>
+            <div class="text-5xl font-bold mt-3" th:text="${moyenneGenerale} + ' / 20'">--</div>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] font-bold uppercase tracking-[0.25em] opacity-80">Rang</div>
+            <div class="text-4xl font-bold mt-2" th:text="${rang}">--</div>
+            <div class="text-sm opacity-80" th:text="'sur ' + ${effectif}">sur --</div>
+          </div>
+        </div>
+        <div class="mt-7 flex flex-wrap gap-2">
+          <span class="rounded-full border border-white/50 px-3 py-1 text-xs font-bold uppercase"
+            th:text="${mention}">--</span>
+          <span class="rounded-full border border-white/50 px-3 py-1 text-xs font-bold uppercase"
+            th:if="${felicitations}">Félicitations</span>
+          <span class="rounded-full border border-white/50 px-3 py-1 text-xs font-bold uppercase"
+            th:if="${tableauHonneur}">Tableau d'honneur</span>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-slate-50 p-xl">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500">Absences justifiées</span>
+            <span class="font-bold text-slate-900"
+              th:text="${absencesJustifiees} + (${absencesJustifiees > 1} ? ' jours' : ' jour')">0</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500">Absences non justifiées</span>
+            <span class="font-bold" th:classappend="${absencesNonJustifiees > 0} ? 'text-error' : 'text-slate-900'"
+              th:text="${absencesNonJustifiees} + (${absencesNonJustifiees > 1} ? ' jours' : ' jour')">0</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500">Moyenne de classe</span>
+            <span class="font-bold text-slate-900" th:text="${moyenneClasseGenerale} + ' / 20'">--</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500">Conduite &amp; comportement</span>
+            <span class="font-bold text-primary"
+              th:text="${conduite != null ? conduite.evaluation : 'Non renseignée'}">--</span>
+          </div>
+        </div>
+        <form class="mt-6 no-print flex items-end gap-sm" method="post"
+          th:action="@{/bulletins/{id}/conduite(id=${eleve.id})}" th:if="${estAdminOuEnseignant}">
+          <input name="trimestre" th:value="${trimestre}" type="hidden" />
+          <div class="flex-1">
+            <label class="font-label-sm text-label-sm text-outline block mb-1">Évaluer la conduite</label>
+            <select class="w-full p-2 border border-outline-variant rounded-lg font-body-md text-body-md"
+              name="evaluation">
+              <option th:selected="${conduite != null and conduite.evaluation == 'EXCELLENTE'}" value="EXCELLENTE">
+                Excellente</option>
+              <option th:selected="${conduite != null and conduite.evaluation == 'BONNE'}" value="BONNE">Bonne</option>
+              <option th:selected="${conduite != null and conduite.evaluation == 'MOYENNE'}" value="MOYENNE">Moyenne
+              </option>
+              <option th:selected="${conduite != null and conduite.evaluation == 'A_AMELIORER'}" value="A_AMELIORER">À
+                améliorer</option>
+            </select>
+          </div>
+          <button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md"
+            type="submit">Enregistrer</button>
+        </form>
+      </div>
+    </section>
 
-<!-- Formulaire de saisie de la conduite, reserve au personnel -->
-<form class="border border-outline-variant p-md rounded-xl no-print flex items-end gap-sm" method="post" th:action="@{/bulletins/{id}/conduite(id=${eleve.id})}" th:if="${estAdminOuEnseignant}">
-<input name="trimestre" th:value="${trimestre}" type="hidden"/>
-<div class="flex-1">
-<label class="font-label-sm text-label-sm text-outline block mb-1">Évaluer la conduite</label>
-<select class="w-full p-2 border border-outline-variant rounded-lg font-body-md text-body-md" name="evaluation">
-<option th:selected="${conduite != null and conduite.evaluation == 'EXCELLENTE'}" value="EXCELLENTE">Excellente</option>
-<option th:selected="${conduite != null and conduite.evaluation == 'BONNE'}" value="BONNE">Bonne</option>
-<option th:selected="${conduite != null and conduite.evaluation == 'MOYENNE'}" value="MOYENNE">Moyenne</option>
-<option th:selected="${conduite != null and conduite.evaluation == 'A_AMELIORER'}" value="A_AMELIORER">À améliorer</option>
-</select>
-</div>
-<button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md" type="submit">Enregistrer</button>
-</form>
-</div>
+    <section class="px-xl pb-xl">
+      <div class="rounded-2xl border border-slate-300 bg-white p-xl">
+        <div class="text-xs uppercase font-bold tracking-[0.24em] text-primary mb-3">Observations du Conseil</div>
+        <p class="text-sm leading-7 text-slate-700" th:text="${appreciation}">Appreciation</p>
+      </div>
+    </section>
 
-<div class="border-2 border-primary/20 p-lg rounded-xl relative">
-<span class="absolute -top-3 left-6 bg-white px-md font-label-md text-label-md text-primary uppercase font-bold">Observations du Conseil</span>
-<p class="font-body-md text-body-md leading-relaxed mt-2 text-on-surface-variant" th:text="${appreciation}">Appreciation</p>
-<div class="mt-lg flex gap-2 flex-wrap" th:if="${felicitations or tableauHonneur}">
-<span class="px-md py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-label-sm text-label-sm" th:if="${felicitations}">Félicitations</span>
-<span class="px-md py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full font-label-sm text-label-sm" th:if="${tableauHonneur}">Tableau d'Honneur</span>
-</div>
-</div>
-</div>
+    <section class="px-xl pb-xl">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-xl border-t border-slate-200 pt-xl">
+        <div class="text-center">
+          <div class="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">L’élève / Parent</div>
+          <div class="border-t border-slate-300 mt-12 pt-3 text-xs text-slate-400 italic">(Signature)</div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Le professeur titulaire</div>
+          <div class="border-t border-slate-300 mt-12 pt-3 text-sm font-bold text-slate-700"
+            th:if="${professeurTitulaire != null}"
+            th:text="${professeurTitulaire.prenom} + ' ' + ${professeurTitulaire.nom}">--</div>
+          <div class="border-t border-slate-300 mt-12 pt-3 text-xs text-slate-400 italic"
+            th:if="${professeurTitulaire == null}">(Signature)</div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Le Chef d’établissement</div>
+          <div class="border-t border-slate-300 mt-12 pt-3 text-sm font-bold text-slate-700"
+            th:if="${chefEtablissement != null}" th:text="${chefEtablissement}">--</div>
+          <div class="border-t border-slate-300 mt-12 pt-3 text-xs text-slate-400 italic"
+            th:if="${chefEtablissement == null}">(Signature)</div>
+        </div>
+      </div>
+    </section>
 
-<!-- Signatures -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-xl pt-xl border-t border-outline-variant text-center">
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block mb-8">L'Élève / Parent</span>
-<div class="h-16 flex items-center justify-center">
-<span class="font-label-sm text-label-sm text-outline-variant italic">(Signature)</span>
-</div>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block mb-8">Le Professeur Titulaire</span>
-<div class="h-16 flex flex-col items-center justify-center">
-<span class="font-label-sm text-label-sm text-outline-variant italic" th:if="${professeurTitulaire == null}">(Signature)</span>
-<span class="font-medium mt-2" th:if="${professeurTitulaire != null}" th:text="${professeurTitulaire.prenom} + ' ' + ${professeurTitulaire.nom}">--</span>
-</div>
-</div>
-<div>
-<span class="font-label-sm text-label-sm text-outline uppercase block mb-8">Le Chef d'Établissement</span>
-<div class="h-16 flex flex-col items-center justify-center">
-<span class="font-label-sm text-label-sm text-outline-variant italic" th:if="${chefEtablissement == null}">(Signature)</span>
-<span class="font-bold mt-2" th:if="${chefEtablissement != null}" th:text="${chefEtablissement}">--</span>
-</div>
-</div>
-</div>
+    <section
+      class="px-xl pb-xl text-sm flex justify-between items-center text-slate-500 border-t border-slate-200 pt-md">
+      <span th:text="'Émis le : ' + ${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy à HH:mm')}">--</span>
+      <span class="font-mono text-slate-600" th:text="'VERIF: ' + ${codeVerification}">--</span>
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-sm">shield_lock</span>
+        Authentifié par EduSystem Pro
+      </div>
+    </section>
 
-<!-- Pied de page -->
-<div class="mt-xl pt-md border-t border-outline-variant/30 flex flex-col sm:flex-row justify-between items-center gap-xs font-label-sm text-label-sm text-outline">
-<span th:text="'Émis le : ' + ${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy à HH:mm')}">--</span>
-<span class="font-mono" th:text="'VERIF: ' + ${codeVerification}">--</span>
-<div class="flex items-center gap-1">
-<span class="material-symbols-outlined text-sm">shield_lock</span>
-Authentifié par EduSystem Pro
-</div>
-</div>
-</div>
-
-<p class="max-w-[1000px] mx-auto mt-md text-outline font-label-sm text-label-sm flex items-center gap-2 no-print">
-<span class="material-symbols-outlined text-sm">info</span>
-Ce document est un modèle officiel généré par le système à partir des notes réellement saisies et publiées.
-</p>
+    <p class="max-w-[1100px] mx-auto mt-md text-outline font-label-sm text-label-sm flex items-center gap-2 no-print">
+      <span class="material-symbols-outlined text-sm">info</span>
+      Ce document est un modèle officiel généré par le système à partir des notes réellement saisies et publiées.
+    </p>
+  </div>
 </body>
+
 </html>

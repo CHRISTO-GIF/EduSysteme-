@@ -18,6 +18,7 @@
 </header>
 
 <main class="max-w-2xl mx-auto px-4 md:px-8 py-4 md:py-8">
+<div th:if="${erreurAuth}" class="mb-4 p-3 rounded-lg bg-red-100 text-red-800 text-sm" th:text="${erreurAuth}"></div>
 <div class="bg-white border border-gray-200 rounded-xl p-4 md:p-8">
 <form class="space-y-4" enctype="multipart/form-data" method="post" th:action="@{/tableau-enseignant/devoirs}">
 

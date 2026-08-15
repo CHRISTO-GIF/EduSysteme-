@@ -339,15 +339,11 @@ Ajouter un profil
 <span class="material-symbols-outlined">close</span>
 </button>
 </div>
-<p class="text-body-md text-on-surface-variant mb-lg">Renseignez le matricule et la date de naissance de votre enfant pour rattacher son dossier a votre compte.</p>
+<p class="text-body-md text-on-surface-variant mb-lg">Renseignez le code d'accès (père ou mère) remis par le secrétariat pour cet enfant afin de rattacher son dossier à votre compte.</p>
 <form class="space-y-md" method="post" th:action="@{/portail-parent/ajouter-profil}">
 <div>
-<label class="text-label-sm text-secondary block mb-1">Matricule de l'eleve</label>
-<input class="w-full p-2 border border-outline-variant rounded-lg" name="matricule" placeholder="Ex: HF-2026-012" required="required" type="text"/>
-</div>
-<div>
-<label class="text-label-sm text-secondary block mb-1">Date de naissance de l'eleve</label>
-<input class="w-full p-2 border border-outline-variant rounded-lg" name="dateNaissance" required="required" type="date"/>
+<label class="text-label-sm text-secondary block mb-1">Code d'accès de l'élève</label>
+<input class="w-full p-2 border border-outline-variant rounded-lg" name="codeAcces" placeholder="Code remis par le secrétariat" required="required" type="text"/>
 </div>
 <div class="flex justify-end gap-sm pt-md">
 <button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md" onclick="document.getElementById('modal-profil').classList.add('hidden')" type="button">Annuler</button>

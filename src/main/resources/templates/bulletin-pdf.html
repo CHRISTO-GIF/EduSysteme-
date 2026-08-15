@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8" />
+  <title th:text="'Bulletin'">Bulletin</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm 12mm;
+    }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9.5pt;
+      color: #1a1a1a;
+      margin: 0;
+    }
+
+    .entete {
+      width: 100%;
+      border-bottom: 2px solid #00236f;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .entete-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .logo-cell {
+      width: 60px;
+      vertical-align: middle;
+    }
+
+    .logo-cell img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .etab-nom {
+      font-size: 15pt;
+      font-weight: bold;
+      color: #00236f;
+      margin: 0;
+    }
+
+    .etab-info {
+      font-size: 8pt;
+      color: #555555;
+      margin: 1px 0;
+    }
+
+    .titre-doc {
+      text-align: right;
+      vertical-align: middle;
+    }
+
+    .titre-doc .badge {
+      display: inline-block;
+      background: #00236f;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .titre-doc .trimestre {
+      font-size: 8pt;
+      color: #555555;
+      margin-top: 3px;
+    }
+
+    .fiche-eleve {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+
+    .fiche-eleve td {
+      padding: 3px 6px;
+      font-size: 9pt;
+      vertical-align: top;
+    }
+
+    .fiche-eleve .label {
+      color: #777777;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .fiche-eleve .valeur {
+      font-weight: bold;
+      color: #1a1a1a;
+    }
+
+    .photo-cell {
+      width: 60px;
+    }
+
+    .photo-cell img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+    }
+
+    table.notes {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+
+    table.notes th {
+      background: #00236f;
+      color: #ffffff;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      padding: 4px 4px;
+      text-align: center;
+      border: 1px solid #00236f;
+    }
+
+    table.notes th.col-matiere {
+      text-align: left;
+    }
+
+    table.notes td {
+      font-size: 8.5pt;
+      padding: 3px 4px;
+      text-align: center;
+      border: 1px solid #dddddd;
+    }
+
+    table.notes td.col-matiere {
+      text-align: left;
+      font-weight: bold;
+    }
+
+    table.notes td.col-appreciation {
+      text-align: left;
+      font-style: italic;
+      color: #555555;
+      font-size: 8pt;
+    }
+
+    tr.pole-row td {
+      background: #eef1f8;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 7.5pt;
+      color: #00236f;
+      text-align: left;
+      border: 1px solid #dddddd;
+    }
+
+    .synthese {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+
+    .synthese td {
+      vertical-align: top;
+      padding: 0;
+    }
+
+    .bloc-moyenne {
+      background: #00236f;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+
+    .bloc-moyenne .grand-nombre {
+      font-size: 22pt;
+      font-weight: bold;
+    }
+
+    .bloc-moyenne .petit-label {
+      font-size: 7pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+
+    .bloc-details {
+      border: 1px solid #dddddd;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 8.5pt;
+    }
+
+    .bloc-details .ligne {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .bloc-details .ligne td {
+      padding: 2px 0;
+      border: none;
+      font-size: 8.5pt;
+    }
+
+    .distinctions {
+      margin: 6px 0 10px 0;
+    }
+
+    .distinctions .badge {
+      display: inline-block;
+      border: 1px solid #00236f;
+      color: #00236f;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 7.5pt;
+      font-weight: bold;
+      margin-right: 6px;
+    }
+
+    .appreciation-generale {
+      border: 1px solid #dddddd;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 9pt;
+      margin-bottom: 14px;
+    }
+
+    .appreciation-generale .label {
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      color: #777777;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .pied-page {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .pied-page td {
+      vertical-align: bottom;
+      font-size: 7.5pt;
+      color: #777777;
+    }
+
+    .signature-box {
+      border-top: 1px solid #999999;
+      padding-top: 4px;
+      width: 160px;
+      text-align: center;
+    }
+
+    .code-verif {
+      font-family: monospace;
+      font-size: 7pt;
+      color: #999999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="entete">
+    <table class="entete-table">
+      <tr>
+        <td class="logo-cell">
+          <img th:if="${logoDataUri != null}" th:src="${logoDataUri}" alt="Logo" />
+        </td>
+        <td>
+          <p class="etab-nom" th:text="${nomEtab != null ? #strings.toUpperCase(nomEtab) : 'ETABLISSEMENT'}">NOM ETABLISSEMENT</p>
+          <p class="etab-info" th:if="${adresseEtab != null and !#strings.isEmpty(adresseEtab)}" th:text="${adresseEtab}">Adresse</p>
+          <p class="etab-info" th:if="${emailEtab != null and !#strings.isEmpty(emailEtab)}" th:text="${emailEtab}">Email</p>
+        </td>
+        <td class="titre-doc">
+          <span class="badge">BULLETIN SCOLAIRE</span>
+          <p class="trimestre" th:text="'Trimestre ' + ${trimestre} + (${anneeScolaire != null} ? ' — ' + ${anneeScolaire} : '')">Trimestre</p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <table class="fiche-eleve">
+    <tr>
+      <td class="photo-cell" rowspan="2">
+        <img th:if="${photoDataUri != null}" th:src="${photoDataUri}" alt="Photo" />
+      </td>
+      <td>
+        <span class="label">Élève</span>
+        <span class="valeur" th:text="${eleve.nom} + ' ' + ${eleve.prenom}">Nom Prénom</span>
+      </td>
+      <td>
+        <span class="label">Matricule</span>
+        <span class="valeur" th:text="${eleve.matricule}">--</span>
+      </td>
+      <td>
+        <span class="label">Classe</span>
+        <span class="valeur" th:text="${eleve.classe != null ? eleve.classe.nom : '?'}">Classe</span>
+      </td>
+      <td>
+        <span class="label">Professeur titulaire</span>
+        <span class="valeur" th:text="${professeurTitulaire != null ? professeurTitulaire.prenom + ' ' + professeurTitulaire.nom : 'Non assigné'}">--</span>
+      </td>
+    </tr>
+  </table>
+
+  <table class="notes">
+    <thead>
+      <tr>
+        <th class="col-matiere">Matières</th>
+        <th>Coef</th>
+        <th>Dev 1</th>
+        <th>Dev 2</th>
+        <th>Dev 3</th>
+        <th>Examen</th>
+        <th>Note /20</th>
+        <th>Moy. Cl.</th>
+        <th class="col-appreciation">Appréciation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <th:block th:each="entree : ${poles}">
+        <tr class="pole-row">
+          <td colspan="9" th:text="${entree.key}">Pôle</td>
+        </tr>
+        <tr th:each="ligne : ${entree.value}">
+          <td class="col-matiere" th:text="${ligne.matiere.nom}">Matière</td>
+          <td th:text="${ligne.matiere.coefficient}">--</td>
+          <td th:text="${ligne.moyenneDevoir1 != null ? ligne.moyenneDevoir1 : '—'}">--</td>
+          <td th:text="${ligne.moyenneDevoir2 != null ? ligne.moyenneDevoir2 : '—'}">--</td>
+          <td th:text="${ligne.moyenneDevoir3 != null ? ligne.moyenneDevoir3 : '—'}">--</td>
+          <td th:text="${ligne.moyenneExamens != null ? ligne.moyenneExamens : '—'}">--</td>
+          <td th:text="${ligne.moyenne}">--</td>
+          <td th:text="${ligne.moyenneClasse}">--</td>
+          <td class="col-appreciation" th:text="${#strings.isEmpty(ligne.appreciation) ? '—' : ligne.appreciation}">--</td>
+        </tr>
+      </th:block>
+      <tr th:if="${poles.isEmpty()}">
+        <td colspan="9" style="text-align:center;color:#999999;padding:10px;">Aucune note publiée pour ce trimestre.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="synthese">
+    <tr>
+      <td style="width:48%;padding-right:2%;">
+        <div class="bloc-moyenne">
+          <table style="width:100%;">
+            <tr>
+              <td>
+                <span class="petit-label">Moyenne générale</span><br />
+                <span class="grand-nombre" th:text="${moyenneGenerale} + ' / 20'">--</span>
+              </td>
+              <td style="text-align:right;">
+                <span class="petit-label">Rang</span><br />
+                <span class="grand-nombre" th:text="${rang}">--</span>
+                <span style="font-size:9pt;" th:text="' / ' + ${effectif}">/--</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="distinctions">
+          <span class="badge" th:text="${mention}">--</span>
+          <span class="badge" th:if="${felicitations}">Félicitations</span>
+          <span class="badge" th:if="${tableauHonneur}">Tableau d'honneur</span>
+        </div>
+      </td>
+      <td style="width:52%;">
+        <div class="bloc-details">
+          <table class="ligne">
+            <tr>
+              <td>Moyenne devoirs / contrôle continu</td>
+              <td style="text-align:right;font-weight:bold;" th:text="${moyenneControleContinu != null ? moyenneControleContinu + ' / 20' : '—'}">—</td>
+            </tr>
+            <tr>
+              <td>Moyenne examens</td>
+              <td style="text-align:right;font-weight:bold;" th:text="${moyenneExamens != null ? moyenneExamens + ' / 20' : '—'}">—</td>
+            </tr>
+            <tr>
+              <td>Moyenne de classe</td>
+              <td style="text-align:right;" th:text="${moyenneClasseGenerale} + ' / 20'">--</td>
+            </tr>
+            <tr>
+              <td>Absences justifiées</td>
+              <td style="text-align:right;" th:text="${absencesJustifiees}">0</td>
+            </tr>
+            <tr>
+              <td>Absences non justifiées</td>
+              <td style="text-align:right;" th:text="${absencesNonJustifiees}">0</td>
+            </tr>
+            <tr>
+              <td>Conduite &amp; comportement</td>
+              <td style="text-align:right;" th:text="${conduite != null ? conduite.evaluation : 'Non renseignée'}">--</td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="appreciation-generale">
+    <span class="label">Observations du conseil de classe</span>
+    <span th:text="${appreciation}">Appréciation générale.</span>
+  </div>
+
+  <table class="pied-page">
+    <tr>
+      <td>
+        <span class="code-verif" th:text="'Code de vérification : ' + ${codeVerification}">Code</span>
+      </td>
+      <td style="text-align:right;">
+        <div class="signature-box">Cachet et signature</div>
+      </td>
+    </tr>
+  </table>
+
+</body>
+
+</html>

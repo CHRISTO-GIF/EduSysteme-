@@ -98,6 +98,11 @@
 </div>
 </section>
 
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between gap-sm hover:bg-surface-container-low transition-colors" th:href="@{/rh/mes-bulletins}" th:if="${personnelLie}">
+<span class="flex items-center gap-sm font-label-md text-label-md text-on-surface"><span class="material-symbols-outlined text-primary">payments</span> Mes bulletins de paie</span>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</a>
+
 <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md" id="mes-conges">
 <h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-sm"><span class="material-symbols-outlined text-primary">event_busy</span> Mes conges</h3>
 
@@ -305,6 +310,11 @@
 </tbody>
 </table>
 </div>
+
+<a class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-xl flex items-center justify-between gap-sm hover:bg-surface-container-low transition-colors" th:href="@{/rh/mes-bulletins}" th:if="${personnelLie}">
+<span class="flex items-center gap-sm font-label-md text-label-md text-on-surface"><span class="material-symbols-outlined text-primary">payments</span> Mes bulletins de paie</span>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</a>
 
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-xl" id="mes-conges">
 <h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center gap-sm"><span class="material-symbols-outlined text-primary">event_busy</span> Mes conges</h3>

@@ -57,8 +57,8 @@
 <main class="flex-1 flex flex-col items-center justify-start p-md md:p-xl">
 
 <nav class="no-print w-full max-w-[800px] mb-lg flex flex-wrap items-center justify-between gap-md bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant">
-<a class="flex items-center gap-xs text-secondary hover:text-primary transition-colors font-label-md text-label-md" th:href="@{/personnel/{id}(id=${personnel.id})}">
-<span class="material-symbols-outlined">arrow_back</span> Retour à la fiche personnel
+<a class="flex items-center gap-xs text-secondary hover:text-primary transition-colors font-label-md text-label-md" th:href="@{${retourUrl}}">
+<span class="material-symbols-outlined">arrow_back</span> Retour
 </a>
 <button class="flex items-center gap-xs px-lg py-sm rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-all shadow-md font-label-md text-label-md" onclick="window.print()" type="button">
 <span class="material-symbols-outlined">print</span> Imprimer le bulletin
