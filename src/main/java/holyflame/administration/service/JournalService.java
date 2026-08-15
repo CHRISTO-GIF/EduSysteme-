@@ -7,13 +7,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 public class JournalService {
 
     @Autowired private JournalActionRepository journalRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private HorlogeService horlogeService;
 
     public void log(String action, String module, String detail) {
         try {
@@ -27,7 +26,7 @@ public class JournalService {
             entry.setModule(module);
             entry.setDetail(detail);
             entry.setEtablissementId(etablissementService.getCurrentEtablissementId());
-            entry.setDate(LocalDateTime.now());
+            entry.setDate(horlogeService.maintenant());
             journalRepository.save(entry);
         } catch (Exception ignored) {
             // Ne jamais bloquer l'action principale à cause du journal

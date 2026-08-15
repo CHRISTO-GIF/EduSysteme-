@@ -45,6 +45,7 @@ public class SurveillanceController {
     @Autowired private DocumentEleveRepository documentEleveRepository;
     @Autowired private FileStorageService fileStorageService;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
 
     @GetMapping
@@ -78,7 +79,7 @@ public class SurveillanceController {
 
         Map<Long, String> photosParEleve = new HashMap<>();
         Map<Long, long[]> statsParEleve = new HashMap<>(); // [absencesAnnee, absencesMois, absencesInjustifiees]
-        LocalDate maintenant = LocalDate.now();
+        LocalDate maintenant = horlogeService.aujourdHui();
         for (Eleve e : eleves) {
             documentEleveRepository.findByEleveIdOrderByDateUploadDesc(e.getId()).stream()
                 .filter(d -> "PHOTO_IDENTITE".equals(d.getTypeDocument()))
@@ -146,7 +147,12 @@ public class SurveillanceController {
 
     @PostMapping("/absences/{id}/supprimer")
     public String supprimerAbsence(@PathVariable Long id) {
-        absenceRepository.deleteById(id);
+        // Sans le filtre par etablissement, n'importe quel id d'absence (y compris d'un autre
+        // etablissement) etait supprimable par n'importe quel enseignant/admin connecte.
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        absenceRepository.findById(id)
+            .filter(a -> a.getEleve() != null && etabId != null && etabId.equals(a.getEleve().getEtablissementId()))
+            .ifPresent(absenceRepository::delete);
         return "redirect:/surveillance";
     }
 
@@ -167,7 +173,7 @@ public class SurveillanceController {
             RedirectAttributes ra) {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
-        String anneeScolaireProgramme = holyflame.administration.util.AnneeScolaireUtil.pour(dateDebut != null ? dateDebut : LocalDate.now());
+        String anneeScolaireProgramme = holyflame.administration.util.AnneeScolaireUtil.pour(dateDebut != null ? dateDebut : horlogeService.aujourdHui());
         anneeScolaireService.verifierModifiable(anneeScolaireProgramme, etabId);
 
         Programme programme = new Programme();

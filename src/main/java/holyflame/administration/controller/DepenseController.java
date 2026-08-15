@@ -9,6 +9,7 @@ import holyflame.administration.repository.DepenseRepository;
 import holyflame.administration.repository.LigneBudgetRepository;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.FileStorageService;
+import holyflame.administration.service.HorlogeService;
 import holyflame.administration.service.JournalService;
 import holyflame.administration.util.AnneeScolaireUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class DepenseController {
     @Autowired private EtablissementService etablissementService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
+    @Autowired private HorlogeService horlogeService;
     @Autowired private FileStorageService fileStorageService;
 
     @GetMapping
@@ -63,7 +65,7 @@ public class DepenseController {
             Model model) {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
         int moisFiltre = mois != null ? mois : aujourdHui.getMonthValue();
         int anneeFiltre = annee != null ? annee : aujourdHui.getYear();
 

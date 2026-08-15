@@ -3,7 +3,9 @@ package holyflame.administration.controller;
 import holyflame.administration.model.Eleve;
 import holyflame.administration.model.Note;
 import holyflame.administration.model.Paiement;
+import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.EleveRepository;
+import holyflame.administration.repository.EnseignantAutorisationRepository;
 import holyflame.administration.repository.NoteRepository;
 import holyflame.administration.repository.PaiementRepository;
 import holyflame.administration.service.EtablissementService;
@@ -29,6 +31,7 @@ public class ExportController {
     @Autowired private PaiementRepository paiementRepository;
     @Autowired private EleveRepository eleveRepository;
     @Autowired private NoteRepository noteRepository;
+    @Autowired private EnseignantAutorisationRepository autorisationRepository;
     @Autowired private EtablissementService etablissementService;
 
     // ── Styles partagés ──────────────────────────────────────────
@@ -135,7 +138,7 @@ public class ExportController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         List<Eleve> eleves = etabId != null
             ? eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId)
-            : eleveRepository.findAllByOrderByNomAscPrenomAsc();
+            : List.of();
 
         XSSFWorkbook wb = new XSSFWorkbook();
         XSSFSheet sheet = wb.createSheet("Élèves");
@@ -183,8 +186,19 @@ public class ExportController {
         List<Note> notes = etabId != null
             ? noteRepository.findByEtablissementId(etabId).stream()
                 .filter(n -> trimestre.equals(n.getTrimestre())).collect(Collectors.toList())
-            : noteRepository.findAllByOrderByDateEvaluationDesc().stream()
-                .filter(n -> trimestre.equals(n.getTrimestre())).collect(Collectors.toList());
+            : List.of();
+
+        // Un enseignant n'exporte que les notes des matieres/classes qu'il enseigne lui-meme ;
+        // ADMIN/SECRETAIRE conservent la vue complete sur l'etablissement.
+        Utilisateur utilisateurConnecte = etablissementService.getCurrentUtilisateur();
+        if (utilisateurConnecte != null && "ENSEIGNANT".equals(utilisateurConnecte.getRole()) && etabId != null) {
+            var autorisations = autorisationRepository.findByEnseignantIdAndEtablissementId(utilisateurConnecte.getId(), etabId);
+            notes = notes.stream()
+                .filter(n -> n.getMatiere() != null && n.getEleve() != null && n.getEleve().getClasse() != null
+                    && autorisations.stream().anyMatch(a -> a.getMatiereId().equals(n.getMatiere().getId())
+                        && a.getClasseId().equals(n.getEleve().getClasse().getId())))
+                .collect(Collectors.toList());
+        }
 
         XSSFWorkbook wb = new XSSFWorkbook();
         XSSFSheet sheet = wb.createSheet("Notes T" + trimestre);

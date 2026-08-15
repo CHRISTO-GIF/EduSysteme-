@@ -49,29 +49,46 @@ import java.util.stream.Collectors;
 @RequestMapping("/portail-parent")
 public class PortailParentController {
 
-    @Autowired private EleveRepository eleveRepository;
-    @Autowired private UtilisateurRepository utilisateurRepository;
-    @Autowired private NoteRepository noteRepository;
-    @Autowired private AbsenceRepository absenceRepository;
-    @Autowired private ExamenRepository examenRepository;
-    @Autowired private EvenementEcoleRepository evenementEcoleRepository;
-    @Autowired private RappelParentRepository rappelParentRepository;
-    @Autowired private ConduiteRepository conduiteRepository;
-    @Autowired private AvisParentRepository avisParentRepository;
-    @Autowired private EtablissementService etablissementService;
-    @Autowired private holyflame.administration.service.CalendrierScolaireService calendrierScolaireService;
-    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
-    @Autowired private FinanceParentService financeParentService;
-    @Autowired private MessagerieService messagerieService;
+    @Autowired
+    private EleveRepository eleveRepository;
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
+    @Autowired
+    private NoteRepository noteRepository;
+    @Autowired
+    private AbsenceRepository absenceRepository;
+    @Autowired
+    private ExamenRepository examenRepository;
+    @Autowired
+    private EvenementEcoleRepository evenementEcoleRepository;
+    @Autowired
+    private RappelParentRepository rappelParentRepository;
+    @Autowired
+    private ConduiteRepository conduiteRepository;
+    @Autowired
+    private AvisParentRepository avisParentRepository;
+    @Autowired
+    private EtablissementService etablissementService;
+    @Autowired
+    private holyflame.administration.service.CalendrierScolaireService calendrierScolaireService;
+    @Autowired
+    private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
+    @Autowired
+    private FinanceParentService financeParentService;
+    @Autowired
+    private MessagerieService messagerieService;
+    @Autowired
+    private holyflame.administration.service.HorlogeService horlogeService;
 
-    private static final String[] COULEURS_ENFANTS = {"blue", "pink", "green", "orange", "purple", "teal"};
+    private static final String[] COULEURS_ENFANTS = { "blue", "pink", "green", "orange", "purple", "teal" };
 
     @GetMapping
     public String index(Authentication auth, Model model) {
         String email = auth != null ? auth.getName() : "";
         List<Eleve> enfants = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email);
         Long etabId = etablissementService.getCurrentEtablissementId();
-        if (etabId == null && !enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
+        if (etabId == null && !enfants.isEmpty())
+            etabId = enfants.get(0).getEtablissementId();
 
         List<Map<String, Object>> cartesEnfants = new ArrayList<>();
         int totalDevoirsRecents = 0;
@@ -81,34 +98,39 @@ public class PortailParentController {
             Map<String, Object> carte = construireCarteEnfant(enfant);
             cartesEnfants.add(carte);
             totalDevoirsRecents += ((Long) carte.get("nbDevoirsRecents")).intValue();
-            if (carte.get("prochainExamen") != null) totalExamensAVenir++;
+            if (carte.get("prochainExamen") != null)
+                totalExamensAVenir++;
         }
 
-        // Evenements a venir (examens) toutes classes confondues, pour l'aperçu "A venir" du tableau de bord
+        // Evenements a venir (examens) toutes classes confondues, pour l'aperçu "A
+        // venir" du tableau de bord
         List<Map<String, Object>> prochainsEvenements = new ArrayList<>();
         for (Eleve enfant : enfants) {
-            if (enfant.getClasse() == null) continue;
+            if (enfant.getClasse() == null)
+                continue;
             examenRepository.findByEtablissementIdAndClasseIdOrderByDateExamenAscHeureDebutAsc(
                     enfant.getEtablissementId(), enfant.getClasse().getId()).stream()
-                .filter(ex -> ex.getDateExamen() != null && !ex.getDateExamen().isBefore(LocalDate.now()))
-                .findFirst()
-                .ifPresent(ex -> {
-                    Map<String, Object> evt = new LinkedHashMap<>();
-                    evt.put("date", ex.getDateExamen());
-                    evt.put("titre", ex.getMatiere() != null ? "Examen de " + ex.getMatiere().getNom() : "Examen");
-                    evt.put("enfantNom", enfant.getPrenom());
-                    evt.put("heureDebut", ex.getHeureDebut());
-                    evt.put("heureFin", ex.getHeureFin());
-                    evt.put("salle", ex.getSalle());
-                    prochainsEvenements.add(evt);
-                });
+                    .filter(ex -> ex.getDateExamen() != null && !ex.getDateExamen().isBefore(horlogeService.aujourdHui()))
+                    .findFirst()
+                    .ifPresent(ex -> {
+                        Map<String, Object> evt = new LinkedHashMap<>();
+                        evt.put("date", ex.getDateExamen());
+                        evt.put("titre", ex.getMatiere() != null ? "Examen de " + ex.getMatiere().getNom() : "Examen");
+                        evt.put("enfantNom", enfant.getPrenom());
+                        evt.put("heureDebut", ex.getHeureDebut());
+                        evt.put("heureFin", ex.getHeureFin());
+                        evt.put("salle", ex.getSalle());
+                        prochainsEvenements.add(evt);
+                    });
         }
         if (etabId != null) {
             for (EvenementEcole ev : evenementEcoleRepository.findByEtablissementIdOrderByDateEvenementAsc(etabId)) {
-                if (ev.getDateEvenement() == null || ev.getDateEvenement().isBefore(LocalDate.now())) continue;
+                if (ev.getDateEvenement() == null || ev.getDateEvenement().isBefore(horlogeService.aujourdHui()))
+                    continue;
                 List<Long> classesEnfants = enfants.stream()
-                    .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).toList();
-                if (ev.getClasse() != null && !classesEnfants.contains(ev.getClasse().getId())) continue;
+                        .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).toList();
+                if (ev.getClasse() != null && !classesEnfants.contains(ev.getClasse().getId()))
+                    continue;
                 Map<String, Object> evt = new LinkedHashMap<>();
                 evt.put("date", ev.getDateEvenement());
                 evt.put("titre", ev.getTitre());
@@ -122,7 +144,8 @@ public class PortailParentController {
         prochainsEvenements.sort(Comparator.comparing(e -> (LocalDate) e.get("date")));
         List<Map<String, Object>> prochainsEvenementsApercu = prochainsEvenements.stream().limit(3).toList();
 
-        // Solde de scolarite en attente (logique partagee avec /portail-parent/paiements)
+        // Solde de scolarite en attente (logique partagee avec
+        // /portail-parent/paiements)
         FinanceParentService.ResumeSolde resumeSolde = financeParentService.calculerResume(enfants, etabId);
 
         // Messages non lus (logique partagee avec /portail-parent/messages)
@@ -130,8 +153,8 @@ public class PortailParentController {
         List<Map<String, Object>> conversations = messagerieService.construireConversations(email, contactsParEmail);
         long totalMessagesNonLus = conversations.stream().mapToLong(c -> (Long) c.get("nonLus")).sum();
         Map<String, Object> derniereConvNonLue = conversations.stream()
-            .filter(c -> ((Long) c.get("nonLus")) > 0)
-            .findFirst().orElse(null);
+                .filter(c -> ((Long) c.get("nonLus")) > 0)
+                .findFirst().orElse(null);
 
         Etablissement etablissement = etablissementService.getCurrentEtablissement();
         String nomParent = nomAffichageParent(email);
@@ -168,13 +191,16 @@ public class PortailParentController {
         return "portail-parent-enfants";
     }
 
-    /** Construit la fiche de synthese reelle d'un enfant : notes, absences, prochain examen, conduite. */
+    /**
+     * Construit la fiche de synthese reelle d'un enfant : notes, absences, prochain
+     * examen, conduite.
+     */
     private Map<String, Object> construireCarteEnfant(Eleve enfant) {
         Classe classe = enfant.getClasse();
 
         List<Note> notesPubliees = noteRepository.findByEleveOrderByDateEvaluationDesc(enfant).stream()
-            .filter(n -> "PUBLIE".equals(n.getStatut()))
-            .toList();
+                .filter(n -> "PUBLIE".equals(n.getStatut()))
+                .toList();
         double moyenne = 0;
         double somme = 0, totalCoef = 0;
         for (Note n : notesPubliees) {
@@ -183,35 +209,38 @@ public class PortailParentController {
                 totalCoef += n.getCoefficient();
             }
         }
-        if (totalCoef > 0) moyenne = Math.round((somme / totalCoef) * 100.0) / 100.0;
+        if (totalCoef > 0)
+            moyenne = Math.round((somme / totalCoef) * 100.0) / 100.0;
 
         long nbDevoirsRecents = notesPubliees.stream()
-            .filter(n -> "DEVOIR".equals(n.getType()) && n.getDateEvaluation() != null
-                && n.getDateEvaluation().isAfter(LocalDate.now().minusDays(7)))
-            .count();
+                .filter(n -> Note.isDevoirLikeType(n.getType()) && n.getDateEvaluation() != null
+                        && n.getDateEvaluation().isAfter(horlogeService.aujourdHui().minusDays(7)))
+                .count();
 
         List<Absence> absences = absenceRepository.findByEleveIdOrderByDateDesc(enfant.getId());
         long nbAbsencesNonJustifiees = absences.stream().filter(a -> !a.isEstJustifiee()).count();
         Absence derniereAbsenceNonJustifiee = absences.stream()
-            .filter(a -> !a.isEstJustifiee()).findFirst().orElse(null);
+                .filter(a -> !a.isEstJustifiee()).findFirst().orElse(null);
 
         long joursOuvres = calendrierScolaireService.joursEcoleOuvres(
-            enfant.getDateInscription() != null ? enfant.getDateInscription() : LocalDate.now().minusMonths(3),
-            LocalDate.now(), enfant.getEtablissementId());
+                enfant.getDateInscription() != null ? enfant.getDateInscription() : horlogeService.aujourdHui().minusMonths(3),
+                horlogeService.aujourdHui(), enfant.getEtablissementId());
         double tauxAssiduite = joursOuvres > 0
-            ? Math.max(0, Math.min(100, Math.round((100.0 - (nbAbsencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
-            : 100;
+                ? Math.max(0,
+                        Math.min(100,
+                                Math.round((100.0 - (nbAbsencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
+                : 100;
 
         Examen prochainExamen = null;
         if (classe != null) {
             prochainExamen = examenRepository.findByEtablissementIdAndClasseIdOrderByDateExamenAscHeureDebutAsc(
                     enfant.getEtablissementId(), classe.getId()).stream()
-                .filter(ex -> ex.getDateExamen() != null && !ex.getDateExamen().isBefore(LocalDate.now()))
-                .findFirst().orElse(null);
+                    .filter(ex -> ex.getDateExamen() != null && !ex.getDateExamen().isBefore(horlogeService.aujourdHui()))
+                    .findFirst().orElse(null);
         }
 
         Conduite derniereConduite = conduiteRepository.findByEleveOrderBySaisieAtDesc(enfant).stream()
-            .findFirst().orElse(null);
+                .findFirst().orElse(null);
 
         Map<String, Object> carte = new LinkedHashMap<>();
         carte.put("eleve", enfant);
@@ -230,34 +259,40 @@ public class PortailParentController {
     private String nomAffichageParent(String email) {
         Utilisateur compteParent = utilisateurRepository.findByEmail(email).orElse(null);
         return compteParent != null && compteParent.getPrenom() != null && !compteParent.getPrenom().isBlank()
-            ? compteParent.getPrenom() + (compteParent.getNom() != null ? " " + compteParent.getNom() : "")
-            : email;
+                ? compteParent.getPrenom() + (compteParent.getNom() != null ? " " + compteParent.getNom() : "")
+                : email;
     }
 
-    // ── Rattacher un enfant existant a ce compte parent (self-service) ──────
+    // ── Rattacher un enfant supplementaire (fratrie) a ce compte parent (self-service) ──
+    // Utilise le meme code d'acces secret pere/mere que l'inscription initiale
+    // (InscriptionParentController) — le matricule (sequentiel, visible sur les documents)
+    // et la date de naissance (facilement devinable, sans limitation de tentatives) ne
+    // constituaient pas une preuve de filiation suffisante pour ouvrir l'acces aux notes,
+    // absences et informations financieres d'un enfant.
     @PostMapping("/ajouter-profil")
     public String ajouterProfil(
-            @RequestParam String matricule,
-            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate dateNaissance,
+            @RequestParam String codeAcces,
             Authentication auth,
             RedirectAttributes ra) {
 
         String email = auth != null ? auth.getName() : "";
-        Eleve eleve = eleveRepository.findAll().stream()
-            .filter(e -> matricule.equalsIgnoreCase(e.getMatricule()))
-            .findFirst().orElse(null);
+        String code = codeAcces != null ? codeAcces.trim().toUpperCase() : "";
+        Eleve eleve = code.isBlank() ? null : eleveRepository.findByPereCodeAccesOrMereCodeAcces(code).orElse(null);
 
-        if (eleve == null || eleve.getDateNaissance() == null || !eleve.getDateNaissance().equals(dateNaissance)) {
-            ra.addFlashAttribute("erreurMsg", "Aucun eleve ne correspond a ce matricule et cette date de naissance.");
+        if (eleve == null) {
+            ra.addFlashAttribute("erreurMsg", "Ce code d'accès est invalide. Contactez le secrétariat de l'établissement.");
             return "redirect:/portail-parent";
         }
-        if (eleve.getEmailParent() != null && !eleve.getEmailParent().isBlank() && !eleve.getEmailParent().equalsIgnoreCase(email)) {
-            ra.addFlashAttribute("erreurMsg", "Cet eleve est deja rattache a un autre compte parent. Contactez le secretariat.");
+        if (eleve.getEmailParent() != null && !eleve.getEmailParent().isBlank()
+                && !eleve.getEmailParent().equalsIgnoreCase(email)) {
+            ra.addFlashAttribute("erreurMsg",
+                    "Cet eleve est deja rattache a un autre compte parent. Contactez le secretariat.");
             return "redirect:/portail-parent";
         }
         eleve.setEmailParent(email);
         eleveRepository.save(eleve);
-        ra.addFlashAttribute("successMsg", eleve.getPrenom() + " " + eleve.getNom() + " a ete rattache(e) a votre compte.");
+        ra.addFlashAttribute("successMsg",
+                eleve.getPrenom() + " " + eleve.getNom() + " a ete rattache(e) a votre compte.");
         return "redirect:/portail-parent";
     }
 
@@ -273,7 +308,7 @@ public class PortailParentController {
         String email = auth != null ? auth.getName() : "";
         List<Eleve> enfants = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email);
 
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
         int moisFiltre = mois != null ? mois : aujourdHui.getMonthValue();
         int anneeFiltre = annee != null ? annee : aujourdHui.getYear();
         LocalDate ancre = LocalDate.of(anneeFiltre, moisFiltre, 1);
@@ -289,14 +324,17 @@ public class PortailParentController {
 
         // Examens reels par enfant
         for (Eleve enfant : enfants) {
-            if (enfant.getClasse() == null) continue;
+            if (enfant.getClasse() == null)
+                continue;
             List<Examen> examens = examenRepository.findByEtablissementIdAndClasseIdOrderByDateExamenAscHeureDebutAsc(
-                enfant.getEtablissementId(), enfant.getClasse().getId());
+                    enfant.getEtablissementId(), enfant.getClasse().getId());
             for (Examen ex : examens) {
-                if (ex.getDateExamen() == null) continue;
+                if (ex.getDateExamen() == null)
+                    continue;
                 Map<String, Object> evt = new LinkedHashMap<>();
                 evt.put("date", ex.getDateExamen());
-                evt.put("titre", enfant.getPrenom() + " : " + (ex.getMatiere() != null ? ex.getMatiere().getNom() : "Examen"));
+                evt.put("titre",
+                        enfant.getPrenom() + " : " + (ex.getMatiere() != null ? ex.getMatiere().getNom() : "Examen"));
                 evt.put("heure", ex.getHeureDebut());
                 evt.put("lieu", ex.getSalle());
                 evt.put("categorie", "EXAMEN");
@@ -309,14 +347,17 @@ public class PortailParentController {
 
         // Evenements ecole reels (generaux ou lies a une des classes des enfants)
         List<Long> classesEnfants = enfants.stream()
-            .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).distinct().toList();
+                .filter(e -> e.getClasse() != null).map(e -> e.getClasse().getId()).distinct().toList();
         Long etabId = etablissementService.getCurrentEtablissementId();
-        if (etabId == null && !enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
+        if (etabId == null && !enfants.isEmpty())
+            etabId = enfants.get(0).getEtablissementId();
         if (etabId != null) {
             for (EvenementEcole ev : evenementEcoleRepository.findByEtablissementIdOrderByDateEvenementAsc(etabId)) {
-                if (ev.getDateEvenement() == null) continue;
+                if (ev.getDateEvenement() == null)
+                    continue;
                 boolean concerne = ev.getClasse() == null || classesEnfants.contains(ev.getClasse().getId());
-                if (!concerne) continue;
+                if (!concerne)
+                    continue;
                 Map<String, Object> evt = new LinkedHashMap<>();
                 evt.put("date", ev.getDateEvenement());
                 evt.put("titre", ev.getTitre());
@@ -332,7 +373,8 @@ public class PortailParentController {
 
         // Rappels personnels du parent
         for (RappelParent r : rappelParentRepository.findByParentEmailOrderByDateRappelAsc(email)) {
-            if (r.getDateRappel() == null) continue;
+            if (r.getDateRappel() == null)
+                continue;
             Map<String, Object> evt = new LinkedHashMap<>();
             evt.put("date", r.getDateRappel());
             evt.put("titre", r.getTitre());
@@ -349,20 +391,22 @@ public class PortailParentController {
         tousLesEvenements.sort(Comparator.comparing(e -> (LocalDate) e.get("date")));
 
         List<Map<String, Object>> evenementsDuMois = tousLesEvenements.stream()
-            .filter(e -> {
-                LocalDate d = (LocalDate) e.get("date");
-                return !d.isBefore(debutMois) && !d.isAfter(finMois);
-            }).toList();
+                .filter(e -> {
+                    LocalDate d = (LocalDate) e.get("date");
+                    return !d.isBefore(debutMois) && !d.isAfter(finMois);
+                }).toList();
 
         Map<LocalDate, List<Map<String, Object>>> parJour = evenementsDuMois.stream()
-            .collect(Collectors.groupingBy(e -> (LocalDate) e.get("date"), LinkedHashMap::new, Collectors.toList()));
+                .collect(
+                        Collectors.groupingBy(e -> (LocalDate) e.get("date"), LinkedHashMap::new, Collectors.toList()));
 
         List<Map<String, Object>> evenementsAVenir = tousLesEvenements.stream()
-            .filter(e -> !((LocalDate) e.get("date")).isBefore(aujourdHui))
-            .limit(5)
-            .toList();
+                .filter(e -> !((LocalDate) e.get("date")).isBefore(aujourdHui))
+                .limit(5)
+                .toList();
 
-        // Grille du mois : premier jour affiche = lundi de la semaine contenant le 1er du mois
+        // Grille du mois : premier jour affiche = lundi de la semaine contenant le 1er
+        // du mois
         LocalDate debutGrille = debutMois.minusDays((debutMois.getDayOfWeek().getValue() - 1));
         LocalDate finGrille = finMois.plusDays(7 - finMois.getDayOfWeek().getValue());
         LocalDate debutSemaineCourante = aujourdHui.minusDays(aujourdHui.getDayOfWeek().getValue() - 1);
@@ -407,11 +451,13 @@ public class PortailParentController {
         r.setNotes(notes);
         rappelParentRepository.save(r);
         ra.addFlashAttribute("successMsg", "Rappel ajoute.");
-        return "redirect:/portail-parent/calendrier?mois=" + dateRappel.getMonthValue() + "&annee=" + dateRappel.getYear();
+        return "redirect:/portail-parent/calendrier?mois=" + dateRappel.getMonthValue() + "&annee="
+                + dateRappel.getYear();
     }
 
     @PostMapping("/calendrier/rappel/{id}/supprimer")
-    public String supprimerRappel(@org.springframework.web.bind.annotation.PathVariable Long id, Authentication auth, RedirectAttributes ra) {
+    public String supprimerRappel(@org.springframework.web.bind.annotation.PathVariable Long id, Authentication auth,
+            RedirectAttributes ra) {
         String email = auth != null ? auth.getName() : "";
         rappelParentRepository.deleteByIdAndParentEmail(id, email);
         ra.addFlashAttribute("successMsg", "Rappel supprime.");
@@ -434,12 +480,12 @@ public class PortailParentController {
             RedirectAttributes ra) {
         String email = auth != null ? auth.getName() : "";
         Eleve enfant = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email).stream()
-            .filter(e -> e.getId().equals(eleveId))
-            .findFirst()
-            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
-                org.springframework.http.HttpStatus.FORBIDDEN, "Cet eleve n'est pas rattache a votre compte."));
+                .filter(e -> e.getId().equals(eleveId))
+                .findFirst()
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.FORBIDDEN, "Cet eleve n'est pas rattache a votre compte."));
 
-        String anneeScolaireAvis = holyflame.administration.util.AnneeScolaireUtil.pour(java.time.LocalDate.now());
+        String anneeScolaireAvis = holyflame.administration.util.AnneeScolaireUtil.pour(horlogeService.aujourdHui());
         anneeScolaireService.verifierModifiable(anneeScolaireAvis, enfant.getEtablissementId());
 
         AvisParent avis = new AvisParent();
@@ -447,7 +493,7 @@ public class PortailParentController {
         avis.setCategorie(categorie);
         avis.setDescription(description);
         avis.setParentEmail(email);
-        avis.setDateSignalement(java.time.LocalDateTime.now());
+        avis.setDateSignalement(horlogeService.maintenant());
         avis.setAnneeScolaire(anneeScolaireAvis);
         avis.setEtablissementId(enfant.getEtablissementId());
         avisParentRepository.save(avis);

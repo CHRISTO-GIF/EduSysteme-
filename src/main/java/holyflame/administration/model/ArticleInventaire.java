@@ -25,6 +25,7 @@ public class ArticleInventaire {
     private String numSerie;
     @Column(length = 1000)
     private String notes;
+    private Long etablissementId;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<MouvementInventaire> mouvements = new ArrayList<>();
@@ -53,6 +54,8 @@ public class ArticleInventaire {
     public void setNumSerie(String numSerie) { this.numSerie = numSerie; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+    public Long getEtablissementId() { return etablissementId; }
+    public void setEtablissementId(Long etablissementId) { this.etablissementId = etablissementId; }
     public List<MouvementInventaire> getMouvements() { return mouvements; }
     public void setMouvements(List<MouvementInventaire> mouvements) { this.mouvements = mouvements; }
 }

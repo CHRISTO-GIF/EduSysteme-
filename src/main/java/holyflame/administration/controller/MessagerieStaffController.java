@@ -1,12 +1,7 @@
 package holyflame.administration.controller;
 
-import holyflame.administration.model.Classe;
-import holyflame.administration.model.Eleve;
-import holyflame.administration.model.EnseignantAutorisation;
 import holyflame.administration.model.MessagePrive;
 import holyflame.administration.model.Utilisateur;
-import holyflame.administration.repository.EleveRepository;
-import holyflame.administration.repository.EnseignantAutorisationRepository;
 import holyflame.administration.repository.UtilisateurRepository;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.MessagerieService;
@@ -23,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +26,6 @@ import java.util.Map;
 public class MessagerieStaffController {
 
     @Autowired private UtilisateurRepository utilisateurRepository;
-    @Autowired private EleveRepository eleveRepository;
-    @Autowired private EnseignantAutorisationRepository enseignantAutorisationRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private MessagerieService messagerieService;
 
@@ -44,38 +36,7 @@ public class MessagerieStaffController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         if (etabId == null && moi != null && moi.getEtablissement() != null) etabId = moi.getEtablissement().getId();
 
-        List<Eleve> elevesConcernes = new ArrayList<>();
-        if (etabId != null) {
-            if (moi != null && "ENSEIGNANT".equals(moi.getRole())) {
-                List<Long> classeIds = enseignantAutorisationRepository.findByEnseignantIdAndEtablissementId(moi.getId(), etabId).stream()
-                    .map(EnseignantAutorisation::getClasseId).distinct().toList();
-                elevesConcernes = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId).stream()
-                    .filter(e -> e.getClasse() != null && classeIds.contains(e.getClasse().getId()))
-                    .toList();
-            } else {
-                // ADMIN / SECRETAIRE : parents de tous les eleves de l'etablissement
-                elevesConcernes = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
-            }
-        }
-
-        // Regroupement des eleves par email du parent (un parent peut avoir plusieurs enfants)
-        Map<String, List<Eleve>> elevesParParent = new LinkedHashMap<>();
-        for (Eleve e : elevesConcernes) {
-            if (e.getEmailParent() == null || e.getEmailParent().isBlank()) continue;
-            elevesParParent.computeIfAbsent(e.getEmailParent(), k -> new ArrayList<>()).add(e);
-        }
-
-        Map<String, Map<String, Object>> contactsParEmail = new LinkedHashMap<>();
-        for (Map.Entry<String, List<Eleve>> entry : elevesParParent.entrySet()) {
-            String nomsEnfants = entry.getValue().stream()
-                .map(e -> e.getPrenom() + " " + e.getNom()).distinct().reduce((a, b) -> a + ", " + b).orElse("");
-            String classesEnfants = entry.getValue().stream()
-                .map(Eleve::getClasse).filter(java.util.Objects::nonNull).map(Classe::getNom).distinct()
-                .reduce((a, b) -> a + ", " + b).orElse("");
-            contactsParEmail.put(entry.getKey(), messagerieService.creerContact(
-                entry.getKey(), "Parent de " + nomsEnfants, classesEnfants.isBlank() ? "Parent" : classesEnfants));
-        }
-
+        Map<String, Map<String, Object>> contactsParEmail = messagerieService.construireContactsStaff(moi, etabId);
         List<Map<String, Object>> conversations = messagerieService.construireConversations(email, contactsParEmail);
 
         String correspondantActif = avec;
@@ -110,7 +71,25 @@ public class MessagerieStaffController {
                            @RequestParam(required = false) MultipartFile pieceJointe,
                            Authentication auth, RedirectAttributes ra) throws IOException {
         String email = auth != null ? auth.getName() : "";
-        messagerieService.envoyerMessage(email, destinataire, contenu, pieceJointe);
+        Utilisateur moi = utilisateurRepository.findByEmail(email).orElse(null);
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (etabId == null && moi != null && moi.getEtablissement() != null) etabId = moi.getEtablissement().getId();
+
+        // Le destinataire ne peut etre que le parent d'un eleve que ce membre du staff peut
+        // legitimement contacter (ses classes autorisees pour un enseignant, tout l'etablissement
+        // pour admin/secretaire) — sans ce controle, n'importe quelle adresse email du systeme
+        // pourrait recevoir un message, y compris d'un autre etablissement.
+        Map<String, Map<String, Object>> contactsParEmail = messagerieService.construireContactsStaff(moi, etabId);
+        if (!messagerieService.estContactAutorise(destinataire, contactsParEmail)) {
+            ra.addFlashAttribute("erreurMsg", "Ce destinataire n'est pas un contact autorisé.");
+            return "redirect:/messagerie";
+        }
+
+        try {
+            messagerieService.envoyerMessage(email, destinataire, contenu, pieceJointe, etabId);
+        } catch (IOException e) {
+            ra.addFlashAttribute("erreurMsg", e.getMessage());
+        }
         return "redirect:/messagerie?avec=" + destinataire;
     }
 }

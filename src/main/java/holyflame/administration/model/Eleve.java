@@ -12,16 +12,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
+// Le matricule n'est unique QUE dans son etablissement (colonne composite), pas sur toute la
+// base : deux ecoles differentes doivent pouvoir utiliser le meme numero sans se gener.
 @Entity
-@Table(name = "eleves")
+@Table(name = "eleves", uniqueConstraints = @UniqueConstraint(columnNames = {"matricule", "etablissement_id"}))
 public class Eleve {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String matricule;
 
     private String nom;

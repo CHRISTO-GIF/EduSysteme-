@@ -15,6 +15,7 @@ public class AlerteService {
     @Autowired private PaiementRepository paiementRepository;
     @Autowired private PersonnelRepository personnelRepository;
     @Autowired private ParametreRepository parametreRepository;
+    @Autowired private HorlogeService horlogeService;
 
     public record Alerte(String niveau, String icone, String message, String lien) {}
 
@@ -23,8 +24,8 @@ public class AlerteService {
         if (etabId == null) return alertes;
 
         // 1. Élèves avec ≥ 5 absences ce mois
-        int moisActuel = LocalDate.now().getMonthValue();
-        int anneeActuelle = LocalDate.now().getYear();
+        int moisActuel = horlogeService.aujourdHui(etabId).getMonthValue();
+        int anneeActuelle = horlogeService.aujourdHui(etabId).getYear();
         long elevesAbsents = absenceRepository.findByEtablissementId(etabId).stream()
             .filter(a -> a.getDate() != null
                 && a.getDate().getMonthValue() == moisActuel
@@ -60,7 +61,7 @@ public class AlerteService {
                 String[] parts = p.getValeur().split("/");
                 LocalDate fin = LocalDate.of(Integer.parseInt(parts[2]),
                     Integer.parseInt(parts[1]), Integer.parseInt(parts[0]));
-                long jours = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), fin);
+                long jours = java.time.temporal.ChronoUnit.DAYS.between(horlogeService.aujourdHui(etabId), fin);
                 if (jours >= 0 && jours <= 30) {
                     alertes.add(new Alerte("info", "bi-calendar-event",
                         "Fin d'année dans " + jours + " jour(s) — pensez aux bulletins", "/bulletins"));

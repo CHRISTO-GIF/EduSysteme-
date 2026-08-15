@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +33,7 @@ public class MessagerieController {
     @Autowired private EtablissementService etablissementService;
     @Autowired private MessagerieService messagerieService;
     @Autowired private SignalementMessagerieRepository signalementMessagerieRepository;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     @GetMapping
     public String index(@RequestParam(required = false) String avec, Authentication auth, Model model) {
@@ -89,7 +89,24 @@ public class MessagerieController {
                            @RequestParam(required = false) MultipartFile pieceJointe,
                            Authentication auth, RedirectAttributes ra) throws IOException {
         String email = auth != null ? auth.getName() : "";
-        messagerieService.envoyerMessage(email, destinataire, contenu, pieceJointe);
+
+        // Le destinataire ne peut etre qu'un contact reellement legitime pour ce parent
+        // (enseignant d'un de ses enfants, ou administration de son etablissement) — sans ce
+        // controle, n'importe quelle adresse email du systeme pourrait recevoir un message.
+        List<Eleve> enfants = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email);
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (etabId == null && !enfants.isEmpty()) etabId = enfants.get(0).getEtablissementId();
+        Map<String, Map<String, Object>> contactsParEmail = messagerieService.construireContactsParent(enfants, etabId);
+        if (!messagerieService.estContactAutorise(destinataire, contactsParEmail)) {
+            ra.addFlashAttribute("erreurMsg", "Ce destinataire n'est pas un contact autorisé.");
+            return "redirect:/portail-parent/messages";
+        }
+
+        try {
+            messagerieService.envoyerMessage(email, destinataire, contenu, pieceJointe, etabId);
+        } catch (IOException e) {
+            ra.addFlashAttribute("erreurMsg", e.getMessage());
+        }
         return "redirect:/portail-parent/messages?avec=" + destinataire;
     }
 
@@ -103,7 +120,7 @@ public class MessagerieController {
         s.setConcernant(concernant);
         s.setMotif(motif);
         s.setDescription(description);
-        s.setDateSignalement(LocalDateTime.now());
+        s.setDateSignalement(horlogeService.maintenant());
         s.setStatut("OUVERT");
         Long etabId = etablissementService.getCurrentEtablissementId();
         if (etabId == null) {

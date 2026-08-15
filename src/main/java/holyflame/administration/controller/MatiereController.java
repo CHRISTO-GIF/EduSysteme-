@@ -48,6 +48,7 @@ public class MatiereController {
     @GetMapping
     public String index(@RequestParam(required = false, defaultValue = "manuelle") String tab, Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         model.addAttribute("matieres", matiereRepository.findByEtablissementIdOrderByNomAsc(etabId));
         model.addAttribute("activeTab", tab);
         return "matieres";
@@ -237,6 +238,7 @@ public class MatiereController {
         session.setAttribute(SESSION_IMPORT_KEY, validesUniquement);
 
         Long etabIdModel = etablissementService.getCurrentEtablissementId();
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         model.addAttribute("matieres", matiereRepository.findByEtablissementIdOrderByNomAsc(etabIdModel));
         model.addAttribute("activeTab", "import");
         model.addAttribute("erreurImport", erreurFichier);

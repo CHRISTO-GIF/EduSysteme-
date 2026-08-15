@@ -6,6 +6,7 @@ import holyflame.administration.model.Matiere;
 import holyflame.administration.model.Note;
 import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.EleveRepository;
+import holyflame.administration.repository.EnseignantAutorisationRepository;
 import holyflame.administration.repository.ExamenRepository;
 import holyflame.administration.repository.MatiereRepository;
 import holyflame.administration.repository.NoteRepository;
@@ -33,8 +34,24 @@ public class ExamenController {
     @Autowired private ClasseRepository classeRepository;
     @Autowired private MatiereRepository matiereRepository;
     @Autowired private EleveRepository eleveRepository;
+    @Autowired private EnseignantAutorisationRepository autorisationRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private JournalService journalService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
+
+    private boolean isEnseignant() {
+        holyflame.administration.model.Utilisateur u = etablissementService.getCurrentUtilisateur();
+        return u != null && "ENSEIGNANT".equals(u.getRole());
+    }
+
+    /** Un enseignant ne peut planifier/supprimer un examen que pour une matiere+classe qu'il enseigne. */
+    private boolean isAutorise(Long matiereId, Long classeId) {
+        if (!isEnseignant()) return true; // ADMIN/SECRETAIRE : acces total
+        holyflame.administration.model.Utilisateur u = etablissementService.getCurrentUtilisateur();
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        return autorisationRepository.findByEnseignantIdAndEtablissementId(u.getId(), etabId).stream()
+            .anyMatch(a -> a.getMatiereId().equals(matiereId) && a.getClasseId().equals(classeId));
+    }
 
     @GetMapping
     public String index(@RequestParam(required = false) Long classeId, Model model) {
@@ -51,8 +68,8 @@ public class ExamenController {
             ? examenRepository.findByEtablissementIdAndClasseIdOrderByDateExamenAscHeureDebutAsc(etabId, classeId)
             : examenRepository.findByEtablissementIdOrderByDateExamenAscHeureDebutAsc(etabId);
 
-        LocalDate aujourdHui = LocalDate.now();
-        LocalTime maintenant = LocalTime.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
+        LocalTime maintenant = horlogeService.maintenant().toLocalTime();
 
         List<Map<String, Object>> sessions = new ArrayList<>();
         for (Examen e : examens) {
@@ -157,7 +174,8 @@ public class ExamenController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateExamen,
             @RequestParam(required = false) String heureDebut,
             @RequestParam(required = false) String heureFin,
-            @RequestParam(required = false) Integer trimestre,
+            @RequestParam Integer trimestre,
+            @RequestParam(required = false, defaultValue = "false") boolean confirmerQuota,
             RedirectAttributes ra) {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
@@ -166,6 +184,18 @@ public class ExamenController {
         if (!etabId.equals(matiere.getEtablissementId()) || !etabId.equals(classe.getEtablissementId())) {
             throw new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.FORBIDDEN, "Matiere ou classe introuvable dans cet etablissement.");
+        }
+        if (!isAutorise(matiereId, classeId)) {
+            ra.addFlashAttribute("erreurAuth", "Vous n'êtes pas autorisé à planifier un examen pour cette matière ou classe.");
+            return "redirect:/examens";
+        }
+
+        // Un seul examen est normalement autorise par matiere et par trimestre pour une classe.
+        if (!confirmerQuota && examenRepository.countByMatiereIdAndClasseIdAndTrimestre(matiereId, classeId, trimestre) >= 1) {
+            ra.addFlashAttribute("erreurAuth",
+                "Un examen de " + matiere.getNom() + " est déjà planifié pour la classe " + classe.getNom()
+                    + " ce trimestre — un seul examen est normalement autorisé. Cochez la confirmation pour en planifier un second.");
+            return "redirect:/examens";
         }
 
         Examen examen = new Examen();
@@ -188,13 +218,22 @@ public class ExamenController {
     @PostMapping("/{id}/supprimer")
     public String supprimer(@PathVariable Long id, RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
-        examenRepository.findById(id)
+        Examen examen = examenRepository.findById(id)
             .filter(e -> etabId.equals(e.getEtablissementId()))
-            .ifPresent(e -> {
-                journalService.log("EXAMEN_SUPPRIMÉ", "EXAMENS",
-                    (e.getMatiere() != null ? e.getMatiere().getNom() : "?") + " — " + e.getDateExamen());
-                examenRepository.delete(e);
-            });
+            .orElse(null);
+        if (examen == null) {
+            ra.addFlashAttribute("erreurAuth", "Examen introuvable.");
+            return "redirect:/examens";
+        }
+        Long matiereId = examen.getMatiere() != null ? examen.getMatiere().getId() : null;
+        Long classeId = examen.getClasse() != null ? examen.getClasse().getId() : null;
+        if (!isAutorise(matiereId, classeId)) {
+            ra.addFlashAttribute("erreurAuth", "Vous n'êtes pas autorisé à supprimer cet examen.");
+            return "redirect:/examens";
+        }
+        journalService.log("EXAMEN_SUPPRIMÉ", "EXAMENS",
+            (examen.getMatiere() != null ? examen.getMatiere().getNom() : "?") + " — " + examen.getDateExamen());
+        examenRepository.delete(examen);
         ra.addFlashAttribute("successMsg", "Examen supprime.");
         return "redirect:/examens";
     }

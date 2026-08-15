@@ -57,17 +57,30 @@ public class SecretariatController {
     @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
 
     @GetMapping
-    public String index(Model model) {
+    public String index(@RequestParam(defaultValue = "false") boolean toutesAnnees, Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
-        var eleves = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
-        var classes = classeRepository.findByEtablissementId(etabId);
+        String anneeActive = etablissementService.getAnneeScolaireActive();
+        var elevesTous = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
+        var classesTous = classeRepository.findByEtablissementId(etabId);
+        // Par defaut, seule l'annee scolaire active est affichee : les eleves/classes des annees
+        // precedentes restent consultables via "Voir aussi les annees precedentes" sans encombrer l'usage quotidien.
+        var eleves = toutesAnnees ? elevesTous : elevesTous.stream()
+            .filter(e -> e.getClasse() == null || anneeActive.equals(e.getClasse().getAnneeScolaire()))
+            .toList();
+        var classes = toutesAnnees ? classesTous : classesTous.stream()
+            .filter(c -> anneeActive.equals(c.getAnneeScolaire()))
+            .toList();
         model.addAttribute("eleves",        eleves);
         model.addAttribute("classes",       classes);
+        model.addAttribute("toutesAnnees",  toutesAnnees);
+        model.addAttribute("anneeActive",   anneeActive);
+        model.addAttribute("nbElevesAnneesPrecedentes", elevesTous.size() - eleves.size());
         var absences = absenceRepository.findByEtablissementId(etabId);
         model.addAttribute("absences",      absences);
         model.addAttribute("totalAbsences", absences.size());
@@ -78,10 +91,10 @@ public class SecretariatController {
         model.addAttribute("totalInscrits",  totalInscrits);
         model.addAttribute("totalEnAttente", eleves.size() - totalInscrits);
         java.util.Set<Long> eleveIdsAbsentsAujourdHui = absences.stream()
-            .filter(a -> java.time.LocalDate.now().equals(a.getDate()))
+            .filter(a -> horlogeService.aujourdHui().equals(a.getDate()))
             .map(a -> a.getEleve().getId())
             .collect(java.util.stream.Collectors.toSet());
-        java.util.Set<Long> eleveIdsRetardAujourdHui = retardRepository.findByEtablissementIdAndDate(etabId, java.time.LocalDate.now()).stream()
+        java.util.Set<Long> eleveIdsRetardAujourdHui = retardRepository.findByEtablissementIdAndDate(etabId, horlogeService.aujourdHui()).stream()
             .map(r -> r.getEleve().getId())
             .collect(java.util.stream.Collectors.toSet());
         model.addAttribute("eleveIdsAbsentsAujourdHui", eleveIdsAbsentsAujourdHui);
@@ -276,6 +289,7 @@ public class SecretariatController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         Absence absence = absenceRepository.findById(id).orElseThrow();
         if (absence.getEleve() != null) verifierProprietaire(absence.getEleve(), etabId);
+        anneeScolaireService.verifierModifiable(absence.getAnneeScolaire(), etabId);
         absenceRepository.deleteById(id);
         return "redirect:/secretariat";
     }
@@ -484,9 +498,9 @@ public class SecretariatController {
                 eleve.setMereTelephone(l.mereTelephone);
                 eleve.setMereEmail(l.mereEmail);
                 eleve.setStatutInscription("INSCRIT");
-                eleve.setDateInscription(LocalDate.now());
+                eleve.setDateInscription(horlogeService.aujourdHui());
                 eleve.setEtablissementId(etabId);
-                eleve.setMatricule("HF-" + LocalDate.now().getYear() + "-" + String.format("%03d", (eleveRepository.count() + 1)));
+                eleve.setMatricule("HF-" + horlogeService.aujourdHui().getYear() + "-" + String.format("%03d", (eleveRepository.count() + 1)));
                 if (l.pereEmail != null && !l.pereEmail.isBlank()) eleve.setPereCodeAcces(genererCodeAcces());
                 if (l.mereEmail != null && !l.mereEmail.isBlank()) eleve.setMereCodeAcces(genererCodeAcces());
                 eleveRepository.save(eleve);

@@ -21,6 +21,7 @@ public class CommunicationMessage {
     private LocalDateTime dateEnvoi;
     private String expediteur;
     private int nbDestinataires;
+    private Long etablissementId;
 
     public CommunicationMessage() {}
 
@@ -44,4 +45,6 @@ public class CommunicationMessage {
     public void setExpediteur(String expediteur) { this.expediteur = expediteur; }
     public int getNbDestinataires() { return nbDestinataires; }
     public void setNbDestinataires(int nbDestinataires) { this.nbDestinataires = nbDestinataires; }
+    public Long getEtablissementId() { return etablissementId; }
+    public void setEtablissementId(Long etablissementId) { this.etablissementId = etablissementId; }
 }

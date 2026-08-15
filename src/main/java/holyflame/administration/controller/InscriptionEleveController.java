@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -50,6 +49,7 @@ public class InscriptionEleveController {
     @Autowired private FileStorageService fileStorageService;
     @Autowired private EtablissementService etablissementService;
     @Autowired private JournalService journalService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     public static class DonneesInscriptionEleve implements Serializable {
         // Etape 1 : Informations Personnelles
@@ -206,7 +206,7 @@ public class InscriptionEleveController {
         } else if (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank()) {
             anneeScolaire = etab.getAnneeScolaire();
         } else {
-            anneeScolaire = LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1);
+            anneeScolaire = horlogeService.aujourdHui().getYear() + "-" + (horlogeService.aujourdHui().getYear() + 1);
         }
         model.addAttribute("donnees", donnees);
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
@@ -233,7 +233,7 @@ public class InscriptionEleveController {
         }
         donnees.classeId = classeId;
         donnees.anneeScolaire = anneeScolaire;
-        donnees.dateInscription = dateInscription != null ? dateInscription : LocalDate.now();
+        donnees.dateInscription = dateInscription != null ? dateInscription : horlogeService.aujourdHui();
         donnees.ecoleProvenance = ecoleProvenance;
         donnees.langueVivante1 = langueVivante1;
         donnees.langueVivante2 = langueVivante2;
@@ -328,7 +328,7 @@ public class InscriptionEleveController {
         String nomFamille = parts.length > 1 ? parts[1] : parts[0];
 
         Eleve eleve = new Eleve();
-        eleve.setMatricule("HF-" + LocalDate.now().getYear() + "-" + String.format("%03d", (eleveRepository.count() + 1)));
+        eleve.setMatricule("HF-" + horlogeService.aujourdHui().getYear() + "-" + String.format("%03d", (eleveRepository.count() + 1)));
         eleve.setNom(nomFamille.toUpperCase());
         eleve.setPrenom(prenom);
         eleve.setDateNaissance(donnees.dateNaissance);
@@ -358,7 +358,7 @@ public class InscriptionEleveController {
         eleve.setTelephoneParent(pereRenseigne ? donnees.pereTelephone : donnees.mereTelephone);
         eleve.setEmailParent(pereRenseigne ? donnees.pereEmail : donnees.mereEmail);
         eleve.setClasse(classe);
-        eleve.setDateInscription(donnees.dateInscription != null ? donnees.dateInscription : LocalDate.now());
+        eleve.setDateInscription(donnees.dateInscription != null ? donnees.dateInscription : horlogeService.aujourdHui());
         eleve.setEcoleProvenance(donnees.ecoleProvenance);
         eleve.setLangueVivante1(donnees.langueVivante1);
         eleve.setLangueVivante2(donnees.langueVivante2);
@@ -375,8 +375,8 @@ public class InscriptionEleveController {
             paiement.setMontantVerse(donnees.paiementMontant);
             paiement.setTypePaiement("INSCRIPTION");
             paiement.setModePaiement(donnees.paiementMode != null && !donnees.paiementMode.isBlank() ? donnees.paiementMode : "ESPECES");
-            paiement.setDatePaiement(LocalDateTime.now());
-            paiement.setAnneeScolaire(holyflame.administration.util.AnneeScolaireUtil.pour(LocalDate.now()));
+            paiement.setDatePaiement(horlogeService.maintenant());
+            paiement.setAnneeScolaire(holyflame.administration.util.AnneeScolaireUtil.pour(horlogeService.aujourdHui()));
             paiement.setRecuNumero("HF-" + System.currentTimeMillis());
             fraisScolariteRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId).stream()
                 .filter(f -> "INSCRIPTION".equals(f.getTypeFrais()))
@@ -419,7 +419,7 @@ public class InscriptionEleveController {
             doc.setTypeDocument(typeDocument);
             doc.setContentType(fichier.getContentType());
             doc.setTaille(fichier.getSize());
-            doc.setDateUpload(LocalDateTime.now());
+            doc.setDateUpload(horlogeService.maintenant());
             documentEleveRepository.save(doc);
         } catch (IOException ignored) {
         }

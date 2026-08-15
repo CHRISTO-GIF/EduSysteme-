@@ -28,6 +28,7 @@ public class DashboardController {
     @Autowired private ParametreRepository parametreRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private AlerteService alerteService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -43,15 +44,15 @@ public class DashboardController {
         model.addAttribute("alertes", alerteService.getAlertes(etabId));
 
         // KPIs — filtrés par établissement
-        model.addAttribute("totalEleves",     etabId != null ? eleveRepository.countByEtablissementId(etabId)     : eleveRepository.count());
-        model.addAttribute("totalClasses",    etabId != null ? classeRepository.findByEtablissementId(etabId).size() : classeRepository.count());
-        model.addAttribute("totalAbsences",   etabId != null ? absenceRepository.countByEtablissementId(etabId)   : absenceRepository.count());
-        model.addAttribute("totalPersonnels", etabId != null ? personnelRepository.countByEtablissementId(etabId) : personnelRepository.count());
+        model.addAttribute("totalEleves",     etabId != null ? eleveRepository.countByEtablissementId(etabId)     : 0L);
+        model.addAttribute("totalClasses",    etabId != null ? classeRepository.findByEtablissementId(etabId).size() : 0);
+        model.addAttribute("totalAbsences",   etabId != null ? absenceRepository.countByEtablissementId(etabId)   : 0L);
+        model.addAttribute("totalPersonnels", etabId != null ? personnelRepository.countByEtablissementId(etabId) : 0L);
 
         // Finances — filtrées par établissement
         List<Paiement> paiements = etabId != null
             ? paiementRepository.findByEtablissementId(etabId)
-            : paiementRepository.findAll();
+            : List.of();
         double totalEncaisse = paiements.stream()
             .mapToDouble(p -> p.getMontantVerse() != null ? p.getMontantVerse() : 0).sum();
         model.addAttribute("totalEncaisse", totalEncaisse);
@@ -60,7 +61,7 @@ public class DashboardController {
         String anneeScolaire = etablissementService.getAnneeScolaireActive();
         var lignesBudget = etabId != null
             ? budgetRepository.findByEtablissementIdAndAnneeScolaireOrderByDesignationAsc(etabId, anneeScolaire)
-            : budgetRepository.findByAnneeScolaireOrderByDesignationAsc(anneeScolaire);
+            : List.<holyflame.administration.model.LigneBudget>of();
         double budgetRevenu = lignesBudget.stream().filter(holyflame.administration.model.LigneBudget::isRevenu)
             .mapToDouble(l -> l.getMontantPrevu() != null ? l.getMontantPrevu() : 0).sum();
         double budgetDepense = lignesBudget.stream().filter(l -> !l.isRevenu())
@@ -71,7 +72,7 @@ public class DashboardController {
 
         // Graphique paiements par mois
         String[] moisNoms = {"Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"};
-        int annee = LocalDateTime.now().getYear();
+        int annee = horlogeService.maintenant().getYear();
         Map<Integer, Double> pParMois = paiements.stream()
             .filter(p -> p.getDatePaiement() != null && p.getDatePaiement().getYear() == annee)
             .collect(Collectors.groupingBy(p -> p.getDatePaiement().getMonthValue(),
@@ -83,14 +84,14 @@ public class DashboardController {
         model.addAttribute("paiementsData",   pData);
         double maxPaiementMois = pData.stream().mapToDouble(Double::doubleValue).max().orElse(0.0);
         model.addAttribute("maxPaiementMois", Math.max(1.0, maxPaiementMois));
-        int moisCourantIndex = LocalDateTime.now().getMonthValue() - 1;
+        int moisCourantIndex = horlogeService.maintenant().getMonthValue() - 1;
         model.addAttribute("moisCourantIndex", moisCourantIndex);
         model.addAttribute("totalEncaisseMois", pData.get(moisCourantIndex));
 
         // Graphique absences par mois — filtrées par établissement
         List<holyflame.administration.model.Absence> absences = etabId != null
             ? absenceRepository.findByEtablissementId(etabId)
-            : absenceRepository.findAll();
+            : List.of();
         Map<Integer, Long> absParMois = absences.stream()
             .filter(a -> a.getDate() != null && a.getDate().getYear() == annee)
             .collect(Collectors.groupingBy(a -> a.getDate().getMonthValue(), Collectors.counting()));
@@ -102,7 +103,7 @@ public class DashboardController {
         // Graphique notes par mention — filtrées par établissement
         List<Note> toutesNotes = etabId != null
             ? noteRepository.findByEtablissementId(etabId)
-            : noteRepository.findAllByOrderByDateEvaluationDesc();
+            : List.of();
         List<Long> notesMentions = List.of(
             toutesNotes.stream().filter(n -> n.getValeur() != null && n.getValeur() >= 16).count(),
             toutesNotes.stream().filter(n -> n.getValeur() != null && n.getValeur() >= 14 && n.getValeur() < 16).count(),

@@ -34,6 +34,7 @@ public class InscriptionEcoleController {
     @Autowired private ClasseRepository classeRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private holyflame.administration.service.PlanComptableService planComptableService;
 
     /** Code de niveau -> [nom affiche, cycle]. Utilise pour generer une classe par defaut par niveau coche. */
     private static final java.util.Map<String, String[]> NIVEAUX = new java.util.LinkedHashMap<>();
@@ -263,6 +264,7 @@ public class InscriptionEcoleController {
         etab.setLangueSysteme(donnees.langueSysteme != null ? donnees.langueSysteme : "Francais");
 
         etablissementRepository.save(etab);
+        planComptableService.seedSiVide(etab.getId());
 
         // Classes generees automatiquement a partir des niveaux coches a l'etape 1
         // (une classe "A" par niveau ; l'etablissement pourra ajouter des sections

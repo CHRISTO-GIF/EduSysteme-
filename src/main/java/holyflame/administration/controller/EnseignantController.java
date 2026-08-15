@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +25,7 @@ public class EnseignantController {
     @Autowired private PersonnelRepository personnelRepository;
     @Autowired private CongeRepository congeRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     @GetMapping
     public String index(Model model) {
@@ -105,8 +105,8 @@ public class EnseignantController {
 
         // Absences ce mois, pour ces eleves uniquement
         Set<Long> eleveIds = eleves.stream().map(Eleve::getId).collect(Collectors.toSet());
-        int moisActuel = LocalDate.now().getMonthValue();
-        int anneeActuelle = LocalDate.now().getYear();
+        int moisActuel = horlogeService.aujourdHui().getMonthValue();
+        int anneeActuelle = horlogeService.aujourdHui().getYear();
         long absencesCeMois = absenceRepository.findByEtablissementId(etabId).stream()
             .filter(a -> a.getEleve() != null && eleveIds.contains(a.getEleve().getId()))
             .filter(a -> a.getDate() != null && a.getDate().getMonthValue() == moisActuel && a.getDate().getYear() == anneeActuelle)

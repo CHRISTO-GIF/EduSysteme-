@@ -28,7 +28,9 @@ public class ClasseGestionController {
     @Autowired private ProgrammeRepository programmeRepository;
     @Autowired private CreneauHoraireRepository creneauHoraireRepository;
     @Autowired private UtilisateurRepository utilisateurRepository;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
 
     @GetMapping
     public String index(Model model) {
@@ -44,7 +46,7 @@ public class ClasseGestionController {
         Etablissement etab = etablissementService.getCurrentEtablissement();
         String anneeScolaire = (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank())
             ? etab.getAnneeScolaire()
-            : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1));
+            : (horlogeService.aujourdHui().getYear() + "-" + (horlogeService.aujourdHui().getYear() + 1));
         model.addAttribute("enseignants", utilisateurRepository.findByRoleAndEtablissementIdOrderByNomAsc("ENSEIGNANT", etabId));
         model.addAttribute("anneeScolaire", anneeScolaire);
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
@@ -68,8 +70,9 @@ public class ClasseGestionController {
             ? anneeScolaire
             : (etab != null && etab.getAnneeScolaire() != null && !etab.getAnneeScolaire().isBlank()
                 ? etab.getAnneeScolaire()
-                : (LocalDate.now().getYear() + "-" + (LocalDate.now().getYear() + 1)));
+                : (horlogeService.aujourdHui().getYear() + "-" + (horlogeService.aujourdHui().getYear() + 1)));
 
+        anneeScolaireService.verifierModifiable(anneeResolue, etabId);
         if (classeRepository.findByNomIgnoreCaseAndAnneeScolaireAndEtablissementId(nom.trim(), anneeResolue, etabId).isPresent()) {
             ra.addFlashAttribute("erreur", "Une classe nommée \"" + nom.trim() + "\" existe déjà pour l'année " + anneeResolue + ".");
             return "redirect:/gestion-classes/nouveau";
@@ -109,6 +112,10 @@ public class ClasseGestionController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         Classe classe = classeRepository.findById(id).orElseThrow();
         verifierProprietaire(classe, etabId);
+        anneeScolaireService.verifierModifiable(classe.getAnneeScolaire(), etabId);
+        if (anneeScolaire != null && !anneeScolaire.isBlank()) {
+            anneeScolaireService.verifierModifiable(anneeScolaire, etabId);
+        }
 
         boolean nomDejaPris = classeRepository.findByNomIgnoreCaseAndAnneeScolaireAndEtablissementId(nom.trim(), anneeScolaire, etabId)
             .map(autre -> !autre.getId().equals(id))
@@ -196,6 +203,7 @@ public class ClasseGestionController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         Classe classe = classeRepository.findById(id).orElseThrow();
         verifierProprietaire(classe, etabId);
+        anneeScolaireService.verifierModifiable(classe.getAnneeScolaire(), etabId);
         long nbEleves = eleveRepository.countByClasseId(id);
         if (nbEleves > 0) {
             ra.addFlashAttribute("erreur",

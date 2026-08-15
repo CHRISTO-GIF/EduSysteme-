@@ -68,9 +68,11 @@ public class FinancesController {
     @Autowired private EtablissementService etablissementService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private FinanceParentService financeParentService;
+    @Autowired private holyflame.administration.service.PlanComptableService planComptableService;
     @Autowired private JournalService journalService;
     @Autowired private EmailService emailService;
     @Autowired private NombreEnLettresService nombreEnLettresService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     // ===== PAGE UNIQUE A ONGLETS =====
     @GetMapping
@@ -86,7 +88,7 @@ public class FinancesController {
 
         Long etabId = etablissementService.getCurrentEtablissementId();
         if (annee == null || annee.isBlank()) annee = etablissementService.getAnneeScolaireActive();
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
         int moisFiltre = mois != null ? mois : aujourdHui.getMonthValue();
         int anneeFiltre = anneeCivile != null ? anneeCivile : aujourdHui.getYear();
         int trimestreChoisi = rapportTrimestre != null && rapportTrimestre >= 1 && rapportTrimestre <= 3 ? rapportTrimestre : 1;
@@ -95,6 +97,10 @@ public class FinancesController {
         model.addAttribute("tab", tab);
         model.addAttribute("annee", annee);
 
+        // Filet de securite : un etablissement cree avant ce correctif (ou par tout autre chemin que
+        // l'inscription en ligne) peut encore n'avoir aucune categorie comptable — sans quoi Depenses/
+        // Budget sont inutilisables. Sans effet si le plan comptable existe deja.
+        planComptableService.seedSiVide(etabId);
         List<CategorieComptable> categories = categorieComptableRepository.findByEtablissementIdAndActifTrueOrderByCodeAsc(etabId);
         List<CategorieComptable> categoriesCharges = categories.stream().filter(c -> "CHARGE".equals(c.getSens())).collect(Collectors.toList());
         List<CategorieComptable> categoriesProduits = categories.stream().filter(c -> "PRODUIT".equals(c.getSens())).collect(Collectors.toList());
@@ -103,20 +109,34 @@ public class FinancesController {
 
         List<Paiement> paiements = paiementRepository.findByEtablissementId(etabId);
         List<Depense> depenses = depenseRepository.findByEtablissementIdOrderByDateDepenseDesc(etabId);
+        // Tous les eleves, toutes annees confondues : necessaire uniquement pour retrouver un ancien
+        // eleve lors de l'enregistrement d'un arriere reporte (l'arriere peut concerner une annee passee).
         List<Eleve> tousLesEleves = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
+        // Eleves de l'annee scolaire active uniquement : utilises partout ailleurs (saisie de paiement,
+        // suivi de scolarite, KPIs, rapport par classe) pour ne jamais melanger des eleves d'annees ecoulees.
+        String anneeActive = etablissementService.getAnneeScolaireActive();
+        List<Eleve> elevesAnneeActive = tousLesEleves.stream()
+            .filter(e -> e.getClasse() == null || anneeActive.equals(e.getClasse().getAnneeScolaire()))
+            .collect(Collectors.toList());
         List<FraisScolarite> tousLesFrais = fraisScolariteRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId);
         List<LigneBudget> lignesBudget = budgetRepository.findByEtablissementIdAndAnneeScolaireOrderByDesignationAsc(etabId, annee);
 
-        model.addAttribute("eleves", tousLesEleves);
+        model.addAttribute("eleves", elevesAnneeActive);
+        model.addAttribute("elevesRecherche", tousLesEleves);
         model.addAttribute("tousLesFrais", tousLesFrais);
 
-        buildResume(model, paiements, lignesBudget, tousLesEleves, tousLesFrais, moisFiltre);
+        buildResume(model, paiements, lignesBudget, elevesAnneeActive, tousLesFrais, moisFiltre);
         buildJournal(model, etabId, paiements, depenses, moisFiltre, anneeFiltre);
-        buildScolarite(model, etabId, tousLesEleves);
+        buildScolarite(model, etabId, elevesAnneeActive);
         buildDepensesTab(model, etabId, depenses, lignesBudget, moisFiltre, anneeFiltre, categorieComptableId, statutDepense);
         buildBudgetTab(model, lignesBudget);
-        buildRapports(model, etabId, tousLesEleves, depenses, paiements, annee);
+        buildRapports(model, etabId, elevesAnneeActive, depenses, paiements, annee);
         buildRapportEconome(model, etabId, paiements, depenses, trimestreChoisi);
+
+        // ===== ONGLET PARAMETRAGE =====
+        Map<String, String> tauxPaie = parametreRepository.findByCategorieAndEtablissementIdOrderByCleAsc("PAIE", etabId).stream()
+            .collect(Collectors.toMap(Parametre::getCle, Parametre::getValeur, (a, b) -> a));
+        model.addAttribute("tauxPaie", tauxPaie);
 
         return "finances";
     }
@@ -381,6 +401,29 @@ public class FinancesController {
         return "redirect:/finances?tab=" + tab;
     }
 
+    // ===== ONGLET PARAMETRAGE — taux de paie par defaut, modifiables par le tresorier lui-meme
+    // (auparavant fige a la creation de l'etablissement, sans aucune page pour les corriger) =====
+    private static final List<String> CLES_TAUX_PAIE = List.of(
+        "TAUX_CNPS_EMPLOYE", "TAUX_IRPP", "TAUX_TAXE_APPRENTISSAGE",
+        "TAUX_TAXE_FORFAITAIRE", "TAUX_CNPS_ACCIDENT_TRAVAIL", "TAUX_CNPS_ALLOCATIONS_FAMILIALES",
+        "TAUX_CNPS_PENSION_VIEILLESSE");
+
+    @PostMapping("/parametres/taux-paie")
+    public String tauxPaie(@RequestParam Map<String, String> formParams, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        for (String cle : CLES_TAUX_PAIE) {
+            String valeur = formParams.get(cle);
+            if (valeur == null || valeur.isBlank()) continue;
+            Parametre p = parametreRepository.findByCleAndEtablissementId(cle, etabId).orElseGet(Parametre::new);
+            p.setCle(cle); p.setValeur(valeur.trim());
+            p.setCategorie("PAIE"); p.setEtablissementId(etabId);
+            if (p.getDescription() == null) p.setDescription(cle);
+            parametreRepository.save(p);
+        }
+        ra.addFlashAttribute("successMsg", "Taux de paie par defaut mis a jour. Ils pre-rempliront desormais chaque nouveau bulletin.");
+        return "redirect:/finances?tab=parametrage";
+    }
+
     // ===== ONGLET SCOLARITE & ARRIERES =====
     private void buildScolarite(Model model, Long etabId, List<Eleve> tousLesEleves) {
         FinanceParentService.ResumeSolde resume = financeParentService.calculerResume(tousLesEleves, etabId);
@@ -439,7 +482,7 @@ public class FinancesController {
         ArriereEleve a = new ArriereEleve();
         a.setEleve(eleve); a.setAnneeScolaireOrigine(anneeScolaireOrigine);
         a.setMontant(montant); a.setNotes(notes);
-        a.setDateEnregistrement(LocalDate.now()); a.setEtablissementId(etabId);
+        a.setDateEnregistrement(horlogeService.aujourdHui()); a.setEtablissementId(etabId);
         arriereEleveRepository.save(a);
         journalService.log("ARRIERE_AJOUTE", "FINANCES", eleve.getNom() + " " + eleve.getPrenom() + " — " + montant + " F (" + anneeScolaireOrigine + ")");
         ra.addFlashAttribute("successMsg", "Arriere enregistre pour " + eleve.getNom() + " " + eleve.getPrenom() + ".");
@@ -463,7 +506,12 @@ public class FinancesController {
     @PostMapping("/rappels")
     public String envoyerRappels(RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
-        List<Eleve> tousLesEleves = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
+        String anneeActive = etablissementService.getAnneeScolaireActive();
+        // Uniquement les eleves de l'annee active : un eleve parti/diplome les annees precedentes
+        // n'a pas a recevoir de rappel de paiement pour l'annee en cours.
+        List<Eleve> elevesAnneeActive = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId).stream()
+            .filter(e -> e.getClasse() == null || anneeActive.equals(e.getClasse().getAnneeScolaire()))
+            .collect(Collectors.toList());
         List<Paiement> paiements = paiementRepository.findByEtablissementId(etabId);
         List<FraisScolarite> fraisObligatoires = fraisScolariteRepository
             .findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId).stream()
@@ -475,14 +523,14 @@ public class FinancesController {
                 Collectors.summingDouble(p -> p.getMontantVerse() != null ? p.getMontantVerse() : 0)));
 
         int nbRappels = 0;
-        for (Eleve e : tousLesEleves) {
+        for (Eleve e : elevesAnneeActive) {
             double du = fraisObligatoires.stream()
                 .filter(f -> f.getNiveauCible() == null || f.getNiveauCible().isBlank()
                     || (e.getClasse() != null && f.getNiveauCible().equalsIgnoreCase(e.getClasse().getNiveau())))
                 .mapToDouble(f -> f.getMontant() != null ? f.getMontant() : 0).sum();
             double verse = paiementsParEleve.getOrDefault(e.getId(), 0.0);
             if (du > 0 && verse < du) {
-                e.setDernierRappelPaiement(LocalDateTime.now());
+                e.setDernierRappelPaiement(horlogeService.maintenant());
                 eleveRepository.save(e);
                 nbRappels++;
             }
@@ -517,7 +565,7 @@ public class FinancesController {
             ra.addFlashAttribute("erreur", "Le montant versé doit être supérieur à 0.");
             return "redirect:/finances?tab=journal";
         }
-        LocalDate dateEffective = datePaiement != null ? datePaiement : LocalDate.now();
+        LocalDate dateEffective = datePaiement != null ? datePaiement : horlogeService.aujourdHui();
         String anneeScolairePaiement = AnneeScolaireUtil.pour(dateEffective);
         anneeScolaireService.verifierModifiable(anneeScolairePaiement, etabIdCourant);
         Paiement p = new Paiement();
@@ -651,8 +699,9 @@ public class FinancesController {
     public String supprimerPaiement(@PathVariable Long id) {
         Long etabId = etablissementService.getCurrentEtablissementId();
         paiementRepository.findById(id)
-            .filter(p -> p.getEleve() != null && etabId.equals(p.getEleve().getEtablissementId()))
+            .filter(p -> p.getEleve() != null && etabId != null && etabId.equals(p.getEleve().getEtablissementId()))
             .ifPresent(p -> {
+                anneeScolaireService.verifierModifiable(p.getAnneeScolaire(), etabId);
                 journalService.log("PAIEMENT_SUPPRIMÉ", "FINANCES",
                     "Reçu " + (p.getRecuNumero() != null ? p.getRecuNumero() : id));
                 paiementRepository.deleteById(id);
@@ -795,7 +844,7 @@ public class FinancesController {
         l.setDesignation(designation);
         categorieComptableRepository.findById(categorieComptableId).ifPresent(l::setCategorieComptable);
         l.setMontantPrevu(montantPrevu); l.setMontantReel(montantReel); l.setMois(mois);
-        l.setAnneeScolaire(anneeScolaire); l.setNotes(notes); l.setDateCreation(LocalDate.now());
+        l.setAnneeScolaire(anneeScolaire); l.setNotes(notes); l.setDateCreation(horlogeService.aujourdHui());
         l.setEtablissementId(etabIdBudget);
         budgetRepository.save(l);
         return "redirect:/finances?tab=budget&annee=" + anneeScolaire;
@@ -806,7 +855,7 @@ public class FinancesController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         LigneBudget ligne = budgetRepository.findById(id).orElse(null);
         String annee = ligne != null ? ligne.getAnneeScolaire() : etablissementService.getAnneeScolaireActive();
-        if (ligne != null && etabId.equals(ligne.getEtablissementId())) {
+        if (ligne != null && etabId != null && etabId.equals(ligne.getEtablissementId())) {
             anneeScolaireService.verifierModifiable(ligne.getAnneeScolaire(), etabId);
             budgetRepository.deleteById(id);
         }
@@ -817,7 +866,7 @@ public class FinancesController {
     public String realiserBudget(@PathVariable Long id, @RequestParam Double montantReel) {
         Long etabId = etablissementService.getCurrentEtablissementId();
         String annee = budgetRepository.findById(id)
-            .filter(l -> etabId.equals(l.getEtablissementId()))
+            .filter(l -> etabId != null && etabId.equals(l.getEtablissementId()))
             .map(l -> {
                 anneeScolaireService.verifierModifiable(l.getAnneeScolaire(), etabId);
                 l.setMontantReel(montantReel); budgetRepository.save(l); return l.getAnneeScolaire();
@@ -880,7 +929,7 @@ public class FinancesController {
         LocalDate t3Fin = lireParametreDate(etabId, "T3_FIN");
 
         int anneeDebut;
-        try { anneeDebut = Integer.parseInt(annee.split("-")[0].trim()); } catch (Exception e) { anneeDebut = LocalDate.now().getYear(); }
+        try { anneeDebut = Integer.parseInt(annee.split("-")[0].trim()); } catch (Exception e) { anneeDebut = horlogeService.aujourdHui().getYear(); }
 
         List<Map<String, Object>> rapportTrimestriel = new ArrayList<>();
         String[] noms = {"1er trimestre", "2e trimestre", "3e trimestre"};
@@ -929,6 +978,8 @@ public class FinancesController {
         List<Map<String, Object>> evolutionAnnuelle = new ArrayList<>();
         String[] nomsMoisCourt = {"Sep","Oct","Nov","Dec","Jan","Fev","Mar","Avr","Mai","Jun","Jul","Aou"};
         int[] moisOrdre = {9,10,11,12,1,2,3,4,5,6,7,8};
+        double soldeCourant = soldeInitial;
+        List<Double> soldesFinMois = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
             int mois = moisOrdre[i];
             int anneeDuMois = mois >= 9 ? anneeDebut : anneeDebut + 1;
@@ -941,15 +992,30 @@ public class FinancesController {
             double sorties = toutesDepenses.stream()
                 .filter(d -> "CHARGE".equals(d.getSens()) && d.getDateDepense() != null && d.getDateDepense().getMonthValue() == mois && d.getDateDepense().getYear() == anneeDuMois)
                 .mapToDouble(d -> d.getMontant() != null ? d.getMontant() : 0).sum();
+            soldeCourant += entrees - sorties;
             Map<String, Object> point = new LinkedHashMap<>();
             point.put("mois", nomsMoisCourt[i]);
             point.put("entrees", entrees);
             point.put("sorties", sorties);
+            point.put("solde", soldeCourant);
             evolutionAnnuelle.add(point);
+            soldesFinMois.add(soldeCourant);
         }
         double maxEvolutionAnnuelle = evolutionAnnuelle.stream()
             .flatMapToDouble(p -> java.util.stream.DoubleStream.of((double) p.get("entrees"), (double) p.get("sorties")))
             .max().orElse(1);
+
+        // Courbe de solde de caisse (12 points normalises pour un <polyline> SVG, viewBox 0 0 100 40)
+        double soldeMin = soldesFinMois.stream().mapToDouble(Double::doubleValue).min().orElse(0);
+        double soldeMax = soldesFinMois.stream().mapToDouble(Double::doubleValue).max().orElse(0);
+        double ecartSolde = soldeMax - soldeMin;
+        StringBuilder pointsCourbe = new StringBuilder();
+        for (int i = 0; i < soldesFinMois.size(); i++) {
+            double x = i * (100.0 / (soldesFinMois.size() - 1));
+            double y = ecartSolde > 0 ? 36 - ((soldesFinMois.get(i) - soldeMin) / ecartSolde * 32) : 20;
+            if (i > 0) pointsCourbe.append(' ');
+            pointsCourbe.append(String.format(Locale.ROOT, "%.2f,%.2f", x, y));
+        }
 
         double totalImpayesAnnee = rapportParClasse.stream().mapToDouble(r -> (double) r.get("reste")).sum();
 
@@ -960,6 +1026,10 @@ public class FinancesController {
         model.addAttribute("evolutionAnnuelle", evolutionAnnuelle);
         model.addAttribute("maxEvolutionAnnuelle", maxEvolutionAnnuelle > 0 ? maxEvolutionAnnuelle : 1);
         model.addAttribute("totalImpayesAnnee", totalImpayesAnnee);
+        model.addAttribute("statCourbePoints", pointsCourbe.toString());
+        model.addAttribute("statSoldeMin", soldeMin);
+        model.addAttribute("statSoldeMax", soldeMax);
+        model.addAttribute("statSoldeActuel", soldeCourant);
     }
 
     private LocalDate lireParametreDate(Long etabId, String cle) {
@@ -986,7 +1056,7 @@ public class FinancesController {
         double soldeTheorique = soldeInitial + totalEntrees - totalSorties;
 
         ComptageCaisse c = new ComptageCaisse();
-        c.setDateComptage(LocalDate.now());
+        c.setDateComptage(horlogeService.aujourdHui());
         c.setSoldeTheorique(soldeTheorique);
         c.setSoldeCompte(soldeCompte);
         c.setEcart(soldeCompte - soldeTheorique);

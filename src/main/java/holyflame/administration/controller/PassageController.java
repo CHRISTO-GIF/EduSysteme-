@@ -44,6 +44,7 @@ public class PassageController {
     @Autowired private CalendrierScolaireService calendrierScolaireService;
     @Autowired private JournalService journalService;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
 
     private static final DateTimeFormatter FMT_PARAM_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -212,7 +213,7 @@ public class PassageController {
         d.setAnneeScolaire(classeOrigine.getAnneeScolaire());
         d.setDecision(decision);
         d.setMoyenne(Math.round(moyenne * 100.0) / 100.0);
-        d.setDateDecision(LocalDate.now());
+        d.setDateDecision(horlogeService.aujourdHui());
         Utilisateur u = etablissementService.getCurrentUtilisateur();
         d.setDecideParId(u != null ? u.getId() : null);
         d.setEtablissementId(classeOrigine.getEtablissementId());
@@ -422,7 +423,13 @@ public class PassageController {
     @PostMapping("/jury/{seanceId}/membre/{membreId}/supprimer")
     public String supprimerMembreJury(@PathVariable Long seanceId, @PathVariable Long membreId,
                                        @RequestParam(required = false) String batch) {
-        membreJuryRepository.deleteByIdAndSeanceDeliberationId(membreId, seanceId);
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        boolean seanceAutorisee = seanceDeliberationRepository.findById(seanceId)
+            .filter(sd -> etabId != null && etabId.equals(sd.getEtablissementId()))
+            .isPresent();
+        if (seanceAutorisee) {
+            membreJuryRepository.deleteByIdAndSeanceDeliberationId(membreId, seanceId);
+        }
         return "redirect:/passage/jury/" + seanceId + (batch != null && !batch.isBlank() ? "?batch=" + batch : "");
     }
 
@@ -545,7 +552,7 @@ public class PassageController {
             .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.FORBIDDEN, "Eleve introuvable dans cet établissement."));
         Classe classe = classeRepository.findById(classeId)
-            .filter(c -> etabId.equals(c.getEtablissementId()))
+            .filter(c -> etabId != null && etabId.equals(c.getEtablissementId()))
             .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.FORBIDDEN, "Classe introuvable dans cet établissement."));
 

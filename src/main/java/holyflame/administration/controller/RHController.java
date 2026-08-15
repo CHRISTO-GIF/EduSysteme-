@@ -34,7 +34,9 @@ public class RHController {
     @Autowired private CategorieComptableRepository categorieComptableRepository;
     @Autowired private DepenseRepository depenseRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
+    @Autowired private holyflame.administration.service.JournalService journalService;
 
     @GetMapping
     public String index() {
@@ -82,6 +84,8 @@ public class RHController {
         c.setTypeContrat(typeContrat); c.setDateDebut(dateDebut); c.setDateFin(dateFin);
         c.setSalaireBase(salaireBase); c.setStatut("ACTIF"); c.setNotes(notes);
         contratRepository.save(c);
+        journalService.log("CONTRAT_AJOUTE", "RH",
+            personnel.getPrenom() + " " + personnel.getNom() + " — " + typeContrat + " (" + salaireBase + " F/mois)");
         return "redirect:/personnel/" + personnelId + "?saved=true#rh-contrats";
     }
 
@@ -179,6 +183,53 @@ public class RHController {
 
     private static final List<String> LIBELLES_GAIN = List.of(
         "Salaire de base", "Prime de responsabilité", "Congé annuel", "Indemnité de fin de contrat");
+    private static final double SEUIL_ECART_PAIE_PCT = 20.0;
+
+    // Vue d'ensemble mensuelle : tous les bulletins du mois + le personnel actif pour qui aucun
+    // bulletin n'a encore ete etabli, pour que le tresorier traite sa paie sans ouvrir chaque fiche.
+    @GetMapping("/salaires")
+    public String listeSalaires(@RequestParam(required = false) Integer mois,
+                                @RequestParam(required = false) Integer annee,
+                                @RequestParam(required = false) String statut,
+                                Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        LocalDate maintenant = horlogeService.aujourdHui();
+        int moisFiltre = mois != null ? mois : maintenant.getMonthValue();
+        int anneeFiltre = annee != null ? annee : maintenant.getYear();
+
+        List<SalaireMensuel> salairesDuMois = salaireRepository.findByEtablissementId(etabId).stream()
+            .filter(s -> s.getMois() == moisFiltre && s.getAnnee() == anneeFiltre)
+            .filter(s -> statut == null || statut.isBlank() || statut.equals(s.getStatut()))
+            .collect(Collectors.toList());
+
+        java.util.Set<Long> personnelAvecBulletinCeMois = salaireRepository.findByEtablissementId(etabId).stream()
+            .filter(s -> s.getMois() == moisFiltre && s.getAnnee() == anneeFiltre)
+            .map(s -> s.getPersonnel().getId())
+            .collect(java.util.stream.Collectors.toSet());
+        List<Personnel> personnelSansBulletin = personnelRepository
+            .findByEtablissementIdOrderByNomAscPrenomAsc(etabId).stream()
+            .filter(p -> "ACTIF".equals(p.getStatut()) && !personnelAvecBulletinCeMois.contains(p.getId()))
+            .collect(Collectors.toList());
+
+        double totalEnAttente = salairesDuMois.stream().filter(s -> "EN_ATTENTE".equals(s.getStatut()))
+            .mapToDouble(s -> s.getNetAPayer() != null ? s.getNetAPayer() : 0).sum();
+        double totalPaye = salairesDuMois.stream().filter(s -> "PAYE".equals(s.getStatut()))
+            .mapToDouble(s -> s.getNetAPayer() != null ? s.getNetAPayer() : 0).sum();
+        long nbEnAttente = salairesDuMois.stream().filter(s -> "EN_ATTENTE".equals(s.getStatut())).count();
+
+        model.addAttribute("salaires", salairesDuMois);
+        model.addAttribute("personnelSansBulletin", personnelSansBulletin);
+        model.addAttribute("moisFiltre", moisFiltre);
+        model.addAttribute("anneeFiltre", anneeFiltre);
+        model.addAttribute("statutFiltre", statut);
+        model.addAttribute("totalEnAttente", totalEnAttente);
+        model.addAttribute("totalPaye", totalPaye);
+        model.addAttribute("nbEnAttente", nbEnAttente);
+        model.addAttribute("nomsMois", List.of("Janvier","Fevrier","Mars","Avril","Mai","Juin",
+            "Juillet","Aout","Septembre","Octobre","Novembre","Decembre"));
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "rh-salaires";
+    }
 
     @GetMapping("/salaires/nouveau")
     public String nouveauBulletin(
@@ -190,7 +241,7 @@ public class RHController {
         Personnel personnel = personnelDuMemeEtablissement(personnelId);
         Long etabId = etablissementService.getCurrentEtablissementId();
 
-        LocalDate maintenant = LocalDate.now();
+        LocalDate maintenant = horlogeService.aujourdHui();
         int moisChoisi = mois != null ? mois : maintenant.getMonthValue();
         int anneeChoisie = annee != null ? annee : maintenant.getYear();
         YearMonth periode = YearMonth.of(anneeChoisie, moisChoisi);
@@ -207,13 +258,174 @@ public class RHController {
             ? Period.between(personnel.getDateEmbauche(), periode.atEndOfMonth()).toTotalMonths()
             : null;
 
+        // Reference de comparaison : le bulletin du mois precedent pour ce meme employe, s'il existe,
+        // pour reperer un ecart anormal avant validation (voir le controle dans ajouterSalaire).
+        int[] precedent = periodePrecedente(moisChoisi, anneeChoisie);
+        SalaireMensuel salairePrecedent = salaireRepository
+            .findByPersonnelIdAndMoisAndAnnee(personnelId, precedent[0], precedent[1]).orElse(null);
+
         model.addAttribute("personnel", personnel);
         model.addAttribute("contrat", contrat);
         model.addAttribute("mois", moisChoisi);
         model.addAttribute("annee", anneeChoisie);
         model.addAttribute("anciennete", anciennete);
         model.addAttribute("taux", taux);
+        model.addAttribute("salairePrecedent", salairePrecedent);
+        model.addAttribute("periodePrecedenteLabel", precedent[0] + "/" + precedent[1]);
         return "rh-salaire-nouveau";
+    }
+
+    // ===== "Lancer la paie du mois" : genere en un clic un brouillon de bulletin pour chaque
+    // employe actif encore sans bulletin ce mois — reconduit le bulletin du mois precedent s'il
+    // existe (montants identiques), sinon repart du contrat actif + des taux par defaut. L'admin
+    // n'a plus qu'a parcourir et ajuster/valider, jamais a ressaisir depuis zero. =====
+    @PostMapping("/salaires/lancer-mois")
+    public String lancerPaieDuMois(@RequestParam int mois, @RequestParam int annee, RedirectAttributes ra) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        YearMonth periode = YearMonth.of(annee, mois);
+        anneeScolaireService.verifierModifiable(AnneeScolaireUtil.pour(periode.atDay(1)), etabId);
+
+        int[] precedent = periodePrecedente(mois, annee);
+        Map<String, String> taux = parametreRepository.findByCategorieAndEtablissementIdOrderByCleAsc("PAIE", etabId).stream()
+            .collect(Collectors.toMap(Parametre::getCle, Parametre::getValeur, (a, b) -> a));
+
+        java.util.Set<Long> dejaTraites = salaireRepository.findByEtablissementId(etabId).stream()
+            .filter(s -> s.getMois() == mois && s.getAnnee() == annee)
+            .map(s -> s.getPersonnel().getId())
+            .collect(java.util.stream.Collectors.toSet());
+
+        List<Personnel> aTraiter = personnelRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId).stream()
+            .filter(p -> "ACTIF".equals(p.getStatut()) && !dejaTraites.contains(p.getId()))
+            .collect(Collectors.toList());
+
+        int dupliques = 0, depuisContrat = 0, ignores = 0;
+        for (Personnel p : aTraiter) {
+            java.util.Optional<SalaireMensuel> bulletinPrecedent =
+                salaireRepository.findByPersonnelIdAndMoisAndAnnee(p.getId(), precedent[0], precedent[1]);
+            if (bulletinPrecedent.isPresent()) {
+                salaireRepository.save(dupliquerBulletin(bulletinPrecedent.get(), p, mois, annee));
+                dupliques++;
+                continue;
+            }
+            Contrat contrat = contratRepository.findByPersonnelId(p.getId()).stream()
+                .filter(c -> "ACTIF".equals(c.getStatut()))
+                .max(Comparator.comparing(Contrat::getDateDebut, Comparator.nullsFirst(Comparator.naturalOrder())))
+                .orElse(null);
+            if (contrat == null || contrat.getSalaireBase() == null) {
+                ignores++;
+                continue;
+            }
+            salaireRepository.save(construireDepuisContratEtTaux(p, mois, annee, contrat.getSalaireBase(), taux));
+            depuisContrat++;
+        }
+
+        int total = dupliques + depuisContrat;
+        journalService.log("PAIE_LANCEE", "RH",
+            mois + "/" + annee + " — " + total + " bulletin(s) genere(s) en brouillon ("
+            + dupliques + " reconduit(s), " + depuisContrat + " depuis contrat), "
+            + ignores + " ignore(s) faute de contrat actif");
+
+        if (total == 0) {
+            ra.addFlashAttribute("infoMsg", ignores > 0
+                ? ignores + " employe(s) actif(s) sans contrat actif — impossible de generer un brouillon, a traiter manuellement."
+                : "Tout le personnel actif a deja un bulletin pour cette periode.");
+        } else {
+            ra.addFlashAttribute("successMsg", total + " bulletin(s) genere(s) en brouillon — "
+                + dupliques + " reconduit(s) depuis le mois precedent, " + depuisContrat + " depuis le contrat actif."
+                + (ignores > 0 ? " " + ignores + " employe(s) ignore(s) faute de contrat actif." : "")
+                + " Verifiez et validez chaque bulletin avant paiement.");
+        }
+        return "redirect:/rh/salaires?mois=" + mois + "&annee=" + annee;
+    }
+
+    private int[] periodePrecedente(int mois, int annee) {
+        return mois == 1 ? new int[]{12, annee - 1} : new int[]{mois - 1, annee};
+    }
+
+    private double parseTaux(Map<String, String> taux, String cle) {
+        String v = taux.get(cle);
+        if (v == null || v.isBlank()) return 0;
+        try {
+            return Double.parseDouble(v.trim().replace(",", "."));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /** Brouillon a partir du salaire de base du contrat et des taux par defaut de l'etablissement —
+     * reproduit exactement le calcul fait cote client dans rh-salaire-nouveau.html. */
+    private SalaireMensuel construireDepuisContratEtTaux(Personnel personnel, int mois, int annee,
+                                                          Double salaireBase, Map<String, String> taux) {
+        YearMonth periode = YearMonth.of(annee, mois);
+        double gains = salaireBase != null ? salaireBase : 0;
+
+        double tauxCnpsEmploye = parseTaux(taux, "TAUX_CNPS_EMPLOYE");
+        double tauxIrpp = parseTaux(taux, "TAUX_IRPP");
+        double tauxTaxeApprentissage = parseTaux(taux, "TAUX_TAXE_APPRENTISSAGE");
+        double tauxTaxeForfaitaire = parseTaux(taux, "TAUX_TAXE_FORFAITAIRE");
+        double tauxCnpsAccident = parseTaux(taux, "TAUX_CNPS_ACCIDENT_TRAVAIL");
+        double tauxCnpsAllocFam = parseTaux(taux, "TAUX_CNPS_ALLOCATIONS_FAMILIALES");
+        double tauxCnpsPension = parseTaux(taux, "TAUX_CNPS_PENSION_VIEILLESSE");
+
+        double retenueCnps = Math.round(gains * tauxCnpsEmploye / 100.0);
+        double netSoumisIrpp = gains - retenueCnps;
+        double irpp = Math.round(netSoumisIrpp * tauxIrpp / 100.0);
+        double taxeApprentissage = Math.round(netSoumisIrpp * tauxTaxeApprentissage / 100.0);
+        double taxeForfaitaire = Math.round(netSoumisIrpp * tauxTaxeForfaitaire / 100.0);
+        double cnpsAccident = Math.round(gains * tauxCnpsAccident / 100.0);
+        double cnpsAllocFam = Math.round(gains * tauxCnpsAllocFam / 100.0);
+        double cnpsPension = Math.round(gains * tauxCnpsPension / 100.0);
+
+        double totalRetenues = retenueCnps + irpp;
+        double totalCharges = taxeApprentissage + taxeForfaitaire + cnpsAccident + cnpsAllocFam + cnpsPension;
+
+        SalaireMensuel s = new SalaireMensuel();
+        s.setPersonnel(personnel);
+        s.setMois(mois); s.setAnnee(annee);
+        s.setPeriodeDebut(periode.atDay(1)); s.setPeriodeFin(periode.atEndOfMonth());
+        s.setAnneeScolaire(AnneeScolaireUtil.pour(periode.atDay(1)));
+        s.setStatut("EN_ATTENTE");
+        s.setTotalBrut(gains);
+        s.setTotalRetenuesSalariales(totalRetenues);
+        s.setTotalChargesPatronales(totalCharges);
+        s.setNetAPayer(gains - totalRetenues);
+
+        List<LigneSalaire> lignes = new java.util.ArrayList<>();
+        int ordre = 0;
+        ordre = ajouterLigne(lignes, s, ordre, "GAIN", "Salaire de base", null, null, gains);
+        if (retenueCnps > 0) ordre = ajouterLigne(lignes, s, ordre, "RETENUE_SALARIALE", "Cotisation CNPS - Employé", gains, tauxCnpsEmploye, retenueCnps);
+        if (irpp > 0) ordre = ajouterLigne(lignes, s, ordre, "RETENUE_SALARIALE", "IRPP sur salaire", netSoumisIrpp, tauxIrpp, irpp);
+        if (taxeApprentissage > 0) ordre = ajouterLigne(lignes, s, ordre, "CHARGE_PATRONALE", "Taxe d'apprentissage", netSoumisIrpp, tauxTaxeApprentissage, taxeApprentissage);
+        if (taxeForfaitaire > 0) ordre = ajouterLigne(lignes, s, ordre, "CHARGE_PATRONALE", "Taxe forfaitaire", netSoumisIrpp, tauxTaxeForfaitaire, taxeForfaitaire);
+        if (cnpsAccident > 0) ordre = ajouterLigne(lignes, s, ordre, "CHARGE_PATRONALE", "CNPS accident de travail", gains, tauxCnpsAccident, cnpsAccident);
+        if (cnpsAllocFam > 0) ordre = ajouterLigne(lignes, s, ordre, "CHARGE_PATRONALE", "CNPS allocations familiales", gains, tauxCnpsAllocFam, cnpsAllocFam);
+        if (cnpsPension > 0) ajouterLigne(lignes, s, ordre, "CHARGE_PATRONALE", "CNPS pension vieillesse", gains, tauxCnpsPension, cnpsPension);
+        s.setLignes(lignes);
+        return s;
+    }
+
+    /** Reconduction d'un mois sur l'autre : reprend integralement les lignes du bulletin precedent. */
+    private SalaireMensuel dupliquerBulletin(SalaireMensuel source, Personnel personnel, int mois, int annee) {
+        YearMonth periode = YearMonth.of(annee, mois);
+        SalaireMensuel s = new SalaireMensuel();
+        s.setPersonnel(personnel);
+        s.setMois(mois); s.setAnnee(annee);
+        s.setPeriodeDebut(periode.atDay(1)); s.setPeriodeFin(periode.atEndOfMonth());
+        s.setAnneeScolaire(AnneeScolaireUtil.pour(periode.atDay(1)));
+        s.setStatut("EN_ATTENTE");
+        s.setTotalBrut(source.getTotalBrut());
+        s.setTotalRetenuesSalariales(source.getTotalRetenuesSalariales());
+        s.setTotalChargesPatronales(source.getTotalChargesPatronales());
+        s.setNetAPayer(source.getNetAPayer());
+
+        List<LigneSalaire> sourceLignes = ligneSalaireRepository.findBySalaireMensuelIdOrderByOrdreAsc(source.getId());
+        List<LigneSalaire> lignes = new java.util.ArrayList<>();
+        int ordre = 0;
+        for (LigneSalaire l : sourceLignes) {
+            ordre = ajouterLigne(lignes, s, ordre, l.getSection(), l.getLibelle(), l.getBase(), l.getTaux(), l.getMontant());
+        }
+        s.setLignes(lignes);
+        return s;
     }
 
     @PostMapping("/salaires")
@@ -248,11 +460,20 @@ public class RHController {
             @RequestParam(defaultValue = "false") boolean activerTaxeForfaitaire,
             @RequestParam(defaultValue = "false") boolean activerCnpsAccident,
             @RequestParam(defaultValue = "false") boolean activerCnpsAllocFam,
-            @RequestParam(defaultValue = "false") boolean activerCnpsPension) {
+            @RequestParam(defaultValue = "false") boolean activerCnpsPension,
+            @RequestParam(defaultValue = "false") boolean confirmerEcart,
+            RedirectAttributes ra) {
 
         Personnel personnel = personnelDuMemeEtablissement(personnelId);
         YearMonth periode = YearMonth.of(annee, mois);
         anneeScolaireService.verifierModifiable(AnneeScolaireUtil.pour(periode.atDay(1)), etablissementService.getCurrentEtablissementId());
+
+        // Un seul bulletin par employe et par mois : evite un doublon (double soumission du
+        // formulaire, retour arriere du navigateur...) qui fausserait la masse salariale et
+        // risquerait un double virement si les deux bulletins sont marques payes independamment.
+        if (salaireRepository.findByPersonnelIdAndMoisAndAnnee(personnelId, mois, annee).isPresent()) {
+            return "redirect:/personnel/" + personnelId + "?erreurSalaire=doublon#rh-salaires";
+        }
 
         double primeEff = activerPrime ? primeResponsabilite : 0;
         double congeEff = activerConge ? congeAnnuel : 0;
@@ -263,6 +484,26 @@ public class RHController {
         double irppSurSalaireEff = activerIrpp ? irppSurSalaire : 0;
         double netSoumisIrpp = totalBrut - retenueCnpsEmployeEff;
         double totalRetenues = retenueCnpsEmployeEff + irppSurSalaireEff;
+
+        // Detection d'ecart anormal : si le net a payer s'ecarte de plus de 20% du mois precedent
+        // pour ce meme employe, on demande une confirmation explicite avant d'enregistrer — filet
+        // de securite contre une virgule decalee ou un zero de trop avant qu'il ne parte en virement.
+        if (!confirmerEcart) {
+            int[] precedent = periodePrecedente(mois, annee);
+            SalaireMensuel bulletinPrecedent = salaireRepository
+                .findByPersonnelIdAndMoisAndAnnee(personnelId, precedent[0], precedent[1]).orElse(null);
+            if (bulletinPrecedent != null && bulletinPrecedent.getNetAPayer() != null && bulletinPrecedent.getNetAPayer() > 0) {
+                double netAPayerCalcule = totalBrut - totalRetenues;
+                double ecartPct = Math.abs(netAPayerCalcule - bulletinPrecedent.getNetAPayer()) / bulletinPrecedent.getNetAPayer() * 100;
+                if (ecartPct > SEUIL_ECART_PAIE_PCT) {
+                    ra.addFlashAttribute("erreurAuth", "Le net a payer (" + Math.round(netAPayerCalcule) + " F) s'ecarte de "
+                        + Math.round(ecartPct) + " % du mois precedent (" + Math.round(bulletinPrecedent.getNetAPayer())
+                        + " F, " + precedent[0] + "/" + precedent[1] + "). Verifiez les montants, puis cochez "
+                        + "\"Confirmer malgre l'ecart\" pour enregistrer quand meme.");
+                    return "redirect:/rh/salaires/nouveau?personnelId=" + personnelId + "&mois=" + mois + "&annee=" + annee;
+                }
+            }
+        }
 
         double taxeApprentissageEff = activerTaxeApprentissage ? chargeTaxeApprentissage : 0;
         double taxeForfaitaireEff = activerTaxeForfaitaire ? chargeTaxeForfaitaire : 0;
@@ -299,6 +540,9 @@ public class RHController {
         s.setLignes(lignes);
 
         salaireRepository.save(s);
+        journalService.log("BULLETIN_PAIE_CREE", "RH",
+            personnel.getPrenom() + " " + personnel.getNom() + " — " + mois + "/" + annee
+            + " — net a payer " + s.getNetAPayer() + " F");
         return "redirect:/personnel/" + personnelId + "?saved=true#rh-salaires";
     }
 
@@ -318,8 +562,35 @@ public class RHController {
             .filter(sm -> sm.getPersonnel() != null && etabId != null && etabId.equals(sm.getPersonnel().getEtablissementId()))
             .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.NOT_FOUND, "Bulletin introuvable."));
+        remplirModeleBulletin(model, s, "/personnel/" + s.getPersonnel().getId());
+        return "bulletin-paie";
+    }
 
-        List<LigneSalaire> lignes = ligneSalaireRepository.findBySalaireMensuelIdOrderByOrdreAsc(id);
+    // ===== Auto-service : chaque employe consulte ses propres bulletins, sans passer par
+    // Admin/Tresorier — reduit les demandes repetees "peux-tu me renvoyer mon bulletin de mars ?" =====
+    @GetMapping("/mes-bulletins")
+    public String mesBulletins(Model model) {
+        Personnel personnel = personnelDeLUtilisateurConnecte();
+        model.addAttribute("personnel", personnel);
+        model.addAttribute("salaires", salaireRepository.findByPersonnelIdOrderByAnneeDescMoisDesc(personnel.getId()));
+        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        return "mes-bulletins-paie";
+    }
+
+    @GetMapping("/mes-bulletins/{id}")
+    public String monBulletin(@PathVariable Long id, Model model) {
+        Personnel personnel = personnelDeLUtilisateurConnecte();
+        SalaireMensuel s = salaireRepository.findById(id)
+            .filter(sm -> sm.getPersonnel() != null && personnel.getId().equals(sm.getPersonnel().getId()))
+            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Bulletin introuvable."));
+        remplirModeleBulletin(model, s, "/rh/mes-bulletins");
+        return "bulletin-paie";
+    }
+
+    private void remplirModeleBulletin(Model model, SalaireMensuel s, String retourUrl) {
+        Long etabId = s.getPersonnel().getEtablissementId();
+        List<LigneSalaire> lignes = ligneSalaireRepository.findBySalaireMensuelIdOrderByOrdreAsc(s.getId());
         Map<String, List<LigneSalaire>> parSection = lignes.stream()
             .collect(Collectors.groupingBy(LigneSalaire::getSection, LinkedHashMap::new, Collectors.toList()));
 
@@ -343,7 +614,7 @@ public class RHController {
         model.addAttribute("telEtab", params.getOrDefault("TELEPHONE_ECOLE", ""));
         model.addAttribute("logoPath", params.getOrDefault("LOGO_ETAB", null));
         model.addAttribute("monnaie", params.getOrDefault("MONNAIE", "FCFA"));
-        return "bulletin-paie";
+        model.addAttribute("retourUrl", retourUrl);
     }
 
     @PostMapping("/salaires/{id}/payer")
@@ -360,7 +631,7 @@ public class RHController {
         anneeScolaireService.verifierModifiable(s.getAnneeScolaire(), etabId);
 
         s.setStatut("PAYE");
-        s.setDatePaiement(LocalDate.now());
+        s.setDatePaiement(horlogeService.aujourdHui());
         salaireRepository.save(s);
 
         Personnel personnel = s.getPersonnel();
@@ -385,9 +656,9 @@ public class RHController {
             d.setSens("CHARGE");
             d.setBeneficiaire(nomPersonnel);
             d.setMontant(s.getTotalBrut());
-            d.setDateDepense(LocalDate.now());
+            d.setDateDepense(horlogeService.aujourdHui());
             d.setStatut("PAYE");
-            d.setAnneeScolaire(AnneeScolaireUtil.pour(LocalDate.now()));
+            d.setAnneeScolaire(AnneeScolaireUtil.pour(horlogeService.aujourdHui()));
             d.setEtablissementId(etabId);
             depenseRepository.save(d);
         });
@@ -400,14 +671,16 @@ public class RHController {
                 d.setSens("CHARGE");
                 d.setBeneficiaire(nomPersonnel);
                 d.setMontant(s.getTotalChargesPatronales());
-                d.setDateDepense(LocalDate.now());
+                d.setDateDepense(horlogeService.aujourdHui());
                 d.setStatut("PAYE");
-                d.setAnneeScolaire(AnneeScolaireUtil.pour(LocalDate.now()));
+                d.setAnneeScolaire(AnneeScolaireUtil.pour(horlogeService.aujourdHui()));
                 d.setEtablissementId(etabId);
                 depenseRepository.save(d);
             });
         }
 
+        journalService.log("SALAIRE_PAYE", "RH",
+            nomPersonnel + " — " + libellePeriode + " — " + s.getNetAPayer() + " F net, comptabilise automatiquement");
         return "redirect:/personnel/" + pid + "#rh-salaires";
     }
 
@@ -423,7 +696,10 @@ public class RHController {
             ra.addFlashAttribute("erreurMsg", "Ce bulletin est déjà payé et a été comptabilisé — il ne peut plus être supprimé.");
             return "redirect:/personnel/" + pid + "#rh-salaires";
         }
+        String nomPersonnel = s.getPersonnel().getPrenom() + " " + s.getPersonnel().getNom();
+        String libellePeriode = s.getMois() + "/" + s.getAnnee();
         salaireRepository.delete(s);
+        journalService.log("BULLETIN_PAIE_SUPPRIME", "RH", nomPersonnel + " — " + libellePeriode);
         return "redirect:/personnel/" + pid + "#rh-salaires";
     }
 }

@@ -65,11 +65,6 @@ public class ParametreController {
         // Frais
         model.addAttribute("frais", fraisRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId));
 
-        // Classes année courante
-        String annee = etablissementService.getAnneeScolaireActive();
-        model.addAttribute("classesAnnee", classeRepository.findByAnneeScolaireAndEtablissementId(annee, etabId));
-
-        // ── Onglet Autorisations ──────────────────────────────────────────
         // Migration automatique des anciens enregistrements sans etabId
         matiereRepository.migrateNullEtablissementId(etabId);
         classeRepository.migrateNullEtablissementId(etabId);
@@ -79,151 +74,66 @@ public class ParametreController {
         model.addAttribute("matieres", matieres);
         model.addAttribute("toutesClasses", toutesClasses);
 
-        Map<Long, Matiere> matiereMap = matieres.stream().collect(Collectors.toMap(Matiere::getId, m -> m));
-        Map<Long, Classe>  classeMap  = toutesClasses.stream().collect(Collectors.toMap(Classe::getId, c -> c));
-        model.addAttribute("matiereMap", matiereMap);
-        model.addAttribute("classeMap", classeMap);
-
-        // Enseignants depuis Personnel (pas Utilisateur), avec compte associé par email
-        List<Personnel> personnelsEnseignants = personnelRepository
-            .findByFonctionAndEtablissementIdOrderByNomAsc("ENSEIGNANT", etabId);
-        model.addAttribute("personnelsEnseignants", personnelsEnseignants);
-
-        // Pour chaque personnel, trouver son compte Utilisateur par email
-        Map<Long, Utilisateur> compteParPersonnelId = new HashMap<>();
-        for (Personnel pers : personnelsEnseignants) {
-            if (pers.getEmail() != null && !pers.getEmail().isBlank()) {
-                utilisateurRepository.findByEmail(pers.getEmail())
-                    .ifPresent(u -> compteParPersonnelId.put(pers.getId(), u));
-            }
-        }
-        model.addAttribute("compteParPersonnelId", compteParPersonnelId);
-
-        // Autorisations groupées par enseignantId (Utilisateur.id)
         List<EnseignantAutorisation> autorisations = autorisationRepository.findByEtablissementId(etabId);
-        Map<Long, List<EnseignantAutorisation>> authByEnseignant = autorisations.stream()
-            .collect(Collectors.groupingBy(EnseignantAutorisation::getEnseignantId));
-        model.addAttribute("authByEnseignant", authByEnseignant);
 
-        // ── Onglet Suivi ────────────────────────────────────────────────
-        List<Map<String, Object>> suiviRows = buildSuiviRows(autorisations, matiereMap, classeMap, etabId);
-        model.addAttribute("suiviRows", suiviRows);
+        // ── Affectations enseignant / matiere / classe ──────────────────
+        List<Utilisateur> enseignantsDisponibles = utilisateurRepository
+            .findByRoleAndEtablissementIdOrderByNomAsc("ENSEIGNANT", etabId);
+        model.addAttribute("enseignantsDisponibles", enseignantsDisponibles);
 
-        // Suivi par enseignant (TOUS les enseignants du personnel)
-        List<Map<String, Object>> suiviEnseignants = buildSuiviEnseignants(
-            personnelsEnseignants, compteParPersonnelId, autorisations, matiereMap, classeMap);
-        model.addAttribute("suiviEnseignants", suiviEnseignants);
+        Map<Long, Utilisateur> enseignantParId = enseignantsDisponibles.stream()
+            .collect(Collectors.toMap(Utilisateur::getId, u -> u, (a, b) -> a));
+        Map<Long, Matiere> matiereParId = matieres.stream().collect(Collectors.toMap(Matiere::getId, m -> m));
+        Map<Long, Classe> classeParId = toutesClasses.stream().collect(Collectors.toMap(Classe::getId, c -> c));
+        List<Map<String, Object>> autorisationsAffichage = new ArrayList<>();
+        for (EnseignantAutorisation a : autorisations) {
+            Utilisateur ens = enseignantParId.get(a.getEnseignantId());
+            Matiere mat = matiereParId.get(a.getMatiereId());
+            Classe cla = classeParId.get(a.getClasseId());
+            if (ens == null || mat == null || cla == null) continue;
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("id", a.getId());
+            row.put("enseignantNom", ens.getPrenom() + " " + ens.getNom());
+            row.put("matiereNom", mat.getNom());
+            row.put("classeNom", cla.getNom());
+            autorisationsAffichage.add(row);
+        }
+        autorisationsAffichage.sort(Comparator.comparing(r -> (String) r.get("enseignantNom")));
+        model.addAttribute("autorisationsAffichage", autorisationsAffichage);
 
-        // Délégation direction
+        // Délégation direction (la page /direction/suivi peut être confiée à un DIRECTEUR non-ADMIN)
         boolean delegationActive = "true".equals(p.get("DELEGATION_DIRECTION"));
         model.addAttribute("delegationActive", delegationActive);
+
+        // Signalements de messagerie non traites — pour la carte de navigation rapide
+        long nbSignalementsOuverts = signalementMessagerieRepository.countByEtablissementIdAndStatut(etabId, "OUVERT");
+        model.addAttribute("nbSignalementsOuverts", nbSignalementsOuverts);
+
+        // ── Checklist de premiere configuration ─────────────────────────
+        // Guide un etablissement tout juste cree : que reste-t-il a faire avant d'etre operationnel ?
+        holyflame.administration.model.Etablissement etab = etablissementService.getCurrentEtablissement();
+        boolean anneeActiveExiste = !anneeScolaireRepository.findByEtablissementIdAndStatut(etabId, "ACTIVE").isEmpty();
+        List<Map<String, Object>> checklist = new ArrayList<>();
+        checklist.add(etapeChecklist("Identite de l'etablissement", etab != null && etab.getNom() != null && !etab.getNom().isBlank(), "#config-generale"));
+        checklist.add(etapeChecklist("Annee scolaire active", anneeActiveExiste, "/parametres/annees"));
+        checklist.add(etapeChecklist("Classes creees", !toutesClasses.isEmpty(), "#config-outils"));
+        checklist.add(etapeChecklist("Matieres et coefficients", !matieres.isEmpty(), "/gestion-academique"));
+        checklist.add(etapeChecklist("Frais de scolarite", !fraisRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId).isEmpty(), "#config-frais"));
+        checklist.add(etapeChecklist("Enseignants affectes a leurs classes", !autorisations.isEmpty(), "#config-autorisations"));
+        long nbEtapesFaites = checklist.stream().filter(e -> (boolean) e.get("fait")).count();
+        model.addAttribute("checklist", checklist);
+        model.addAttribute("checklistFaites", nbEtapesFaites);
+        model.addAttribute("checklistTotal", checklist.size());
 
         return "parametres";
     }
 
-    private List<Map<String, Object>> buildSuiviRows(
-            List<EnseignantAutorisation> autorisations,
-            Map<Long, Matiere> matiereMap,
-            Map<Long, Classe> classeMap,
-            Long etabId) {
-
-        List<Map<String, Object>> rows = new ArrayList<>();
-        for (EnseignantAutorisation auth : autorisations) {
-            Utilisateur enseignant = utilisateurRepository.findById(auth.getEnseignantId()).orElse(null);
-            Matiere matiere = matiereMap.get(auth.getMatiereId());
-            Classe  classe  = classeMap.get(auth.getClasseId());
-            if (matiere == null || classe == null) continue;
-
-            // Toutes les notes pour cette matière + classe, triées par saisieAt DESC
-            List<Note> notes = noteRepository.findTopByMatiereAndClasse(auth.getMatiereId(), auth.getClasseId());
-            long nbElevesSaisies = notes.stream()
-                .map(n -> n.getEleve() != null ? n.getEleve().getId() : null)
-                .filter(Objects::nonNull)
-                .distinct().count();
-            long totalEleves = eleveRepository.countByClasseId(auth.getClasseId());
-            LocalDateTime derniereSaisie = notes.isEmpty() ? null : notes.get(0).getSaisieAt();
-
-            String statut;
-            if (notes.isEmpty()) {
-                statut = "NON_REMPLI";
-            } else if (totalEleves > 0 && nbElevesSaisies >= totalEleves) {
-                statut = "COMPLET";
-            } else {
-                statut = "EN_COURS";
-            }
-
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put("enseignantNom",    enseignant != null ? enseignant.getNom() + " " + enseignant.getPrenom() : "(compte supprimé)");
-            row.put("matiereNom",       matiere.getNom());
-            row.put("classeNom",        classe.getNom());
-            row.put("derniereSaisie",   derniereSaisie);
-            row.put("nbNotes",          notes.size());
-            row.put("nbElevesSaisies",  nbElevesSaisies);
-            row.put("totalEleves",      totalEleves);
-            row.put("statut",           statut);
-            rows.add(row);
-        }
-        return rows;
-    }
-
-    private static final List<String> EXAM_TYPES = List.of("DEVOIR", "EXAMEN", "PARTICIPATION");
-
-    private List<Map<String, Object>> buildSuiviEnseignants(
-            List<Personnel> enseignants,
-            Map<Long, Utilisateur> compteParPersonnelId,
-            List<EnseignantAutorisation> toutesAutorisations,
-            Map<Long, Matiere> matiereMap,
-            Map<Long, Classe> classeMap) {
-
-        List<Map<String, Object>> rows = new ArrayList<>();
-
-        for (Personnel pers : enseignants) {
-            Utilisateur compte = compteParPersonnelId.get(pers.getId());
-
-            List<EnseignantAutorisation> authsPers = compte != null
-                ? toutesAutorisations.stream()
-                    .filter(a -> a.getEnseignantId().equals(compte.getId()))
-                    .toList()
-                : List.of();
-
-            if (authsPers.isEmpty()) {
-                Map<String, Object> row = new LinkedHashMap<>();
-                row.put("enseignantNom", pers.getNom() + " " + pers.getPrenom());
-                row.put("hasCompte", compte != null);
-                row.put("matiereNom", null);
-                row.put("classeNom", null);
-                row.put("totalEleves", 0L);
-                rows.add(row);
-            } else {
-                for (EnseignantAutorisation auth : authsPers) {
-                    Matiere matiere = matiereMap.get(auth.getMatiereId());
-                    Classe  classe  = classeMap.get(auth.getClasseId());
-                    if (matiere == null || classe == null) continue;
-
-                    long totalEleves = eleveRepository.countByClasseId(auth.getClasseId());
-
-                    Map<String, Object> row = new LinkedHashMap<>();
-                    row.put("enseignantNom", pers.getNom() + " " + pers.getPrenom());
-                    row.put("hasCompte", compte != null);
-                    row.put("matiereNom", matiere.getNom());
-                    row.put("classeNom", classe.getNom());
-                    row.put("totalEleves", totalEleves);
-
-                    for (String type : EXAM_TYPES) {
-                        for (int t = 1; t <= 3; t++) {
-                            long nb = noteRepository.countElevesByMatiereClasseTypeTrimestre(
-                                auth.getMatiereId(), auth.getClasseId(), type, t);
-                            String statut = nb == 0 ? "VIDE"
-                                : (totalEleves > 0 && nb >= totalEleves ? "COMPLET" : "EN_COURS");
-                            row.put(type + "_T" + t, statut);
-                            row.put(type + "_T" + t + "_nb", nb);
-                        }
-                    }
-                    rows.add(row);
-                }
-            }
-        }
-        return rows;
+    private Map<String, Object> etapeChecklist(String libelle, boolean fait, String lien) {
+        Map<String, Object> etape = new LinkedHashMap<>();
+        etape.put("libelle", libelle);
+        etape.put("fait", fait);
+        etape.put("lien", lien);
+        return etape;
     }
 
     @PostMapping("/update")
@@ -776,12 +686,13 @@ public class ParametreController {
                               @RequestParam(required = false) String anneeSource,
                               @RequestParam(defaultValue = "false") boolean dupliquerClasses,
                               @RequestParam(defaultValue = "false") boolean dupliquerBudget,
+                              @RequestParam(defaultValue = "false") boolean dupliquerAffectations,
                               RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
         try {
             anneeScolaireService.creer(libelle.trim(), etabId,
                 (anneeSource != null && !anneeSource.isBlank()) ? anneeSource : null,
-                dupliquerClasses, dupliquerBudget);
+                dupliquerClasses, dupliquerBudget, dupliquerAffectations);
             ra.addFlashAttribute("successMsg", "Annee scolaire " + libelle + " creee" + (dupliquerClasses ? " (classes dupliquees)" : "") + ".");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("erreurMsg", e.getMessage());

@@ -59,6 +59,12 @@ public class SecurityConfig {
                 .requestMatchers("/bulletins/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "PARENT")
                 .requestMatchers("/portail-parent/**").hasAnyRole("ADMIN", "PARENT")
                 .requestMatchers("/messagerie/**").hasAnyRole("ADMIN", "SECRETAIRE", "ENSEIGNANT", "TRESORIER", "COORDONNATEUR")
+                // Chaque export est restreint aux roles qui l'utilisent reellement dans l'interface :
+                // les paiements restent reserves a la tresorerie, mais notes/eleves sont aussi
+                // utilises depuis les pages Examens (enseignant) et Secretariat (secretaire).
+                .requestMatchers("/export/paiements/excel").hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/export/eleves/excel").hasAnyRole("ADMIN", "TRESORIER", "SECRETAIRE")
+                .requestMatchers("/export/notes/excel").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
                 .requestMatchers("/export/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/parametres/**").hasRole("ADMIN")
                 .requestMatchers("/tableau-enseignant/**").hasAnyRole("ADMIN", "ENSEIGNANT")
@@ -67,6 +73,10 @@ public class SecurityConfig {
                 .requestMatchers("/inventaire/**").hasRole("ADMIN")
                 // Le versement des salaires est un acte de tresorerie ; contrats/conges restent reserves a l'ADMIN
                 .requestMatchers("/rh/salaires/**").hasAnyRole("ADMIN", "TRESORIER")
+                // Auto-service : chaque membre du personnel consulte uniquement ses propres bulletins
+                // (fiche deduite de son compte connecte, jamais transmise par le client)
+                .requestMatchers("/rh/mes-bulletins/**").hasAnyRole(
+                    "ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER")
                 // Un enseignant peut demander/annuler son propre conge (fiche deduite de son compte,
                 // jamais transmise par le client) ; l'approbation reste reservee a l'ADMIN
                 .requestMatchers("/rh/conges/demander", "/rh/conges/*/annuler").hasAnyRole("ADMIN", "ENSEIGNANT")
@@ -83,6 +93,9 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "TRESORIER", "SECRETAIRE")
                 .requestMatchers("/finances/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/coordination/**").hasAnyRole("ADMIN", "COORDONNATEUR")
+                // Journal d'activite : reserve au personnel (chacun n'y voit que ses propres actions,
+                // sauf ADMIN qui voit tout) — un eleve ou un parent n'a aucune raison d'y acceder.
+                .requestMatchers("/journal/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

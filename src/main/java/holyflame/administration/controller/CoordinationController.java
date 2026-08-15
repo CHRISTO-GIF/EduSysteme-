@@ -41,6 +41,7 @@ public class CoordinationController {
     @Autowired private FicheControleReponseRepository reponseRepository;
     @Autowired private ClasseRepository classeRepository;
     @Autowired private PersonnelRepository personnelRepository;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private NoteRepository noteRepository;
     @Autowired private AvisParentRepository avisParentRepository;
     @Autowired private EtablissementService etablissementService;
@@ -200,7 +201,7 @@ public class CoordinationController {
         var utilisateur = etablissementService.getCurrentUtilisateur();
         if (utilisateur != null) fiche.setCoordonnateurId(utilisateur.getId());
         fiche.setEtablissementId(etabId);
-        fiche.setDateCreation(LocalDateTime.now());
+        fiche.setDateCreation(horlogeService.maintenant());
         ficheControleRepository.save(fiche);
 
         for (int i = 0; i < CriteresControle.LISTE.size(); i++) {

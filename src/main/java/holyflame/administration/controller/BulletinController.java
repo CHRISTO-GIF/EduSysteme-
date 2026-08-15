@@ -7,8 +7,10 @@ import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.ConduiteRepository;
 import holyflame.administration.repository.EleveRepository;
 import holyflame.administration.repository.ParametreRepository;
+import holyflame.administration.service.BulletinPdfService;
 import holyflame.administration.service.BulletinService;
 import holyflame.administration.service.EtablissementService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,14 +40,47 @@ public class BulletinController {
     @Autowired private EtablissementService etablissementService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private BulletinService bulletinService;
+    @Autowired private BulletinPdfService bulletinPdfService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
+
+    /** En-tete etablissement (parametres reels) partage entre l'affichage HTML et le PDF. */
+    private Map<String, Object> buildEnTeteEtablissement(Long etabId) {
+        holyflame.administration.model.Etablissement etab = etablissementService.getCurrentEtablissement();
+        Map<String, Object> enTete = new LinkedHashMap<>();
+        enTete.put("nomEtab", etab != null && etab.getNom() != null && !etab.getNom().isBlank() ? etab.getNom() : "HolyFlame");
+        enTete.put("adresseEtab", etab != null && etab.getAdresse() != null ? etab.getAdresse() : "");
+        enTete.put("emailEtab", parametreRepository.findByCleAndEtablissementId("EMAIL_ECOLE", etabId)
+            .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse(""));
+        enTete.put("logoPath", parametreRepository.findByCleAndEtablissementId("LOGO_ETAB", etabId)
+            .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse(null));
+        enTete.put("devise", parametreRepository.findByCleAndEtablissementId("DEVISE", etabId)
+            .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse(null));
+        enTete.put("chefEtablissement", parametreRepository.findByCleAndEtablissementId("CONTACT_PRINCIPAL", etabId)
+            .map(p -> p.getValeur()).filter(v -> v != null && !v.isBlank()).orElse(null));
+        return enTete;
+    }
 
     @GetMapping
     public String liste(@RequestParam(required = false) Long classeId,
                         @RequestParam(required = false) String q, Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
-        List<Eleve> eleves = classeId != null
-            ? eleveRepository.findByClasseIdOrderByNomAsc(classeId)
-            : eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean estParent = auth != null && auth.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_PARENT".equals(a.getAuthority()));
+
+        List<Eleve> eleves;
+        if (estParent) {
+            // Un parent ne voit jamais que ses propres enfants, jamais une classe ou un etablissement entier.
+            eleves = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(auth.getName());
+            classeId = null;
+        } else if (classeId != null) {
+            boolean classeAutorisee = classeRepository.findById(classeId)
+                .filter(c -> etabId != null && etabId.equals(c.getEtablissementId()))
+                .isPresent();
+            eleves = classeAutorisee ? eleveRepository.findByClasseIdOrderByNomAsc(classeId) : List.of();
+        } else {
+            eleves = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
+        }
 
         if (q != null && !q.isBlank()) {
             String terme = q.trim().toLowerCase();
@@ -79,8 +114,20 @@ public class BulletinController {
                                    @RequestParam(defaultValue = "1") Integer trimestre,
                                    Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
+        Authentication authImpression = SecurityContextHolder.getContext().getAuthentication();
+        boolean estParentImpression = authImpression != null && authImpression.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_PARENT".equals(a.getAuthority()));
+        if (estParentImpression) {
+            // L'impression en lot est une action de gestion (classe/etablissement entier) : jamais pour un parent.
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Action reservee au personnel de l'etablissement.");
+        }
 
-        List<Eleve> eleves = classeId != null
+        boolean classeAutoriseeImpression = classeId == null || classeRepository.findById(classeId)
+            .filter(c -> etabId != null && etabId.equals(c.getEtablissementId()))
+            .isPresent();
+        List<Eleve> eleves = !classeAutoriseeImpression ? List.of()
+            : classeId != null
             ? eleveRepository.findByClasseIdOrderByNomAsc(classeId)
             : eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
 
@@ -128,7 +175,7 @@ public class BulletinController {
                            RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
         Eleve eleve = eleveRepository.findById(eleveId).orElse(null);
-        if (eleve == null || (etabId != null && !etabId.equals(eleve.getEtablissementId()))) {
+        if (eleve == null || etabId == null || !etabId.equals(eleve.getEtablissementId())) {
             ra.addFlashAttribute("erreur", "Élève introuvable.");
             return "redirect:/bulletins";
         }
@@ -177,13 +224,59 @@ public class BulletinController {
         return "bulletin";
     }
 
+    /** Telechargement du bulletin en PDF genere cote serveur (memes controles d'acces que la vue HTML). */
+    @GetMapping("/{eleveId}/pdf")
+    public void bulletinPdf(@PathVariable Long eleveId,
+                            @RequestParam(defaultValue = "1") Integer trimestre,
+                            HttpServletResponse response,
+                            RedirectAttributes ra) throws IOException {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Eleve eleve = eleveRepository.findById(eleveId).orElse(null);
+        if (eleve == null || etabId == null || !etabId.equals(eleve.getEtablissementId())) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean estParent = auth != null && auth.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_PARENT".equals(a.getAuthority()));
+        if (estParent) {
+            String email = auth.getName();
+            boolean estMonEnfant = email.equalsIgnoreCase(eleve.getEmailParent())
+                || email.equalsIgnoreCase(eleve.getPereEmail())
+                || email.equalsIgnoreCase(eleve.getMereEmail());
+            if (!estMonEnfant) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+        }
+
+        byte[] pdf = bulletinPdfService.genererPdf(eleve, trimestre, etabId, buildEnTeteEtablissement(etabId));
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition",
+            "attachment; filename=\"bulletin-" + eleve.getNom() + "-" + eleve.getPrenom() + "-T" + trimestre + ".pdf\"");
+        response.getOutputStream().write(pdf);
+        response.getOutputStream().flush();
+    }
+
     @PostMapping("/{eleveId}/conduite")
     public String enregistrerConduite(@PathVariable Long eleveId,
                                       @RequestParam Integer trimestre,
                                       @RequestParam String evaluation,
                                       @RequestParam(required = false) String commentaire,
                                       RedirectAttributes ra) {
+        Authentication authConduite = SecurityContextHolder.getContext().getAuthentication();
+        boolean autorise = authConduite != null && authConduite.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()) || "ROLE_ENSEIGNANT".equals(a.getAuthority()));
+        if (!autorise) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Action reservee a l'administration et aux enseignants.");
+        }
+        Long etabIdConduite = etablissementService.getCurrentEtablissementId();
         Eleve eleve = eleveRepository.findById(eleveId).orElseThrow();
+        if (etabIdConduite == null || !etabIdConduite.equals(eleve.getEtablissementId())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Élève introuvable dans cet établissement.");
+        }
         String anneeScolaire = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
         if (anneeScolaire == null) {
             ra.addFlashAttribute("erreur", "Impossible d'enregistrer la conduite : aucune classe/annee scolaire associee.");
@@ -197,7 +290,7 @@ public class BulletinController {
         conduite.setAnneeScolaire(anneeScolaire);
         conduite.setEvaluation(evaluation);
         conduite.setCommentaire(commentaire);
-        conduite.setSaisieAt(LocalDateTime.now());
+        conduite.setSaisieAt(horlogeService.maintenant());
         Utilisateur saisiPar = etablissementService.getCurrentUtilisateur();
         if (saisiPar != null) conduite.setSaisieParId(saisiPar.getId());
         conduiteRepository.save(conduite);

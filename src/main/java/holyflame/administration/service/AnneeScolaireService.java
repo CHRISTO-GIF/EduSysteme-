@@ -5,7 +5,6 @@ import holyflame.administration.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -22,6 +21,8 @@ public class AnneeScolaireService {
     @Autowired private ParametreRepository parametreRepository;
     @Autowired private ClasseRepository classeRepository;
     @Autowired private LigneBudgetRepository ligneBudgetRepository;
+    @Autowired private EnseignantAutorisationRepository enseignantAutorisationRepository;
+    @Autowired private HorlogeService horlogeService;
 
     public List<AnneeScolaire> lister(Long etabId) {
         return anneeScolaireRepository.findByEtablissementIdOrderByLibelleDesc(etabId);
@@ -41,6 +42,11 @@ public class AnneeScolaireService {
     }
 
     public AnneeScolaire creer(String libelle, Long etabId, String anneeSource, boolean dupliquerClasses, boolean dupliquerBudget) {
+        return creer(libelle, etabId, anneeSource, dupliquerClasses, dupliquerBudget, dupliquerClasses);
+    }
+
+    public AnneeScolaire creer(String libelle, Long etabId, String anneeSource, boolean dupliquerClasses,
+                                boolean dupliquerBudget, boolean dupliquerAffectationsEnseignants) {
         if (anneeScolaireRepository.existsByEtablissementIdAndLibelle(etabId, libelle)) {
             throw new IllegalArgumentException("Cette annee scolaire existe deja.");
         }
@@ -48,13 +54,19 @@ public class AnneeScolaireService {
         a.setLibelle(libelle);
         a.setEtablissementId(etabId);
         a.setStatut("INACTIVE");
-        a.setDateCreation(LocalDate.now());
+        a.setDateCreation(horlogeService.aujourdHui(etabId));
         a.setDupliqueeDepuis(anneeSource);
         anneeScolaireRepository.save(a);
 
         if (anneeSource != null && !anneeSource.isBlank()) {
             if (dupliquerClasses) dupliquerClasses(etabId, anneeSource, libelle);
             if (dupliquerBudget) dupliquerBudget(etabId, anneeSource, libelle);
+            // Les affectations enseignant/matiere/classe pointent sur des Classe.id precis :
+            // dupliquer les classes cree de NOUVELLES lignes, donc sans ceci chaque enseignant
+            // perdrait toutes ses classes/matieres a chaque changement d'annee.
+            if (dupliquerClasses && dupliquerAffectationsEnseignants) {
+                dupliquerAffectationsEnseignants(etabId, anneeSource, libelle);
+            }
         }
         return a;
     }
@@ -84,9 +96,39 @@ public class AnneeScolaireService {
             nouvelle.setMois(l.getMois());
             nouvelle.setAnneeScolaire(cible);
             nouvelle.setNotes(l.getNotes());
-            nouvelle.setDateCreation(LocalDate.now());
+            nouvelle.setDateCreation(horlogeService.aujourdHui(etabId));
             nouvelle.setEtablissementId(etabId);
             ligneBudgetRepository.save(nouvelle);
+        }
+    }
+
+    /** Reaffecte chaque enseignant a ses classes/matieres de l'annee cible, en faisant correspondre
+        les classes source et cible par nom (les Classe dupliquees ont un nouvel id). */
+    private void dupliquerAffectationsEnseignants(Long etabId, String source, String cible) {
+        List<Classe> classesSource = classeRepository.findByAnneeScolaireAndEtablissementId(source, etabId);
+        List<Classe> classesCible = classeRepository.findByAnneeScolaireAndEtablissementId(cible, etabId);
+        java.util.Map<Long, Long> sourceVersCible = new java.util.HashMap<>();
+        for (Classe cs : classesSource) {
+            for (Classe cc : classesCible) {
+                if (cc.getNom() != null && cc.getNom().equalsIgnoreCase(cs.getNom())) {
+                    sourceVersCible.put(cs.getId(), cc.getId());
+                    break;
+                }
+            }
+        }
+        if (sourceVersCible.isEmpty()) return;
+
+        for (EnseignantAutorisation ea : enseignantAutorisationRepository.findByEtablissementId(etabId)) {
+            Long classeCibleId = sourceVersCible.get(ea.getClasseId());
+            if (classeCibleId == null) continue;
+            if (enseignantAutorisationRepository.existsByEnseignantIdAndMatiereIdAndClasseId(
+                    ea.getEnseignantId(), ea.getMatiereId(), classeCibleId)) continue;
+            EnseignantAutorisation nouvelle = new EnseignantAutorisation();
+            nouvelle.setEnseignantId(ea.getEnseignantId());
+            nouvelle.setMatiereId(ea.getMatiereId());
+            nouvelle.setClasseId(classeCibleId);
+            nouvelle.setEtablissementId(etabId);
+            enseignantAutorisationRepository.save(nouvelle);
         }
     }
 
@@ -102,7 +144,7 @@ public class AnneeScolaireService {
             anneeScolaireRepository.save(ancienne);
         }
         cible.setStatut("ACTIVE");
-        cible.setDateActivation(LocalDate.now());
+        cible.setDateActivation(horlogeService.aujourdHui(etabId));
         anneeScolaireRepository.save(cible);
 
         etablissementRepository.findById(etabId).ifPresent(etab -> {
@@ -120,7 +162,7 @@ public class AnneeScolaireService {
             throw new IllegalStateException("Activez une autre annee avant de cloturer celle-ci : l'annee active ne peut pas etre verrouillee.");
         }
         a.setStatut("CLOTUREE");
-        a.setDateCloture(LocalDate.now());
+        a.setDateCloture(horlogeService.aujourdHui(etabId));
         a.setClotureParId(utilisateurId);
         anneeScolaireRepository.save(a);
     }

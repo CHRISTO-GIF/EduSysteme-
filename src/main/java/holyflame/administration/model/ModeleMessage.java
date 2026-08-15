@@ -16,6 +16,7 @@ public class ModeleMessage {
     private String sujet;
     @Column(length = 3000)
     private String contenu;
+    private Long etablissementId;
 
     public ModeleMessage() {}
 
@@ -29,4 +30,6 @@ public class ModeleMessage {
     public void setSujet(String sujet) { this.sujet = sujet; }
     public String getContenu() { return contenu; }
     public void setContenu(String contenu) { this.contenu = contenu; }
+    public Long getEtablissementId() { return etablissementId; }
+    public void setEtablissementId(Long etablissementId) { this.etablissementId = etablissementId; }
 }

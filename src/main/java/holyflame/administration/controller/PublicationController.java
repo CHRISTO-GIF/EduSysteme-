@@ -11,8 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
-
 @Controller
 @RequestMapping("/publications")
 public class PublicationController {
@@ -20,6 +18,7 @@ public class PublicationController {
     @Autowired private PublicationRepository publicationRepository;
     @Autowired private ClasseRepository classeRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     @GetMapping
     public String index(Model model) {
@@ -46,7 +45,7 @@ public class PublicationController {
         pub.setCategorie(categorie);
         pub.setClasseId(classeId); // null = tous les élèves
         pub.setEtablissementId(etabId);
-        pub.setDatePublication(LocalDateTime.now());
+        pub.setDatePublication(horlogeService.maintenant());
         pub.setPubliePar(auth != null ? auth.getName() : "Admin");
         publicationRepository.save(pub);
 

@@ -1,10 +1,12 @@
 package holyflame.administration.service;
 
+import holyflame.administration.model.Classe;
 import holyflame.administration.model.Eleve;
 import holyflame.administration.model.EnseignantAutorisation;
 import holyflame.administration.model.Matiere;
 import holyflame.administration.model.MessagePrive;
 import holyflame.administration.model.Utilisateur;
+import holyflame.administration.repository.EleveRepository;
 import holyflame.administration.repository.EnseignantAutorisationRepository;
 import holyflame.administration.repository.MatiereRepository;
 import holyflame.administration.repository.MessagePriveRepository;
@@ -23,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class MessagerieService {
@@ -32,6 +35,8 @@ public class MessagerieService {
     @Autowired private EnseignantAutorisationRepository enseignantAutorisationRepository;
     @Autowired private MatiereRepository matiereRepository;
     @Autowired private UtilisateurRepository utilisateurRepository;
+    @Autowired private EleveRepository eleveRepository;
+    @Autowired private HorlogeService horlogeService;
 
     public Map<String, Object> creerContact(String email, String nom, String role) {
         Map<String, Object> c = new LinkedHashMap<>();
@@ -80,6 +85,51 @@ public class MessagerieService {
         }
 
         return contactsParEmail;
+    }
+
+    /**
+     * Construit les contacts reels d'un membre du staff : parents des eleves qu'il peut
+     * legitimement contacter (ses classes autorisees pour un enseignant, tout l'etablissement
+     * pour admin/secretaire). Partage entre l'affichage de la messagerie et la verification
+     * d'autorisation a l'envoi.
+     */
+    public Map<String, Map<String, Object>> construireContactsStaff(Utilisateur moi, Long etabId) {
+        Map<String, Map<String, Object>> contactsParEmail = new LinkedHashMap<>();
+        if (etabId == null || moi == null) return contactsParEmail;
+
+        List<Eleve> elevesConcernes;
+        if ("ENSEIGNANT".equals(moi.getRole())) {
+            List<Long> classeIds = enseignantAutorisationRepository.findByEnseignantIdAndEtablissementId(moi.getId(), etabId).stream()
+                .map(EnseignantAutorisation::getClasseId).distinct().toList();
+            elevesConcernes = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId).stream()
+                .filter(e -> e.getClasse() != null && classeIds.contains(e.getClasse().getId()))
+                .toList();
+        } else {
+            elevesConcernes = eleveRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId);
+        }
+
+        Map<String, List<Eleve>> elevesParParent = new LinkedHashMap<>();
+        for (Eleve e : elevesConcernes) {
+            if (e.getEmailParent() == null || e.getEmailParent().isBlank()) continue;
+            elevesParParent.computeIfAbsent(e.getEmailParent(), k -> new ArrayList<>()).add(e);
+        }
+
+        for (Map.Entry<String, List<Eleve>> entry : elevesParParent.entrySet()) {
+            String nomsEnfants = entry.getValue().stream()
+                .map(e -> e.getPrenom() + " " + e.getNom()).distinct().reduce((a, b) -> a + ", " + b).orElse("");
+            String classesEnfants = entry.getValue().stream()
+                .map(Eleve::getClasse).filter(Objects::nonNull).map(Classe::getNom).distinct()
+                .reduce((a, b) -> a + ", " + b).orElse("");
+            contactsParEmail.put(entry.getKey(), creerContact(
+                entry.getKey(), "Parent de " + nomsEnfants, classesEnfants.isBlank() ? "Parent" : classesEnfants));
+        }
+        return contactsParEmail;
+    }
+
+    /** Verifie qu'un destinataire fait bien partie des contacts autorises (comparaison insensible a la casse). */
+    public boolean estContactAutorise(String destinataire, Map<String, Map<String, Object>> contactsParEmail) {
+        if (destinataire == null) return false;
+        return contactsParEmail.keySet().stream().anyMatch(email -> email.equalsIgnoreCase(destinataire));
     }
 
     public List<Map<String, Object>> construireConversations(String monEmail, Map<String, Map<String, Object>> contactsParEmail) {
@@ -144,7 +194,7 @@ public class MessagerieService {
     public List<Map<String, Object>> avecSeparateursDate(List<MessagePrive> fil) {
         List<Map<String, Object>> result = new ArrayList<>();
         LocalDate dernierJour = null;
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
         for (MessagePrive m : fil) {
             LocalDate jour = m.getDateEnvoi().toLocalDate();
             Map<String, Object> row = new LinkedHashMap<>();
@@ -164,18 +214,31 @@ public class MessagerieService {
         return result;
     }
 
-    public void envoyerMessage(String expediteur, String destinataire, String contenu, MultipartFile pieceJointe) throws IOException {
+    /** Types de pieces jointes acceptes en messagerie : jamais de HTML/SVG (executables dans un
+        navigateur si ouverts directement depuis /uploads, servi sans authentification). */
+    private static final java.util.Set<String> TYPES_PIECE_JOINTE_AUTORISES = java.util.Set.of(
+        "image/jpeg", "image/png", "image/gif", "image/webp",
+        "application/pdf", "text/plain",
+        "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+    public void envoyerMessage(String expediteur, String destinataire, String contenu, MultipartFile pieceJointe,
+            Long etablissementId) throws IOException {
         boolean aTexte = contenu != null && !contenu.isBlank();
         boolean aPieceJointe = pieceJointe != null && !pieceJointe.isEmpty();
         if (!aTexte && !aPieceJointe) return;
+        if (aPieceJointe && !TYPES_PIECE_JOINTE_AUTORISES.contains(pieceJointe.getContentType())) {
+            throw new IOException("Type de fichier non autorisé. Formats acceptés : images, PDF, Word, Excel, texte.");
+        }
 
         MessagePrive m = new MessagePrive();
         m.setExpediteurEmail(expediteur);
         m.setDestinataireEmail(destinataire);
         m.setContenu(aTexte && contenu != null ? contenu.trim() : "");
-        m.setDateEnvoi(LocalDateTime.now());
+        m.setDateEnvoi(horlogeService.maintenant(etablissementId));
         m.setLu(false);
-        if (aPieceJointe && pieceJointe != null) {
+        m.setEtablissementId(etablissementId);
+        if (aPieceJointe) {
             String path = fileStorageService.store(pieceJointe, "messagerie");
             m.setPieceJointeNom(pieceJointe.getOriginalFilename());
             m.setPieceJointeChemin(path);

@@ -7,6 +7,7 @@ import holyflame.administration.model.Note;
 import holyflame.administration.model.NoteQuestion;
 import holyflame.administration.repository.BaremeQuestionRepository;
 import holyflame.administration.repository.EleveRepository;
+import holyflame.administration.repository.EnseignantAutorisationRepository;
 import holyflame.administration.repository.ExamenRepository;
 import holyflame.administration.repository.NoteQuestionRepository;
 import holyflame.administration.repository.NoteRepository;
@@ -33,7 +34,9 @@ public class CorrectionController {
     @Autowired private NoteQuestionRepository noteQuestionRepository;
     @Autowired private NoteRepository noteRepository;
     @Autowired private EleveRepository eleveRepository;
+    @Autowired private EnseignantAutorisationRepository autorisationRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
 
@@ -134,6 +137,25 @@ public class CorrectionController {
         Examen examen = examenRepository.findById(examenId).orElseThrow();
         verifierProprietaire(examen);
         Eleve eleve = eleveRepository.findById(eleveId).orElseThrow();
+
+        // La note ne peut etre rattachee a un bulletin que si l'examen a bien un trimestre
+        // (le bulletin filtre les notes par trimestre exact : une note sans trimestre n'apparait
+        // jamais, quel que soit le trimestre consulte) et si l'eleve a une classe avec une annee
+        // scolaire — memes garde-fous que la saisie de notes classique.
+        if (examen.getTrimestre() == null) {
+            ra.addFlashAttribute("erreurAuth",
+                    "Cet examen n'a pas de trimestre défini : la note ne s'afficherait dans aucun bulletin. "
+                            + "Supprimez cet examen et recréez-le en choisissant un trimestre.");
+            return "redirect:/examens/" + examenId + "/correction?eleveId=" + eleveId;
+        }
+        if (eleve.getClasse() == null || eleve.getClasse().getAnneeScolaire() == null
+                || eleve.getClasse().getAnneeScolaire().isBlank()) {
+            ra.addFlashAttribute("erreurAuth",
+                    "Impossible d'enregistrer la note : " + eleve.getNom() + " " + eleve.getPrenom()
+                            + " n'est affecté à aucune classe avec une année scolaire définie.");
+            return "redirect:/examens/" + examenId + "/correction?eleveId=" + eleveId;
+        }
+
         List<BaremeQuestion> questions = baremeQuestionRepository.findByExamenIdOrderByOrdreAsc(examenId);
 
         double total = 0;
@@ -156,7 +178,7 @@ public class CorrectionController {
             noteQuestionRepository.save(nq);
         }
 
-        String anneeScolaireNote = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
+        String anneeScolaireNote = eleve.getClasse().getAnneeScolaire();
         anneeScolaireService.verifierModifiable(anneeScolaireNote, etablissementService.getCurrentEtablissementId());
 
         Note note = trouverNote(examen, eleve);
@@ -164,7 +186,8 @@ public class CorrectionController {
         note.setEleve(eleve);
         note.setMatiere(examen.getMatiere());
         note.setValeur(Math.round(total * 10) / 10.0);
-        note.setCoefficient(1.0);
+        note.setCoefficient(examen.getMatiere() != null && examen.getMatiere().getCoefficient() != null
+                ? examen.getMatiere().getCoefficient() : 1.0);
         note.setType("EXAMEN");
         note.setTitre(examen.getMatiere() != null ? "Examen — " + examen.getMatiere().getNom() : "Examen");
         note.setTrimestre(examen.getTrimestre());
@@ -172,7 +195,7 @@ public class CorrectionController {
         note.setDateEvaluation(examen.getDateExamen());
         note.setCommentaire(allParams.get("commentaire"));
         note.setStatut("PUBLIE");
-        note.setSaisieAt(LocalDateTime.now());
+        note.setSaisieAt(horlogeService.maintenant());
         var utilisateur = etablissementService.getCurrentUtilisateur();
         if (utilisateur != null) note.setSaisieParId(utilisateur.getId());
         noteRepository.save(note);
@@ -189,11 +212,29 @@ public class CorrectionController {
         return "redirect:/examens/" + examenId + "/correction?eleveId=" + eleveId;
     }
 
+    /**
+     * Verifie que l'examen appartient a l'etablissement courant et, pour un enseignant, qu'il
+     * est bien autorise sur la matiere+classe de cet examen — sans ce second controle, n'importe
+     * quel enseignant de l'etablissement pouvait configurer le bareme et noter un examen d'une
+     * matiere/classe qu'il n'enseigne pas.
+     */
     private void verifierProprietaire(Examen examen) {
         Long etabId = etablissementService.getCurrentEtablissementId();
         if (etabId == null || examen.getEtablissementId() == null || !etabId.equals(examen.getEtablissementId())) {
             throw new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.FORBIDDEN, "Examen introuvable dans cet établissement.");
+        }
+        var utilisateur = etablissementService.getCurrentUtilisateur();
+        if (utilisateur != null && "ENSEIGNANT".equals(utilisateur.getRole())) {
+            Long matiereId = examen.getMatiere() != null ? examen.getMatiere().getId() : null;
+            Long classeId = examen.getClasse() != null ? examen.getClasse().getId() : null;
+            boolean autorise = matiereId != null && classeId != null
+                && autorisationRepository.findByEnseignantIdAndEtablissementId(utilisateur.getId(), etabId).stream()
+                    .anyMatch(a -> a.getMatiereId().equals(matiereId) && a.getClasseId().equals(classeId));
+            if (!autorise) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Vous n'êtes pas autorisé pour cette matière ou classe.");
+            }
         }
     }
 
@@ -202,7 +243,7 @@ public class CorrectionController {
         return noteRepository.findByEleveAndTrimestreOrderByMatiereNomAsc(eleve, examen.getTrimestre()).stream()
             .filter(n -> n.getMatiere() != null && n.getMatiere().getId().equals(examen.getMatiere().getId())
                       && Objects.equals(n.getDateEvaluation(), examen.getDateExamen())
-                      && "EXAMEN".equals(n.getType()))
+                      && Note.isExamenType(n.getType()))
             .findFirst().orElse(null);
     }
 }

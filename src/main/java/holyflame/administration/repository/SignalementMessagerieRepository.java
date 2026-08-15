@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface SignalementMessagerieRepository extends JpaRepository<SignalementMessagerie, Long> {
     List<SignalementMessagerie> findByEtablissementIdOrderByDateSignalementDesc(Long etablissementId);
+    long countByEtablissementIdAndStatut(Long etablissementId, String statut);
 }

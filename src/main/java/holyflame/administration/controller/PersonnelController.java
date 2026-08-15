@@ -24,7 +24,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +46,7 @@ public class PersonnelController {
     @Autowired private MatiereRepository matiereRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private EmailService emailService;
 
     @GetMapping
@@ -73,7 +73,7 @@ public class PersonnelController {
 
         List<Personnel> personnels = etabId != null
             ? personnelRepository.findByEtablissementIdOrderByNomAscPrenomAsc(etabId)
-            : personnelRepository.findAllByOrderByNomAscPrenomAsc();
+            : List.of();
 
         model.addAttribute("totalPersonnels",  personnels.size());
         model.addAttribute("totalActifs", personnels.stream().filter(p -> "ACTIF".equals(p.getStatut())).count());
@@ -189,7 +189,7 @@ public class PersonnelController {
         p.setSpecialisations(specialisations);
         p.setAnneesExperience(anneesExperience);
         p.setCodeAcces(codeAcces != null && !codeAcces.isBlank() ? codeAcces.trim()
-            : "EMP-" + LocalDate.now().getYear() + "-" + String.format("%03d", (personnelRepository.count() + 1)));
+            : "EMP-" + horlogeService.aujourdHui().getYear() + "-" + String.format("%03d", (personnelRepository.count() + 1)));
         p.setEtablissementId(etabId);
         personnelRepository.save(p);
 
@@ -451,7 +451,7 @@ public class PersonnelController {
             doc.setTypeDocument(typeDocument);
             doc.setContentType(fichier.getContentType());
             doc.setTaille(fichier.getSize());
-            doc.setDateUpload(LocalDateTime.now());
+            doc.setDateUpload(horlogeService.maintenant());
             documentRepository.save(doc);
         } catch (IOException e) {
             return "redirect:/personnel/" + id + "?error=upload#documents";

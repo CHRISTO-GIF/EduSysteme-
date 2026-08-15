@@ -26,6 +26,7 @@ public class ArchiveDocument {
     private String uploadePar;
     private LocalDateTime dateArchive;
     private boolean confidentiel;
+    private Long etablissementId;
 
     public ArchiveDocument() {}
 
@@ -53,4 +54,6 @@ public class ArchiveDocument {
     public void setDateArchive(LocalDateTime dateArchive) { this.dateArchive = dateArchive; }
     public boolean isConfidentiel() { return confidentiel; }
     public void setConfidentiel(boolean confidentiel) { this.confidentiel = confidentiel; }
+    public Long getEtablissementId() { return etablissementId; }
+    public void setEtablissementId(Long etablissementId) { this.etablissementId = etablissementId; }
 }

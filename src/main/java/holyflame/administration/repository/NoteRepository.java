@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
@@ -18,6 +19,15 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     @Query("SELECT n FROM Note n JOIN FETCH n.eleve e JOIN FETCH e.classe WHERE n.anneeScolaire IS NULL")
     List<Note> findByAnneeScolaireIsNullWithEleveEtClasse();
+
+    // Nettoyage : notes orphelines (annee jamais figee, ou eleve sans classe) — l'annee
+    // et la classe sont desormais obligatoires a la saisie, ces notes ne peuvent donc
+    // provenir que de donnees anciennes a purger.
+    List<Note> findByAnneeScolaireIsNull();
+
+    @Query("SELECT n FROM Note n WHERE n.eleve.classe IS NULL")
+    List<Note> findByEleveClasseIsNull();
+
     List<Note> findAllByOrderByDateEvaluationDesc();
 
     // Pour le suivi : compter les notes saisies par matière + classe + trimestre
@@ -59,4 +69,16 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
                                                  @Param("classeId") Long classeId,
                                                  @Param("type") String type,
                                                  @Param("trimestre") Integer trimestre);
+
+    // Dates distinctes des evaluations deja saisies pour une matiere+classe+trimestre+annee et un
+    // ensemble de types donnes — sert a compter le nombre d'evaluations (devoirs ou examens)
+    // deja enregistrees, independamment du nombre d'eleves notes pour chacune.
+    @Query("SELECT DISTINCT n.dateEvaluation FROM Note n " +
+           "WHERE n.matiere.id = :matiereId AND n.eleve.classe.id = :classeId " +
+           "AND n.trimestre = :trimestre AND n.anneeScolaire = :anneeScolaire AND n.type IN :types")
+    List<LocalDate> findDatesEvaluationsParMatiereClasseTrimestre(@Param("matiereId") Long matiereId,
+                                                 @Param("classeId") Long classeId,
+                                                 @Param("trimestre") Integer trimestre,
+                                                 @Param("anneeScolaire") String anneeScolaire,
+                                                 @Param("types") List<String> types);
 }

@@ -7,9 +7,11 @@ import holyflame.administration.repository.MouvementInventaireRepository;
 import holyflame.administration.service.EtablissementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,16 +23,21 @@ public class InventaireController {
     @Autowired private ArticleInventaireRepository articleRepository;
     @Autowired private MouvementInventaireRepository mouvementRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     @GetMapping
     public String index(Model model) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (etabId != null) articleRepository.migrateNullEtablissementId(etabId);
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
-        List<ArticleInventaire> articles = articleRepository.findAllByOrderByCategorieAscNomAsc();
+        List<ArticleInventaire> articles = etabId != null
+            ? articleRepository.findByEtablissementIdOrderByCategorieAscNomAsc(etabId)
+            : List.of();
         model.addAttribute("articles", articles);
         model.addAttribute("totalArticles", articles.size());
-        model.addAttribute("totalNeuf",      articleRepository.countByEtat("NEUF"));
-        model.addAttribute("totalReparation",articleRepository.countByEtat("EN_REPARATION"));
-        model.addAttribute("totalHorsSvc",   articleRepository.countByEtat("HORS_SERVICE"));
+        model.addAttribute("totalNeuf",      etabId != null ? articleRepository.countByEtatAndEtablissementId("NEUF", etabId) : 0L);
+        model.addAttribute("totalReparation",etabId != null ? articleRepository.countByEtatAndEtablissementId("EN_REPARATION", etabId) : 0L);
+        model.addAttribute("totalHorsSvc",   etabId != null ? articleRepository.countByEtatAndEtablissementId("HORS_SERVICE", etabId) : 0L);
         double valeurTotale = articles.stream()
             .mapToDouble(a -> (a.getValeurUnitaire() != null ? a.getValeurUnitaire() : 0) * a.getQuantite()).sum();
         model.addAttribute("valeurTotale", valeurTotale);
@@ -50,11 +57,13 @@ public class InventaireController {
             @RequestParam(required = false) String numSerie,
             @RequestParam(required = false) String notes) {
 
+        Long etabId = etablissementService.getCurrentEtablissementId();
         ArticleInventaire a = new ArticleInventaire();
         a.setNom(nom); a.setCategorie(categorie); a.setQuantite(quantite); a.setEtat(etat);
         a.setLocalisation(localisation); a.setDateAcquisition(dateAcquisition);
         a.setValeurUnitaire(valeurUnitaire); a.setFournisseur(fournisseur);
         a.setNumSerie(numSerie); a.setNotes(notes);
+        a.setEtablissementId(etabId);
         articleRepository.save(a);
         return "redirect:/inventaire";
     }
@@ -72,6 +81,7 @@ public class InventaireController {
             @RequestParam(required = false) String notes) {
 
         ArticleInventaire a = articleRepository.findById(id).orElseThrow();
+        verifierProprietaire(a);
         a.setNom(nom); a.setCategorie(categorie); a.setQuantite(quantite); a.setEtat(etat);
         a.setLocalisation(localisation); a.setDateAcquisition(dateAcquisition);
         a.setValeurUnitaire(valeurUnitaire); a.setFournisseur(fournisseur);
@@ -82,7 +92,10 @@ public class InventaireController {
 
     @PostMapping("/{id}/supprimer")
     public String supprimer(@PathVariable Long id) {
-        articleRepository.deleteById(id);
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        articleRepository.findById(id)
+            .filter(a -> etabId != null && etabId.equals(a.getEtablissementId()))
+            .ifPresent(articleRepository::delete);
         return "redirect:/inventaire";
     }
 
@@ -96,9 +109,10 @@ public class InventaireController {
             @RequestParam(required = false) String effectuePar) {
 
         ArticleInventaire a = articleRepository.findById(id).orElseThrow();
+        verifierProprietaire(a);
         MouvementInventaire m = new MouvementInventaire();
         m.setArticle(a); m.setType(type); m.setQuantite(quantite);
-        m.setDate(date != null ? date : LocalDate.now());
+        m.setDate(date != null ? date : horlogeService.aujourdHui());
         m.setMotif(motif); m.setEffectuePar(effectuePar);
 
         if ("ENTREE".equals(type)) a.setQuantite(a.getQuantite() + quantite);
@@ -108,5 +122,12 @@ public class InventaireController {
         mouvementRepository.save(m);
         articleRepository.save(a);
         return "redirect:/inventaire";
+    }
+
+    private void verifierProprietaire(ArticleInventaire article) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        if (etabId == null || article.getEtablissementId() == null || !etabId.equals(article.getEtablissementId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Article introuvable dans cet établissement.");
+        }
     }
 }

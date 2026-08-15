@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,6 +36,7 @@ public class SuiviFinancierParentController {
     @Autowired private PaiementRepository paiementRepository;
     @Autowired private UtilisateurRepository utilisateurRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private MessagerieService messagerieService;
     @Autowired private FinanceParentService financeParentService;
 
@@ -89,7 +89,7 @@ public class SuiviFinancierParentController {
         model.addAttribute("enfants", enfants);
         model.addAttribute("paiements", tousPaiements);
         model.addAttribute("total", total);
-        model.addAttribute("anneeCourante", LocalDate.now().getYear());
+        model.addAttribute("anneeCourante", horlogeService.aujourdHui().getYear());
         model.addAttribute("emailParent", email);
         return "portail-parent-releve";
     }
@@ -98,9 +98,15 @@ public class SuiviFinancierParentController {
     public String demander(@RequestParam Long fraisId, @RequestParam Long eleveId, Authentication auth, RedirectAttributes ra) throws IOException {
         String email = auth != null ? auth.getName() : "";
         FraisScolarite frais = fraisScolariteRepository.findById(fraisId).orElse(null);
-        Eleve eleve = eleveRepository.findById(eleveId).orElse(null);
-        if (frais == null || eleve == null) {
-            ra.addFlashAttribute("erreurMsg", "Frais introuvable.");
+        // L'eleve doit etre l'un des propres enfants du parent connecte — sans ce controle,
+        // n'importe quel eleveId permettait de faire referencer le nom d'un enfant d'une
+        // autre famille dans une demande de paiement.
+        Eleve eleve = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email).stream()
+            .filter(e -> e.getId().equals(eleveId))
+            .findFirst().orElse(null);
+        if (frais == null || eleve == null
+                || !java.util.Objects.equals(frais.getEtablissementId(), eleve.getEtablissementId())) {
+            ra.addFlashAttribute("erreurMsg", "Frais ou élève introuvable.");
             return "redirect:/portail-parent/paiements";
         }
 
@@ -115,7 +121,7 @@ public class SuiviFinancierParentController {
             + " (" + eleve.getPrenom() + " " + eleve.getNom() + ") - Montant : "
             + (frais.getMontant() != null ? frais.getMontant().longValue() : 0) + " F. "
             + "Merci de me contacter pour la marche a suivre.";
-        messagerieService.envoyerMessage(email, adminEmail, message, null);
+        messagerieService.envoyerMessage(email, adminEmail, message, null, eleve.getEtablissementId());
 
         ra.addFlashAttribute("successMsg", "Votre demande de paiement a ete transmise a l'administration via la messagerie.");
         return "redirect:/portail-parent/paiements";

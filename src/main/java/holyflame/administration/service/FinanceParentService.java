@@ -27,6 +27,8 @@ import java.util.Map;
 @Service
 public class FinanceParentService {
 
+    @Autowired private HorlogeService horlogeService;
+
     private static final Map<String, Integer> MOIS_FR = Map.ofEntries(
         Map.entry("janvier", 1), Map.entry("fevrier", 2), Map.entry("février", 2), Map.entry("mars", 3),
         Map.entry("avril", 4), Map.entry("mai", 5), Map.entry("juin", 6), Map.entry("juillet", 7),
@@ -59,7 +61,7 @@ public class FinanceParentService {
         List<Paiement> tousPaiements = new ArrayList<>();
         for (Eleve e : enfants) tousPaiements.addAll(paiementRepository.findByEleveId(e.getId()));
 
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui(etabId);
 
         for (Eleve enfant : enfants) {
             if (enfant.getClasse() == null) continue;

@@ -16,6 +16,7 @@ import holyflame.administration.repository.*;
 import holyflame.administration.service.BulletinService;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.FileStorageService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
@@ -62,8 +63,11 @@ public class PortailController {
     @Autowired private TachePersonnelleRepository tachePersonnelleRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private BulletinService bulletinService;
+    @Autowired private holyflame.administration.service.BulletinPdfService bulletinPdfService;
     @Autowired private FileStorageService fileStorageService;
     @Autowired private holyflame.administration.service.CalendrierScolaireService calendrierScolaireService;
+    @Autowired private PeriodeCalendrierRepository periodeCalendrierRepository;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     private static final String[] JOURS_NOMS = {"", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"};
 
@@ -77,7 +81,10 @@ public class PortailController {
         Eleve eleveRaw = eleveOpt.get();
         if (eleveRaw.getEtablissementId() == null) {
             Long etabIdAdmin = etablissementService.getCurrentEtablissementId();
-            if (etabIdAdmin != null) eleveRepository.migrateNullEtablissementId(etabIdAdmin);
+            if (etabIdAdmin != null) {
+                eleveRaw.setEtablissementId(etabIdAdmin);
+                eleveRepository.save(eleveRaw);
+            }
         }
         return Optional.of(eleveRepository.findById(eleveRaw.getId()).orElse(eleveRaw));
     }
@@ -92,7 +99,7 @@ public class PortailController {
         Eleve eleve = eleveOpt.get();
         Long etabId = eleve.getEtablissementId();
         Long classeId = eleve.getClasse() != null ? eleve.getClasse().getId() : null;
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
 
         // ── Notes publiees (toutes periodes), pour la moyenne generale et l'activite recente ──
         List<Note> toutesNotes = noteRepository.findByEleveOrderByDateEvaluationDesc(eleve).stream()
@@ -217,7 +224,7 @@ public class PortailController {
         }
 
         // ── Dates reelles de la semaine affichee (aujourd'hui + decalage de semaine) ──
-        LocalDate lundi = LocalDate.now().minusDays(LocalDate.now().getDayOfWeek().getValue() - 1).plusWeeks(semaine);
+        LocalDate lundi = horlogeService.aujourdHui().minusDays(horlogeService.aujourdHui().getDayOfWeek().getValue() - 1).plusWeeks(semaine);
         List<Map<String, Object>> joursSemaine = new java.util.ArrayList<>();
         for (int j = 1; j <= NB_JOURS_GRILLE; j++) {
             Map<String, Object> jour = new LinkedHashMap<>();
@@ -249,7 +256,7 @@ public class PortailController {
         }
 
         // ── Prochaine echeance reelle (devoir ou examen), toutes categories confondues ──
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
         String prochaineEcheanceLibelle = null;
         LocalDate prochaineEcheanceDate = null;
         if (classeId != null) {
@@ -331,7 +338,7 @@ public class PortailController {
             .filter(s -> s.getEleve().getId().equals(eleveOpt.get().getId()))
             .ifPresent(s -> {
                 s.setStatut("EN_COURS");
-                s.setDateDebut(LocalDateTime.now());
+                s.setDateDebut(horlogeService.maintenant());
                 soumissionDevoirRepository.save(s);
             });
         return "redirect:/portail/devoirs";
@@ -364,7 +371,7 @@ public class PortailController {
             SoumissionDevoir s = soumissionOpt.get();
             s.setStatut("TERMINE");
             s.setPourcentageAvancement(100);
-            s.setDateSoumission(LocalDateTime.now());
+            s.setDateSoumission(horlogeService.maintenant());
             if (fichier != null && !fichier.isEmpty()) {
                 String chemin = fileStorageService.store(fichier, "devoirs/soumissions");
                 s.setFichierPath(chemin);
@@ -386,6 +393,7 @@ public class PortailController {
         tache.setEleveId(eleveOpt.get().getId());
         tache.setTitre(titre);
         tache.setDateEcheance(dateEcheance);
+        tache.setDateCreation(horlogeService.maintenant());
         tachePersonnelleRepository.save(tache);
         return "redirect:/portail/devoirs";
     }
@@ -465,12 +473,22 @@ public class PortailController {
 
         Map<String, Object> donnees = bulletinService.calculerBulletin(eleve, trimestre, etabId);
 
-        // ── Assiduite reelle (meme formule que le tableau de bord) ──────────
-        LocalDate aujourdHui = LocalDate.now();
-        long absencesNonJustifiees = absenceRepository.findByEleveIdOrderByDateDesc(eleve.getId()).stream()
-            .filter(a -> !a.isEstJustifiee()).count();
-        long joursOuvres = calendrierScolaireService.joursEcoleOuvres(
-            eleve.getDateInscription() != null ? eleve.getDateInscription() : aujourdHui.minusMonths(3), aujourdHui, etabId);
+        // ── Assiduite reelle du trimestre consulte (pas l'historique complet depuis
+        // l'inscription) : numerateur et denominateur bornes a la meme periode de calendrier
+        // scolaire (Parametres > Calendrier), quand elle est configuree pour cette annee. ──
+        LocalDate aujourdHui = horlogeService.aujourdHui();
+        String anneeScolaireEleve = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
+        holyflame.administration.model.PeriodeCalendrier periodeTrimestre = anneeScolaireEleve != null
+            ? periodeCalendrierRepository.findByEtablissementIdAndAnneeScolaireOrderByDateDebutAsc(etabId, anneeScolaireEleve)
+                .stream().filter(p -> ("TRIMESTRE" + trimestre).equals(p.getType())).findFirst().orElse(null)
+            : null;
+        long absencesNonJustifiees = bulletinService.absencesDuTrimestre(eleve, trimestre, anneeScolaireEleve, etabId)
+            .stream().filter(a -> !a.isEstJustifiee()).count();
+        LocalDate debutPeriode = periodeTrimestre != null ? periodeTrimestre.getDateDebut()
+            : (eleve.getDateInscription() != null ? eleve.getDateInscription() : aujourdHui.minusMonths(3));
+        LocalDate finPeriode = periodeTrimestre != null && periodeTrimestre.getDateFin().isBefore(aujourdHui)
+            ? periodeTrimestre.getDateFin() : aujourdHui;
+        long joursOuvres = calendrierScolaireService.joursEcoleOuvres(debutPeriode, finPeriode, etabId);
         double tauxAssiduite = joursOuvres > 0
             ? Math.max(0, Math.min(100, Math.round((100.0 - (absencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
             : 100;
@@ -518,6 +536,39 @@ public class PortailController {
         return "portail-bulletin";
     }
 
+    /** Telechargement du bulletin en PDF genere cote serveur, pour l'eleve/parent connecte. */
+    @GetMapping("/bulletin/pdf")
+    public void bulletinPdf(@RequestParam(defaultValue = "1") Integer trimestre, Authentication auth,
+                            HttpServletResponse response) throws IOException {
+        Optional<Eleve> eleveOpt = resoudreEleveConnecte(auth);
+        if (eleveOpt.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        Eleve eleve = eleveOpt.get();
+        Long etabId = eleve.getEtablissementId();
+
+        Map<String, String> params = parametreRepository.findByEtablissementId(etabId).stream()
+            .collect(java.util.stream.Collectors.toMap(
+                holyflame.administration.model.Parametre::getCle,
+                holyflame.administration.model.Parametre::getValeur, (a, b) -> a));
+        holyflame.administration.model.Etablissement etab = etablissementService.getCurrentEtablissement();
+        Map<String, Object> enTete = new LinkedHashMap<>();
+        enTete.put("nomEtab", etab != null && etab.getNom() != null && !etab.getNom().isBlank() ? etab.getNom() : "HolyFlame");
+        enTete.put("adresseEtab", etab != null && etab.getAdresse() != null ? etab.getAdresse() : "");
+        enTete.put("emailEtab", params.getOrDefault("EMAIL_ECOLE", ""));
+        enTete.put("logoPath", params.get("LOGO_ETAB"));
+        enTete.put("devise", params.get("DEVISE"));
+        enTete.put("chefEtablissement", params.get("CONTACT_PRINCIPAL"));
+
+        byte[] pdf = bulletinPdfService.genererPdf(eleve, trimestre, etabId, enTete);
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition",
+            "attachment; filename=\"bulletin-" + eleve.getNom() + "-" + eleve.getPrenom() + "-T" + trimestre + ".pdf\"");
+        response.getOutputStream().write(pdf);
+        response.getOutputStream().flush();
+    }
+
     // ── Vie scolaire : annonces, evenements, assiduite, conduite ─────────────
     @GetMapping("/vie-scolaire")
     public String vieScolaire(Authentication auth, Model model) {
@@ -526,7 +577,7 @@ public class PortailController {
         Eleve eleve = eleveOpt.get();
         Long etabId = eleve.getEtablissementId();
         Long classeId = eleve.getClasse() != null ? eleve.getClasse().getId() : null;
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
 
         List<Publication> publications = (etabId != null && classeId != null)
             ? publicationRepository.findForEleve(etabId, classeId)

@@ -28,6 +28,7 @@ public class InfirmerieController {
     @Autowired private EtablissementService etablissementService;
     @Autowired private AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     private static final Map<String, String> MOTIFS = new LinkedHashMap<>() {{
         put("MAUX_TETE", "Maux de tête");
@@ -52,7 +53,7 @@ public class InfirmerieController {
     @GetMapping
     public String dashboard(Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
-        LocalDate aujourdHui = LocalDate.now();
+        LocalDate aujourdHui = horlogeService.aujourdHui();
         LocalDateTime debutJour = aujourdHui.atStartOfDay();
         LocalDateTime finJour = aujourdHui.atTime(23, 59, 59);
 
@@ -138,7 +139,7 @@ public class InfirmerieController {
             return "redirect:/infirmerie";
         }
 
-        LocalDateTime maintenant = LocalDateTime.now();
+        LocalDateTime maintenant = horlogeService.maintenant();
         String anneeScolaireConsult = AnneeScolaireUtil.pour(maintenant.toLocalDate());
         anneeScolaireService.verifierModifiable(anneeScolaireConsult, etabId);
 

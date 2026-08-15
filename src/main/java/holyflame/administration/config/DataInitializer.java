@@ -40,6 +40,7 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private RetardRepository retardRepository;
     @Autowired private ProgrammeRepository programmeRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private holyflame.administration.service.PlanComptableService planComptableService;
 
     @Override
     public void run(String... args) {
@@ -179,64 +180,13 @@ public class DataInitializer implements CommandLineRunner {
             saveArticleInfirmerie("Stylos Adrénaline", 3, 20, "unités", etabId);
         }
 
-        // 12. Plan comptable
-        if (categorieComptableRepository.count() == 0) {
-            saveCategorieComptable("21820", "Materiels de transports", "CHARGE", etabId);
-            saveCategorieComptable("21830", "Ordinateurs ou Imprimantes", "CHARGE", etabId);
-            saveCategorieComptable("21840", "Equipements", "CHARGE", etabId);
-            saveCategorieComptable("60110", "Electrique (materiel et reparation)", "CHARGE", etabId);
-            saveCategorieComptable("60450", "Impressions et Informatique", "CHARGE", etabId);
-            saveCategorieComptable("60460", "Produits d'entretien", "CHARGE", etabId);
-            saveCategorieComptable("60470", "Fourniture de bureau", "CHARGE", etabId);
-            saveCategorieComptable("60472", "Agios", "CHARGE", etabId);
-            saveCategorieComptable("60473", "Fournitures scolaires", "CHARGE", etabId);
-            saveCategorieComptable("60530", "Gazoil groupe", "CHARGE", etabId);
-            saveCategorieComptable("60531", "Eau", "CHARGE", etabId);
-            saveCategorieComptable("60500", "SNE", "CHARGE", etabId);
-            saveCategorieComptable("60510", "Plomberie", "CHARGE", etabId);
-            saveCategorieComptable("60580", "Mobilier (achat)", "CHARGE", etabId);
-            saveCategorieComptable("61412", "Deplacement, taxis", "CHARGE", etabId);
-            saveCategorieComptable("62420", "Entretien mobilier", "CHARGE", etabId);
-            saveCategorieComptable("62430", "Entretien Batiment", "CHARGE", etabId);
-            saveCategorieComptable("62440", "Entretien groupe", "CHARGE", etabId);
-            saveCategorieComptable("62650", "Bibliotheque, manuels", "CHARGE", etabId);
-            saveCategorieComptable("62810", "Tel-Corr-Internet", "CHARGE", etabId);
-            saveCategorieComptable("63840", "Voyages", "CHARGE", etabId);
-            saveCategorieComptable("65130", "Retour de scolarite", "CHARGE", etabId);
-            saveCategorieComptable("65820", "Reduction de la scolarite", "CHARGE", etabId);
-            saveCategorieComptable("66120", "Salaires Vacataires", "CHARGE", etabId);
-            saveCategorieComptable("66110", "Salaires Permanants", "CHARGE", etabId);
-            saveCategorieComptable("66170", "Achat de Tenues", "CHARGE", etabId);
-            saveCategorieComptable("66160", "Honoraires Cabinet d'avocat", "CHARGE", etabId);
-            saveCategorieComptable("66161", "Salaires occasionnels", "CHARGE", etabId);
-            saveCategorieComptable("66180", "Publicite", "CHARGE", etabId);
-            saveCategorieComptable("66181", "Loisirs : enseignants", "CHARGE", etabId);
-            saveCategorieComptable("66182", "Prelevement", "CHARGE", etabId);
-            saveCategorieComptable("66183", "Loisir : des eleves", "CHARGE", etabId);
-            saveCategorieComptable("66420", "Charges sociales (CNPS)", "CHARGE", etabId);
-            saveCategorieComptable("66421", "Impot sur salaire", "CHARGE", etabId);
-            saveCategorieComptable("66430", "Cotisations", "CHARGE", etabId);
-            saveCategorieComptable("66431", "Accompagnement Administratif", "CHARGE", etabId);
-            saveCategorieComptable("66840", "Medicaments, soins medicaux", "CHARGE", etabId);
-            saveCategorieComptable("66841", "Assurances", "CHARGE", etabId);
-            saveCategorieComptable("66850", "Depenses Examens", "CHARGE", etabId);
-            saveCategorieComptable("66881", "Formation", "CHARGE", etabId);
-            saveCategorieComptable("67500", "Loyer", "CHARGE", etabId);
-            saveCategorieComptable("67600", "Depenses chantier", "CHARGE", etabId);
-            saveCategorieComptable("70110", "Scolarite", "PRODUIT", etabId);
-            saveCategorieComptable("70720", "Subventions diverses", "PRODUIT", etabId);
-            saveCategorieComptable("70730", "Locations : locaux, manuels", "PRODUIT", etabId);
-            saveCategorieComptable("71824", "Dons d'organisme", "PRODUIT", etabId);
-            saveCategorieComptable("71825", "Dons divers recus", "PRODUIT", etabId);
-            saveCategorieComptable("72100", "Vente de Tenues de classe", "PRODUIT", etabId);
-            saveCategorieComptable("75820", "APE", "PRODUIT", etabId);
-            saveCategorieComptable("77100", "Ventes diverses", "PRODUIT", etabId);
-            saveCategorieComptable("77110", "Arrieres scolarites", "PRODUIT", etabId);
-            saveCategorieComptable("77120", "Test d'entree", "PRODUIT", etabId);
-            saveCategorieComptable("77170", "Vente tenue de sport", "PRODUIT", etabId);
-            saveCategorieComptable("77180", "Vente Pull over", "PRODUIT", etabId);
-            saveCategorieComptable("77190", "Somme empruntee", "PRODUIT", etabId);
-            saveCategorieComptable("77160", "Cahiers (Inscriptions + Test)", "PRODUIT", etabId);
+        // 12. Plan comptable — desormais seede pour CHAQUE etablissement (defensif, idempotent
+        // par etablissement) via PlanComptableService, plutot qu'une seule fois globalement pour
+        // le tout premier etablissement : sinon tout etablissement cree ensuite (inscription en
+        // ligne ou nouvelle base) se retrouvait sans aucune categorie comptable, rendant tout le
+        // module Depenses/Budget inutilisable.
+        for (Etablissement e : etablissementRepository.findAll()) {
+            planComptableService.seedSiVide(e.getId());
         }
 
         // 12bis. Groupe fonctionnel des postes de charge (rapport econome trimestriel : Fournitures
@@ -302,6 +252,18 @@ public class DataInitializer implements CommandLineRunner {
             n.setAnneeScolaire(n.getEleve().getClasse().getAnneeScolaire());
             noteRepository.save(n);
         }
+
+        // 12quinquies. Purge idempotente des notes orphelines : l'annee scolaire et la classe
+        // sont desormais obligatoires a la saisie (cf. NoteController), donc toute note qui en
+        // serait encore depourvue apres le backfill ci-dessus est forcement une donnee ancienne
+        // impossible a rattacher a un bulletin — elle serait invisible ou fausserait les moyennes
+        // si on la laissait trainer. Sans effet une fois la base assainie (listes vides).
+        List<Note> notesSansAnnee = noteRepository.findByAnneeScolaireIsNull();
+        if (!notesSansAnnee.isEmpty())
+            noteRepository.deleteAll(notesSansAnnee);
+        List<Note> notesSansClasse = noteRepository.findByEleveClasseIsNull();
+        if (!notesSansClasse.isEmpty())
+            noteRepository.deleteAll(notesSansClasse);
 
         // 11. Lier compte élève KONAN Amara
         if (eleveRepository.findByCompteEmail("eleve@holyflame.com").isEmpty()) {
@@ -505,10 +467,4 @@ public class DataInitializer implements CommandLineRunner {
         zoneRepository.save(z);
     }
 
-    private void saveCategorieComptable(String code, String libelle, String sens, Long etabId) {
-        CategorieComptable c = new CategorieComptable();
-        c.setCode(code); c.setLibelle(libelle); c.setSens(sens);
-        c.setEtablissementId(etabId);
-        categorieComptableRepository.save(c);
-    }
 }

@@ -8,6 +8,7 @@ import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.DevoirRepository;
 import holyflame.administration.repository.EleveRepository;
+import holyflame.administration.repository.EnseignantAutorisationRepository;
 import holyflame.administration.repository.MatiereRepository;
 import holyflame.administration.repository.SoumissionDevoirRepository;
 import holyflame.administration.service.EtablissementService;
@@ -35,8 +36,20 @@ public class DevoirEnseignantController {
     @Autowired private ClasseRepository classeRepository;
     @Autowired private MatiereRepository matiereRepository;
     @Autowired private EleveRepository eleveRepository;
+    @Autowired private EnseignantAutorisationRepository autorisationRepository;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private EtablissementService etablissementService;
+
+    /** Classes que l'enseignant connecte est autorise a enseigner (toutes pour ADMIN/autres roles). */
+    private List<Classe> classesAutorisees(Utilisateur moi, Long etabId) {
+        List<Classe> toutes = classeRepository.findByEtablissementId(etabId);
+        if (moi == null || !"ENSEIGNANT".equals(moi.getRole())) return toutes;
+        java.util.Set<Long> mesClasseIds = autorisationRepository.findByEnseignantIdAndEtablissementId(moi.getId(), etabId)
+            .stream().map(holyflame.administration.model.EnseignantAutorisation::getClasseId)
+            .collect(java.util.stream.Collectors.toSet());
+        return toutes.stream().filter(c -> mesClasseIds.contains(c.getId())).toList();
+    }
 
     @GetMapping
     public String liste(Model model) {
@@ -63,9 +76,10 @@ public class DevoirEnseignantController {
     @GetMapping("/nouveau")
     public String nouveauForm(Model model) {
         Long etabId = etablissementService.getCurrentEtablissementId();
-        model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
+        Utilisateur moi = etablissementService.getCurrentUtilisateur();
+        model.addAttribute("classes", classesAutorisees(moi, etabId));
         model.addAttribute("matieres", matiereRepository.findByEtablissementIdOrderByNomAsc(etabId));
-        model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
+        model.addAttribute("utilisateurConnecte", moi);
         return "tableau-enseignant-devoir-nouveau";
     }
 
@@ -84,11 +98,18 @@ public class DevoirEnseignantController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         Utilisateur moi = etablissementService.getCurrentUtilisateur();
 
+        // Un enseignant ne peut donner un devoir qu'aux classes qu'il est autorise a enseigner.
+        boolean classeAutorisee = classesAutorisees(moi, etabId).stream().anyMatch(c -> c.getId().equals(classeId));
+        if (!classeAutorisee) {
+            ra.addFlashAttribute("erreurAuth", "Vous n'êtes pas autorisé à donner un devoir pour cette classe.");
+            return "redirect:/tableau-enseignant/devoirs/nouveau";
+        }
+
         Devoir devoir = new Devoir();
         devoir.setTitre(titre);
         devoir.setDescription(description);
         devoir.setDateEcheance(dateEcheance);
-        devoir.setDatePublication(LocalDate.now());
+        devoir.setDatePublication(horlogeService.aujourdHui());
         devoir.setPriorite(priorite);
         devoir.setStatut(publierImmediatement ? "PUBLIE" : "BROUILLON");
         devoir.setEtablissementId(etabId);
@@ -114,7 +135,7 @@ public class DevoirEnseignantController {
 
     @PostMapping("/{id}/publier")
     public String togglePublier(@PathVariable Long id, RedirectAttributes ra) {
-        Devoir devoir = devoirRepository.findById(id).orElseThrow();
+        Devoir devoir = trouverDevoirAutorise(id);
         devoir.setStatut("BROUILLON".equals(devoir.getStatut()) ? "PUBLIE" : "BROUILLON");
         devoirRepository.save(devoir);
         if ("PUBLIE".equals(devoir.getStatut())) {
@@ -125,7 +146,7 @@ public class DevoirEnseignantController {
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        Devoir devoir = devoirRepository.findById(id).orElseThrow();
+        Devoir devoir = trouverDevoirAutorise(id);
         List<SoumissionDevoir> soumissions = soumissionDevoirRepository.findByDevoirIdOrderByEleveNomAsc(id);
         model.addAttribute("devoir", devoir);
         model.addAttribute("soumissions", soumissions);
@@ -138,11 +159,19 @@ public class DevoirEnseignantController {
                            @RequestParam(required = false) Double note,
                            @RequestParam(required = false) String appreciation,
                            RedirectAttributes ra) {
-        SoumissionDevoir soumission = soumissionDevoirRepository.findById(soumissionId).orElseThrow();
+        trouverDevoirAutorise(id);
+        if (note != null && (note < 0 || note > 20)) {
+            ra.addFlashAttribute("erreurAuth", "La note doit être comprise entre 0 et 20.");
+            return "redirect:/tableau-enseignant/devoirs/" + id;
+        }
+        SoumissionDevoir soumission = soumissionDevoirRepository.findById(soumissionId)
+            .filter(s -> s.getDevoir() != null && id.equals(s.getDevoir().getId()))
+            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "Soumission introuvable pour ce devoir."));
         soumission.setNote(note);
         soumission.setAppreciation(appreciation);
         soumission.setCorrige(true);
-        soumission.setDateCorrection(java.time.LocalDateTime.now());
+        soumission.setDateCorrection(horlogeService.maintenant());
         soumissionDevoirRepository.save(soumission);
         ra.addFlashAttribute("successMsg", "Correction enregistree pour " + soumission.getEleve().getPrenom() + " " + soumission.getEleve().getNom() + ".");
         return "redirect:/tableau-enseignant/devoirs/" + id;
@@ -150,7 +179,7 @@ public class DevoirEnseignantController {
 
     @PostMapping("/{id}/supprimer")
     public String supprimer(@PathVariable Long id, RedirectAttributes ra) {
-        Devoir devoir = devoirRepository.findById(id).orElseThrow();
+        Devoir devoir = trouverDevoirAutorise(id);
         if (devoir.getPieceJointePath() != null) fileStorageService.delete(devoir.getPieceJointePath());
         soumissionDevoirRepository.findByDevoirIdOrderByEleveNomAsc(id)
             .forEach(s -> { if (s.getFichierPath() != null) fileStorageService.delete(s.getFichierPath()); });
@@ -158,6 +187,28 @@ public class DevoirEnseignantController {
         devoirRepository.deleteById(id);
         ra.addFlashAttribute("successMsg", "Devoir supprime.");
         return "redirect:/tableau-enseignant/devoirs";
+    }
+
+    /**
+     * Charge un devoir en verifiant qu'il appartient a l'etablissement courant et, pour un
+     * enseignant, qu'il en est bien l'auteur — sans ce controle, n'importe quel id de devoir
+     * (y compris d'un autre etablissement ou d'un collegue) etait consultable/modifiable.
+     */
+    private Devoir trouverDevoirAutorise(Long id) {
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        Utilisateur moi = etablissementService.getCurrentUtilisateur();
+        Devoir devoir = devoirRepository.findById(id).orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+            org.springframework.http.HttpStatus.NOT_FOUND, "Devoir introuvable."));
+        if (etabId == null || !etabId.equals(devoir.getEtablissementId())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Devoir introuvable dans cet établissement.");
+        }
+        if (moi != null && "ENSEIGNANT".equals(moi.getRole())
+                && devoir.getEnseignantId() != null && !devoir.getEnseignantId().equals(moi.getId())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Vous n'êtes pas l'auteur de ce devoir.");
+        }
+        return devoir;
     }
 
     /** Cree les lignes de suivi manquantes pour les eleves de la classe qui n'en ont pas encore. */
