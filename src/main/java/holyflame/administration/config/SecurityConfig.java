@@ -29,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
+                .requestMatchers("/", "/index.html", "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
                     "/inscription-parent", "/inscription-parent/**",
                     "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe",
                     // Webhook CinetPay : appele serveur a serveur par CinetPay, sans session
@@ -40,7 +40,7 @@ public class SecurityConfig {
                     // Site vitrine public d'un etablissement (active depuis l'espace MARKETING) —
                     // accessible sans compte, comme n'importe quel site web d'ecole.
                     "/ecole/**",
-                    "/h2-console/**", "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**").permitAll()
+                    "/h2-console/**", "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**", "/assets/**").permitAll()
                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/secretariat/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 .requestMatchers("/passage/**").hasAnyRole("ADMIN", "SECRETAIRE", "COORDONNATEUR")

@@ -89,7 +89,7 @@
 <form class="flex flex-wrap items-end gap-3" method="post" th:action="@{/secretariat/eleves/{id}/reset-mdp(id=${eleve.id})}">
 <div>
 <label class="text-xs text-gray-500 block mb-1">Nouveau mot de passe</label>
-<input class="p-2 border border-gray-300 rounded-lg" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+<input class="p-2 border border-gray-300 rounded-lg" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="password"/>
 </div>
 <button class="px-4 py-2 border border-gray-300 rounded-lg font-medium" type="submit">Reinitialiser le mot de passe</button>
 </form>
@@ -104,7 +104,7 @@
 </div>
 <div>
 <label class="text-xs text-gray-500 block mb-1">Mot de passe</label>
-<input class="p-2 border border-gray-300 rounded-lg" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+<input class="p-2 border border-gray-300 rounded-lg" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="password"/>
 </div>
 <button class="px-4 py-2 bg-blue-900 text-white rounded-lg font-medium" type="submit">Creer le compte</button>
 </form>

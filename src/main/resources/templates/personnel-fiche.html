@@ -321,7 +321,7 @@ La fonction "<span th:text="${personnel.fonction}"></span>" ne dispose pas d'esp
 <form class="flex flex-wrap items-end gap-md" method="post" th:action="@{/personnel/{id}/reset-mdp(id=${personnel.id})}">
 <div class="flex flex-col gap-xs">
 <label class="font-label-sm text-label-sm text-on-surface-variant">Nouveau mot de passe</label>
-<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="password"/>
 </div>
 <button class="px-lg py-2 border border-outline-variant rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors" type="submit">Reinitialiser le mot de passe</button>
 </form>
@@ -336,7 +336,7 @@ La fonction "<span th:text="${personnel.fonction}"></span>" ne dispose pas d'esp
 </div>
 <div class="flex flex-col gap-xs">
 <label class="font-label-sm text-label-sm text-on-surface-variant">Mot de passe</label>
-<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="text"/>
+<input class="rounded-lg border-outline-variant px-md py-2 font-body-md text-body-md" minlength="6" name="motDePasse" placeholder="6 caracteres minimum" required="required" type="password"/>
 </div>
 <button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors" type="submit">Creer le compte</button>
 </form>
