@@ -6,6 +6,7 @@ import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.ClasseRepository;
 import holyflame.administration.repository.EtablissementRepository;
 import holyflame.administration.repository.UtilisateurRepository;
+import holyflame.administration.service.AssistantService;
 import holyflame.administration.service.FileStorageService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -35,6 +38,7 @@ public class InscriptionEcoleController {
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private FileStorageService fileStorageService;
     @Autowired private holyflame.administration.service.PlanComptableService planComptableService;
+    @Autowired private AssistantService assistantService;
 
     /** Code de niveau -> [nom affiche, cycle]. Utilise pour generer une classe par defaut par niveau coche. */
     private static final java.util.Map<String, String[]> NIVEAUX = new java.util.LinkedHashMap<>();
@@ -313,6 +317,30 @@ public class InscriptionEcoleController {
             return "redirect:/inscription-ecole";
         }
         return "inscription-ecole-confirmation";
+    }
+
+    public static class MessageAssistantEntrant {
+        public String message;
+        public List<AssistantService.Tour> historique;
+    }
+
+    public static class MessageAssistantSortant {
+        public String reponse;
+
+        public MessageAssistantSortant(String reponse) {
+            this.reponse = reponse;
+        }
+    }
+
+    /** Assistant public (sans authentification, sans outils) pour guider le remplissage du formulaire. */
+    @PostMapping("/inscription-ecole/assistant-message")
+    @ResponseBody
+    public MessageAssistantSortant assistantMessage(@RequestBody MessageAssistantEntrant entree) {
+        if (entree.message == null || entree.message.isBlank()) {
+            return new MessageAssistantSortant("Posez une question pour commencer.");
+        }
+        AssistantService.ReponseAssistant reponse = assistantService.repondreOnboarding(entree.message.trim(), entree.historique);
+        return new MessageAssistantSortant(reponse.texte);
     }
 
     private String mapRole(String adminRole) {

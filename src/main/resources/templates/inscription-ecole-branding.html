@@ -1,6 +1,8 @@
 <!DOCTYPE html><html class="light" lang="fr"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <title>EduSystem Pro | Inscription Ecole - Identite et image de marque</title>
 <link rel="stylesheet" href="/css/fonts.css">
 <script src="/js/tailwind.js"></script>
@@ -562,4 +564,5 @@ Continuer
         }
     })();
 </script>
+<div th:replace="~{fragments/assistant-onboarding-widget :: widget}"></div>
 </body></html>

@@ -35,6 +35,7 @@
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
         .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
         @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .no-print { display: none !important; }
             main { margin-left: 0 !important; }
             .bento-grid { display: block; }

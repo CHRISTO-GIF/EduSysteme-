@@ -32,6 +32,14 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
                     "/inscription-parent", "/inscription-parent/**",
                     "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe",
+                    // Webhook CinetPay : appele serveur a serveur par CinetPay, sans session
+                    // utilisateur. Aucune donnee sensible n'est lue depuis la requete elle-meme
+                    // (voir PaiementMobileWebhookController) — seul un identifiant de transaction
+                    // est accepte, et le vrai statut est toujours revérifié aupres de CinetPay.
+                    "/paiements/mobile/notification",
+                    // Site vitrine public d'un etablissement (active depuis l'espace MARKETING) —
+                    // accessible sans compte, comme n'importe quel site web d'ecole.
+                    "/ecole/**",
                     "/h2-console/**", "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**").permitAll()
                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/secretariat/**").hasAnyRole("ADMIN", "SECRETAIRE")
@@ -76,7 +84,7 @@ public class SecurityConfig {
                 // Auto-service : chaque membre du personnel consulte uniquement ses propres bulletins
                 // (fiche deduite de son compte connecte, jamais transmise par le client)
                 .requestMatchers("/rh/mes-bulletins/**").hasAnyRole(
-                    "ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER")
+                    "ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER", "MARKETING")
                 // Un enseignant peut demander/annuler son propre conge (fiche deduite de son compte,
                 // jamais transmise par le client) ; l'approbation reste reservee a l'ADMIN
                 .requestMatchers("/rh/conges/demander", "/rh/conges/*/annuler").hasAnyRole("ADMIN", "ENSEIGNANT")
@@ -93,9 +101,21 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "TRESORIER", "SECRETAIRE")
                 .requestMatchers("/finances/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/coordination/**").hasAnyRole("ADMIN", "COORDONNATEUR")
+                // Espace MARKETING : pilote le site vitrine public de l'etablissement
+                // (actualites, galerie, evenements, page a propos) — n'a acces a aucune donnee
+                // d'eleve, de personnel ou de finances.
+                .requestMatchers("/marketing/**").hasAnyRole("ADMIN", "MARKETING")
+                // Assistant conversationnel : ouvert a tous les roles rattaches a un
+                // etablissement, SAUF ELEVE. Chaque role ne voit que le sous-ensemble d'outils
+                // (donc de donnees) que ce role peut deja consulter ailleurs dans l'appli — voir
+                // la map OUTILS_PAR_ROLE dans AssistantService. Le PARENT a ses propres outils,
+                // strictement limites a ses enfants (jamais l'etablissement entier).
+                .requestMatchers("/assistant/**").hasAnyRole(
+                    "ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR",
+                    "SURVEILLANT", "INFIRMIER", "PARENT", "SUPER_ADMIN", "MARKETING")
                 // Journal d'activite : reserve au personnel (chacun n'y voit que ses propres actions,
                 // sauf ADMIN qui voit tout) — un eleve ou un parent n'a aucune raison d'y acceder.
-                .requestMatchers("/journal/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER")
+                .requestMatchers("/journal/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER", "MARKETING")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -115,8 +135,9 @@ public class SecurityConfig {
                 .rememberMeParameter("remember-me")
             )
             .headers(h -> h.frameOptions(fo -> fo.sameOrigin()))
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
-            .addFilterAfter(new CsrfTokenEagerLoadFilter(), CsrfFilter.class);
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/paiements/mobile/notification"))
+            .addFilterAfter(new CsrfTokenEagerLoadFilter(), CsrfFilter.class)
+            .addFilterAfter(new FontPreloadFilter(), CsrfTokenEagerLoadFilter.class);
 
         return http.build();
     }

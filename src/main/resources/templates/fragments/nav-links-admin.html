@@ -83,9 +83,17 @@
 <span class="material-symbols-outlined">forum</span>
 <span class="font-label-md text-label-md">Messagerie</span>
 </a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'marketing'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}" href="/marketing">
+<span class="material-symbols-outlined">public</span>
+<span class="font-label-md text-label-md">Site vitrine</span>
+</a>
 <a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'journal'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" href="/journal">
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-md text-label-md">Journal d'activite</span>
+</a>
+<a th:class="'flex items-center px-lg py-md gap-md cursor-pointer active:scale-95 transition-all duration-200 ' + (${activePage == 'assistant'} ? 'text-on-primary-fixed border-l-4 border-primary-fixed bg-tertiary-container dark:bg-tertiary' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container/50')" th:if="${utilisateurConnecte != null and (utilisateurConnecte.role == 'ADMIN' or utilisateurConnecte.role == 'ENSEIGNANT' or utilisateurConnecte.role == 'SECRETAIRE' or utilisateurConnecte.role == 'TRESORIER' or utilisateurConnecte.role == 'COORDONNATEUR')}" href="/assistant">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md">Assistant</span>
 </a>
 </div>
 </body>

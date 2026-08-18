@@ -26,6 +26,10 @@
 <span class="material-symbols-outlined">school</span>
 <span class="font-label-sm text-label-sm">Bulletins</span>
 </a>
+<a class="flex flex-col items-center justify-center" th:classappend="${active == 'assistant'} ? 'text-primary font-semibold' : 'text-secondary'" th:href="@{/assistant}">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
 </nav>
 
 <!-- ===================== VERSION DESKTOP ===================== -->
@@ -58,6 +62,10 @@
 <a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'signalement'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/portail-parent/signalement}">
 <span class="material-symbols-outlined mr-md">flag</span>
 <span class="font-label-md text-label-md">Signaler un point</span>
+</a>
+<a class="flex items-center px-lg py-md transition-colors duration-200" th:classappend="${active == 'assistant'} ? 'text-on-primary-container border-l-4 border-primary bg-primary-container/10' : 'text-on-tertiary-container hover:text-on-tertiary hover:bg-tertiary-container'" th:href="@{/assistant}">
+<span class="material-symbols-outlined mr-md">smart_toy</span>
+<span class="font-label-md text-label-md">Assistant</span>
 </a>
 </nav>
 <div class="mt-auto px-lg pt-lg border-t border-tertiary-container">

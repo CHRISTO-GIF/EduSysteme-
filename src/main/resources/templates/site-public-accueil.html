@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="${etablissement.nom} + ' — Site officiel'">Établissement</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" th:href="${site.police == 'CLASSIQUE'} ? 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap' : (${site.police == 'ELEGANTE'} ? 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Karla:wght@400;500;600&display=swap' : 'https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap')"/>
+<script src="/js/tailwind.js"></script>
+<style>
+body { font-family: 'Inter', sans-serif; background: #fffdf9; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.text-accent { color: var(--accent); }
+.bg-accent { background-color: var(--accent); }
+.border-accent { border-color: var(--accent); }
+.bg-accent-soft { background-color: color-mix(in srgb, var(--accent) 10%, white); }
+.bg-accent-dark { background-color: color-mix(in srgb, var(--accent) 80%, black); }
+.hero-accent { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 65%, black)); }
+.text-accent-2 { color: var(--accent-2); }
+.bg-accent-2 { background-color: var(--accent-2); }
+.border-accent-2 { border-color: var(--accent-2); }
+.bg-accent-2-soft { background-color: color-mix(in srgb, var(--accent-2) 14%, white); }
+.font-heading { font-family: var(--font-heading); }
+.font-body { font-family: var(--font-body); }
+</style>
+</head>
+<body class="text-stone-800 font-body" th:style="'--accent:' + ${etablissement.couleurPrimaire != null and !#strings.isEmpty(etablissement.couleurPrimaire) ? etablissement.couleurPrimaire : '#00236f'} + ';--accent-2:' + ${site.couleurSecondaire != null and !#strings.isEmpty(site.couleurSecondaire) ? site.couleurSecondaire : '#c9a227'} + ';--font-heading:' + ${site.police == 'CLASSIQUE' ? 'Playfair Display, serif' : (site.police == 'ELEGANTE' ? 'Cormorant Garamond, serif' : 'Poppins, sans-serif')} + ';--font-body:' + ${site.police == 'CLASSIQUE' ? 'Lora, serif' : (site.police == 'ELEGANTE' ? 'Karla, sans-serif' : 'Inter, sans-serif')} + ';'">
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200">
+<div class="max-w-6xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between">
+<a class="flex items-center gap-3" th:href="@{/ecole/{slug}(slug=${site.slug})}">
+<img th:if="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" th:src="@{'/uploads/' + ${etablissement.logoPath}}" class="w-12 h-12 rounded-full object-cover border-2 border-accent" alt="Logo"/>
+<span th:unless="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" class="w-12 h-12 rounded-full bg-accent-soft border-2 border-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-accent">school</span>
+</span>
+<span class="font-heading text-lg md:text-xl font-extrabold text-stone-900 leading-tight" th:text="${etablissement.nom}">Établissement</span>
+</a>
+<nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-stone-600">
+<a class="text-accent" th:href="@{/ecole/{slug}(slug=${site.slug})}">Accueil</a>
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}/actualites(slug=${site.slug})}">Actualités</a>
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}/galerie(slug=${site.slug})}">Galerie</a>
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}/evenements(slug=${site.slug})}">Événements</a>
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}/a-propos(slug=${site.slug})}">À propos</a>
+</nav>
+<button id="menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center text-stone-700" type="button">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<div id="mobile-menu" class="md:hidden hidden flex-col px-5 pb-4 border-t border-stone-100">
+<a class="block py-2 font-semibold text-accent" th:href="@{/ecole/{slug}(slug=${site.slug})}">Accueil</a>
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}/actualites(slug=${site.slug})}">Actualités</a>
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}/galerie(slug=${site.slug})}">Galerie</a>
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}/evenements(slug=${site.slug})}">Événements</a>
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}/a-propos(slug=${site.slug})}">À propos</a>
+</div>
+</header>
+
+<section class="text-white relative overflow-hidden" th:classappend="${(site.heroVideoUrl == null or #strings.isEmpty(site.heroVideoUrl)) and (site.heroImagePath == null or #strings.isEmpty(site.heroImagePath))} ? 'hero-accent' : ''">
+<div class="absolute inset-0 overflow-hidden" th:if="${site.heroVideoUrl != null and !#strings.isEmpty(site.heroVideoUrl)}"
+     th:with="ytId=${#strings.contains(site.heroVideoUrl,'youtu.be/') ? #strings.substringBefore(#strings.substringAfter(site.heroVideoUrl,'youtu.be/'),'?') : (#strings.contains(site.heroVideoUrl,'v=') ? #strings.substringBefore(#strings.substringAfter(site.heroVideoUrl,'v='),'&') : (#strings.contains(site.heroVideoUrl,'embed/') ? #strings.substringBefore(#strings.substringAfter(site.heroVideoUrl,'embed/'),'?') : ''))}">
+<iframe th:if="${!#strings.isEmpty(ytId)}" class="absolute top-1/2 left-1/2 w-[178vh] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none" frameborder="0" allow="autoplay; encrypted-media" th:src="'https://www.youtube.com/embed/' + ${ytId} + '?autoplay=1&mute=1&loop=1&playlist=' + ${ytId} + '&controls=0&showinfo=0&modestbranding=1'"></iframe>
+<video th:if="${#strings.isEmpty(ytId)}" autoplay="autoplay" muted="muted" loop="loop" playsinline="playsinline" class="absolute inset-0 w-full h-full object-cover" th:src="${site.heroVideoUrl}"></video>
+<div class="absolute inset-0 hero-accent opacity-75"></div>
+</div>
+<div class="absolute inset-0" th:if="${(site.heroVideoUrl == null or #strings.isEmpty(site.heroVideoUrl)) and site.heroImagePath != null and !#strings.isEmpty(site.heroImagePath)}">
+<img class="absolute inset-0 w-full h-full object-cover" th:src="@{'/uploads/' + ${site.heroImagePath}}" alt=""/>
+<div class="absolute inset-0 hero-accent opacity-75"></div>
+</div>
+<div class="max-w-6xl mx-auto px-5 md:px-8 py-20 md:py-28 flex flex-col items-center text-center gap-6 relative z-10">
+<img th:if="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" th:src="@{'/uploads/' + ${etablissement.logoPath}}" class="w-24 h-24 rounded-full object-cover border-4 border-white/70 shadow-lg" alt="Logo"/>
+<span th:unless="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" class="w-24 h-24 rounded-full bg-white/15 border-4 border-white/70 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[48px]">school</span>
+</span>
+<h1 class="font-heading text-3xl md:text-5xl font-extrabold leading-tight max-w-3xl" th:text="${etablissement.nom}">Nom de l'établissement</h1>
+<p class="font-body text-lg md:text-xl text-white/90 max-w-2xl" th:if="${site.accroche != null and !#strings.isEmpty(site.accroche)}" th:text="${site.accroche}">Accroche de l'établissement</p>
+<p class="text-white/80 flex items-center gap-2" th:if="${etablissement.ville != null and !#strings.isEmpty(etablissement.ville)}">
+<span class="material-symbols-outlined text-[20px]">location_on</span>
+<span th:text="${etablissement.ville}">Ville</span>
+</p>
+<div class="flex flex-wrap justify-center gap-4 mt-2">
+<a class="bg-white text-accent font-bold px-6 py-3 rounded-xl shadow-md hover:scale-105 transition-transform" th:href="@{/ecole/{slug}/a-propos(slug=${site.slug})}">Découvrir l'établissement</a>
+<a class="border-2 border-white/70 text-white font-bold px-6 py-3 rounded-xl hover:bg-white/10 transition" th:href="@{/ecole/{slug}/actualites(slug=${site.slug})}">Voir les actualités</a>
+</div>
+</div>
+<svg class="absolute bottom-0 left-0 w-full text-[#fffdf9]" viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+<path fill="currentColor" d="M0,32 C240,80 480,80 720,48 C960,16 1200,16 1440,48 L1440,80 L0,80 Z"></path>
+</svg>
+</section>
+
+<section class="bg-white" th:if="${chiffresCles != null and chiffresCles.eleves != null and chiffresCles.eleves > 0}">
+<div class="max-w-6xl mx-auto px-5 md:px-8 -mt-1 pb-16">
+<div class="grid grid-cols-1 sm:grid-cols-3 rounded-3xl overflow-hidden shadow-xl border border-stone-100">
+<div class="bg-accent-soft px-8 py-10 text-center border-b sm:border-b-0 sm:border-r border-stone-100">
+<span class="material-symbols-outlined text-accent text-[32px] mb-2 inline-block">groups</span>
+<p class="font-heading text-4xl md:text-5xl font-extrabold text-accent" th:text="${chiffresCles.eleves}">0</p>
+<p class="mt-2 text-sm font-semibold uppercase tracking-wide text-stone-500">Élèves</p>
+</div>
+<div class="bg-accent-2-soft px-8 py-10 text-center border-b sm:border-b-0 sm:border-r border-stone-100">
+<span class="material-symbols-outlined text-accent-2 text-[32px] mb-2 inline-block">apartment</span>
+<p class="font-heading text-4xl md:text-5xl font-extrabold text-accent-2" th:text="${chiffresCles.classes}">0</p>
+<p class="mt-2 text-sm font-semibold uppercase tracking-wide text-stone-500">Classes</p>
+</div>
+<div class="bg-accent-soft px-8 py-10 text-center">
+<span class="material-symbols-outlined text-accent text-[32px] mb-2 inline-block">badge</span>
+<p class="font-heading text-4xl md:text-5xl font-extrabold text-accent" th:text="${chiffresCles.personnel}">0</p>
+<p class="mt-2 text-sm font-semibold uppercase tracking-wide text-stone-500">Membres du personnel</p>
+</div>
+</div>
+</div>
+</section>
+
+<main>
+<section class="max-w-6xl mx-auto px-5 md:px-8 py-16" th:if="${site.aPropos != null and !#strings.isEmpty(site.aPropos)}">
+<div class="grid md:grid-cols-3 gap-8 items-center">
+<div class="md:col-span-1">
+<span class="inline-flex items-center gap-2 text-accent font-bold uppercase text-sm tracking-wide">
+<span class="material-symbols-outlined">favorite</span> Qui sommes-nous
+</span>
+<h2 class="font-heading text-2xl md:text-3xl font-extrabold text-stone-900 mt-2">Notre établissement</h2>
+</div>
+<div class="md:col-span-2">
+<p class="text-stone-600 leading-relaxed" th:text="${#strings.abbreviate(site.aPropos, 380)}">Présentation de l'établissement.</p>
+<a class="inline-flex items-center gap-1 text-accent font-semibold mt-4 hover:underline" th:href="@{/ecole/{slug}/a-propos(slug=${site.slug})}">
+En savoir plus <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+
+<section class="bg-white border-y border-stone-100 py-16" th:if="${actualites != null and !#lists.isEmpty(actualites)}">
+<div class="max-w-6xl mx-auto px-5 md:px-8">
+<div class="flex items-end justify-between mb-10 gap-4 flex-wrap">
+<div>
+<span class="inline-flex items-center gap-2 text-accent font-bold uppercase text-sm tracking-wide">
+<span class="material-symbols-outlined">campaign</span> Actualités
+</span>
+<h2 class="font-heading text-2xl md:text-3xl font-extrabold text-stone-900 mt-2">Ce qui se passe chez nous</h2>
+</div>
+<a class="text-accent font-semibold hover:underline hidden sm:inline-flex items-center gap-1" th:href="@{/ecole/{slug}/actualites(slug=${site.slug})}">
+Toutes les actualités <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<a class="group block rounded-2xl border border-stone-200 overflow-hidden hover:shadow-xl transition-shadow bg-white"
+   th:each="a : ${actualites}"
+   th:href="@{/ecole/{slug}/actualites/{id}(slug=${site.slug},id=${a.id})}">
+<div class="h-44 bg-accent-soft overflow-hidden" th:if="${a.imagePath != null and !#strings.isEmpty(a.imagePath)}">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" th:src="@{'/uploads/' + ${a.imagePath}}" alt=""/>
+</div>
+<div class="p-5">
+<p class="text-xs font-semibold text-stone-400 mb-2" th:if="${a.datePublication != null}" th:text="${#temporals.format(a.datePublication, 'dd MMMM yyyy')}">Date</p>
+<h3 class="font-heading font-bold text-stone-900 mb-2 group-hover:text-accent transition-colors" th:text="${a.titre}">Titre de l'actualité</h3>
+<p class="text-sm text-stone-500 leading-relaxed" th:text="${#strings.abbreviate(a.contenu, 110)}">Extrait de l'actualité.</p>
+</div>
+</a>
+</div>
+</div>
+</section>
+
+<section class="max-w-6xl mx-auto px-5 md:px-8 py-16" th:if="${photos != null and !#lists.isEmpty(photos)}">
+<div class="flex items-end justify-between mb-10 gap-4 flex-wrap">
+<div>
+<span class="inline-flex items-center gap-2 text-accent font-bold uppercase text-sm tracking-wide">
+<span class="material-symbols-outlined">photo_library</span> Galerie
+</span>
+<h2 class="font-heading text-2xl md:text-3xl font-extrabold text-stone-900 mt-2">La vie à l'école en images</h2>
+</div>
+<a class="text-accent font-semibold hover:underline hidden sm:inline-flex items-center gap-1" th:href="@{/ecole/{slug}/galerie(slug=${site.slug})}">
+Toute la galerie <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<div class="aspect-square rounded-2xl overflow-hidden bg-accent-soft" th:each="p : ${photos}" th:if="${p.imagePath != null and !#strings.isEmpty(p.imagePath)}">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" th:src="@{'/uploads/' + ${p.imagePath}}" th:alt="${p.legende}"/>
+</div>
+</div>
+</section>
+
+<section class="bg-white border-y border-stone-100 py-16" th:if="${equipe != null and !#lists.isEmpty(equipe)}">
+<div class="max-w-6xl mx-auto px-5 md:px-8">
+<div class="mb-10">
+<span class="inline-flex items-center gap-2 text-accent font-bold uppercase text-sm tracking-wide">
+<span class="material-symbols-outlined">diversity_3</span> Équipe pédagogique
+</span>
+<h2 class="font-heading text-2xl md:text-3xl font-extrabold text-stone-900 mt-2">Celles et ceux qui font l'établissement</h2>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="rounded-2xl border border-stone-200 bg-white p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all" th:each="m : ${equipe}">
+<img th:if="${m.photoPath != null and !#strings.isEmpty(m.photoPath)}" th:src="@{'/uploads/' + ${m.photoPath}}" class="w-24 h-24 rounded-full object-cover border-2 border-accent-2 mx-auto mb-4" alt=""/>
+<span th:unless="${m.photoPath != null and !#strings.isEmpty(m.photoPath)}" class="w-24 h-24 rounded-full bg-accent-2-soft border-2 border-accent-2 flex items-center justify-center mx-auto mb-4">
+<span class="material-symbols-outlined text-accent-2 text-[40px]">person</span>
+</span>
+<h3 class="font-heading font-bold text-stone-900" th:text="${m.nom}">Nom du membre</h3>
+<p class="text-accent-2 text-sm font-semibold mt-1" th:if="${m.fonction != null and !#strings.isEmpty(m.fonction)}" th:text="${m.fonction}">Fonction</p>
+<p class="text-stone-500 text-sm mt-3 leading-relaxed" th:if="${m.bio != null and !#strings.isEmpty(m.bio)}" th:text="${m.bio}">Bio</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="max-w-6xl mx-auto px-5 md:px-8 py-16" th:if="${temoignages != null and !#lists.isEmpty(temoignages)}">
+<div class="mb-10 text-center">
+<span class="inline-flex items-center gap-2 text-accent font-bold uppercase text-sm tracking-wide">
+<span class="material-symbols-outlined">format_quote</span> Témoignages
+</span>
+<h2 class="font-heading text-2xl md:text-3xl font-extrabold text-stone-900 mt-2">Ce qu'ils disent de nous</h2>
+</div>
+<div class="grid md:grid-cols-3 gap-6">
+<div class="rounded-2xl border border-stone-200 bg-white p-6 flex flex-col gap-4 hover:shadow-lg transition-shadow" th:each="t : ${temoignages.size() > 3 ? temoignages.subList(0,3) : temoignages}">
+<span class="material-symbols-outlined text-accent-2 text-[32px]">format_quote</span>
+<p class="text-stone-600 leading-relaxed flex-1" th:text="${#strings.abbreviate(t.contenu, 220)}">Contenu du témoignage.</p>
+<div>
+<p class="font-heading font-bold text-stone-900" th:text="${t.auteur}">Auteur</p>
+<p class="text-accent text-sm font-semibold" th:if="${t.role != null and !#strings.isEmpty(t.role)}" th:text="${t.role}">Rôle</p>
+</div>
+</div>
+</div>
+<p class="text-center text-stone-400 text-sm mt-8" th:if="${temoignages.size() > 3}" th:text="'+ ' + ${temoignages.size() - 3} + ' autres témoignages'">+ N autres témoignages</p>
+</section>
+
+<section class="bg-white border-y border-stone-100 py-16" th:if="${evenements != null and !#lists.isEmpty(evenements)}">
+<div class="max-w-6xl mx-auto px-5 md:px-8">
+<div class="flex items-end justify-between mb-10 gap-4 flex-wrap">
+<div>
+<span class="inline-flex items-center gap-2 text-accent font-bold uppercase text-sm tracking-wide">
+<span class="material-symbols-outlined">event</span> Événements
+</span>
+<h2 class="font-heading text-2xl md:text-3xl font-extrabold text-stone-900 mt-2">Prochains rendez-vous</h2>
+</div>
+<a class="text-accent font-semibold hover:underline hidden sm:inline-flex items-center gap-1" th:href="@{/ecole/{slug}/evenements(slug=${site.slug})}">
+Tous les événements <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="rounded-2xl border border-stone-200 p-5 flex gap-4 items-start bg-white" th:each="e : ${evenements}">
+<div class="shrink-0 w-16 h-16 rounded-xl bg-accent text-white flex flex-col items-center justify-center leading-none" th:if="${e.dateEvenement != null}">
+<span class="text-xl font-extrabold" th:text="${#temporals.format(e.dateEvenement, 'dd')}">01</span>
+<span class="text-xs uppercase" th:text="${#temporals.format(e.dateEvenement, 'MMM')}">jan</span>
+</div>
+<div>
+<h3 class="font-heading font-bold text-stone-900" th:text="${e.titre}">Titre de l'événement</h3>
+<p class="text-sm text-stone-500 flex items-center gap-1 mt-1" th:if="${e.lieu != null and !#strings.isEmpty(e.lieu)}">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span th:text="${e.lieu}">Lieu</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<footer class="bg-stone-900 text-stone-300 mt-4">
+<div class="max-w-6xl mx-auto px-5 md:px-8 py-12 grid gap-10 md:grid-cols-3">
+<div>
+<div class="flex items-center gap-3 mb-3">
+<img th:if="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" th:src="@{'/uploads/' + ${etablissement.logoPath}}" class="w-10 h-10 rounded-full object-cover" alt="Logo"/>
+<span th:unless="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" class="material-symbols-outlined text-accent">school</span>
+<span class="text-white font-bold" th:text="${etablissement.nom}">Établissement</span>
+</div>
+<p class="text-sm text-stone-400" th:if="${etablissement.adresse != null and !#strings.isEmpty(etablissement.adresse)}" th:text="${etablissement.adresse}">Adresse</p>
+<p class="text-sm text-stone-400" th:if="${etablissement.ville != null and !#strings.isEmpty(etablissement.ville)}" th:text="${etablissement.ville}">Ville</p>
+</div>
+<div>
+<h3 class="font-heading text-white font-bold mb-3">Contact</h3>
+<ul class="space-y-2 text-sm">
+<li class="flex items-center gap-2" th:if="${(site.emailContact != null and !#strings.isEmpty(site.emailContact)) or (etablissement.email != null and !#strings.isEmpty(etablissement.email))}">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+<span th:text="${site.emailContact != null and !#strings.isEmpty(site.emailContact)} ? ${site.emailContact} : ${etablissement.email}">email</span>
+</li>
+<li class="flex items-center gap-2" th:if="${(site.telephoneContact != null and !#strings.isEmpty(site.telephoneContact)) or (etablissement.telephone != null and !#strings.isEmpty(etablissement.telephone))}">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span th:text="${site.telephoneContact != null and !#strings.isEmpty(site.telephoneContact)} ? ${site.telephoneContact} : ${etablissement.telephone}">téléphone</span>
+</li>
+</ul>
+</div>
+<div>
+<h3 class="font-heading text-white font-bold mb-3">Suivez-nous</h3>
+<div class="flex gap-3">
+<a class="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center hover:bg-accent transition-colors" target="_blank" rel="noopener" th:if="${site.facebookUrl != null and !#strings.isEmpty(site.facebookUrl)}" th:href="${site.facebookUrl}">
+<span class="material-symbols-outlined text-[20px]">thumb_up</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center hover:bg-accent transition-colors" target="_blank" rel="noopener" th:if="${site.instagramUrl != null and !#strings.isEmpty(site.instagramUrl)}" th:href="${site.instagramUrl}">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-stone-800 py-5 text-center text-xs text-stone-500">
+Site propulsé par <span class="font-semibold text-stone-300">EduSystem Pro</span>
+</div>
+</footer>
+
+<script>
+(function(){
+var btn=document.getElementById('menu-toggle');
+var menu=document.getElementById('mobile-menu');
+if(!btn||!menu)return;
+btn.addEventListener('click',function(){
+menu.classList.toggle('hidden');
+menu.classList.toggle('flex');
+var icon=btn.querySelector('.material-symbols-outlined');
+icon.textContent=menu.classList.contains('hidden')?'menu':'close';
+});
+})();
+</script>
+</body>
+</html>

@@ -83,6 +83,8 @@ public class DataInitializer implements CommandLineRunner {
             saveUser("Demba",   "Oumar",     "surveillant@holyflame.com","surv123",   "SURVEILLANT",defEtab);
         if (utilisateurRepository.findByEmail("infirmerie@holyflame.com").isEmpty())
             saveUser("Kouassi", "Ines",      "infirmerie@holyflame.com", "infirm123", "INFIRMIER",  defEtab);
+        if (utilisateurRepository.findByEmail("marketing@holyflame.com").isEmpty())
+            saveUser("Kacou",   "Estelle",   "marketing@holyflame.com",  "market123", "MARKETING",  defEtab);
 
         // 4. Classes
         if (classeRepository.count() == 0) {

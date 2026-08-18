@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Marketing - EduSystem Pro</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#f2f4f6", "surface-container-high": "#e6e8ea",
+            "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
+            "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb",
+            "surface-dim": "#d8dadc", "surface-bright": "#f7f9fb", "primary-fixed": "#dce1ff",
+            "secondary-container": "#d0e1fb", "on-error": "#ffffff", "tertiary": [[${accentColor}]],
+            "outline": "#757682", "on-primary-container": "#90a8ff", "on-secondary": "#ffffff",
+            "surface-variant": "#e0e3e5", "surface-container": "#eceef0",
+            "on-error-container": "#93000a", "outline-variant": "#c5c5d3",
+            "surface": "#f7f9fb", "secondary": "#505f76", "on-background": "#191c1e",
+            "on-surface": "#191c1e", "on-surface-variant": "#444651",
+            "success-container": "#c4f7d0", "on-success-container": "#0a3818",
+            "tertiary-fixed-dim": "#bec6e0"
+          },
+          borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+          spacing: { gutter: "24px", xs: "4px", lg: "24px", xl: "32px", sm: "8px", "sidebar-width": "260px", md: "16px", "container-max": "1440px" },
+          fontFamily: { "label-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"] },
+          fontSize: {
+            "label-md": ["14px", {lineHeight: "20px", fontWeight: "600"}],
+            "headline-sm": ["18px", {lineHeight: "28px", fontWeight: "600"}],
+            "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700"}],
+            "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+            "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500"}]
+          }
+        }
+      }
+    }
+</script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+<div class="md:hidden bg-background min-h-screen pb-24" id="marketing-dashboard-mobile-section">
+<header class="w-full top-0 sticky flex justify-between items-center h-14 px-md z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">campaign</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Marketing</h1>
+</div>
+<span class="material-symbols-outlined text-outline">account_circle</span>
+</header>
+<main class="px-md pt-md space-y-lg">
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container text-sm" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="p-md rounded-lg bg-error-container text-on-error-container text-sm" th:text="${erreurMsg}"></div>
+
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<span class="material-symbols-outlined text-primary text-[20px]">photo_library</span>
+<p class="font-headline-sm text-headline-sm text-primary mt-xs" th:text="${nbPhotos}">0</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Photos</p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<span class="material-symbols-outlined text-primary text-[20px]">event</span>
+<p class="font-headline-sm text-headline-sm text-primary mt-xs" th:text="${nbEvenements}">0</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Événements</p>
+</div>
+</div>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm mb-md"><span class="material-symbols-outlined text-primary text-[18px]">public</span>Activation du site</h3>
+<p class="text-xs text-on-surface-variant mb-md" th:text="'Le site public de ' + ${nomEtablissement} + ' sera accessible a l’adresse /ecole/{adresse}.'">Adresse publique</p>
+<form class="flex flex-col gap-md" method="post" th:action="@{/marketing/activer}">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Adresse du site (slug)</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="slug" th:value="${site.slug}" placeholder="mon-ecole" required="required" type="text"/>
+</div>
+<label class="flex items-center gap-sm text-sm">
+<input name="actif" th:checked="${site.actif}" type="checkbox" value="true"/>
+Site public activé
+</label>
+<button class="bg-primary text-on-primary py-3 rounded-xl font-label-md" type="submit">Enregistrer</button>
+</form>
+<a th:if="${site.actif}" class="mt-md flex items-center justify-center gap-sm text-primary font-label-md text-sm border border-primary rounded-xl py-2" target="_blank" th:href="@{'/ecole/' + ${site.slug}}">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span> Voir le site public
+</a>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm mb-md"><span class="material-symbols-outlined text-primary text-[18px]">edit_note</span>Informations du site</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/marketing/a-propos}">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Accroche</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="accroche" th:value="${site.accroche}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">À propos</label>
+<textarea class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="aPropos" rows="4" th:text="${site.aPropos}"></textarea>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Informations admissions</label>
+<textarea class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="infosAdmissions" rows="4" th:text="${site.infosAdmissions}"></textarea>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Email de contact</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="emailContact" th:value="${site.emailContact}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Téléphone de contact</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="telephoneContact" th:value="${site.telephoneContact}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Lien Facebook</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="facebookUrl" th:value="${site.facebookUrl}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Lien Instagram</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="instagramUrl" th:value="${site.instagramUrl}" type="text"/>
+</div>
+<button class="bg-primary text-on-primary py-3 rounded-xl font-label-md" type="submit">Enregistrer les informations</button>
+</form>
+</section>
+
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm"><span class="material-symbols-outlined text-primary text-[18px]">newspaper</span>Actualités récentes</h3>
+<a class="text-primary font-label-md text-sm" th:href="@{/marketing/actualites}">Voir tout</a>
+</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-md py-sm flex items-center justify-between gap-sm" th:each="a : ${actualitesRecentes}">
+<div class="min-w-0">
+<p class="font-label-md text-sm truncate" th:text="${a.titre}">Titre</p>
+<p class="text-xs text-on-surface-variant" th:text="${#temporals.format(a.dateCreation, 'dd/MM/yyyy')}">date</p>
+</div>
+<span th:if="${a.statut == 'PUBLIE'}" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase shrink-0">Publié</span>
+<span th:unless="${a.statut == 'PUBLIE'}" class="px-2 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase shrink-0">Brouillon</span>
+</div>
+<p th:if="${#lists.isEmpty(actualitesRecentes)}" class="text-center text-outline py-lg text-sm">Aucune actualité pour le moment.</p>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex items-center gap-1 h-16 px-xs bg-surface/90 backdrop-blur-md border-t border-outline-variant z-50 overflow-x-auto">
+<a class="flex flex-col items-center justify-center gap-0.5 shrink-0 w-16 text-primary font-semibold" th:href="@{/marketing}">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-[10px]">Tableau</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 shrink-0 w-16 text-secondary" th:href="@{/marketing/actualites}">
+<span class="material-symbols-outlined text-[20px]">campaign</span>
+<span class="font-label-sm text-[10px]">Actualités</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 shrink-0 w-16 text-secondary" th:href="@{/marketing/galerie}">
+<span class="material-symbols-outlined text-[20px]">photo_library</span>
+<span class="font-label-sm text-[10px]">Galerie</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 shrink-0 w-16 text-secondary" th:href="@{/marketing/evenements}">
+<span class="material-symbols-outlined text-[20px]">event</span>
+<span class="font-label-sm text-[10px]">Événements</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 shrink-0 w-16 text-secondary" th:href="@{/marketing/design}">
+<span class="material-symbols-outlined text-[20px]">palette</span>
+<span class="font-label-sm text-[10px]">Design</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 shrink-0 w-16 text-secondary" th:href="@{/marketing/temoignages}">
+<span class="material-symbols-outlined text-[20px]">format_quote</span>
+<span class="font-label-sm text-[10px]">Témoignages</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 shrink-0 w-16 text-secondary" th:href="@{/marketing/equipe}">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+<span class="font-label-sm text-[10px]">Équipe</span>
+</a>
+</nav>
+</div>
+<div class="hidden md:contents">
+<aside class="w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">campaign</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduSystem Pro</h1>
+<p class="text-[10px] text-tertiary-fixed-dim uppercase tracking-widest">Module Marketing</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs px-sm overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary border-l-4 border-primary-fixed bg-tertiary/50" th:href="@{/marketing}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/marketing/actualites}">
+<span class="material-symbols-outlined">campaign</span>
+<span class="font-label-md text-label-md">Actualités</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/marketing/galerie}">
+<span class="material-symbols-outlined">photo_library</span>
+<span class="font-label-md text-label-md">Galerie</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/marketing/evenements}">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-md text-label-md">Événements</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/marketing/design}">
+<span class="material-symbols-outlined">palette</span>
+<span class="font-label-md text-label-md">Design</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/marketing/temoignages}">
+<span class="material-symbols-outlined">format_quote</span>
+<span class="font-label-md text-label-md">Témoignages</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/marketing/equipe}">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Équipe</span>
+</a>
+</nav>
+<div class="mt-auto px-sm pt-lg border-t border-outline/20">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/assistant}">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md">Assistant</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/rh/mes-bulletins}">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Mes bulletins</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Déconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="flex-1 flex flex-col min-w-0">
+<header class="w-full h-16 sticky top-0 z-40 bg-surface border-b border-surface-variant flex justify-between items-center px-lg py-md">
+<nav class="flex items-center gap-xs text-label-sm text-outline">
+<span>EduSystem Pro</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Marketing</span>
+</nav>
+<div class="flex items-center gap-sm">
+<p class="font-label-md text-label-md leading-none" th:text="${utilisateurConnecte != null ? (utilisateurConnecte.prenom + ' ' + utilisateurConnecte.nom) : 'Marketing'}">Marketing</p>
+<span class="material-symbols-outlined text-outline">account_circle</span>
+</div>
+</header>
+
+<main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm">
+<span class="p-2 bg-secondary-container rounded-lg text-primary w-fit"><span class="material-symbols-outlined">photo_library</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Photos dans la galerie</p>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-xs" th:text="${nbPhotos}">0</h2>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm">
+<span class="p-2 bg-primary-fixed rounded-lg text-primary w-fit"><span class="material-symbols-outlined">event</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Événements à venir</p>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-xs" th:text="${nbEvenements}">0</h2>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<section class="lg:col-span-2 flex flex-col gap-lg">
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm mb-xs"><span class="material-symbols-outlined text-primary">public</span>Activation du site</h3>
+<p class="text-body-md text-on-surface-variant mb-lg" th:text="'Le site public de ' + ${nomEtablissement} + ' sera accessible a l’adresse /ecole/{adresse} une fois active.'">Adresse publique</p>
+<form class="grid grid-cols-1 md:grid-cols-3 gap-md items-end" method="post" th:action="@{/marketing/activer}">
+<div class="flex flex-col gap-xs md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Adresse du site (slug)</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="slug" th:value="${site.slug}" placeholder="mon-ecole" required="required" type="text"/>
+</div>
+<label class="flex items-center gap-sm text-body-md h-fit">
+<input name="actif" th:checked="${site.actif}" type="checkbox" value="true"/>
+Site activé
+</label>
+<div class="md:col-span-3 flex items-center gap-md">
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md" type="submit">Enregistrer</button>
+<a th:if="${site.actif}" class="flex items-center gap-xs text-primary font-label-md text-label-sm hover:underline" target="_blank" th:href="@{'/ecole/' + ${site.slug}}">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span> Voir le site public
+</a>
+</div>
+</form>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm mb-lg"><span class="material-symbols-outlined text-primary">edit_note</span>Informations du site</h3>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-md" method="post" th:action="@{/marketing/a-propos}">
+<div class="flex flex-col gap-xs md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Accroche</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="accroche" th:value="${site.accroche}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant">À propos</label>
+<textarea class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="aPropos" rows="4" th:text="${site.aPropos}"></textarea>
+</div>
+<div class="flex flex-col gap-xs md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Informations admissions</label>
+<textarea class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="infosAdmissions" rows="4" th:text="${site.infosAdmissions}"></textarea>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Email de contact</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="emailContact" th:value="${site.emailContact}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Téléphone de contact</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="telephoneContact" th:value="${site.telephoneContact}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Lien Facebook</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="facebookUrl" th:value="${site.facebookUrl}" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Lien Instagram</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="instagramUrl" th:value="${site.instagramUrl}" type="text"/>
+</div>
+<div class="md:col-span-2">
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md" type="submit">Enregistrer les informations</button>
+</div>
+</form>
+</div>
+</section>
+
+<aside class="flex flex-col gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low/50">
+<h3 class="font-label-md text-label-md">Actualités récentes</h3>
+<a class="text-primary text-label-sm hover:underline" th:href="@{/marketing/actualites}">Voir tout</a>
+</div>
+<div class="divide-y divide-outline-variant">
+<div th:each="a : ${actualitesRecentes}" class="p-lg">
+<div class="flex justify-between items-start mb-xs gap-sm">
+<p class="font-label-md" th:text="${a.titre}">Titre</p>
+<span th:if="${a.statut == 'PUBLIE'}" class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-[10px] font-bold uppercase shrink-0">Publié</span>
+<span th:unless="${a.statut == 'PUBLIE'}" class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase shrink-0">Brouillon</span>
+</div>
+<p class="text-[11px] text-outline" th:text="${#temporals.format(a.dateCreation, 'dd/MM/yyyy')}">date</p>
+</div>
+<p th:if="${#lists.isEmpty(actualitesRecentes)}" class="p-lg text-center text-outline">Aucune actualité pour le moment.</p>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</div>
+</body>
+</html>

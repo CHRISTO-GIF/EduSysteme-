@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8" />
+  <title th:text="${titreRapport}">Rapport</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm 12mm;
+    }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9.5pt;
+      color: #1a1a1a;
+      margin: 0;
+    }
+
+    .entete {
+      width: 100%;
+      border-bottom: 2px solid #00236f;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .entete-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .logo-cell {
+      width: 60px;
+      vertical-align: middle;
+    }
+
+    .logo-cell img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .etab-nom {
+      font-size: 15pt;
+      font-weight: bold;
+      color: #00236f;
+      margin: 0;
+    }
+
+    .titre-doc {
+      text-align: right;
+      vertical-align: middle;
+    }
+
+    .titre-doc .badge {
+      display: inline-block;
+      background: #00236f;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .titre-doc .periode {
+      font-size: 8pt;
+      color: #555555;
+      margin-top: 3px;
+    }
+
+    .sous-titre {
+      font-size: 10.5pt;
+      color: #333333;
+      margin: 0 0 14px 0;
+    }
+
+    .section {
+      margin-bottom: 14px;
+    }
+
+    .section-titre {
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #00236f;
+      font-weight: bold;
+      border-bottom: 1px solid #dddddd;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+    }
+
+    .section-texte {
+      font-size: 9.5pt;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    table.donnees {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table.donnees th {
+      background: #00236f;
+      color: #ffffff;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      padding: 4px 5px;
+      text-align: left;
+      border: 1px solid #00236f;
+    }
+
+    table.donnees td {
+      font-size: 8.5pt;
+      padding: 3px 5px;
+      border: 1px solid #dddddd;
+    }
+
+    table.donnees tr:nth-child(even) td {
+      background: #f7f9fb;
+    }
+
+    .pied-page {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+    }
+
+    .pied-page td {
+      vertical-align: bottom;
+      font-size: 7.5pt;
+      color: #777777;
+    }
+
+    .signature-box {
+      border-top: 1px solid #999999;
+      padding-top: 4px;
+      width: 160px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="entete">
+    <table class="entete-table">
+      <tr>
+        <td class="logo-cell">
+          <img th:if="${logoDataUri != null}" th:src="${logoDataUri}" alt="Logo" />
+        </td>
+        <td>
+          <p class="etab-nom" th:text="${nomEtab != null ? #strings.toUpperCase(nomEtab) : 'ETABLISSEMENT'}">NOM ETABLISSEMENT</p>
+        </td>
+        <td class="titre-doc">
+          <span class="badge">RAPPORT</span>
+          <p class="periode" th:if="${periodeRapport != null and !#strings.isEmpty(periodeRapport)}" th:text="${periodeRapport}">Periode</p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <h1 style="font-size:13pt;margin:0 0 4px 0;color:#1a1a1a;" th:text="${titreRapport}">Titre du rapport</h1>
+  <p class="sous-titre" th:if="${sousTitreRapport != null and !#strings.isEmpty(sousTitreRapport)}" th:text="${sousTitreRapport}">Sous-titre</p>
+
+  <div class="section" th:each="section : ${sections}">
+    <div class="section-titre" th:if="${section.titre != null and !#strings.isEmpty(section.titre)}" th:text="${section.titre}">Titre section</div>
+
+    <div class="section-texte" th:if="${section.type == 'texte'}" th:text="${section.texte}">Contenu libre.</div>
+
+    <table class="donnees" th:if="${section.type == 'tableau'}">
+      <thead>
+        <tr>
+          <th th:each="colonne : ${section.colonnes}" th:text="${colonne}">Colonne</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="ligne : ${section.lignes}">
+          <td th:each="cellule : ${ligne}" th:text="${cellule}">--</td>
+        </tr>
+        <tr th:if="${section.lignes == null or section.lignes.isEmpty()}">
+          <td th:attr="colspan=${section.colonnes != null ? section.colonnes.size() : 1}" style="text-align:center;color:#999999;padding:8px;">Aucune donnee.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <table class="pied-page">
+    <tr>
+      <td>
+        <span th:text="'Document genere le ' + ${dateGeneration} + ' par l\'assistant EduSystem Pro.'">Date</span>
+      </td>
+      <td style="text-align:right;">
+        <div class="signature-box">Cachet et signature</div>
+      </td>
+    </tr>
+  </table>
+
+</body>
+
+</html>

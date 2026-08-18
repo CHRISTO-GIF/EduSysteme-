@@ -25,6 +25,13 @@
 
 <main class="max-w-4xl mx-auto px-md md:px-8 py-8">
 
+<div class="flex flex-wrap gap-sm mb-lg">
+<span th:class="'text-xs px-3 py-1 rounded-full font-semibold ' + (${emailConfigure} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')"
+      th:text="${emailConfigure} ? 'Email actif' : 'Email non configure (BREVO_API_KEY absente)'">Email</span>
+<span th:class="'text-xs px-3 py-1 rounded-full font-semibold ' + (${smsConfigure} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')"
+      th:text="${smsConfigure} ? 'SMS actif' : 'SMS non configure (BREVO_API_KEY absente ou credits SMS non actives)'">SMS</span>
+</div>
+
 <div class="bg-white border border-gray-200 rounded-xl p-lg mb-xl">
 <h3 class="font-semibold mb-md">Nouveau message</h3>
 <form class="space-y-3" method="post" th:action="@{/communication/envoyer}">

@@ -589,7 +589,7 @@ public class FinancesController {
         if (envoye) {
             ra.addFlashAttribute("successMsg", "Paiement enregistre. Une copie du recu a ete envoyee par email a " + emailDestinataire + ".");
         } else if (emailDestinataire != null) {
-            ra.addFlashAttribute("erreurEmail", "Paiement enregistre, mais l'envoi du recu par email a echoue.");
+            ra.addFlashAttribute("erreurEmail", "Paiement enregistré, mais le service d'envoi d'email n'est pas configuré sur ce serveur (ou l'envoi a échoué).");
         }
         return "redirect:/finances/paiements/" + p.getId() + "/recu";
     }
@@ -648,11 +648,17 @@ public class FinancesController {
             return "redirect:/finances?tab=journal";
         }
         String emailDestinataire = adresseParent(p.getEleve());
+        if (emailDestinataire == null || emailDestinataire.isBlank()) {
+            ra.addFlashAttribute("erreurEmail",
+                "Impossible d'envoyer le reçu : aucune adresse email n'est enregistrée pour le père, la mère ou le tuteur de cet élève. Ajoutez-en une depuis sa fiche au Secrétariat.");
+            return "redirect:/finances/paiements/" + id + "/recu";
+        }
         boolean envoye = envoyerRecuParEmail(p);
         if (envoye) {
             ra.addFlashAttribute("successMsg", "Recu renvoye par email a " + emailDestinataire + ".");
         } else {
-            ra.addFlashAttribute("erreurEmail", "Impossible d'envoyer le recu par email (aucune adresse parent valide ou service email indisponible).");
+            ra.addFlashAttribute("erreurEmail",
+                "L'adresse email (" + emailDestinataire + ") est enregistrée, mais le service d'envoi d'email n'est pas configuré sur ce serveur (ou l'envoi a échoué). Contactez l'administrateur technique.");
         }
         return "redirect:/finances/paiements/" + id + "/recu";
     }

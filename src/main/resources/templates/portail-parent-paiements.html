@@ -129,7 +129,8 @@
 <p class="font-label-md text-on-surface text-sm" th:text="${#numbers.formatDecimal(l.montant, 0, 'COMMA', 0, 'POINT')} + ' F'">0 F</p>
 <p class="text-xs" th:classappend="${l.statut == 'EN_RETARD'} ? 'text-error font-medium' : 'text-on-surface-variant'" th:text="${l.echeanceDate != null} ? ${#temporals.format(l.echeanceDate, 'dd MMM yyyy')} : '--'">Date</p>
 </div>
-<form th:if="${l.statut != 'PAYE'}" method="post" th:action="@{/portail-parent/paiements/demander}">
+<form th:if="${l.statut != 'PAYE'}" method="post"
+      th:action="${paiementMobileConfigure} ? @{/portail-parent/paiements/payer-mobile} : @{/portail-parent/paiements/demander}">
 <input name="fraisId" th:value="${l.fraisId}" type="hidden"/>
 <input name="eleveId" th:value="${l.eleveId}" type="hidden"/>
 <button class="bg-primary text-on-primary text-xs px-4 py-2 rounded-lg font-label-md active:scale-95 transition-all" type="submit">Payer maintenant</button>
@@ -149,7 +150,8 @@
 </div>
 <div>
 <h4 class="font-label-md text-primary text-sm">Comment fonctionne "Payer maintenant" ?</h4>
-<p class="text-xs text-on-surface-variant">Une demande réelle est transmise à l'administration via la messagerie.</p>
+<p class="text-xs text-on-surface-variant" th:if="${paiementMobileConfigure}">Vous serez redirigé vers une page de paiement sécurisée (Orange Money, MTN, Moov, Wave...). Le solde se met à jour automatiquement une fois le paiement confirmé.</p>
+<p class="text-xs text-on-surface-variant" th:unless="${paiementMobileConfigure}">Une demande réelle est transmise à l'administration via la messagerie.</p>
 </div>
 </div>
 <div class="bg-surface-container rounded-xl p-md flex items-center gap-md border border-outline-variant">
@@ -350,7 +352,8 @@ Telecharger Releve Annuel
       th:text="${l.statut == 'PAYE'} ? 'Paye' : (${l.statut == 'EN_RETARD'} ? 'En retard' : 'En attente')">Statut</span>
 </td>
 <td class="px-lg py-4 text-right">
-<form th:if="${l.statut != 'PAYE'}" method="post" th:action="@{/portail-parent/paiements/demander}">
+<form th:if="${l.statut != 'PAYE'}" method="post"
+      th:action="${paiementMobileConfigure} ? @{/portail-parent/paiements/payer-mobile} : @{/portail-parent/paiements/demander}">
 <input name="fraisId" th:value="${l.fraisId}" type="hidden"/>
 <input name="eleveId" th:value="${l.eleveId}" type="hidden"/>
 <button class="bg-primary text-on-primary text-xs px-4 py-1.5 rounded font-label-md hover:brightness-110 active:scale-95 transition-all" type="submit">Payer maintenant</button>
@@ -372,7 +375,8 @@ Telecharger Releve Annuel
 </div>
 <div>
 <h4 class="font-label-md text-primary">Comment fonctionne "Payer maintenant" ?</h4>
-<p class="text-body-md text-on-surface-variant">Une demande reelle est transmise a l'administration via la messagerie, qui vous recontactera pour finaliser le reglement.</p>
+<p class="text-body-md text-on-surface-variant" th:if="${paiementMobileConfigure}">Vous serez redirige vers une page de paiement securisee (Orange Money, MTN, Moov, Wave...). Le solde se met a jour automatiquement une fois le paiement confirme.</p>
+<p class="text-body-md text-on-surface-variant" th:unless="${paiementMobileConfigure}">Une demande reelle est transmise a l'administration via la messagerie, qui vous recontactera pour finaliser le reglement.</p>
 </div>
 </div>
 <div class="bg-surface-container rounded-xl p-lg flex items-center gap-4 border border-outline-variant">

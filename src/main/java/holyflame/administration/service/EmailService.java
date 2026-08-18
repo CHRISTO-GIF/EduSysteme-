@@ -35,6 +35,10 @@ public class EmailService {
         .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    public boolean estConfigure() {
+        return apiKey != null && !apiKey.isBlank();
+    }
+
     /** Envoie un email HTML. Retourne false si l'API Brevo n'est pas configuree ou si l'envoi echoue. */
     public boolean envoyer(String destinataire, String sujet, String corpsHtml) {
         if (apiKey == null || apiKey.isBlank()) {

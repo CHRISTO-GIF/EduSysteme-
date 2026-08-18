@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<title>Assistant - EduSystem Pro</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff", "surface": "#f7f9fb",
+                    "on-tertiary-container": "#a4acc5", "on-primary": "#ffffff", "outline-variant": "#c5c5d3",
+                    "surface-bright": "#f7f9fb", "secondary-container": "#d0e1fb", "on-secondary-container": "#54647a",
+                    "secondary": "#505f76", "outline": "#757682", "error": "#ba1a1a",
+                    "surface-container-low": "#f2f4f6", "on-error": "#ffffff",
+                    "primary": "#00236f", "on-surface-variant": "#444651", "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#384055", "on-background": "#191c1e",
+                    "tertiary": [[${accentColor}]], "on-secondary-container": "#54647a",
+                    "on-primary-container": "#90a8ff", "surface-container-highest": "#e0e3e5",
+                    "on-secondary": "#ffffff", "on-error-container": "#93000a", "background": "#f7f9fb",
+                    "primary-container": "#1e3a8a", "surface-container": "#eceef0",
+                    "on-surface": "#191c1e", "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"gutter": "24px", "base": "4px", "container-max": "1440px", "xl": "32px", "lg": "24px", "md": "16px", "sidebar-width": "260px", "sm": "8px", "xs": "4px"},
+            "fontFamily": {"headline-md": ["Inter"], "headline-sm": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"]}
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bulle { white-space: pre-wrap; word-break: break-word; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<div th:replace="~{fragments/sidebar-admin :: admin('assistant')}"></div>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('assistant')}"></div>
+
+<main class="ml-0 md:ml-sidebar-width p-md md:p-xl flex flex-col" style="height:100vh;">
+<div class="md:hidden -mx-md -mt-md mb-md px-md py-sm flex items-center gap-sm bg-tertiary flex-shrink-0">
+<a class="text-on-tertiary" href="/dashboard"><span class="material-symbols-outlined">arrow_back</span></a>
+<span class="font-headline-sm text-headline-sm font-bold text-on-tertiary">Assistant</span>
+</div>
+
+<div class="max-w-container-max mx-auto w-full flex flex-col flex-1 min-h-0">
+<div class="mb-md flex-shrink-0">
+<h2 class="font-headline-md text-headline-md text-on-surface">Assistant</h2>
+<p class="text-on-surface-variant">Posez une question sur les effectifs, un eleve ou les absences de l'etablissement.</p>
+</div>
+
+<div class="p-md rounded-lg bg-error-container text-on-error-container mb-md flex-shrink-0" th:unless="${assistantConfigure}">
+L'assistant n'est pas encore configure : aucune cle API n'a ete fournie a l'application (variable d'environnement ANTHROPIC_API_KEY).
+</div>
+
+<div id="chat-fenetre" class="flex-1 min-h-0 overflow-y-auto bg-surface-container-lowest border border-outline-variant rounded-xl p-md space-y-sm">
+<div class="flex gap-sm">
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-tertiary-container text-[18px]">smart_toy</span>
+</div>
+<div class="bulle bg-surface-container px-md py-sm rounded-lg max-w-[80%] font-body-md text-body-md">
+Bonjour ! Je peux repondre a des questions sur les eleves, les effectifs, les finances et les absences de votre etablissement. Que voulez-vous savoir ?
+</div>
+</div>
+</div>
+
+<form id="chat-form" class="mt-md flex gap-sm flex-shrink-0">
+<input id="chat-input" type="text" autocomplete="off"
+       class="flex-1 px-md py-sm rounded-lg border border-outline-variant bg-surface-container-lowest font-body-md text-body-md"
+       placeholder="Ecrivez votre question..." th:disabled="${!assistantConfigure}"/>
+<button id="chat-envoyer" type="submit"
+        class="bg-primary text-white px-lg py-sm rounded-lg font-label-md flex items-center gap-base active:scale-95 transition-all"
+        th:disabled="${!assistantConfigure}">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</form>
+</div>
+</main>
+
+<script th:inline="javascript">
+(function () {
+    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    var fenetre = document.getElementById('chat-fenetre');
+    var form = document.getElementById('chat-form');
+    var input = document.getElementById('chat-input');
+    var bouton = document.getElementById('chat-envoyer');
+    var historique = [];
+
+    function ajouterBulle(role, contenu) {
+        var ligne = document.createElement('div');
+        ligne.className = 'flex gap-sm' + (role === 'user' ? ' flex-row-reverse' : '');
+        var avatar = document.createElement('div');
+        avatar.className = 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 '
+            + (role === 'user' ? 'bg-primary' : 'bg-tertiary-container');
+        var icone = document.createElement('span');
+        icone.className = 'material-symbols-outlined text-[18px] ' + (role === 'user' ? 'text-white' : 'text-on-tertiary-container');
+        icone.textContent = role === 'user' ? 'person' : 'smart_toy';
+        avatar.appendChild(icone);
+        var bulle = document.createElement('div');
+        bulle.className = 'bulle px-md py-sm rounded-lg max-w-[80%] font-body-md text-body-md '
+            + (role === 'user' ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container');
+        bulle.textContent = contenu;
+        ligne.appendChild(avatar);
+        ligne.appendChild(bulle);
+        fenetre.appendChild(ligne);
+        fenetre.scrollTop = fenetre.scrollHeight;
+        return bulle;
+    }
+
+    form.addEventListener('submit', function (evenement) {
+        evenement.preventDefault();
+        var message = input.value.trim();
+        if (!message) return;
+
+        ajouterBulle('user', message);
+        historique.push({ role: 'user', contenu: message });
+        input.value = '';
+        input.disabled = true;
+        bouton.disabled = true;
+        var bulleAttente = ajouterBulle('assistant', 'Recherche en cours...');
+
+        fetch('/assistant/message', {
+            method: 'POST',
+            headers: (function () {
+                var h = { 'Content-Type': 'application/json' };
+                h[csrfHeader] = csrfToken;
+                return h;
+            })(),
+            body: JSON.stringify({ message: message, historique: historique })
+        })
+            .then(function (reponse) { return reponse.json(); })
+            .then(function (donnees) {
+                bulleAttente.textContent = donnees.reponse;
+                if (donnees.lienRapport) {
+                    var conteneurLien = document.createElement('div');
+                    conteneurLien.className = 'mt-sm';
+                    var lien = document.createElement('a');
+                    lien.href = donnees.lienRapport;
+                    lien.target = '_blank';
+                    lien.rel = 'noopener';
+                    lien.className = 'inline-flex items-center gap-base px-md py-sm rounded-lg bg-primary text-white font-label-md text-label-md active:scale-95 transition-all';
+                    lien.innerHTML = '<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span> Telecharger le rapport PDF';
+                    conteneurLien.appendChild(lien);
+                    bulleAttente.appendChild(conteneurLien);
+                }
+                historique.push({ role: 'assistant', contenu: donnees.reponse });
+            })
+            .catch(function () {
+                bulleAttente.textContent = "Une erreur est survenue. Reessayez.";
+            })
+            .finally(function () {
+                input.disabled = false;
+                bouton.disabled = false;
+                input.focus();
+                fenetre.scrollTop = fenetre.scrollHeight;
+            });
+    });
+})();
+</script>
+</body>
+</html>

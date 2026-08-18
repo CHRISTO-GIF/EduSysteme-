@@ -301,6 +301,7 @@ public class PersonnelController {
             case "SURVEILLANT" -> "SURVEILLANT";
             case "DIRECTEUR"   -> "ADMIN";
             case "COORDONNATEUR" -> "COORDONNATEUR";
+            case "MARKETING"   -> "MARKETING";
             default -> null; // AUTRE : fiche RH seule, pas de compte de connexion automatique
         };
     }

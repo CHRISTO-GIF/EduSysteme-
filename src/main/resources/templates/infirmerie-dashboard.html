@@ -74,6 +74,10 @@
 <span class="material-symbols-outlined">inventory_2</span>
 <span class="font-label-md text-label-md">Stock</span>
 </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/assistant}">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md">Assistant</span>
+</a>
 </nav>
 <div class="mt-auto px-sm pt-lg border-t border-outline/20">
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">

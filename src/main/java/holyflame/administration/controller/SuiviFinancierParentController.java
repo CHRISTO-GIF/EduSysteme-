@@ -3,11 +3,14 @@ package holyflame.administration.controller;
 import holyflame.administration.model.Eleve;
 import holyflame.administration.model.FraisScolarite;
 import holyflame.administration.model.Paiement;
+import holyflame.administration.model.TransactionMobile;
 import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.EleveRepository;
 import holyflame.administration.repository.FraisScolariteRepository;
 import holyflame.administration.repository.PaiementRepository;
+import holyflame.administration.repository.TransactionMobileRepository;
 import holyflame.administration.repository.UtilisateurRepository;
+import holyflame.administration.service.CinetPayService;
 import holyflame.administration.service.EtablissementService;
 import holyflame.administration.service.FinanceParentService;
 import holyflame.administration.service.MessagerieService;
@@ -22,10 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/portail-parent/paiements")
@@ -39,6 +45,8 @@ public class SuiviFinancierParentController {
     @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private MessagerieService messagerieService;
     @Autowired private FinanceParentService financeParentService;
+    @Autowired private CinetPayService cinetPayService;
+    @Autowired private TransactionMobileRepository transactionMobileRepository;
 
     @GetMapping
     public String index(Authentication auth, Model model) {
@@ -72,6 +80,7 @@ public class SuiviFinancierParentController {
         model.addAttribute("categories", categories);
         model.addAttribute("adminEmail", trouverEmailAdministration(etabId));
         model.addAttribute("emailParent", email);
+        model.addAttribute("paiementMobileConfigure", cinetPayService.estConfigure());
         return "portail-parent-paiements";
     }
 
@@ -125,6 +134,63 @@ public class SuiviFinancierParentController {
 
         ra.addFlashAttribute("successMsg", "Votre demande de paiement a ete transmise a l'administration via la messagerie.");
         return "redirect:/portail-parent/paiements";
+    }
+
+    /**
+     * Demarre un paiement mobile money (CinetPay) pour une echeance precise et redirige vers
+     * la page de paiement hebergee. eleveId est TOUJOURS verifie contre les enfants du parent
+     * connecte — jamais fait confiance a la valeur brute du formulaire — sinon un parent
+     * pourrait regler (ou consulter le montant exact du) l'echeance d'un autre eleve.
+     */
+    @PostMapping("/payer-mobile")
+    public String payerMobile(@RequestParam Long fraisId, @RequestParam Long eleveId, Authentication auth, RedirectAttributes ra) {
+        String email = auth != null ? auth.getName() : "";
+        Eleve eleve = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email).stream()
+            .filter(e -> e.getId().equals(eleveId))
+            .findFirst().orElse(null);
+        if (eleve == null) {
+            ra.addFlashAttribute("erreurMsg", "Élève introuvable.");
+            return "redirect:/portail-parent/paiements";
+        }
+        if (!cinetPayService.estConfigure()) {
+            ra.addFlashAttribute("erreurMsg", "Le paiement en ligne n'est pas encore active pour cet etablissement. Contactez l'administration.");
+            return "redirect:/portail-parent/paiements";
+        }
+
+        FinanceParentService.ResumeSolde resume = financeParentService.calculerResume(List.of(eleve), eleve.getEtablissementId());
+        Map<String, Object> ligne = resume.lignes.stream()
+            .filter(l -> fraisId.equals(l.get("fraisId")))
+            .findFirst().orElse(null);
+        if (ligne == null) {
+            ra.addFlashAttribute("erreurMsg", "Cette échéance est introuvable ou déjà réglée.");
+            return "redirect:/portail-parent/paiements";
+        }
+        double resteAPayer = ((Number) ligne.get("resteAPayer")).doubleValue();
+        if (resteAPayer <= 0) {
+            ra.addFlashAttribute("erreurMsg", "Cette échéance est déjà réglée.");
+            return "redirect:/portail-parent/paiements";
+        }
+
+        String transactionId = "MM-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase();
+        TransactionMobile tx = new TransactionMobile();
+        tx.setTransactionId(transactionId);
+        tx.setEtablissementId(eleve.getEtablissementId());
+        tx.setEleveId(eleve.getId());
+        tx.setFraisScolariteId(fraisId);
+        tx.setMontant(resteAPayer);
+        tx.setDescription((String) ligne.get("designation") + " — " + eleve.getNom() + " " + eleve.getPrenom());
+        tx.setStatut("EN_ATTENTE");
+        tx.setDateCreation(LocalDateTime.now());
+        transactionMobileRepository.save(tx);
+
+        String lienPaiement = cinetPayService.initierPaiement(transactionId, resteAPayer, tx.getDescription());
+        if (lienPaiement == null) {
+            tx.setStatut("REFUSEE");
+            transactionMobileRepository.save(tx);
+            ra.addFlashAttribute("erreurMsg", "Le service de paiement en ligne est momentanement indisponible. Réessayez plus tard.");
+            return "redirect:/portail-parent/paiements";
+        }
+        return "redirect:" + lienPaiement;
     }
 
     private String trouverEmailAdministration(Long etabId) {

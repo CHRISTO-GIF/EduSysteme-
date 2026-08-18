@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Actualités — ' + ${etablissement.nom}">Actualités</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" th:href="${site.police == 'CLASSIQUE'} ? 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap' : (${site.police == 'ELEGANTE'} ? 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Karla:wght@400;500;600&display=swap' : 'https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap')"/>
+<script src="/js/tailwind.js"></script>
+<style>
+body { font-family: 'Inter', sans-serif; background: #fffdf9; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.text-accent { color: var(--accent); }
+.bg-accent { background-color: var(--accent); }
+.border-accent { border-color: var(--accent); }
+.bg-accent-soft { background-color: color-mix(in srgb, var(--accent) 10%, white); }
+.bg-accent-dark { background-color: color-mix(in srgb, var(--accent) 80%, black); }
+.hero-accent { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 65%, black)); }
+.text-accent-2 { color: var(--accent-2); }
+.bg-accent-2 { background-color: var(--accent-2); }
+.border-accent-2 { border-color: var(--accent-2); }
+.bg-accent-2-soft { background-color: color-mix(in srgb, var(--accent-2) 14%, white); }
+.font-heading { font-family: var(--font-heading); }
+.font-body { font-family: var(--font-body); }
+</style>
+</head>
+<body class="text-stone-800 font-body" th:style="'--accent:' + ${etablissement.couleurPrimaire != null and !#strings.isEmpty(etablissement.couleurPrimaire) ? etablissement.couleurPrimaire : '#00236f'} + ';--accent-2:' + ${site.couleurSecondaire != null and !#strings.isEmpty(site.couleurSecondaire) ? site.couleurSecondaire : '#c9a227'} + ';--font-heading:' + ${site.police == 'CLASSIQUE' ? 'Playfair Display, serif' : (site.police == 'ELEGANTE' ? 'Cormorant Garamond, serif' : 'Poppins, sans-serif')} + ';--font-body:' + ${site.police == 'CLASSIQUE' ? 'Lora, serif' : (site.police == 'ELEGANTE' ? 'Karla, sans-serif' : 'Inter, sans-serif')} + ';'">
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200">
+<div class="max-w-6xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between">
+<a class="flex items-center gap-3" th:href="@{/ecole/{slug}(slug=${site.slug})}">
+<img th:if="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" th:src="@{'/uploads/' + ${etablissement.logoPath}}" class="w-12 h-12 rounded-full object-cover border-2 border-accent" alt="Logo"/>
+<span th:unless="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" class="w-12 h-12 rounded-full bg-accent-soft border-2 border-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-accent">school</span>
+</span>
+<span class="font-heading text-lg md:text-xl font-extrabold text-stone-900 leading-tight" th:text="${etablissement.nom}">Établissement</span>
+</a>
+<nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-stone-600">
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}(slug=${site.slug})}">Accueil</a>
+<a class="text-accent" th:href="@{/ecole/{slug}/actualites(slug=${site.slug})}">Actualités</a>
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}/galerie(slug=${site.slug})}">Galerie</a>
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}/evenements(slug=${site.slug})}">Événements</a>
+<a class="hover:text-accent transition" th:href="@{/ecole/{slug}/a-propos(slug=${site.slug})}">À propos</a>
+</nav>
+<button id="menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center text-stone-700" type="button">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<div id="mobile-menu" class="md:hidden hidden flex-col px-5 pb-4 border-t border-stone-100">
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}(slug=${site.slug})}">Accueil</a>
+<a class="block py-2 font-semibold text-accent" th:href="@{/ecole/{slug}/actualites(slug=${site.slug})}">Actualités</a>
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}/galerie(slug=${site.slug})}">Galerie</a>
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}/evenements(slug=${site.slug})}">Événements</a>
+<a class="block py-2 font-semibold text-stone-700" th:href="@{/ecole/{slug}/a-propos(slug=${site.slug})}">À propos</a>
+</div>
+</header>
+
+<section class="hero-accent text-white">
+<div class="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-20 text-center">
+<span class="inline-flex items-center gap-2 bg-white/15 px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+<span class="material-symbols-outlined text-[18px]">campaign</span> Actualités
+</span>
+<h1 class="font-heading text-3xl md:text-4xl font-extrabold">Ce qui se passe chez nous</h1>
+</div>
+</section>
+
+<main class="max-w-6xl mx-auto px-5 md:px-8 py-16">
+<div th:if="${actualites == null or #lists.isEmpty(actualites)}" class="text-center py-20 text-stone-400">
+<span class="material-symbols-outlined text-[56px] mb-3 block">campaign</span>
+<p class="text-lg font-semibold">Aucune actualité publiée pour le moment.</p>
+<p class="text-sm mt-1">Revenez bientôt pour suivre les dernières nouvelles de l'établissement.</p>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" th:unless="${actualites == null or #lists.isEmpty(actualites)}">
+<a class="group block rounded-2xl border border-stone-200 overflow-hidden hover:shadow-xl transition-shadow bg-white"
+   th:each="a : ${actualites}"
+   th:href="@{/ecole/{slug}/actualites/{id}(slug=${site.slug},id=${a.id})}">
+<div class="h-44 bg-accent-soft overflow-hidden" th:if="${a.imagePath != null and !#strings.isEmpty(a.imagePath)}">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" th:src="@{'/uploads/' + ${a.imagePath}}" alt=""/>
+</div>
+<div class="p-5">
+<p class="text-xs font-semibold text-stone-400 mb-2" th:if="${a.datePublication != null}" th:text="${#temporals.format(a.datePublication, 'dd MMMM yyyy')}">Date</p>
+<h3 class="font-heading font-bold text-stone-900 mb-2 group-hover:text-accent transition-colors" th:text="${a.titre}">Titre de l'actualité</h3>
+<p class="text-sm text-stone-500 leading-relaxed" th:text="${#strings.abbreviate(a.contenu, 130)}">Extrait de l'actualité.</p>
+<span class="inline-flex items-center gap-1 text-accent font-semibold mt-3 text-sm">
+Lire la suite <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+</div>
+</main>
+
+<footer class="bg-stone-900 text-stone-300 mt-4">
+<div class="max-w-6xl mx-auto px-5 md:px-8 py-12 grid gap-10 md:grid-cols-3">
+<div>
+<div class="flex items-center gap-3 mb-3">
+<img th:if="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" th:src="@{'/uploads/' + ${etablissement.logoPath}}" class="w-10 h-10 rounded-full object-cover" alt="Logo"/>
+<span th:unless="${etablissement.logoPath != null and !#strings.isEmpty(etablissement.logoPath)}" class="material-symbols-outlined text-accent">school</span>
+<span class="text-white font-bold" th:text="${etablissement.nom}">Établissement</span>
+</div>
+<p class="text-sm text-stone-400" th:if="${etablissement.adresse != null and !#strings.isEmpty(etablissement.adresse)}" th:text="${etablissement.adresse}">Adresse</p>
+<p class="text-sm text-stone-400" th:if="${etablissement.ville != null and !#strings.isEmpty(etablissement.ville)}" th:text="${etablissement.ville}">Ville</p>
+</div>
+<div>
+<h3 class="font-heading text-white font-bold mb-3">Contact</h3>
+<ul class="space-y-2 text-sm">
+<li class="flex items-center gap-2" th:if="${(site.emailContact != null and !#strings.isEmpty(site.emailContact)) or (etablissement.email != null and !#strings.isEmpty(etablissement.email))}">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+<span th:text="${site.emailContact != null and !#strings.isEmpty(site.emailContact)} ? ${site.emailContact} : ${etablissement.email}">email</span>
+</li>
+<li class="flex items-center gap-2" th:if="${(site.telephoneContact != null and !#strings.isEmpty(site.telephoneContact)) or (etablissement.telephone != null and !#strings.isEmpty(etablissement.telephone))}">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span th:text="${site.telephoneContact != null and !#strings.isEmpty(site.telephoneContact)} ? ${site.telephoneContact} : ${etablissement.telephone}">téléphone</span>
+</li>
+</ul>
+</div>
+<div>
+<h3 class="font-heading text-white font-bold mb-3">Suivez-nous</h3>
+<div class="flex gap-3">
+<a class="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center hover:bg-accent transition-colors" target="_blank" rel="noopener" th:if="${site.facebookUrl != null and !#strings.isEmpty(site.facebookUrl)}" th:href="${site.facebookUrl}">
+<span class="material-symbols-outlined text-[20px]">thumb_up</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center hover:bg-accent transition-colors" target="_blank" rel="noopener" th:if="${site.instagramUrl != null and !#strings.isEmpty(site.instagramUrl)}" th:href="${site.instagramUrl}">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-stone-800 py-5 text-center text-xs text-stone-500">
+Site propulsé par <span class="font-semibold text-stone-300">EduSystem Pro</span>
+</div>
+</footer>
+
+<script>
+(function(){
+var btn=document.getElementById('menu-toggle');
+var menu=document.getElementById('mobile-menu');
+if(!btn||!menu)return;
+btn.addEventListener('click',function(){
+menu.classList.toggle('hidden');
+menu.classList.toggle('flex');
+var icon=btn.querySelector('.material-symbols-outlined');
+icon.textContent=menu.classList.contains('hidden')?'menu':'close';
+});
+})();
+</script>
+</body>
+</html>

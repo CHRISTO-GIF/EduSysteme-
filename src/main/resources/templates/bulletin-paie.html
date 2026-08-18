@@ -45,6 +45,10 @@
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
     .print-area { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
     @media print {
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
         body { background: white; }
         .no-print, .no-print * { display: none !important; }
         .print-area { box-shadow: none; margin: 0; width: 100%; max-width: none; padding: 16px !important; }
