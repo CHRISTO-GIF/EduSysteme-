@@ -5,9 +5,6 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title th:text="'Galerie — ' + ${etablissement.nom}">Galerie</title>
 <link rel="stylesheet" href="/css/fonts.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" th:href="${site.police == 'CLASSIQUE'} ? 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap' : (${site.police == 'ELEGANTE'} ? 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Karla:wght@400;500;600&display=swap' : 'https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap')"/>
 <script src="/js/tailwind.js"></script>
 <style>
 body { font-family: 'Inter', sans-serif; background: #fffdf9; }
@@ -30,7 +27,7 @@ body { font-family: 'Inter', sans-serif; background: #fffdf9; }
 .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
 </style>
 </head>
-<body class="text-stone-800 font-body" th:style="'--accent:' + ${etablissement.couleurPrimaire != null and !#strings.isEmpty(etablissement.couleurPrimaire) ? etablissement.couleurPrimaire : '#00236f'} + ';--accent-2:' + ${site.couleurSecondaire != null and !#strings.isEmpty(site.couleurSecondaire) ? site.couleurSecondaire : '#c9a227'} + ';--font-heading:' + ${site.police == 'CLASSIQUE' ? 'Playfair Display, serif' : (site.police == 'ELEGANTE' ? 'Cormorant Garamond, serif' : 'Poppins, sans-serif')} + ';--font-body:' + ${site.police == 'CLASSIQUE' ? 'Lora, serif' : (site.police == 'ELEGANTE' ? 'Karla, sans-serif' : 'Inter, sans-serif')} + ';'">
+<body class="text-stone-800 font-body" th:style="'--accent:' + ${etablissement.couleurPrimaire != null and !#strings.isEmpty(etablissement.couleurPrimaire) ? etablissement.couleurPrimaire : '#00236f'} + ';--accent-2:' + ${site.couleurSecondaire != null and !#strings.isEmpty(site.couleurSecondaire) ? site.couleurSecondaire : '#c9a227'} + ';--font-heading:' + ${site.police == 'CLASSIQUE' ? 'Georgia, serif' : (site.police == 'ELEGANTE' ? 'Palatino, Georgia, serif' : 'Inter, sans-serif')} + ';--font-body:' + ${site.police == 'CLASSIQUE' ? 'Georgia, serif' : (site.police == 'ELEGANTE' ? 'Inter, sans-serif' : 'Inter, sans-serif')} + ';'">
 <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200">
 <div class="max-w-6xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between">
 <a class="flex items-center gap-3" th:href="@{/ecole/{slug}(slug=${site.slug})}">
