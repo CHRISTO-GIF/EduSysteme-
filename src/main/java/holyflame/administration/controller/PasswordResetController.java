@@ -3,6 +3,8 @@ package holyflame.administration.controller;
 import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.UtilisateurRepository;
 import holyflame.administration.service.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @Controller
 public class PasswordResetController {
 
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetController.class);
     private static final int VALIDITE_HEURES = 2;
 
     @Autowired private UtilisateurRepository utilisateurRepository;
@@ -50,12 +53,19 @@ public class PasswordResetController {
 
             boolean envoye = emailService.envoyer(u.getEmail(), "Reinitialisation de votre mot de passe", corpsHtml);
             if (!envoye) {
-                model.addAttribute("lienReinitialisation", lien);
+                log.warn("Echec d'envoi de l'email de reinitialisation pour l'utilisateur {} — verifier la configuration "
+                    + "de l'envoi d'email (BREVO_API_KEY).", u.getId());
             }
         });
 
-        // Message générique dans tous les cas (on ne révèle pas si l'email existe ou non)
+        // Message générique dans tous les cas (on ne révèle jamais si l'email existe). Le lien de
+        // réinitialisation ne doit JAMAIS transiter par la réponse HTTP — uniquement par l'email du
+        // titulaire du compte — sinon n'importe qui connaissant un email pourrait prendre le
+        // contrôle du compte correspondant tant que l'envoi d'email n'est pas configuré.
         model.addAttribute("demandeEnvoyee", true);
+        if (!emailService.estConfigure()) {
+            model.addAttribute("emailIndisponible", true);
+        }
         return "mot-de-passe-oublie";
     }
 
