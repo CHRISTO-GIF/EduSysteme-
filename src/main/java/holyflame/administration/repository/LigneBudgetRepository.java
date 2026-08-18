@@ -9,11 +9,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface LigneBudgetRepository extends JpaRepository<LigneBudget, Long> {
-    List<LigneBudget> findByAnneeScolaireOrderByCategorieAscDesignationAsc(String annee);
-    List<LigneBudget> findByCategorieAndAnneeScolaire(String categorie, String annee);
+    List<LigneBudget> findByAnneeScolaireOrderByDesignationAsc(String annee);
 
-    List<LigneBudget> findByEtablissementIdAndAnneeScolaireOrderByCategorieAscDesignationAsc(Long etabId, String annee);
-    List<LigneBudget> findByEtablissementIdOrderByCategorieAscDesignationAsc(Long etabId);
+    List<LigneBudget> findByEtablissementIdAndAnneeScolaireOrderByDesignationAsc(Long etabId, String annee);
 
     @Modifying
     @Query("UPDATE LigneBudget l SET l.etablissementId = :etabId WHERE l.etablissementId IS NULL")

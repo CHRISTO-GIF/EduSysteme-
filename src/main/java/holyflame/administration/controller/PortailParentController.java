@@ -1,6 +1,7 @@
 package holyflame.administration.controller;
 
 import holyflame.administration.model.Absence;
+import holyflame.administration.model.AvisParent;
 import holyflame.administration.model.Classe;
 import holyflame.administration.model.Conduite;
 import holyflame.administration.model.Eleve;
@@ -11,6 +12,7 @@ import holyflame.administration.model.Note;
 import holyflame.administration.model.RappelParent;
 import holyflame.administration.model.Utilisateur;
 import holyflame.administration.repository.AbsenceRepository;
+import holyflame.administration.repository.AvisParentRepository;
 import holyflame.administration.repository.ConduiteRepository;
 import holyflame.administration.repository.EleveRepository;
 import holyflame.administration.repository.EvenementEcoleRepository;
@@ -55,7 +57,9 @@ public class PortailParentController {
     @Autowired private EvenementEcoleRepository evenementEcoleRepository;
     @Autowired private RappelParentRepository rappelParentRepository;
     @Autowired private ConduiteRepository conduiteRepository;
+    @Autowired private AvisParentRepository avisParentRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.CalendrierScolaireService calendrierScolaireService;
     @Autowired private FinanceParentService financeParentService;
     @Autowired private MessagerieService messagerieService;
 
@@ -190,9 +194,9 @@ public class PortailParentController {
         Absence derniereAbsenceNonJustifiee = absences.stream()
             .filter(a -> !a.isEstJustifiee()).findFirst().orElse(null);
 
-        long joursOuvres = compterJoursOuvres(
+        long joursOuvres = calendrierScolaireService.joursEcoleOuvres(
             enfant.getDateInscription() != null ? enfant.getDateInscription() : LocalDate.now().minusMonths(3),
-            LocalDate.now());
+            LocalDate.now(), enfant.getEtablissementId());
         double tauxAssiduite = joursOuvres > 0
             ? Math.max(0, Math.min(100, Math.round((100.0 - (nbAbsencesNonJustifiees * 100.0 / joursOuvres)) * 10) / 10.0))
             : 100;
@@ -413,13 +417,38 @@ public class PortailParentController {
         return "redirect:/portail-parent/calendrier";
     }
 
-    private long compterJoursOuvres(LocalDate debut, LocalDate fin) {
-        long total = 0;
-        LocalDate d = debut;
-        while (!d.isAfter(fin)) {
-            if (d.getDayOfWeek() != DayOfWeek.SATURDAY && d.getDayOfWeek() != DayOfWeek.SUNDAY) total++;
-            d = d.plusDays(1);
-        }
-        return total;
+    @GetMapping("/signalement")
+    public String signalementForm(Authentication auth, Model model) {
+        String email = auth != null ? auth.getName() : "";
+        model.addAttribute("enfants", eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email));
+        return "portail-parent-signalement";
     }
+
+    @PostMapping("/signalement")
+    public String enregistrerSignalement(
+            Authentication auth,
+            @RequestParam Long eleveId,
+            @RequestParam String categorie,
+            @RequestParam String description,
+            RedirectAttributes ra) {
+        String email = auth != null ? auth.getName() : "";
+        Eleve enfant = eleveRepository.findAllByParentEmailAnyOrderByNomAsc(email).stream()
+            .filter(e -> e.getId().equals(eleveId))
+            .findFirst()
+            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Cet eleve n'est pas rattache a votre compte."));
+
+        AvisParent avis = new AvisParent();
+        avis.setEleve(enfant);
+        avis.setCategorie(categorie);
+        avis.setDescription(description);
+        avis.setParentEmail(email);
+        avis.setDateSignalement(java.time.LocalDateTime.now());
+        avis.setEtablissementId(enfant.getEtablissementId());
+        avisParentRepository.save(avis);
+
+        ra.addFlashAttribute("successMsg", "Votre signalement a ete transmis a la coordination pedagogique.");
+        return "redirect:/portail-parent/signalement";
+    }
+
 }

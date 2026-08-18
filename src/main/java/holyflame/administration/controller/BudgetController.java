@@ -10,6 +10,6 @@ public class BudgetController {
 
     @GetMapping
     public String index() {
-        return "redirect:/finances/budget";
+        return "redirect:/finances?tab=budget";
     }
 }

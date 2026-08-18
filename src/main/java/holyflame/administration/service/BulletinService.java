@@ -73,10 +73,29 @@ public class BulletinService {
         return coef > 0 ? somme / coef : 0;
     }
 
+    /** Notes publiees d'un eleve pour un trimestre, filtrees par annee scolaire quand elle est connue
+        (evite de melanger les notes de plusieurs annees apres un passage de classe). */
+    private List<Note> notesEleveTrimestreAnnee(Eleve eleve, Integer trimestre, String anneeScolaire) {
+        List<Note> notes = anneeScolaire != null
+            ? noteRepository.findByEleveAndTrimestreAndAnneeScolaireOrderByMatiereNomAsc(eleve, trimestre, anneeScolaire)
+            : noteRepository.findByEleveAndTrimestreOrderByMatiereNomAsc(eleve, trimestre);
+        return notes.stream().filter(n -> !"BROUILLON".equals(n.getStatut())).toList();
+    }
+
+    /** Moyenne annuelle (moyenne des 3 trimestres publies) pour le module de passage de classe. */
+    public double calculerMoyenneAnnuelle(Eleve eleve, String anneeScolaire) {
+        List<Double> moyennesTrimestres = new ArrayList<>();
+        for (int t = 1; t <= 3; t++) {
+            List<Note> notes = notesEleveTrimestreAnnee(eleve, t, anneeScolaire);
+            if (!notes.isEmpty()) moyennesTrimestres.add(moyennePonderee(notes));
+        }
+        return moyennesTrimestres.isEmpty() ? 0
+            : moyennesTrimestres.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+    }
+
     public Map<String, Object> calculerBulletin(Eleve eleve, Integer trimestre, Long etabId) {
-        List<Note> notes = noteRepository.findByEleveAndTrimestreOrderByMatiereNomAsc(eleve, trimestre).stream()
-            .filter(n -> !"BROUILLON".equals(n.getStatut()))
-            .toList();
+        String anneeScolaireBulletin = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
+        List<Note> notes = notesEleveTrimestreAnnee(eleve, trimestre, anneeScolaireBulletin);
         double moyenne = moyennePonderee(notes);
         double moyenneArrondie = Math.round(moyenne * 100.0) / 100.0;
 
@@ -88,8 +107,7 @@ public class BulletinService {
             effectif = camarades.size();
             double sommeMoyennes = 0;
             for (Eleve cam : camarades) {
-                List<Note> notesCam = noteRepository.findByEleveAndTrimestreOrderByMatiereNomAsc(cam, trimestre).stream()
-                    .filter(n -> !"BROUILLON".equals(n.getStatut())).toList();
+                List<Note> notesCam = notesEleveTrimestreAnnee(cam, trimestre, anneeScolaireBulletin);
                 double moyenneCam = moyennePonderee(notesCam);
                 sommeMoyennes += moyenneCam;
                 if (!cam.getId().equals(eleve.getId()) && moyenneCam > moyenne) rang++;
@@ -174,7 +192,7 @@ public class BulletinService {
             .orElse(null);
 
         // ── Conduite reelle (si saisie) ──
-        String anneeScolaire = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
+        String anneeScolaire = anneeScolaireBulletin;
         Conduite conduite = anneeScolaire != null
             ? conduiteRepository.findByEleveAndTrimestreAndAnneeScolaire(eleve, trimestre, anneeScolaire).orElse(null)
             : null;

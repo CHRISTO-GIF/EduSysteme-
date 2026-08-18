@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Consultations - Infirmerie</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#f2f4f6", "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
+            "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb",
+            "primary-fixed": "#dce1ff", "secondary-container": "#d0e1fb", "tertiary": [[${accentColor}]],
+            "outline": "#757682", "surface-variant": "#e0e3e5", "surface-container": "#eceef0",
+            "outline-variant": "#c5c5d3", "surface": "#f7f9fb", "secondary": "#505f76",
+            "on-background": "#191c1e", "on-surface": "#191c1e", "on-surface-variant": "#444651",
+            "success-container": "#c4f7d0", "tertiary-fixed-dim": "#bec6e0"
+          },
+          borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+          spacing: { gutter: "24px", xs: "4px", lg: "24px", xl: "32px", sm: "8px", "sidebar-width": "260px", md: "16px", "container-max": "1440px" },
+          fontFamily: { "label-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"] },
+          fontSize: {
+            "label-md": ["14px", {lineHeight: "20px", fontWeight: "600"}],
+            "headline-sm": ["18px", {lineHeight: "28px", fontWeight: "600"}],
+            "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700"}],
+            "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+            "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500"}]
+          }
+        }
+      }
+    }
+</script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<main class="max-w-container-max mx-auto p-lg">
+<div class="flex items-center text-outline font-label-sm text-label-sm mb-md">
+<a class="hover:underline" th:href="@{/infirmerie}">Infirmerie</a>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="text-primary font-bold">Consultations</span>
+</div>
+
+<div class="mb-lg flex justify-between items-end">
+<h2 class="font-headline-lg text-headline-lg text-primary">Historique des consultations</h2>
+<a th:href="@{/infirmerie}" class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour au tableau de bord
+</a>
+</div>
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container">
+<tr>
+<th class="px-lg py-3 font-label-sm text-outline">Date</th>
+<th class="px-lg py-3 font-label-sm text-outline">Élève</th>
+<th class="px-lg py-3 font-label-sm text-outline">Motif</th>
+<th class="px-lg py-3 font-label-sm text-outline">Observations</th>
+<th class="px-lg py-3 font-label-sm text-outline">Orientation</th>
+<th class="px-lg py-3 font-label-sm text-outline">Parents</th>
+<th class="px-lg py-3 font-label-sm text-outline"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="c : ${consultations}">
+<td class="px-lg py-3 text-outline whitespace-nowrap" th:text="${#temporals.format(c.dateHeure, 'dd/MM/yyyy HH:mm')}"></td>
+<td class="px-lg py-3 font-label-md" th:text="${c.eleve.prenom} + ' ' + ${c.eleve.nom} + ' — ' + ${c.eleve.classe != null ? c.eleve.classe.nom : ''}"></td>
+<td class="px-lg py-3" th:text="${motifs.get(c.motif) ?: c.motif}"></td>
+<td class="px-lg py-3 text-on-surface-variant max-w-xs truncate" th:text="${c.observations}"></td>
+<td class="px-lg py-3">
+<span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase"
+      th:classappend="${c.orientation == 'RETOUR_CLASSE' ? 'bg-green-100 text-green-800' : (c.orientation == 'HOPITAL_SAMU' ? 'bg-error text-on-error' : (c.orientation == 'RENVOYE_DOMICILE' ? 'bg-secondary-container text-on-surface-variant' : 'bg-primary-fixed text-primary'))}"
+      th:text="${orientations.get(c.orientation) ?: c.orientation}"></span>
+</td>
+<td class="px-lg py-3" th:text="${c.parentsInformes} ? 'Oui' : 'Non'"></td>
+<td class="px-lg py-3">
+<form method="post" th:action="@{/infirmerie/consultations/{id}/cloturer(id=${c.id})}" th:if="${c.statut == 'EN_COURS'}">
+<button class="px-sm py-1 rounded-lg bg-primary text-on-primary text-[11px] font-bold" type="submit">Clôturer</button>
+</form>
+</td>
+</tr>
+<tr th:if="${#lists.isEmpty(consultations)}"><td class="px-lg py-8 text-center text-outline" colspan="7">Aucune consultation enregistrée.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+</body>
+</html>

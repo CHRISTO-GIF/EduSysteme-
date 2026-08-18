@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title th:text="'Bulletin de paie — ' + ${personnel.prenom} + ' ' + ${personnel.nom}">Bulletin de paie</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed": "#dce1ff", "surface-dim": "#d8dadc", "outline": "#757682",
+            "surface-container-low": "#f2f4f6", "surface-container-lowest": "#ffffff", "outline-variant": "#c5c5d3",
+            "surface-bright": "#f7f9fb", "primary": "#00236f",
+            "on-surface": "#191c1e", "on-background": "#191c1e",
+            "on-primary": "#ffffff", "surface-container-highest": "#e0e3e5",
+            "surface-variant": "#e0e3e5", "on-secondary": "#ffffff",
+            "surface-container": "#eceef0", "surface-container-high": "#e6e8ea", "error-container": "#ffdad6",
+            "background": "#f7f9fb",
+            "on-surface-variant": "#444651",
+            "error": "#ba1a1a",
+            "secondary": "#505f76", "on-error": "#ffffff", "success-container": "#dcfce7", "success": "#15803d"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"container-max": "1440px", "xs": "4px", "md": "16px", "gutter": "24px", "lg": "24px", "sm": "8px", "base": "4px", "xl": "32px", "sidebar-width": "260px"},
+          "fontFamily": {"headline-md": ["Inter"], "label-sm": ["Inter"], "code": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"]},
+          "fontSize": {
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+            "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+</script>
+<style>
+    body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .print-area { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
+    @media print {
+        body { background: white; }
+        .no-print, .no-print * { display: none !important; }
+        .print-area { box-shadow: none; margin: 0; width: 100%; max-width: none; padding: 16px !important; }
+        @page { size: A4; margin: 10mm; }
+    }
+</style>
+</head>
+<body class="min-h-screen text-on-surface">
+<div class="flex min-h-screen">
+<main class="flex-1 flex flex-col items-center justify-start p-md md:p-xl">
+
+<nav class="no-print w-full max-w-[800px] mb-lg flex flex-wrap items-center justify-between gap-md bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant">
+<a class="flex items-center gap-xs text-secondary hover:text-primary transition-colors font-label-md text-label-md" th:href="@{/personnel/{id}(id=${personnel.id})}">
+<span class="material-symbols-outlined">arrow_back</span> Retour à la fiche personnel
+</a>
+<button class="flex items-center gap-xs px-lg py-sm rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-all shadow-md font-label-md text-label-md" onclick="window.print()" type="button">
+<span class="material-symbols-outlined">print</span> Imprimer le bulletin
+</button>
+</nav>
+
+<article class="print-area w-full max-w-[800px] bg-white border border-outline-variant p-xl flex flex-col gap-lg">
+
+<header class="flex flex-col md:flex-row justify-between items-start gap-lg border-b-2 border-primary pb-lg">
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary uppercase tracking-wider" th:text="${nomEtab}">Établissement</h1>
+<div class="mt-xs text-xs text-outline font-label-sm">
+<span th:if="${adresseEtab != null and !adresseEtab.isEmpty()}" th:text="${adresseEtab}">Adresse</span><br/>
+<span th:if="${telEtab != null and !telEtab.isEmpty()}" th:text="'Tél: ' + ${telEtab}">Tél</span>
+</div>
+</div>
+<div class="text-right">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase">Bulletin de paie</h2>
+<p class="font-body-md text-body-md text-secondary" th:text="'Période du ' + ${#temporals.format(bulletin.periodeDebut, 'dd/MM/yyyy')} + ' au ' + ${#temporals.format(bulletin.periodeFin, 'dd/MM/yyyy')}">Période</p>
+</div>
+</header>
+
+<section class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between"><span class="text-secondary">Matricule :</span><span class="font-semibold" th:text="${personnel.matricule != null ? personnel.matricule : '—'}">--</span></div>
+<div class="flex justify-between"><span class="text-secondary">Nom :</span><span class="font-semibold" th:text="${personnel.nom} + ' ' + ${personnel.prenom}">--</span></div>
+<div class="flex justify-between"><span class="text-secondary">Fonction :</span><span class="font-semibold" th:text="${personnel.fonction}">--</span></div>
+</div>
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between"><span class="text-secondary">Ancienneté :</span><span class="font-semibold" th:text="${anciennete != null ? anciennete + ' mois' : '—'}">--</span></div>
+<div class="flex justify-between"><span class="text-secondary">Statut :</span>
+<span class="px-sm rounded-full text-xs font-bold" th:classappend="${bulletin.statut == 'PAYE'} ? 'bg-success-container text-success' : 'bg-error-container text-error'" th:text="${bulletin.statut == 'PAYE'} ? 'PAYÉ' : 'EN ATTENTE'">--</span>
+</div>
+</div>
+</section>
+
+<section>
+<table class="w-full border-collapse text-sm">
+<thead>
+<tr class="bg-surface-container-low border-b-2 border-primary">
+<th class="p-sm text-left font-label-sm text-label-sm text-on-surface-variant uppercase">Désignation</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-on-surface-variant uppercase">Base</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-on-surface-variant uppercase">Taux</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-on-surface-variant uppercase">Gain</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-on-surface-variant uppercase">Retenue</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="l : ${lignesGains}">
+<td class="p-sm" th:text="${l.libelle}">--</td>
+<td class="p-sm text-right">—</td>
+<td class="p-sm text-right">—</td>
+<td class="p-sm text-right font-semibold" th:text="${#numbers.formatDecimal(l.montant, 0, 'COMMA', 0, 'POINT')}">0</td>
+<td class="p-sm text-right">—</td>
+</tr>
+<tr class="bg-surface-container-low font-bold">
+<td class="p-sm" colspan="3">Total brut</td>
+<td class="p-sm text-right" th:text="${#numbers.formatDecimal(bulletin.totalBrut, 0, 'COMMA', 0, 'POINT')}">0</td>
+<td class="p-sm text-right">—</td>
+</tr>
+<tr th:each="l : ${lignesRetenues}">
+<td class="p-sm" th:text="${l.libelle}">--</td>
+<td class="p-sm text-right" th:text="${l.base != null ? #numbers.formatDecimal(l.base, 0, 'COMMA', 0, 'POINT') : '—'}">--</td>
+<td class="p-sm text-right" th:text="${l.taux != null ? #numbers.formatDecimal(l.taux, 0, 'COMMA', 1, 'POINT') + '%' : '—'}">--</td>
+<td class="p-sm text-right">—</td>
+<td class="p-sm text-right font-semibold text-error" th:text="${#numbers.formatDecimal(l.montant, 0, 'COMMA', 0, 'POINT')}">0</td>
+</tr>
+<tr class="bg-surface-container-low font-bold">
+<td class="p-sm" colspan="4">Total cotisations salariales</td>
+<td class="p-sm text-right text-error" th:text="${#numbers.formatDecimal(bulletin.totalRetenuesSalariales, 0, 'COMMA', 0, 'POINT')}">0</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section class="flex justify-end">
+<div class="w-full md:w-1/2 flex flex-col gap-sm">
+<div class="flex justify-between px-md py-md bg-primary rounded-lg text-on-primary shadow-lg">
+<span class="font-headline-sm text-headline-sm uppercase">Net à payer</span>
+<span class="font-headline-sm text-headline-sm" th:text="${#numbers.formatDecimal(bulletin.netAPayer, 0, 'COMMA', 0, 'POINT')} + ' ' + ${monnaie}">0</span>
+</div>
+</div>
+</section>
+
+<section th:if="${!lignesCharges.isEmpty()}">
+<h3 class="font-label-md text-label-md text-primary uppercase border-b border-outline-variant pb-xs mb-sm">Charges patronales (à la charge de l'établissement, informatif)</h3>
+<table class="w-full border-collapse text-sm">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="p-sm text-left font-label-sm text-label-sm text-on-surface-variant uppercase">Désignation</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-on-surface-variant uppercase">Base</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-on-surface-variant uppercase">Taux</th>
+<th class="p-sm text-right font-label-sm text-label-sm text-on-surface-variant uppercase">Montant</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="l : ${lignesCharges}">
+<td class="p-sm" th:text="${l.libelle}">--</td>
+<td class="p-sm text-right" th:text="${l.base != null ? #numbers.formatDecimal(l.base, 0, 'COMMA', 0, 'POINT') : '—'}">--</td>
+<td class="p-sm text-right" th:text="${l.taux != null ? #numbers.formatDecimal(l.taux, 0, 'COMMA', 1, 'POINT') + '%' : '—'}">--</td>
+<td class="p-sm text-right font-semibold text-secondary" th:text="${#numbers.formatDecimal(l.montant, 0, 'COMMA', 0, 'POINT')}">0</td>
+</tr>
+<tr class="bg-surface-container-low font-bold">
+<td class="p-sm" colspan="3">Total charges patronales</td>
+<td class="p-sm text-right text-secondary" th:text="${#numbers.formatDecimal(bulletin.totalChargesPatronales, 0, 'COMMA', 0, 'POINT')}">0</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section class="mt-xl grid grid-cols-2 gap-xl pt-xl">
+<div class="flex flex-col items-center gap-lg">
+<div class="h-20 w-full border-b border-dashed border-outline flex items-end justify-center pb-2">
+<span class="text-xs text-outline-variant italic">(Signature)</span>
+</div>
+<p class="font-label-sm text-label-sm text-outline uppercase text-center">Signature employé</p>
+</div>
+<div class="flex flex-col items-center gap-lg">
+<div class="h-20 w-full border-b border-dashed border-outline flex items-end justify-center pb-2">
+<span class="text-xs text-outline-variant italic">(Signature)</span>
+</div>
+<p class="font-label-sm text-label-sm text-outline uppercase text-center">Cachet / Direction</p>
+</div>
+</section>
+
+<footer class="mt-auto pt-lg border-t border-outline-variant text-center">
+<p class="text-xs text-outline font-label-sm">Pour vous aider à valoir vos droits, conservez ce bulletin de paie sans limitation de durée.</p>
+</footer>
+</article>
+</main>
+</div>
+</body>
+</html>

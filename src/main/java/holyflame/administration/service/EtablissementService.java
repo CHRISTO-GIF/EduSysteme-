@@ -36,4 +36,10 @@ public class EtablissementService {
         Utilisateur u = getCurrentUtilisateur();
         return u != null && "SUPER_ADMIN".equals(u.getRole());
     }
+
+    /** Annee scolaire courante de l'etablissement (source unique de verite pour "l'annee active"). */
+    public String getAnneeScolaireActive() {
+        Etablissement e = getCurrentEtablissement();
+        return e != null && e.getAnneeScolaire() != null ? e.getAnneeScolaire() : "2025-2026";
+    }
 }

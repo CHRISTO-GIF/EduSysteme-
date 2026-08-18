@@ -1,15 +1,29 @@
 package holyflame.administration.controller;
 
+import holyflame.administration.service.AnneeScolaireClotureeException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AnneeScolaireClotureeException.class)
+    public String handleAnneeCloturee(AnneeScolaireClotureeException ex, HttpServletRequest req, RedirectAttributes ra) {
+        String msg = "L'annee scolaire " + ex.getAnneeScolaire() + " est cloturee : aucune modification n'est possible. Reouvrez-la depuis Parametres > Annees scolaires si besoin.";
+        // Les pages de l'application n'utilisent pas toutes le meme nom d'attribut flash pour les erreurs
+        // (erreurMsg / erreur / erreurAuth selon la page) : on renseigne les trois pour un affichage fiable partout.
+        ra.addFlashAttribute("erreurMsg", msg);
+        ra.addFlashAttribute("erreur", msg);
+        ra.addFlashAttribute("erreurAuth", msg);
+        String referer = req.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/dashboard");
+    }
 
     @ExceptionHandler(NoSuchElementException.class)
     public ModelAndView handleNotFound(HttpServletRequest req) {

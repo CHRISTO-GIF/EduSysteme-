@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>EduSystem Pro - Emploi du temps</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <style>
         body { font-family: 'Inter', sans-serif; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
@@ -76,6 +76,10 @@
 <main class="mt-16 p-md md:p-lg max-w-container-max mx-auto w-full flex-1">
 <div th:if="${success}" class="mb-lg p-md rounded-lg bg-secondary-container text-on-secondary-container font-body-md text-body-md" th:text="${success}"></div>
 <div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
+
+<a class="inline-flex items-center gap-xs text-primary font-label-md text-label-md hover:underline mb-md" th:href="@{/gestion-academique}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span> Retour a Gestion Academique
+</a>
 
 <!-- En-tete -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md mb-xl">

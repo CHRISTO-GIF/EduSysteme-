@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>EduSystem Pro - Ajouter un Membre du Personnel</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <script id="tailwind-config" th:inline="javascript">
       tailwind.config = {
         darkMode: "class",
@@ -97,6 +97,10 @@
 <input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="prenom" placeholder="ex: Jean" required="required" type="text"/>
 </div>
 <div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Matricule</label>
+<input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="matricule" placeholder="ex: EMP-0012" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
 <label class="font-label-md text-label-md text-on-surface-variant">Email Professionnel</label>
 <input class="rounded-lg border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary px-md py-sm font-body-md text-body-md" name="email" placeholder="j.dupont@edusystem.com" type="email"/>
 </div>
@@ -144,6 +148,7 @@
 <option value="SURVEILLANT">Surveillant</option>
 <option value="DIRECTEUR">Directeur</option>
 <option value="COMPTABLE">Comptable</option>
+<option value="COORDONNATEUR">Coordonnateur</option>
 <option value="AUTRE">Autre</option>
 </select>
 </div>

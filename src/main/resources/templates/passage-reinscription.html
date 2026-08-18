@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Reinscription</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#dae2fd", "primary-fixed-dim": "#b6c4ff", "tertiary": [[${accentColor}]],
+                    "on-primary-fixed-variant": "#264191", "surface-container-low": "#f2f4f6", "surface-container": "#eceef0",
+                    "surface-container-highest": "#e0e3e5", "surface-container-lowest": "#ffffff", "surface": "#f7f9fb",
+                    "outline-variant": "#c5c5d3", "primary": "#00236f", "on-background": "#191c1e",
+                    "surface-bright": "#f7f9fb", "error-container": "#ffdad6", "surface-variant": "#e0e3e5",
+                    "background": "#f7f9fb", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                    "on-error-container": "#93000a", "tertiary-container": "#384055", "secondary": "#505f76",
+                    "on-primary": "#ffffff", "error": "#ba1a1a", "on-tertiary-container": "#a4acc5",
+                    "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a", "surface-dim": "#d8dadc",
+                    "on-surface-variant": "#444651", "on-secondary-container": "#54647a", "surface-container-high": "#e6e8ea",
+                    "outline": "#757682", "on-error": "#ffffff", "success": "#15803d", "success-container": "#dcfce7"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "base": "4px", "lg": "24px", "xs": "4px", "xl": "32px", "gutter": "24px", "md": "16px", "container-max": "1440px", "sm": "8px"},
+            "fontFamily": {"headline-sm": ["Inter"], "body-lg": ["Inter"], "code": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"]},
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; line-height: 1; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<div th:replace="~{fragments/sidebar-admin :: admin('passage')}"></div>
+
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<header class="sticky top-0 z-40 bg-surface border-b border-outline-variant flex justify-between items-center h-16 px-gutter">
+<div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<a class="hover:underline" th:href="@{/passage}">Passage de classe</a>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="text-primary font-bold">Reinscription</span>
+</div>
+</header>
+
+<div class="flex-1 p-gutter max-w-container-max mx-auto w-full">
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary">Reinscrire un ancien eleve</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Recherchez un eleve qui a quitte l'etablissement — sa reinscription reutilise automatiquement son matricule d'origine.</p>
+</div>
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-success font-body-md text-body-md" th:text="${successMsg}"></div>
+
+<form class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg mb-lg flex flex-wrap items-end gap-md" method="get" th:action="@{/passage/reinscription}">
+<div class="flex flex-col gap-xs flex-1 min-w-[240px]">
+<label class="font-label-md text-label-md text-on-surface-variant">Nom, prenom ou matricule</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="q" placeholder="Ex: KONAN ou HF-2025-003" th:value="${q}" type="text"/>
+</div>
+<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Rechercher</button>
+</form>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden" th:if="${q != null and !q.isBlank()}">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Matricule</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Eleve</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Derniere classe</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Reinscrire dans</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="e : ${resultats}">
+<td class="px-lg py-md font-mono text-secondary" th:text="${e.matricule}"></td>
+<td class="px-lg py-md font-medium" th:text="${e.nom} + ' ' + ${e.prenom}"></td>
+<td class="px-lg py-md text-secondary" th:text="${e.classe != null ? e.classe.nom + ' (' + e.classe.anneeScolaire + ')' : '—'}"></td>
+<td class="px-lg py-md">
+<form class="flex items-center gap-xs" method="post" th:action="@{/passage/reinscription/{id}(id=${e.id})}">
+<select class="rounded-lg border-outline-variant px-sm py-1 font-body-md text-body-md" name="classeId" required="required">
+<option th:each="c : ${classesActuelles}" th:text="${c.nom}" th:value="${c.id}"></option>
+</select>
+<button class="px-md py-1 bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-colors" type="submit">Reinscrire</button>
+</form>
+</td>
+<td></td>
+</tr>
+<tr th:if="${resultats.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="5">Aucun ancien eleve ne correspond a cette recherche.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

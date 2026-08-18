@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Nouveau Bulletin de Paie</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#dae2fd", "primary-fixed-dim": "#b6c4ff", "tertiary": [[${accentColor}]],
+                    "on-primary-fixed-variant": "#264191", "surface-container-low": "#f2f4f6", "surface-container": "#eceef0",
+                    "surface-container-highest": "#e0e3e5", "surface-container-lowest": "#ffffff", "surface": "#f7f9fb",
+                    "outline-variant": "#c5c5d3", "primary": "#00236f", "on-background": "#191c1e",
+                    "surface-bright": "#f7f9fb", "error-container": "#ffdad6", "surface-variant": "#e0e3e5",
+                    "background": "#f7f9fb", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                    "on-error-container": "#93000a", "tertiary-container": "#384055", "secondary": "#505f76",
+                    "on-primary": "#ffffff", "error": "#ba1a1a", "on-tertiary-container": "#a4acc5",
+                    "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a", "surface-dim": "#d8dadc",
+                    "on-surface-variant": "#444651", "on-secondary-container": "#54647a", "surface-container-high": "#e6e8ea",
+                    "outline": "#757682", "on-error": "#ffffff", "success": "#15803d", "success-container": "#dcfce7"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "base": "4px", "lg": "24px", "xs": "4px", "xl": "32px", "gutter": "24px", "md": "16px", "container-max": "1440px", "sm": "8px"},
+            "fontFamily": {"headline-sm": ["Inter"], "body-lg": ["Inter"], "code": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"]},
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; line-height: 1; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<div th:replace="~{fragments/sidebar-admin :: admin('personnel')}"></div>
+
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<header class="sticky top-0 z-40 bg-surface border-b border-outline-variant flex justify-between items-center h-16 px-gutter">
+<div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<a class="hover:underline" th:href="@{/personnel/{id}(id=${personnel.id})}">Personnel</a>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="text-primary font-bold">Nouveau bulletin de paie</span>
+</div>
+</header>
+
+<div class="flex-1 p-gutter max-w-[1000px] mx-auto w-full">
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary">Nouveau bulletin de paie</h2>
+<p class="text-on-surface-variant font-body-md text-body-md" th:text="${personnel.prenom} + ' ' + ${personnel.nom} + ' — ' + ${personnel.fonction} + (${anciennete} != null ? ' • Ancienneté : ' + ${anciennete} + ' mois' : '')">Employe</p>
+</div>
+
+<form id="form-bulletin" method="post" th:action="@{/rh/salaires}" class="space-y-lg pb-xl">
+<input name="personnelId" th:value="${personnel.id}" type="hidden"/>
+
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Mois</label>
+<select class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="mois">
+<option th:each="m : ${#numbers.sequence(1, 12)}" th:selected="${m == mois}" th:text="${m}" th:value="${m}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Année</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="annee" required="required" th:value="${annee}" type="number"/>
+</div>
+</div>
+</div>
+
+<!-- Gains -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-sm"><span class="material-symbols-outlined text-primary">add_circle</span> Gains</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Salaire de base</label>
+<input class="paie-gain rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" min="0" name="salaireBase" oninput="paieRecalculer()" step="1" th:value="${contrat != null and contrat.salaireBase != null ? contrat.salaireBase : 0}" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="primeResponsabilite" onchange="paieToggleLigne(this)" name="activerPrime" type="checkbox" value="true"/>
+Prime de responsabilité
+</label>
+<input class="paie-gain rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" id="primeResponsabilite" min="0" name="primeResponsabilite" oninput="paieRecalculer()" step="1" type="number" value="0"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="congeAnnuel" onchange="paieToggleLigne(this)" name="activerConge" type="checkbox" value="true"/>
+Congé annuel
+</label>
+<input class="paie-gain rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" id="congeAnnuel" min="0" name="congeAnnuel" oninput="paieRecalculer()" step="1" type="number" value="0"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="indemniteFinContrat" onchange="paieToggleLigne(this)" name="activerIndemnite" type="checkbox" value="true"/>
+Indemnité de fin de contrat
+</label>
+<input class="paie-gain rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" id="indemniteFinContrat" min="0" name="indemniteFinContrat" oninput="paieRecalculer()" step="1" type="number" value="0"/>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Total brut</span>
+<span class="font-headline-sm text-headline-sm text-primary" id="paie-total-brut">0 F</span>
+</div>
+</div>
+
+<!-- Retenues salariales -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs flex items-center gap-sm"><span class="material-symbols-outlined text-error">remove_circle</span> Retenues salariales</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-md">Déduites du net à payer de l'employé. Taux pré-remplis, modifiables — cliquez sur « Recalculer » après un ajustement.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="p-md bg-surface-container-low rounded-lg">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="retenueCnpsEmploye" onchange="paieToggleLigne(this)" name="activerCnpsEmploye" type="checkbox" value="true"/>
+Cotisation CNPS - Employé (% du brut)
+</label>
+<div class="flex gap-sm mt-xs items-center">
+<input class="paie-taux w-20 rounded-lg border-outline-variant px-sm py-sm font-body-md text-body-md" id="tauxCnpsEmploye" name="tauxCnpsEmploye" step="0.1" th:value="${taux.get('TAUX_CNPS_EMPLOYE')}" type="number"/>
+<span class="text-on-surface-variant">% →</span>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md flex-1" id="retenueCnpsEmploye" min="0" name="retenueCnpsEmploye" step="1" type="number" value="0"/>
+</div>
+</div>
+<div class="p-md bg-surface-container-low rounded-lg">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="irppSurSalaire" onchange="paieToggleLigne(this)" name="activerIrpp" type="checkbox" value="true"/>
+IRPP sur salaire (% du net soumis)
+</label>
+<div class="flex gap-sm mt-xs items-center">
+<input class="paie-taux w-20 rounded-lg border-outline-variant px-sm py-sm font-body-md text-body-md" id="tauxIrpp" name="tauxIrpp" step="0.1" th:value="${taux.get('TAUX_IRPP')}" type="number"/>
+<span class="text-on-surface-variant">% →</span>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md flex-1" id="irppSurSalaire" min="0" name="irppSurSalaire" step="1" type="number" value="0"/>
+</div>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Total retenues salariales</span>
+<span class="font-headline-sm text-headline-sm text-error" id="paie-total-retenues">0 F</span>
+</div>
+</div>
+
+<!-- Charges patronales -->
+<div class="bg-white border border-outline-variant rounded-lg p-lg shadow-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs flex items-center gap-sm"><span class="material-symbols-outlined text-secondary">domain</span> Charges patronales</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-md">Coût employeur additionnel, non déduit de l'employé — pour information et comptabilisation.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="p-md bg-surface-container-low rounded-lg">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="chargeTaxeApprentissage" onchange="paieToggleLigne(this)" name="activerTaxeApprentissage" type="checkbox" value="true"/>
+Taxe d'apprentissage (% du net soumis)
+</label>
+<div class="flex gap-sm mt-xs items-center">
+<input class="paie-taux w-20 rounded-lg border-outline-variant px-sm py-sm font-body-md text-body-md" id="tauxTaxeApprentissage" name="tauxTaxeApprentissage" step="0.1" th:value="${taux.get('TAUX_TAXE_APPRENTISSAGE')}" type="number"/>
+<span class="text-on-surface-variant">% →</span>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md flex-1" id="chargeTaxeApprentissage" min="0" name="chargeTaxeApprentissage" step="1" type="number" value="0"/>
+</div>
+</div>
+<div class="p-md bg-surface-container-low rounded-lg">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="chargeTaxeForfaitaire" onchange="paieToggleLigne(this)" name="activerTaxeForfaitaire" type="checkbox" value="true"/>
+Taxe forfaitaire (% du net soumis)
+</label>
+<div class="flex gap-sm mt-xs items-center">
+<input class="paie-taux w-20 rounded-lg border-outline-variant px-sm py-sm font-body-md text-body-md" id="tauxTaxeForfaitaire" name="tauxTaxeForfaitaire" step="0.1" th:value="${taux.get('TAUX_TAXE_FORFAITAIRE')}" type="number"/>
+<span class="text-on-surface-variant">% →</span>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md flex-1" id="chargeTaxeForfaitaire" min="0" name="chargeTaxeForfaitaire" step="1" type="number" value="0"/>
+</div>
+</div>
+<div class="p-md bg-surface-container-low rounded-lg">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="chargeCnpsAccident" onchange="paieToggleLigne(this)" name="activerCnpsAccident" type="checkbox" value="true"/>
+CNPS accident de travail (% du brut)
+</label>
+<div class="flex gap-sm mt-xs items-center">
+<input class="paie-taux w-20 rounded-lg border-outline-variant px-sm py-sm font-body-md text-body-md" id="tauxCnpsAccident" name="tauxCnpsAccident" step="0.1" th:value="${taux.get('TAUX_CNPS_ACCIDENT_TRAVAIL')}" type="number"/>
+<span class="text-on-surface-variant">% →</span>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md flex-1" id="chargeCnpsAccident" min="0" name="chargeCnpsAccident" step="1" type="number" value="0"/>
+</div>
+</div>
+<div class="p-md bg-surface-container-low rounded-lg">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="chargeCnpsAllocFam" onchange="paieToggleLigne(this)" name="activerCnpsAllocFam" type="checkbox" value="true"/>
+CNPS allocations familiales (% du brut)
+</label>
+<div class="flex gap-sm mt-xs items-center">
+<input class="paie-taux w-20 rounded-lg border-outline-variant px-sm py-sm font-body-md text-body-md" id="tauxCnpsAllocFam" name="tauxCnpsAllocFam" step="0.1" th:value="${taux.get('TAUX_CNPS_ALLOCATIONS_FAMILIALES')}" type="number"/>
+<span class="text-on-surface-variant">% →</span>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md flex-1" id="chargeCnpsAllocFam" min="0" name="chargeCnpsAllocFam" step="1" type="number" value="0"/>
+</div>
+</div>
+<div class="p-md bg-surface-container-low rounded-lg">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<input checked="checked" class="paie-activer" data-target="chargeCnpsPension" onchange="paieToggleLigne(this)" name="activerCnpsPension" type="checkbox" value="true"/>
+CNPS pension vieillesse (% du brut)
+</label>
+<div class="flex gap-sm mt-xs items-center">
+<input class="paie-taux w-20 rounded-lg border-outline-variant px-sm py-sm font-body-md text-body-md" id="tauxCnpsPension" name="tauxCnpsPension" step="0.1" th:value="${taux.get('TAUX_CNPS_PENSION_VIEILLESSE')}" type="number"/>
+<span class="text-on-surface-variant">% →</span>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md flex-1" id="chargeCnpsPension" min="0" name="chargeCnpsPension" step="1" type="number" value="0"/>
+</div>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Total charges patronales</span>
+<span class="font-headline-sm text-headline-sm text-secondary" id="paie-total-charges">0 F</span>
+</div>
+</div>
+
+<div class="bg-primary text-on-primary rounded-lg p-lg shadow-sm flex flex-wrap items-center justify-between gap-md">
+<div>
+<p class="font-label-sm text-label-sm opacity-80 uppercase">Net à payer</p>
+<p class="font-headline-lg text-headline-lg" id="paie-net-a-payer">0 F</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-lg py-sm bg-white/10 hover:bg-white/20 rounded-lg font-label-md text-label-md transition-all flex items-center gap-xs" onclick="paieRecalculer()" type="button">
+<span class="material-symbols-outlined text-[18px]">calculate</span> Recalculer les cotisations
+</button>
+<button class="px-lg py-sm bg-white text-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-all flex items-center gap-xs" type="submit">
+<span class="material-symbols-outlined text-[18px]">save</span> Enregistrer le bulletin
+</button>
+</div>
+</div>
+</form>
+</div>
+</main>
+
+<script th:inline="javascript">
+    function paieNum(id) {
+        const el = document.getElementById(id);
+        const v = parseFloat(el.value);
+        return isNaN(v) ? 0 : v;
+    }
+    function paieNumActive(id) {
+        const el = document.getElementById(id);
+        if (!el || el.disabled) return 0;
+        const v = parseFloat(el.value);
+        return isNaN(v) ? 0 : v;
+    }
+    function paieSetMontant(id, valeur) {
+        document.getElementById(id).value = Math.round(valeur);
+    }
+    function paieFormat(n) {
+        return Math.round(n).toLocaleString('en-US') + ' F';
+    }
+    function paieAppliquerTaux(montantId, tauxId, base) {
+        const el = document.getElementById(montantId);
+        if (el.disabled) return;
+        paieSetMontant(montantId, base * paieNum(tauxId) / 100);
+    }
+
+    function paieToggleLigne(cb) {
+        const target = document.getElementById(cb.dataset.target);
+        if (target) {
+            target.disabled = !cb.checked;
+            target.classList.toggle('opacity-40', !cb.checked);
+        }
+        paieRecalculer();
+    }
+
+    function paieRecalculer() {
+        const gains = Array.from(document.querySelectorAll('.paie-gain:not(:disabled)'))
+            .reduce(function (sum, el) { return sum + (parseFloat(el.value) || 0); }, 0);
+
+        paieAppliquerTaux('retenueCnpsEmploye', 'tauxCnpsEmploye', gains);
+        const netSoumisIrpp = gains - paieNumActive('retenueCnpsEmploye');
+
+        paieAppliquerTaux('irppSurSalaire', 'tauxIrpp', netSoumisIrpp);
+        paieAppliquerTaux('chargeTaxeApprentissage', 'tauxTaxeApprentissage', netSoumisIrpp);
+        paieAppliquerTaux('chargeTaxeForfaitaire', 'tauxTaxeForfaitaire', netSoumisIrpp);
+        paieAppliquerTaux('chargeCnpsAccident', 'tauxCnpsAccident', gains);
+        paieAppliquerTaux('chargeCnpsAllocFam', 'tauxCnpsAllocFam', gains);
+        paieAppliquerTaux('chargeCnpsPension', 'tauxCnpsPension', gains);
+
+        paieMettreAJourResume();
+    }
+
+    function paieMettreAJourResume() {
+        const gains = Array.from(document.querySelectorAll('.paie-gain:not(:disabled)'))
+            .reduce(function (sum, el) { return sum + (parseFloat(el.value) || 0); }, 0);
+        const retenues = paieNumActive('retenueCnpsEmploye') + paieNumActive('irppSurSalaire');
+        const charges = paieNumActive('chargeTaxeApprentissage') + paieNumActive('chargeTaxeForfaitaire')
+            + paieNumActive('chargeCnpsAccident') + paieNumActive('chargeCnpsAllocFam') + paieNumActive('chargeCnpsPension');
+
+        document.getElementById('paie-total-brut').textContent = paieFormat(gains);
+        document.getElementById('paie-total-retenues').textContent = paieFormat(retenues);
+        document.getElementById('paie-total-charges').textContent = paieFormat(charges);
+        document.getElementById('paie-net-a-payer').textContent = paieFormat(gains - retenues);
+    }
+
+    document.querySelectorAll('#retenueCnpsEmploye, #irppSurSalaire, #chargeTaxeApprentissage, #chargeTaxeForfaitaire, #chargeCnpsAccident, #chargeCnpsAllocFam, #chargeCnpsPension')
+        .forEach(function (el) { el.addEventListener('input', paieMettreAJourResume); });
+
+    paieRecalculer();
+</script>
+</body>
+</html>

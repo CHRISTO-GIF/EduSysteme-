@@ -13,6 +13,11 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findByEleveOrderByDateEvaluationDesc(Eleve eleve);
     List<Note> findByTrimestreOrderByDateEvaluationDesc(Integer trimestre);
     List<Note> findByEleveAndTrimestreOrderByMatiereNomAsc(Eleve eleve, Integer trimestre);
+    List<Note> findByEleveAndTrimestreAndAnneeScolaireOrderByMatiereNomAsc(Eleve eleve, Integer trimestre, String anneeScolaire);
+    List<Note> findByEleveAndAnneeScolaire(Eleve eleve, String anneeScolaire);
+
+    @Query("SELECT n FROM Note n JOIN FETCH n.eleve e JOIN FETCH e.classe WHERE n.anneeScolaire IS NULL")
+    List<Note> findByAnneeScolaireIsNullWithEleveEtClasse();
     List<Note> findAllByOrderByDateEvaluationDesc();
 
     // Pour le suivi : compter les notes saisies par matière + classe + trimestre

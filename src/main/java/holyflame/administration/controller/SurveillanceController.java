@@ -45,6 +45,7 @@ public class SurveillanceController {
     @Autowired private DocumentEleveRepository documentEleveRepository;
     @Autowired private FileStorageService fileStorageService;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
 
     @GetMapping
     public String index(Model model) {
@@ -64,8 +65,7 @@ public class SurveillanceController {
         model.addAttribute("classes", classeRepository.findByEtablissementId(etabId));
         model.addAttribute("matieres", matiereRepository.findByEtablissementIdOrderByNomAsc(etabId));
         model.addAttribute("enseignants", personnelRepository.findByFonctionAndEtablissementIdOrderByNomAsc("ENSEIGNANT", etabId));
-        model.addAttribute("anneeScolaire", parametreRepository.findByCleAndEtablissementId("ANNEE_SCOLAIRE", etabId)
-            .map(p -> p.getValeur()).orElse("2025-2026"));
+        model.addAttribute("anneeScolaire", etablissementService.getAnneeScolaireActive());
         model.addAttribute("utilisateurConnecte", etablissementService.getCurrentUtilisateur());
         return "surveillance-programme-nouveau";
     }
@@ -120,9 +120,13 @@ public class SurveillanceController {
             return "redirect:/surveillance";
         }
 
+        String anneeScolaireAbsence = holyflame.administration.util.AnneeScolaireUtil.pour(date);
+        anneeScolaireService.verifierModifiable(anneeScolaireAbsence, etabId);
+
         Absence absence = new Absence();
         absence.setEleve(eleve);
         absence.setDate(date);
+        absence.setAnneeScolaire(anneeScolaireAbsence);
         absence.setPeriode(periode != null ? periode : "Journée entière");
         absence.setEstJustifiee(estJustifiee);
         absence.setMotif(motif);

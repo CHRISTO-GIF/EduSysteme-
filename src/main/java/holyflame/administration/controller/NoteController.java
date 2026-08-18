@@ -42,6 +42,7 @@ public class NoteController {
     @Autowired private ClasseRepository classeRepository;
     @Autowired private EnseignantAutorisationRepository autorisationRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
 
     // ──────────────────────────────────────────────────────────────
@@ -133,11 +134,15 @@ public class NoteController {
             return "redirect:/notes";
         }
 
+        String anneeScolaireNote = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
+        anneeScolaireService.verifierModifiable(anneeScolaireNote, etabId);
+
         Note note = new Note();
         note.setEleve(eleve); note.setMatiere(matiere);
         note.setValeur(valeur);
         note.setCoefficient(coefficient != null ? coefficient : matiere.getCoefficient());
         note.setType(type); note.setTrimestre(trimestre);
+        note.setAnneeScolaire(anneeScolaireNote);
         note.setDateEvaluation(dateEvaluation != null ? dateEvaluation : LocalDate.now());
         note.setCommentaire(commentaire);
         note.setSaisieAt(LocalDateTime.now());
@@ -491,6 +496,9 @@ public class NoteController {
             return "redirect:/notes/saisie";
         }
 
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        classeRepository.findById(classeId).ifPresent(c -> anneeScolaireService.verifierModifiable(c.getAnneeScolaire(), etabId));
+
         @SuppressWarnings("unchecked")
         List<LigneImport> lignes = (List<LigneImport>) session.getAttribute(SESSION_IMPORT_KEY);
         int saved = 0;
@@ -505,6 +513,7 @@ public class NoteController {
                 note.setEleve(eleve); note.setMatiere(matiere);
                 note.setValeur(l.valeur); note.setCoefficient(coefficient);
                 note.setType(type); note.setTrimestre(trimestre);
+                note.setAnneeScolaire(eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null);
                 note.setDateEvaluation(dateEvaluation);
                 note.setSaisieAt(now);
                 if (saisieBy != null) note.setSaisieParId(saisieBy.getId());

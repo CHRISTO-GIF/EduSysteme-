@@ -13,8 +13,9 @@ public class LigneBudget {
     @Column(nullable = false)
     private String designation;
 
-    private String categorie;   // REVENU, DEPENSE
-    private String typeLigne;   // SCOLARITE, INSCRIPTION, SALAIRE, CHARGES, MATERIEL, SUBVENTION, AUTRE
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categorie_comptable_id")
+    private CategorieComptable categorieComptable; // REVENU/DEPENSE derive de categorieComptable.sens (PRODUIT/CHARGE)
     private Double montantPrevu;
     private Double montantReel;
     private Integer mois;       // 1-12, null = annuel
@@ -29,10 +30,9 @@ public class LigneBudget {
     public void setId(Long id) { this.id = id; }
     public String getDesignation() { return designation; }
     public void setDesignation(String designation) { this.designation = designation; }
-    public String getCategorie() { return categorie; }
-    public void setCategorie(String categorie) { this.categorie = categorie; }
-    public String getTypeLigne() { return typeLigne; }
-    public void setTypeLigne(String typeLigne) { this.typeLigne = typeLigne; }
+    public CategorieComptable getCategorieComptable() { return categorieComptable; }
+    public void setCategorieComptable(CategorieComptable categorieComptable) { this.categorieComptable = categorieComptable; }
+    public boolean isRevenu() { return categorieComptable != null && "PRODUIT".equals(categorieComptable.getSens()); }
     public Double getMontantPrevu() { return montantPrevu; }
     public void setMontantPrevu(Double montantPrevu) { this.montantPrevu = montantPrevu; }
     public Double getMontantReel() { return montantReel; }

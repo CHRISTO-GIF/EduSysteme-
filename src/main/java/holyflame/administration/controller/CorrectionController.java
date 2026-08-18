@@ -34,6 +34,7 @@ public class CorrectionController {
     @Autowired private NoteRepository noteRepository;
     @Autowired private EleveRepository eleveRepository;
     @Autowired private EtablissementService etablissementService;
+    @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
 
     // ── Configuration du bareme ──────────────────────────────────────────
@@ -155,6 +156,9 @@ public class CorrectionController {
             noteQuestionRepository.save(nq);
         }
 
+        String anneeScolaireNote = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
+        anneeScolaireService.verifierModifiable(anneeScolaireNote, etablissementService.getCurrentEtablissementId());
+
         Note note = trouverNote(examen, eleve);
         if (note == null) note = new Note();
         note.setEleve(eleve);
@@ -164,6 +168,7 @@ public class CorrectionController {
         note.setType("EXAMEN");
         note.setTitre(examen.getMatiere() != null ? "Examen — " + examen.getMatiere().getNom() : "Examen");
         note.setTrimestre(examen.getTrimestre());
+        note.setAnneeScolaire(anneeScolaireNote);
         note.setDateEvaluation(examen.getDateExamen());
         note.setCommentaire(allParams.get("commentaire"));
         note.setStatut("PUBLIE");

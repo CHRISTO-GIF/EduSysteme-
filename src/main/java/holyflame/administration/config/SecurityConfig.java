@@ -29,12 +29,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
+                .requestMatchers("/", "/index.html", "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
                     "/inscription-parent", "/inscription-parent/**",
                     "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe",
-                    "/h2-console/**", "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**").permitAll()
+                    "/h2-console/**", "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**", "/assets/**").permitAll()
                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/secretariat/**").hasAnyRole("ADMIN", "SECRETAIRE")
+                .requestMatchers("/passage/**").hasAnyRole("ADMIN", "SECRETAIRE", "COORDONNATEUR")
                 .requestMatchers("/tresorerie/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/gestion-academique/**").hasRole("ADMIN")
                 .requestMatchers("/gestion-classes/**").hasRole("ADMIN")
@@ -45,18 +46,19 @@ public class SecurityConfig {
                 .requestMatchers("/personnel/nouveau", "/personnel/nouveau/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 // Le tresorier et le secretariat consultent les fiches personnel (lecture seule),
                 // sans acces a la modification/documents/comptes du personnel
-                .requestMatchers(HttpMethod.GET, "/personnel", "/personnel/*").hasAnyRole("ADMIN", "ENSEIGNANT", "TRESORIER", "SECRETAIRE")
+                .requestMatchers(HttpMethod.GET, "/personnel", "/personnel/*").hasAnyRole("ADMIN", "ENSEIGNANT", "TRESORIER", "SECRETAIRE", "COORDONNATEUR")
                 .requestMatchers("/personnel/**").hasRole("ADMIN")
                 // Le surveillant peut signaler/consulter des absences, mais pas gerer les programmes de cours
                 .requestMatchers("/surveillance/programmes/**").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/surveillance", "/surveillance/absences/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SURVEILLANT")
                 .requestMatchers("/surveillance/**").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/surveillant/**").hasAnyRole("ADMIN", "SURVEILLANT")
+                .requestMatchers("/infirmerie/**").hasAnyRole("ADMIN", "INFIRMIER")
                 .requestMatchers("/notes/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
                 .requestMatchers("/examens/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
                 .requestMatchers("/bulletins/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "PARENT")
                 .requestMatchers("/portail-parent/**").hasAnyRole("ADMIN", "PARENT")
-                .requestMatchers("/messagerie/**").hasAnyRole("ADMIN", "SECRETAIRE", "ENSEIGNANT", "TRESORIER")
+                .requestMatchers("/messagerie/**").hasAnyRole("ADMIN", "SECRETAIRE", "ENSEIGNANT", "TRESORIER", "COORDONNATEUR")
                 .requestMatchers("/export/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/parametres/**").hasRole("ADMIN")
                 .requestMatchers("/tableau-enseignant/**").hasAnyRole("ADMIN", "ENSEIGNANT")
@@ -80,6 +82,7 @@ public class SecurityConfig {
                 .requestMatchers("/finances/paiements/*/recu", "/finances/paiements/*/renvoyer-email")
                     .hasAnyRole("ADMIN", "TRESORIER", "SECRETAIRE")
                 .requestMatchers("/finances/**").hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/coordination/**").hasAnyRole("ADMIN", "COORDONNATEUR")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

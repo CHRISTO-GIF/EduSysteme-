@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Calendrier Scolaire</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#dae2fd", "primary-fixed-dim": "#b6c4ff", "tertiary": [[${accentColor}]],
+                    "on-primary-fixed-variant": "#264191", "surface-container-low": "#f2f4f6", "surface-container": "#eceef0",
+                    "surface-container-highest": "#e0e3e5", "surface-container-lowest": "#ffffff", "surface": "#f7f9fb",
+                    "outline-variant": "#c5c5d3", "primary": "#00236f", "on-background": "#191c1e",
+                    "surface-bright": "#f7f9fb", "error-container": "#ffdad6", "surface-variant": "#e0e3e5",
+                    "background": "#f7f9fb", "primary-fixed": "#dce1ff", "on-surface": "#191c1e",
+                    "on-error-container": "#93000a", "tertiary-container": "#384055", "secondary": "#505f76",
+                    "on-primary": "#ffffff", "error": "#ba1a1a", "on-tertiary-container": "#a4acc5",
+                    "secondary-container": "#d0e1fb", "primary-container": "#1e3a8a", "surface-dim": "#d8dadc",
+                    "on-surface-variant": "#444651", "on-secondary-container": "#54647a", "surface-container-high": "#e6e8ea",
+                    "outline": "#757682", "on-error": "#ffffff", "success": "#15803d", "success-container": "#dcfce7"
+            },
+            "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            "spacing": {"sidebar-width": "260px", "base": "4px", "lg": "24px", "xs": "4px", "xl": "32px", "gutter": "24px", "md": "16px", "container-max": "1440px", "sm": "8px"},
+            "fontFamily": {"headline-sm": ["Inter"], "body-lg": ["Inter"], "code": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"]},
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "code": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; line-height: 1; }
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            aside, header, .no-print { display: none !important; }
+            main { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<div th:replace="~{fragments/sidebar-admin :: admin('parametres')}"></div>
+
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<header class="no-print sticky top-0 z-40 bg-surface border-b border-outline-variant flex justify-between items-center h-16 px-gutter">
+<div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<a class="hover:underline" th:href="@{/parametres}">Parametres</a>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="text-primary font-bold">Calendrier scolaire</span>
+</div>
+<button class="flex items-center gap-xs px-md py-sm rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container-low font-label-md text-label-md" onclick="window.print()" type="button">
+<span class="material-symbols-outlined text-[18px]">print</span> Imprimer
+</button>
+</header>
+
+<div class="flex-1 p-gutter max-w-container-max mx-auto w-full">
+<div class="mb-lg flex flex-wrap items-end justify-between gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Definition du calendrier scolaire</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Trimestres, vacances et jours feries : la base des calculs d'assiduite reels (hors week-ends et hors ces periodes).</p>
+</div>
+<form class="flex items-center gap-xs no-print" method="get" th:action="@{/parametres/calendrier}">
+<label class="font-label-md text-label-md text-on-surface-variant">Annee scolaire</label>
+<select class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="annee" onchange="this.form.submit()">
+<option th:each="a : ${anneesExistantes}" th:selected="${a == anneeActuelle}" th:text="${a}" th:value="${a}"></option>
+<option th:if="${!anneesExistantes.contains(anneeActuelle)}" selected="selected" th:text="${anneeActuelle}" th:value="${anneeActuelle}"></option>
+</select>
+</form>
+</div>
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-success font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-error font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg mb-lg" th:if="${suiviAnnee != null}">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md">Suivi de l'annee scolaire <span th:text="${anneeActuelle}"></span></h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-md mb-lg">
+<div class="rounded-lg bg-surface-container-low p-md">
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Jours calendaires</p>
+<p class="font-headline-md text-headline-md text-on-surface" th:text="${suiviAnnee.joursCalendaires}"></p>
+<p class="text-secondary font-body-md text-body-md" th:text="${#temporals.format(suiviAnnee.dateDebut, 'dd/MM/yyyy')} + ' au ' + ${#temporals.format(suiviAnnee.dateFin, 'dd/MM/yyyy')}"></p>
+</div>
+<div class="rounded-lg bg-blue-50 p-md">
+<p class="font-label-sm text-label-sm text-blue-700 uppercase tracking-wider">Jours ouvrables</p>
+<p class="font-headline-md text-headline-md text-blue-700" th:text="${suiviAnnee.joursOuvrables}"></p>
+<p class="text-blue-700/70 font-body-md text-body-md">Lundi a samedi, hors dimanche</p>
+</div>
+<div class="rounded-lg bg-success-container p-md">
+<p class="font-label-sm text-label-sm text-success uppercase tracking-wider">Jours ouvres (classe)</p>
+<p class="font-headline-md text-headline-md text-success" th:text="${suiviAnnee.joursOuvres}"></p>
+<p class="text-success/70 font-body-md text-body-md">Hors week-ends, vacances et feries</p>
+</div>
+</div>
+<div class="overflow-x-auto" th:if="${!suiviTrimestres.isEmpty()}">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider">Trimestre</th>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider">Periode</th>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Jours calendaires</th>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Jours ouvrables</th>
+<th class="px-md py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Jours ouvres</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="t : ${suiviTrimestres}">
+<td class="px-md py-sm font-medium" th:text="${t.nom}"></td>
+<td class="px-md py-sm text-secondary" th:text="${#temporals.format(t.dateDebut, 'dd/MM/yyyy')} + ' au ' + ${#temporals.format(t.dateFin, 'dd/MM/yyyy')}"></td>
+<td class="px-md py-sm text-right" th:text="${t.joursCalendaires}"></td>
+<td class="px-md py-sm text-right" th:text="${t.joursOuvrables}"></td>
+<td class="px-md py-sm text-right font-bold text-success" th:text="${t.joursOuvres}"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-secondary font-body-md text-body-md" th:if="${suiviTrimestres.isEmpty()}">Declarez les trimestres (Trimestre 1, 2, 3) ci-dessous pour voir le detail par periode.</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg mb-lg">
+
+<div class="lg:col-span-2 bg-white border border-outline-variant rounded-xl shadow-sm p-lg no-print">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md" id="titre-formulaire">Ajouter une periode</h3>
+<form class="grid grid-cols-1 md:grid-cols-4 gap-md items-end" id="form-periode" method="post" th:action="@{/parametres/calendrier/periodes}">
+<input id="champ-id" name="id" type="hidden" value=""/>
+<input name="anneeScolaire" th:value="${anneeActuelle}" type="hidden"/>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Type</label>
+<select class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" id="champ-type" name="type" required="required">
+<option th:each="t : ${typesDisponibles}" th:text="${t.value}" th:value="${t.key}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Libelle</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" id="champ-nom" name="nom" placeholder="Ex: Vacances de la Toussaint" required="required" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Debut</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" id="champ-debut" name="dateDebut" required="required" type="date"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Fin</label>
+<input class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" id="champ-fin" name="dateFin" required="required" type="date"/>
+</div>
+<div class="md:col-span-4 flex gap-md">
+<button class="flex-1 bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-xs" id="bouton-soumettre" type="submit">
+<span class="material-symbols-outlined text-[20px]">add</span> Ajouter au calendrier
+</button>
+<button class="px-lg py-sm rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container-low font-label-md text-label-md hidden" id="bouton-annuler" onclick="annulerEdition()" type="button">Annuler</button>
+</div>
+</form>
+</div>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md">Calendriers existants</h3>
+<div class="space-y-xs">
+<a class="flex items-center justify-between px-md py-sm rounded-lg hover:bg-surface-container-low transition-colors"
+   th:classappend="${a == anneeActuelle} ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant'"
+   th:each="a : ${anneesExistantes}" th:href="@{/parametres/calendrier(annee=${a})}" th:text="${a}"></a>
+<p class="text-secondary font-body-md text-body-md" th:if="${anneesExistantes.isEmpty()}">Aucun calendrier enregistre pour le moment.</p>
+</div>
+</div>
+</div>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-lg">
+<div class="px-lg py-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Elements configures</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Type</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Periode</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Debut</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Fin</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider no-print"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr th:each="p : ${periodes}">
+<td class="px-lg py-md">
+<span class="px-sm py-xs rounded-full font-label-sm text-label-sm" th:switch="${p.type}">
+<span th:case="'TRIMESTRE1'" class="bg-blue-100 text-blue-700 px-sm py-xs rounded-full">Trimestre 1</span>
+<span th:case="'TRIMESTRE2'" class="bg-purple-100 text-purple-700 px-sm py-xs rounded-full">Trimestre 2</span>
+<span th:case="'TRIMESTRE3'" class="bg-indigo-100 text-indigo-700 px-sm py-xs rounded-full">Trimestre 3</span>
+<span th:case="'VACANCES'" class="bg-amber-100 text-amber-700 px-sm py-xs rounded-full">Vacances</span>
+<span th:case="'FERIE'" class="bg-red-100 text-red-700 px-sm py-xs rounded-full">Jour ferie</span>
+<span th:case="*" class="bg-surface-container text-secondary px-sm py-xs rounded-full" th:text="${p.type}"></span>
+</span>
+</td>
+<td class="px-lg py-md font-medium" th:text="${p.nom}"></td>
+<td class="px-lg py-md text-secondary" th:text="${#temporals.format(p.dateDebut, 'dd/MM/yyyy')}"></td>
+<td class="px-lg py-md text-secondary" th:text="${#temporals.format(p.dateFin, 'dd/MM/yyyy')}"></td>
+<td class="px-lg py-md text-right no-print">
+<button class="p-2 text-primary hover:bg-primary-fixed rounded-full transition-colors" type="button"
+        th:attr="onclick=|editerPeriode(${p.id}, '${#strings.escapeJavaScript(p.nom)}', '${p.type}', '${p.dateDebut}', '${p.dateFin}')|">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<form class="inline" method="post" th:action="@{/parametres/calendrier/periodes/{id}/supprimer(id=${p.id})}">
+<input name="annee" th:value="${anneeActuelle}" type="hidden"/>
+<button class="p-2 text-error hover:bg-error-container rounded-full transition-colors" type="submit">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</form>
+</td>
+</tr>
+<tr th:if="${periodes.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="5">Aucune periode declaree pour cette annee scolaire.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm p-lg">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Apercu mensuel</h3>
+<div class="flex flex-wrap items-center gap-md text-label-sm font-label-sm">
+<span class="flex items-center gap-xs"><span class="w-3 h-3 rounded bg-blue-200 inline-block"></span> Trimestre 1</span>
+<span class="flex items-center gap-xs"><span class="w-3 h-3 rounded bg-purple-200 inline-block"></span> Trimestre 2</span>
+<span class="flex items-center gap-xs"><span class="w-3 h-3 rounded bg-indigo-200 inline-block"></span> Trimestre 3</span>
+<span class="flex items-center gap-xs"><span class="w-3 h-3 rounded bg-amber-200 inline-block"></span> Vacances</span>
+<span class="flex items-center gap-xs"><span class="w-3 h-3 rounded bg-red-200 inline-block"></span> Ferie</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
+<div class="border border-outline-variant rounded-lg p-md" th:each="m : ${apercuMensuel}">
+<p class="font-label-md text-label-md text-on-surface mb-xs" th:text="${m.nom} + ' ' + ${m.annee}"></p>
+<div class="grid grid-cols-7 gap-[2px] text-center">
+<span class="text-[10px] text-secondary" th:each="j : ${ {'L','M','M','J','V','S','D'} }" th:text="${j}"></span>
+<span class="text-[10px] rounded aspect-square flex items-center justify-center"
+      th:classappend="${jour == null ? '' : (jour.type == 'TRIMESTRE1' ? 'bg-blue-200' : (jour.type == 'TRIMESTRE2' ? 'bg-purple-200' : (jour.type == 'TRIMESTRE3' ? 'bg-indigo-200' : (jour.type == 'VACANCES' ? 'bg-amber-200' : (jour.type == 'FERIE' ? 'bg-red-200' : '')))))}"
+      th:each="jour : ${m.jours}" th:text="${jour != null ? jour.numero : ''}"></span>
+</div>
+<p class="text-[11px] text-secondary mt-xs" th:text="${m.joursOuvres} + ' ouvres / ' + ${m.joursOuvrables} + ' ouvrables'"></p>
+</div>
+</div>
+</div>
+
+</div>
+</main>
+<script th:inline="javascript">
+    function editerPeriode(id, nom, type, debut, fin) {
+        document.getElementById('champ-id').value = id;
+        document.getElementById('champ-nom').value = nom;
+        document.getElementById('champ-type').value = type;
+        document.getElementById('champ-debut').value = debut;
+        document.getElementById('champ-fin').value = fin;
+        document.getElementById('titre-formulaire').textContent = 'Modifier la periode';
+        document.getElementById('bouton-soumettre').innerHTML = '<span class="material-symbols-outlined text-[20px]">save</span> Enregistrer les modifications';
+        document.getElementById('bouton-annuler').classList.remove('hidden');
+        document.getElementById('form-periode').scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+    function annulerEdition() {
+        document.getElementById('form-periode').reset();
+        document.getElementById('champ-id').value = '';
+        document.getElementById('titre-formulaire').textContent = 'Ajouter une periode';
+        document.getElementById('bouton-soumettre').innerHTML = '<span class="material-symbols-outlined text-[20px]">add</span> Ajouter au calendrier';
+        document.getElementById('bouton-annuler').classList.add('hidden');
+    }
+</script>
+</body>
+</html>

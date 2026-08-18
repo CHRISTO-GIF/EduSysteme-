@@ -376,6 +376,7 @@ public class InscriptionEleveController {
             paiement.setTypePaiement("INSCRIPTION");
             paiement.setModePaiement(donnees.paiementMode != null && !donnees.paiementMode.isBlank() ? donnees.paiementMode : "ESPECES");
             paiement.setDatePaiement(LocalDateTime.now());
+            paiement.setAnneeScolaire(holyflame.administration.util.AnneeScolaireUtil.pour(LocalDate.now()));
             paiement.setRecuNumero("HF-" + System.currentTimeMillis());
             fraisScolariteRepository.findByEtablissementIdOrderByTypeFraisAscDesignationAsc(etabId).stream()
                 .filter(f -> "INSCRIPTION".equals(f.getTypeFrais()))

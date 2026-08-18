@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Infirmerie - EduSystem Pro</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+<script id="tailwind-config" th:inline="javascript">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#f2f4f6", "surface-container-high": "#e6e8ea",
+            "on-primary": "#ffffff", "error": "#ba1a1a", "error-container": "#ffdad6",
+            "surface-container-lowest": "#ffffff", "primary": "#00236f", "background": "#f7f9fb",
+            "surface-dim": "#d8dadc", "surface-bright": "#f7f9fb", "primary-fixed": "#dce1ff",
+            "secondary-container": "#d0e1fb", "on-error": "#ffffff", "tertiary": [[${accentColor}]],
+            "outline": "#757682", "on-primary-container": "#90a8ff", "on-secondary": "#ffffff",
+            "surface-variant": "#e0e3e5", "surface-container": "#eceef0",
+            "on-error-container": "#93000a", "outline-variant": "#c5c5d3",
+            "surface": "#f7f9fb", "secondary": "#505f76", "on-background": "#191c1e",
+            "on-surface": "#191c1e", "on-surface-variant": "#444651",
+            "success-container": "#c4f7d0", "on-success-container": "#0a3818",
+            "tertiary-fixed-dim": "#bec6e0"
+          },
+          borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+          spacing: { gutter: "24px", xs: "4px", lg: "24px", xl: "32px", sm: "8px", "sidebar-width": "260px", md: "16px", "container-max": "1440px" },
+          fontFamily: { "label-md": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "headline-md": ["Inter"] },
+          fontSize: {
+            "label-md": ["14px", {lineHeight: "20px", fontWeight: "600"}],
+            "headline-sm": ["18px", {lineHeight: "28px", fontWeight: "600"}],
+            "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700"}],
+            "headline-md": ["22px", {lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "700"}],
+            "body-md": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+            "label-sm": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500"}]
+          }
+        }
+      }
+    }
+</script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+
+<aside class="hidden md:flex w-sidebar-width h-screen sticky left-0 top-0 bg-tertiary border-r border-outline-variant flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">medical_services</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduSystem Pro</h1>
+<p class="text-[10px] text-tertiary-fixed-dim uppercase tracking-widest">Module Infirmerie</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs px-sm overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary border-l-4 border-primary-fixed bg-tertiary/50" th:href="@{/infirmerie}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/infirmerie/consultations}">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Consultations</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/infirmerie/pai}">
+<span class="material-symbols-outlined">assignment_ind</span>
+<span class="font-label-md text-label-md">PAI &amp; Allergies</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary hover:bg-tertiary/50 transition-colors" th:href="@{/infirmerie/stock}">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Stock</span>
+</a>
+</nav>
+<div class="mt-auto px-sm pt-lg border-t border-outline/20">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" th:href="@{/dashboard}" th:if="${utilisateurConnecte != null and utilisateurConnecte.role == 'ADMIN'}">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label-md text-label-md">Retour à l'administration</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-tertiary-fixed-dim hover:text-on-primary transition-colors" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Déconnexion</span>
+</a>
+<form id="logout-form" method="post" th:action="@{/logout}" style="display:none"></form>
+</div>
+</aside>
+
+<div class="flex-1 flex flex-col min-w-0">
+<header class="w-full h-16 sticky top-0 z-40 bg-surface border-b border-surface-variant flex justify-between items-center px-lg py-md gap-md">
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary shrink-0">Tableau de Bord - Infirmerie</h2>
+<div class="relative flex-1 max-w-md hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input id="recherche-entete" autocomplete="off" class="w-full pl-10 pr-md py-2 rounded-full border border-outline-variant bg-surface-container-low text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Rechercher un élève, un PAI..." type="text"/>
+<div class="absolute mt-1 w-full bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden hidden z-50" id="recherche-entete-resultats"></div>
+</div>
+<div class="flex items-center gap-md shrink-0">
+<span class="material-symbols-outlined text-outline">help_outline</span>
+<span class="relative">
+<span class="material-symbols-outlined text-outline">notifications</span>
+<span th:if="${!alertesActives.isEmpty()}" class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</span>
+<span class="material-symbols-outlined text-outline">account_circle</span>
+</div>
+</header>
+
+<main class="flex-1 overflow-y-auto p-lg max-w-container-max mx-auto w-full">
+
+<div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreurMsg}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreurMsg}"></div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm">
+<span class="p-2 bg-secondary-container rounded-lg text-primary w-fit"><span class="material-symbols-outlined">groups</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase">Visites aujourd'hui</p>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-xs" th:text="${visitesAujourdhui}">0</h2>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm">
+<span class="p-2 bg-primary-fixed rounded-lg text-primary w-fit"><span class="material-symbols-outlined">bed</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase">En observation</p>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-xs" th:text="${#lists.size(enObservation) + ' élève' + (#lists.size(enObservation) > 1 ? 's' : '')}">0 élèves</h2>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col gap-sm" th:classappend="${!alertesActives.isEmpty()} ? 'ring-2 ring-error' : ''">
+<span class="p-2 bg-error-container rounded-lg text-error w-fit"><span class="material-symbols-outlined">warning</span></span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase">Alertes actives</p>
+<h2 class="font-headline-lg text-headline-lg text-error mt-xs" th:text="${#lists.size(alertesActives)}">0</h2>
+</div>
+</div>
+</div>
+
+<div th:each="alerte : ${alertesActives}" class="mb-lg p-lg rounded-xl bg-error-container border border-error flex items-start gap-md relative">
+<span class="material-symbols-outlined text-error">emergency</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-error" th:text="${alerte.motif != null ? (motifs.get(alerte.motif) ?: alerte.motif) : 'Urgence'} + ' — ' + ${alerte.eleve.classe != null ? alerte.eleve.classe.nom : ''}"></p>
+<p class="text-body-md text-on-error-container mt-xs" th:text="${alerte.eleve.prenom} + ' ' + ${alerte.eleve.nom} + ' a été pris en charge. Contacté à ' + ${#temporals.format(alerte.dateHeure, 'HH:mm')} + '.'"></p>
+<p class="text-body-md text-on-error-container" th:if="${alerte.observations != null and !alerte.observations.isEmpty()}" th:text="${alerte.observations}"></p>
+</div>
+<form method="post" th:action="@{/infirmerie/consultations/{id}/cloturer(id=${alerte.id})}">
+<button class="text-error hover:bg-error/10 rounded-full p-1" title="Marquer comme résolu" type="submit">
+<span class="material-symbols-outlined">close</span>
+</button>
+</form>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-lg">
+
+<section class="lg:col-span-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg h-fit">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary">note_add</span>
+Nouvelle Consultation
+</h3>
+<form class="flex flex-col gap-md" method="post" th:action="@{/infirmerie/consultations}">
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-md text-label-md text-on-surface-variant">Élève</label>
+<input id="consultation-eleve-recherche" autocomplete="off" class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" placeholder="Nom ou Prénom..." required="required" type="text"/>
+<input id="consultation-eleve-id" name="eleveId" required="required" type="hidden"/>
+<div class="absolute top-full mt-1 w-full bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden hidden z-50" id="consultation-eleve-resultats"></div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Motif principal</label>
+<select class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="motif" required="required">
+<option disabled="disabled" selected="selected" value="">Sélectionner un motif...</option>
+<option th:each="m : ${motifs}" th:text="${m.value}" th:value="${m.key}"></option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Soins prodigués / Observations</label>
+<textarea class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="observations" placeholder="Détails de l'intervention..." rows="3"></textarea>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Orientation</label>
+<select class="rounded-lg border-outline-variant px-md py-sm font-body-md text-body-md" name="orientation">
+<option th:each="o : ${orientations}" th:text="${o.value}" th:value="${o.key}"></option>
+</select>
+</div>
+<label class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<input name="parentsInformes" type="checkbox" value="true"/> Parents informés
+</label>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-xs" type="submit">
+<span class="material-symbols-outlined text-[20px]">save</span> Enregistrer
+</button>
+</form>
+</section>
+
+<section class="lg:col-span-2 flex flex-col gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">history</span>
+Consultations Récentes
+</h3>
+<a class="text-primary font-label-md text-label-md hover:underline" th:href="@{/infirmerie/consultations}">Voir tout</a>
+</div>
+<div class="divide-y divide-outline-variant">
+<div class="px-lg py-md flex items-start gap-md" th:each="c : ${consultationsRecentes}">
+<p class="text-body-md text-on-surface-variant w-12 shrink-0 pt-xs" th:text="${#temporals.format(c.dateHeure, 'HH:mm')}"></p>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-xs flex-wrap">
+<p class="font-label-md text-label-md" th:text="${c.eleve.prenom} + ' ' + ${c.eleve.nom}"></p>
+<span class="text-label-sm text-outline" th:text="${c.eleve.classe != null ? c.eleve.classe.nom : ''}"></span>
+<span th:each="cond : ${conditionsParEleve.get(c.eleve.id)}" class="px-2 py-0.5 bg-secondary-container text-on-surface-variant rounded text-[10px] font-bold uppercase" th:text="'PAI ' + ${cond.libelle}"></span>
+</div>
+<p class="text-body-md text-on-surface-variant" th:text="${(motifs.get(c.motif) ?: c.motif) + (c.observations != null and !c.observations.isEmpty() ? ' - ' + c.observations : '')}"></p>
+</div>
+<span class="shrink-0 px-2 py-1 rounded-full text-[10px] font-bold uppercase text-center"
+      th:classappend="${c.orientation == 'RETOUR_CLASSE' ? 'bg-green-100 text-green-800' : (c.orientation == 'HOPITAL_SAMU' ? 'bg-error text-on-error' : (c.orientation == 'RENVOYE_DOMICILE' ? 'bg-secondary-container text-on-surface-variant' : 'bg-primary-fixed text-primary'))}"
+      th:text="${orientations.get(c.orientation) ?: c.orientation}"></span>
+</div>
+<p th:if="${#lists.isEmpty(consultationsRecentes)}" class="px-lg py-lg text-center text-outline">Aucune consultation enregistrée.</p>
+</div>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-primary">bar_chart</span>
+Fréquence des Visites (7 derniers jours)
+</h3>
+<div class="flex items-end justify-between gap-sm h-32">
+<div class="flex-1 flex flex-col items-center gap-xs h-full justify-end" th:each="pt : ${frequence}">
+<span class="text-label-sm text-on-surface-variant" th:text="${pt.total}"></span>
+<div class="w-full bg-primary-fixed rounded-t-md" th:style="'height: ' + ${pt.total * 100 / maxFrequence} + '%; min-height: 4px;'"></div>
+<span class="text-label-sm text-outline" th:text="${pt.jour}"></span>
+</div>
+</div>
+</div>
+</section>
+
+<section class="lg:col-span-1 flex flex-col gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+État des Stocks
+</h3>
+<div class="flex flex-col gap-md">
+<div th:each="s : ${stocks}">
+<div class="flex justify-between items-center mb-1">
+<p class="text-body-md font-label-md" th:text="${s.designation}"></p>
+<p class="text-label-sm" th:classappend="${s.pourcentage <= 20 ? 'text-error font-bold' : 'text-on-surface-variant'}" th:text="${s.pourcentage} + '%'"></p>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden flex items-center gap-xs">
+<div class="h-full rounded-full" th:classappend="${s.pourcentage <= 20 ? 'bg-error' : (s.pourcentage <= 50 ? 'bg-amber-500' : 'bg-green-500')}" th:style="'width: ' + ${s.pourcentage} + '%;'"></div>
+<span th:if="${s.pourcentage <= 20}" class="material-symbols-outlined text-error text-[16px]">warning</span>
+</div>
+</div>
+<p th:if="${#lists.isEmpty(stocks)}" class="text-center text-outline py-md">Aucun article suivi.</p>
+</div>
+<a th:href="@{/infirmerie/stock}" class="mt-lg w-full bg-primary text-on-primary py-sm rounded-lg flex items-center justify-center gap-xs font-label-md text-label-md hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span> Commander des fournitures
+</a>
+</div>
+
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">assignment_ind</span>
+PAI &amp; Allergies (Actifs)
+</h3>
+<a class="text-primary font-label-md text-label-sm hover:underline" th:href="@{/infirmerie/pai}">Gérer</a>
+</div>
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center py-1" th:each="entry : ${paiCounts}">
+<span class="flex items-center gap-xs text-body-md">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span th:text="${entry.key}"></span>
+</span>
+<span class="font-label-md text-label-md text-primary" th:text="${entry.value}"></span>
+</div>
+<p th:if="${paiCounts.isEmpty()}" class="text-center text-outline py-md">Aucune fiche active.</p>
+</div>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+
+<script th:inline="javascript">
+    function initAutocomplete(inputId, resultsId, onSelect) {
+        var input = document.getElementById(inputId);
+        var results = document.getElementById(resultsId);
+        var timer = null;
+        input.addEventListener('input', function() {
+            clearTimeout(timer);
+            var q = input.value.trim();
+            if (q.length < 2) { results.classList.add('hidden'); results.innerHTML = ''; return; }
+            timer = setTimeout(function() {
+                fetch('/infirmerie/eleves/recherche?q=' + encodeURIComponent(q))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        results.innerHTML = '';
+                        if (data.length === 0) { results.classList.add('hidden'); return; }
+                        data.forEach(function(e) {
+                            var div = document.createElement('div');
+                            div.className = 'px-md py-sm hover:bg-surface-container-low cursor-pointer text-body-md';
+                            div.textContent = e.nom + (e.classe ? ' — ' + e.classe : '');
+                            div.addEventListener('click', function() {
+                                onSelect(e);
+                                results.classList.add('hidden');
+                            });
+                            results.appendChild(div);
+                        });
+                        results.classList.remove('hidden');
+                    });
+            }, 200);
+        });
+        document.addEventListener('click', function(ev) {
+            if (!input.contains(ev.target) && !results.contains(ev.target)) results.classList.add('hidden');
+        });
+    }
+
+    initAutocomplete('consultation-eleve-recherche', 'consultation-eleve-resultats', function(e) {
+        document.getElementById('consultation-eleve-recherche').value = e.nom;
+        document.getElementById('consultation-eleve-id').value = e.id;
+    });
+    initAutocomplete('recherche-entete', 'recherche-entete-resultats', function(e) {
+        document.getElementById('consultation-eleve-recherche').value = e.nom;
+        document.getElementById('consultation-eleve-id').value = e.id;
+        document.getElementById('recherche-entete').value = '';
+        document.getElementById('consultation-eleve-recherche').scrollIntoView({behavior: 'smooth', block: 'center'});
+    });
+</script>
+</body>
+</html>

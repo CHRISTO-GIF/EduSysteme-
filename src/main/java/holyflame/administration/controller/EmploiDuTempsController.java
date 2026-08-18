@@ -61,9 +61,7 @@ public class EmploiDuTempsController {
         holyflame.administration.model.Etablissement etabEdt = etablissementService.getCurrentEtablissement();
         String nomEtab = etabEdt != null && etabEdt.getNom() != null && !etabEdt.getNom().isBlank()
             ? etabEdt.getNom() : "HolyFlame";
-        String annee = parametreRepository
-            .findByCleAndEtablissementId("ANNEE_SCOLAIRE", etabId)
-            .map(p -> p.getValeur()).orElse("2025-2026");
+        String annee = etablissementService.getAnneeScolaireActive();
 
         List<holyflame.administration.model.Classe> classes = classeRepository.findAll().stream()
             .filter(c -> etabId == null || etabId.equals(c.getEtablissementId())).toList();

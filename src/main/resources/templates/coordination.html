@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="light" lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSystem Pro - Coordination pedagogique</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+<script id="tailwind-config" th:inline="javascript">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#90a8ff", "secondary": "#505f76", "on-tertiary-fixed": "#131b2e",
+                        "primary-fixed-dim": "#b6c4ff", "on-error-container": "#93000a", "surface-container-highest": "#e0e3e5",
+                        "secondary-fixed": "#d3e4fe", "primary-container": "#1e3a8a", "on-surface-variant": "#444651",
+                        "surface-dim": "#d8dadc", "secondary-container": "#d0e1fb", "primary": "#00236f",
+                        "on-background": "#191c1e", "outline-variant": "#c5c5d3", "error-container": "#ffdad6",
+                        "primary-fixed": "#dce1ff", "on-primary": "#ffffff", "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea", "surface-container": "#eceef0", "surface": "#f7f9fb",
+                        "outline": "#757682", "on-surface": "#191c1e", "on-secondary": "#ffffff",
+                        "surface-container-low": "#f2f4f6", "on-secondary-container": "#54647a", "surface-bright": "#f7f9fb",
+                        "tertiary-container": "#384055", "tertiary": [[${accentColor}]], "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary-fixed": "#dae2fd", "on-tertiary-fixed-variant": "#3f465c", "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff", "on-tertiary-container": "#a4acc5", "tertiary-fixed-dim": "#bec6e0",
+                        "background": "#f7f9fb", "on-primary-fixed-variant": "#264191", "error": "#ba1a1a",
+                        "success-container": "#c8f7d4", "on-success-container": "#0a5c2b"
+                    },
+                    "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                    "spacing": {"xl": "32px", "base": "4px", "md": "16px", "sm": "8px", "xs": "4px", "lg": "24px", "container-max": "1440px", "sidebar-width": "260px", "gutter": "24px"},
+                    "fontFamily": {"code": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "headline-sm": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"]}
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .coord-tab-btn.active-tab { border-color: #00236f; color: #00236f; }
+        .coord-tab-panel.hidden { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<div class="flex h-screen overflow-hidden">
+<div th:replace="~{fragments/sidebar-coordination :: admin('coordination')}"></div>
+<main class="ml-0 md:ml-[260px] flex-1 flex flex-col h-screen bg-surface">
+<header class="h-16 flex items-center justify-between px-md md:px-lg bg-surface border-b border-outline-variant sticky top-0 z-40">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">Coordination pedagogique</span>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold border-2 border-primary-fixed-dim" th:text="${utilisateurConnecte != null ? (#strings.isEmpty(utilisateurConnecte.prenom) ? '' : #strings.substring(utilisateurConnecte.prenom,0,1)) + (#strings.isEmpty(utilisateurConnecte.nom) ? '' : #strings.substring(utilisateurConnecte.nom,0,1)) : 'U'}">U</div>
+</header>
+<div class="flex-1 overflow-y-auto p-md md:p-lg space-y-lg max-w-container-max mx-auto w-full">
+
+<div th:if="${successMsg}" class="p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>
+<div th:if="${erreur}" class="p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
+
+<div class="flex justify-between items-end flex-wrap gap-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Coordination pedagogique</h2>
+<p class="text-body-md text-secondary">Visites de classe, evolution des enseignants et qualite pedagogique.</p>
+</div>
+<a class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md hover:opacity-90 transition-all flex items-center gap-xs shadow-sm" th:href="@{/coordination/nouvelle}">
+<span class="material-symbols-outlined text-[18px]">add</span>
+Nouvelle fiche
+</a>
+</div>
+
+<!-- Barre d'onglets -->
+<div class="flex gap-lg border-b border-outline-variant overflow-x-auto">
+<button class="coord-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="evolution" onclick="coordSwitchTab('evolution')" type="button">Evolution des enseignants</button>
+<button class="coord-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="notes" onclick="coordSwitchTab('notes')" type="button">Qualite des notes</button>
+<button class="coord-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="avis" onclick="coordSwitchTab('avis')" type="button">Avis des parents</button>
+<button class="coord-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors" data-tab="fiches" onclick="coordSwitchTab('fiches')" type="button">Fiches de controle</button>
+</div>
+
+<!-- ================= ONGLET EVOLUTION DES ENSEIGNANTS ================= -->
+<div class="coord-tab-panel space-y-lg" data-panel="evolution" id="panel-evolution">
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="p-md bg-surface-container-low border-b border-outline-variant font-headline-sm text-on-surface">Evolution des enseignants (visites de classe)</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Enseignant</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Visites</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Derniere note</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Tendance</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr th:each="e : ${evolutionEnseignants}">
+<td class="px-lg py-sm font-medium" th:text="${e.enseignant.nom} + ' ' + ${e.enseignant.prenom}"></td>
+<td class="px-lg py-sm text-right" th:text="${e.nbVisites}"></td>
+<td class="px-lg py-sm">
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-red-50 text-red-700" th:if="${e.derniereNote == 'INSUFFISANT'}">Insuffisant</span>
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-amber-50 text-amber-700" th:if="${e.derniereNote == 'MOYEN'}">Moyen</span>
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-blue-50 text-blue-700" th:if="${e.derniereNote == 'BIEN'}">Bien</span>
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-green-50 text-green-700" th:if="${e.derniereNote == 'TRES_BIEN'}">Tres bien</span>
+</td>
+<td class="px-lg py-sm">
+<span class="flex items-center gap-xs text-green-700 text-label-sm font-bold" th:if="${e.tendance == 'HAUSSE'}"><span class="material-symbols-outlined text-[16px]">trending_up</span> En hausse</span>
+<span class="flex items-center gap-xs text-red-700 text-label-sm font-bold" th:if="${e.tendance == 'BAISSE'}"><span class="material-symbols-outlined text-[16px]">trending_down</span> En baisse</span>
+<span class="flex items-center gap-xs text-secondary text-label-sm" th:if="${e.tendance == 'STABLE'}"><span class="material-symbols-outlined text-[16px]">trending_flat</span> Stable</span>
+<span class="text-secondary text-label-sm" th:if="${e.tendance == 'N_A'}">Premiere visite</span>
+</td>
+</tr>
+<tr th:if="${evolutionEnseignants.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="4">Aucune visite avec note globale renseignee pour le moment.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ================= ONGLET QUALITE DES NOTES ================= -->
+<div class="coord-tab-panel hidden space-y-lg" data-panel="notes" id="panel-notes">
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="p-md bg-surface-container-low border-b border-outline-variant font-headline-sm text-on-surface">Qualite des notes par classe</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Classe</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Moyenne T1</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Moyenne T2</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Moyenne T3</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Tendance</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr th:each="q : ${qualiteNotes}">
+<td class="px-lg py-sm font-medium" th:text="${q.classe}"></td>
+<td class="px-lg py-sm text-right" th:text="${q.t1 != null ? q.t1 + '/20' : '—'}"></td>
+<td class="px-lg py-sm text-right" th:text="${q.t2 != null ? q.t2 + '/20' : '—'}"></td>
+<td class="px-lg py-sm text-right" th:text="${q.t3 != null ? q.t3 + '/20' : '—'}"></td>
+<td class="px-lg py-sm">
+<span class="flex items-center gap-xs text-green-700 text-label-sm font-bold" th:if="${q.tendance == 'HAUSSE'}"><span class="material-symbols-outlined text-[16px]">trending_up</span> En hausse</span>
+<span class="flex items-center gap-xs text-red-700 text-label-sm font-bold" th:if="${q.tendance == 'BAISSE'}"><span class="material-symbols-outlined text-[16px]">trending_down</span> En baisse</span>
+<span class="flex items-center gap-xs text-secondary text-label-sm" th:if="${q.tendance == 'STABLE'}"><span class="material-symbols-outlined text-[16px]">trending_flat</span> Stable</span>
+</td>
+</tr>
+<tr th:if="${qualiteNotes.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="5">Aucune note saisie pour le moment.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ================= ONGLET AVIS DES PARENTS ================= -->
+<div class="coord-tab-panel hidden space-y-lg" data-panel="avis" id="panel-avis">
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="p-md bg-surface-container-low border-b border-outline-variant font-headline-sm text-on-surface">Avis des parents — points qui se repetent</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Categorie</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Classe</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider text-right">Occurrences</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Dernier signalement</th>
+<th class="px-lg py-sm font-label-sm text-secondary uppercase tracking-wider">Detail</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr th:each="a : ${avisRecurrents}">
+<td class="px-lg py-sm font-medium" th:text="${a.categorie}"></td>
+<td class="px-lg py-sm" th:text="${a.classe}"></td>
+<td class="px-lg py-sm text-right">
+<span class="px-sm py-xs rounded-full text-label-sm font-bold bg-red-50 text-red-700" th:text="${a.nombre} + '×'"></span>
+</td>
+<td class="px-lg py-sm text-secondary" th:text="${#temporals.format(a.dernierSignalement, 'dd MMM yyyy')}"></td>
+<td class="px-lg py-sm text-secondary text-label-sm">
+<p th:each="s : ${a.avis}" th:text="'— ' + ${s.description}"></p>
+</td>
+</tr>
+<tr th:if="${avisRecurrents.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="5">Aucun point signale plusieurs fois pour le moment.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ================= ONGLET FICHES DE CONTROLE ================= -->
+<div class="coord-tab-panel hidden space-y-lg" data-panel="fiches" id="panel-fiches">
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Fiches enregistrees</p>
+<h3 class="text-headline-md font-bold text-on-surface" th:text="${nbFiches}">0</h3>
+</div>
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm">
+<p class="text-label-sm text-secondary uppercase tracking-wider">Enseignants visites</p>
+<h3 class="text-headline-md font-bold text-on-surface" th:text="${nbEnseignantsVisites}">0</h3>
+</div>
+</div>
+
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Date</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Classe</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Enseignant</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider">Cours</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider text-right">Effectifs</th>
+<th class="px-lg py-md font-label-sm text-secondary uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container/50 transition-colors cursor-pointer" th:each="f : ${fiches}" th:onclick="'window.location=\'' + @{/coordination/{id}(id=${f.id})} + '\''">
+<td class="px-lg py-md text-body-md" th:text="${#temporals.format(f.dateVisite, 'dd MMM yyyy')}"></td>
+<td class="px-lg py-md" th:text="${f.classe != null ? f.classe.nom : '—'}"></td>
+<td class="px-lg py-md font-medium" th:text="${f.enseignant != null ? f.enseignant.nom + ' ' + f.enseignant.prenom : '—'}"></td>
+<td class="px-lg py-md text-secondary" th:text="${f.cours}"></td>
+<td class="px-lg py-md text-right" th:text="${f.effectifs}"></td>
+<td class="px-lg py-md text-right">
+<a class="text-primary hover:underline text-label-sm" th:href="@{/coordination/{id}(id=${f.id})}" th:onclick="'event.stopPropagation()'">Consulter</a>
+</td>
+</tr>
+<tr th:if="${fiches.isEmpty()}">
+<td class="px-lg py-8 text-center text-secondary" colspan="6">Aucune fiche de controle enregistree.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+</div>
+</main>
+</div>
+
+<script>
+    const COORD_TABS = ['evolution', 'notes', 'avis', 'fiches'];
+
+    function coordSwitchTab(tab) {
+        COORD_TABS.forEach(function (t) {
+            const btn = document.querySelector('.coord-tab-btn[data-tab="' + t + '"]');
+            const panel = document.getElementById('panel-' + t);
+            if (t === tab) {
+                btn.classList.add('active-tab');
+                panel.classList.remove('hidden');
+            } else {
+                btn.classList.remove('active-tab');
+                panel.classList.add('hidden');
+            }
+        });
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tab);
+        window.history.replaceState({}, '', url);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const params = new URLSearchParams(window.location.search);
+        const initialTab = params.get('tab');
+        coordSwitchTab(COORD_TABS.includes(initialTab) ? initialTab : 'evolution');
+    });
+</script>
+</body>
+</html>

@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Parametres | EduSystem Pro</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
 <style>
     body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
@@ -86,9 +86,17 @@
 <main class="ml-0 md:ml-sidebar-width pt-16 min-h-screen">
 <div class="max-w-container-max mx-auto p-md md:p-lg">
 
-<div class="mb-lg">
+<div class="mb-lg flex flex-wrap justify-between items-end gap-md">
+<div>
 <h2 class="font-headline-lg text-headline-lg text-primary mb-1">Configuration Globale</h2>
 <p class="text-body-md text-on-surface-variant">Gerez les preferences de votre etablissement et les acces administratifs.</p>
+</div>
+<a class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" th:href="@{/parametres/annees}">
+<span class="material-symbols-outlined text-[18px]">history_edu</span> Annees scolaires
+</a>
+<a class="flex items-center gap-xs px-lg py-sm rounded-lg border border-outline-variant text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" th:href="@{/parametres/calendrier}">
+<span class="material-symbols-outlined text-[18px]">event</span> Calendrier scolaire
+</a>
 </div>
 
 <div th:if="${successMsg}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${successMsg}"></div>

@@ -57,16 +57,13 @@ public class DashboardController {
         model.addAttribute("totalEncaisse", totalEncaisse);
 
         // Budget — filtré par établissement
-        String anneeScolaire = etabId != null
-            ? parametreRepository.findByCleAndEtablissementId("ANNEE_SCOLAIRE", etabId)
-                .map(p -> p.getValeur()).orElse("2025-2026")
-            : "2025-2026";
+        String anneeScolaire = etablissementService.getAnneeScolaireActive();
         var lignesBudget = etabId != null
-            ? budgetRepository.findByEtablissementIdAndAnneeScolaireOrderByCategorieAscDesignationAsc(etabId, anneeScolaire)
-            : budgetRepository.findByAnneeScolaireOrderByCategorieAscDesignationAsc(anneeScolaire);
-        double budgetRevenu = lignesBudget.stream().filter(l -> "REVENU".equals(l.getCategorie()))
+            ? budgetRepository.findByEtablissementIdAndAnneeScolaireOrderByDesignationAsc(etabId, anneeScolaire)
+            : budgetRepository.findByAnneeScolaireOrderByDesignationAsc(anneeScolaire);
+        double budgetRevenu = lignesBudget.stream().filter(holyflame.administration.model.LigneBudget::isRevenu)
             .mapToDouble(l -> l.getMontantPrevu() != null ? l.getMontantPrevu() : 0).sum();
-        double budgetDepense = lignesBudget.stream().filter(l -> "DEPENSE".equals(l.getCategorie()))
+        double budgetDepense = lignesBudget.stream().filter(l -> !l.isRevenu())
             .mapToDouble(l -> l.getMontantPrevu() != null ? l.getMontantPrevu() : 0).sum();
         model.addAttribute("budgetRevenu",  budgetRevenu);
         model.addAttribute("budgetDepense", budgetDepense);

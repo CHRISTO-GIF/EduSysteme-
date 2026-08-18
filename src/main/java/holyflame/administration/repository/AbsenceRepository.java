@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AbsenceRepository extends JpaRepository<Absence, Long> {
@@ -13,6 +14,11 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     List<Absence> findByEtablissementId(@Param("etabId") Long etabId);
 
     List<Absence> findByEleveIdOrderByDateDesc(Long eleveId);
+
+    @Query("SELECT a FROM Absence a WHERE a.eleve.id = :eleveId AND a.date BETWEEN :debut AND :fin")
+    List<Absence> findByEleveIdAndDateBetween(@Param("eleveId") Long eleveId,
+                                               @Param("debut") LocalDate debut,
+                                               @Param("fin") LocalDate fin);
 
     @Query("SELECT COUNT(a) FROM Absence a WHERE a.eleve.etablissementId = :etabId")
     long countByEtablissementId(@Param("etabId") Long etabId);
