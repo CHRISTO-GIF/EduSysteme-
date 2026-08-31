@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Structure academique - EduSystem Pro</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script src="/js/tailwind.js"></script>
+</head>
+<body class="bg-background text-on-background antialiased">
+<!-- Menu lateral -->
+<div th:replace="~{fragments/sidebar-admin :: admin('academique-universite')}"></div>
+<div th:replace="~{fragments/mobile-nav-admin :: nav('academique-universite')}"></div>
+
+<header class="h-16 fixed top-0 right-0 left-0 md:left-sidebar-width bg-surface-container-lowest border-b border-outline-variant flex items-center px-md md:px-lg w-full z-40">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">Structure academique</span>
+</header>
+
+<main class="ml-0 md:ml-sidebar-width pt-16 min-h-screen">
+<div class="max-w-container-max mx-auto p-md md:p-lg">
+
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Facultes, departements, filieres et UE</h2>
+<p class="text-body-md text-on-surface-variant">Le departement est facultatif : une filiere peut se rattacher directement a une faculte pour les etablissements qui n'ont pas ce niveau.</p>
+</div>
+
+<div th:if="${success}" class="mb-lg p-md rounded-lg bg-success-container text-on-success-container font-body-md text-body-md" th:text="${success}"></div>
+<div th:if="${erreur}" class="mb-lg p-md rounded-lg bg-error-container text-on-error-container font-body-md text-body-md" th:text="${erreur}"></div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+
+<!-- Facultes -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-lg">
+<h4 class="font-headline-sm text-headline-sm mb-md">Facultes</h4>
+<form class="flex flex-wrap gap-sm mb-md" method="post" th:action="@{/academique-universite/facultes}">
+<input class="flex-1 min-w-[140px] p-sm border border-outline-variant rounded-lg text-body-sm" name="nom" placeholder="Nom (ex. Sciences)" required="required" type="text"/>
+<input class="w-24 p-sm border border-outline-variant rounded-lg text-body-sm" name="code" placeholder="Code" required="required" type="text"/>
+<button class="px-md py-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md" type="submit">Ajouter</button>
+</form>
+<div class="space-y-xs">
+<div class="text-body-sm text-on-surface-variant" th:if="${facultes.isEmpty()}">Aucune faculte creee.</div>
+<div class="flex items-center justify-between p-sm rounded-lg bg-surface-container" th:each="f : ${facultes}">
+<div>
+<p class="font-medium text-body-sm" th:text="${f.nom}">Nom</p>
+<p class="text-label-sm text-on-surface-variant" th:text="${f.code}">Code</p>
+</div>
+<form method="post" th:action="@{/academique-universite/facultes/{id}/supprimer(id=${f.id})}" onsubmit="return confirm('Supprimer cette faculte ?');">
+<button class="text-error text-label-sm" type="submit">Suppr.</button>
+</form>
+</div>
+</div>
+</section>
+
+<!-- Departements -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-lg">
+<h4 class="font-headline-sm text-headline-sm mb-md">Departements <span class="text-label-sm text-on-surface-variant font-normal">(optionnel)</span></h4>
+<form class="flex flex-wrap gap-sm mb-md" method="post" th:action="@{/academique-universite/departements}">
+<input class="flex-1 min-w-[120px] p-sm border border-outline-variant rounded-lg text-body-sm" name="nom" placeholder="Nom" required="required" type="text"/>
+<input class="w-20 p-sm border border-outline-variant rounded-lg text-body-sm" name="code" placeholder="Code" required="required" type="text"/>
+<select class="p-sm border border-outline-variant rounded-lg text-body-sm" name="faculteId" required="required">
+<option disabled="disabled" selected="selected" value="">Faculte</option>
+<option th:each="f : ${facultes}" th:text="${f.nom}" th:value="${f.id}"></option>
+</select>
+<button class="px-md py-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md" type="submit">Ajouter</button>
+</form>
+<div class="space-y-xs">
+<div class="text-body-sm text-on-surface-variant" th:if="${departements.isEmpty()}">Aucun departement cree.</div>
+<div class="flex items-center justify-between p-sm rounded-lg bg-surface-container" th:each="d : ${departements}">
+<div>
+<p class="font-medium text-body-sm" th:text="${d.nom}">Nom</p>
+<p class="text-label-sm text-on-surface-variant" th:text="${d.code}">Code</p>
+</div>
+<form method="post" th:action="@{/academique-universite/departements/{id}/supprimer(id=${d.id})}" onsubmit="return confirm('Supprimer ce departement ?');">
+<button class="text-error text-label-sm" type="submit">Suppr.</button>
+</form>
+</div>
+</div>
+</section>
+
+<!-- Filieres -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-lg">
+<h4 class="font-headline-sm text-headline-sm mb-md">Filieres</h4>
+<form class="flex flex-wrap gap-sm mb-md" method="post" th:action="@{/academique-universite/filieres}">
+<input class="flex-1 min-w-[120px] p-sm border border-outline-variant rounded-lg text-body-sm" name="nom" placeholder="Nom" required="required" type="text"/>
+<input class="w-20 p-sm border border-outline-variant rounded-lg text-body-sm" name="code" placeholder="Code" required="required" type="text"/>
+<select class="p-sm border border-outline-variant rounded-lg text-body-sm" name="niveau">
+<option value="">Cycle</option>
+<option value="LICENCE">Licence</option>
+<option value="MASTER">Master</option>
+<option value="DOCTORAT">Doctorat</option>
+</select>
+<select class="p-sm border border-outline-variant rounded-lg text-body-sm" name="faculteId" required="required">
+<option disabled="disabled" selected="selected" value="">Faculte</option>
+<option th:each="f : ${facultes}" th:text="${f.nom}" th:value="${f.id}"></option>
+</select>
+<select class="p-sm border border-outline-variant rounded-lg text-body-sm" name="departementId">
+<option selected="selected" value="">(sans departement)</option>
+<option th:each="d : ${departements}" th:text="${d.nom}" th:value="${d.id}"></option>
+</select>
+<button class="px-md py-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md" type="submit">Ajouter</button>
+</form>
+<div class="space-y-xs">
+<div class="text-body-sm text-on-surface-variant" th:if="${filieres.isEmpty()}">Aucune filiere creee.</div>
+<div class="flex items-center justify-between p-sm rounded-lg bg-surface-container" th:each="f : ${filieres}">
+<div>
+<p class="font-medium text-body-sm" th:text="${f.nom} + (${f.niveau} != null ? ' — ' + ${f.niveau} : '')">Nom</p>
+<p class="text-label-sm text-on-surface-variant" th:text="${f.code}">Code</p>
+</div>
+<form method="post" th:action="@{/academique-universite/filieres/{id}/supprimer(id=${f.id})}" onsubmit="return confirm('Supprimer cette filiere ?');">
+<button class="text-error text-label-sm" type="submit">Suppr.</button>
+</form>
+</div>
+</div>
+</section>
+
+<!-- Unites d'enseignement -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md sm:p-lg">
+<h4 class="font-headline-sm text-headline-sm mb-md">Unites d'enseignement</h4>
+<form class="flex flex-wrap gap-sm mb-md" method="post" th:action="@{/academique-universite/ue}">
+<input class="w-20 p-sm border border-outline-variant rounded-lg text-body-sm" name="code" placeholder="Code" required="required" type="text"/>
+<input class="flex-1 min-w-[140px] p-sm border border-outline-variant rounded-lg text-body-sm" name="intitule" placeholder="Intitule" required="required" type="text"/>
+<input class="w-20 p-sm border border-outline-variant rounded-lg text-body-sm" min="0" name="credits" placeholder="Credits" required="required" type="number"/>
+<input class="w-24 p-sm border border-outline-variant rounded-lg text-body-sm" min="1" name="semestre" placeholder="Semestre" required="required" type="number"/>
+<select class="p-sm border border-outline-variant rounded-lg text-body-sm" name="filiereId" required="required">
+<option disabled="disabled" selected="selected" value="">Filiere</option>
+<option th:each="f : ${filieres}" th:text="${f.nom}" th:value="${f.id}"></option>
+</select>
+<button class="px-md py-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md" type="submit">Ajouter</button>
+</form>
+<div class="space-y-xs">
+<div class="text-body-sm text-on-surface-variant" th:if="${unitesEnseignement.isEmpty()}">Aucune UE creee.</div>
+<div class="flex items-center justify-between p-sm rounded-lg bg-surface-container" th:each="ue : ${unitesEnseignement}">
+<div>
+<p class="font-medium text-body-sm" th:text="${ue.code} + ' — ' + ${ue.intitule}">UE</p>
+<p class="text-label-sm text-on-surface-variant" th:text="'S' + ${ue.semestre} + ' • ' + ${ue.credits} + ' credits'">S1</p>
+</div>
+<form method="post" th:action="@{/academique-universite/ue/{id}/supprimer(id=${ue.id})}" onsubmit="return confirm('Supprimer cette UE ?');">
+<button class="text-error text-label-sm" type="submit">Suppr.</button>
+</form>
+</div>
+</div>
+</section>
+
+</div>
+</div>
+</main>
+</body>
+</html>

@@ -46,6 +46,9 @@ public class SecurityConfig {
                 .requestMatchers("/passage/**").hasAnyRole("ADMIN", "SECRETAIRE", "COORDONNATEUR")
                 .requestMatchers("/tresorerie/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/gestion-academique/**").hasRole("ADMIN")
+                // Structure academique universitaire (facultes/departements/filieres/UE) :
+                // ADMIN gere tout, COORDONNATEUR gere la maquette de sa filiere (cf. cahier des charges module universite)
+                .requestMatchers("/academique-universite/**").hasAnyRole("ADMIN", "COORDONNATEUR")
                 .requestMatchers("/gestion-classes/**").hasRole("ADMIN")
                 .requestMatchers("/gestion-salles/**").hasRole("ADMIN")
                 .requestMatchers("/matieres/**").hasRole("ADMIN")
