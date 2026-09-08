@@ -29,7 +29,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index.html", "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
+                .requestMatchers("/", "/index.html",
+                    // Site vitrine du college Holy Flame, deplace ici quand la racine est devenue
+                    // la page produit : il reste consultable publiquement, comme avant.
+                    "/holyflame.html",
+                    "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
                     "/inscription-parent", "/inscription-parent/**",
                     "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe",
                     // Webhook CinetPay : appele serveur a serveur par CinetPay, sans session
