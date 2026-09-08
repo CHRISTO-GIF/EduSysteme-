@@ -62,6 +62,8 @@ public class SecurityConfig {
                 .requestMatchers("/frais/**").hasAnyRole("ADMIN", "TRESORIER")
                 // Grand livre et balance : documents de lecture, sans effet sur les donnees.
                 .requestMatchers("/comptabilite/**").hasAnyRole("ADMIN", "TRESORIER")
+                // Remises et echeanciers : suivi financier des familles, coeur du poste comptable.
+                .requestMatchers("/suivi-familles/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/tresorerie/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/gestion-academique/**").hasRole("ADMIN")
                 // Structure academique universitaire (facultes/departements/filieres/UE) :
