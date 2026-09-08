@@ -34,6 +34,16 @@ public class GestionAcademiqueController {
 
     @GetMapping
     public String index(Model model) {
+        // Cet ecran raisonne en classes, matieres a coefficient et professeurs titulaires :
+        // aucune de ces notions n'existe en regime universitaire, ou les etudiants suivent des
+        // unites d'enseignement a credits. Le menu ne propose plus l'entree, mais l'adresse
+        // reste atteignable — mieux vaut renvoyer vers l'ecran equivalent que d'afficher un
+        // formulaire qui ne correspond a rien.
+        var etablissement = etablissementService.getCurrentEtablissement();
+        if (etablissement != null && etablissement.estRegimeLMD()) {
+            return "redirect:/academique-universite";
+        }
+
         Long etabId = etablissementService.getCurrentEtablissementId();
 
         List<Classe> classes = classeRepository.findByEtablissementId(etabId);
