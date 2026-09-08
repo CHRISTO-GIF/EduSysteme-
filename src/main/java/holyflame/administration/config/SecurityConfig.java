@@ -33,6 +33,9 @@ public class SecurityConfig {
                     // Site vitrine du college Holy Flame, deplace ici quand la racine est devenue
                     // la page produit : il reste consultable publiquement, comme avant.
                     "/holyflame.html",
+                    // Creation d'un etablissement en un seul ecran : meme porte d'entree publique
+                    // que l'assistant detaille /inscription-ecole, dont elle est la version courte.
+                    "/demarrer",
                     "/login", "/error", "/inscription-ecole", "/inscription-ecole/**",
                     "/inscription-parent", "/inscription-parent/**",
                     "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe",

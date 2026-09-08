@@ -41,6 +41,17 @@ public class Utilisateur {
     @JoinColumn(name = "etablissement_id", nullable = true)
     private Etablissement etablissement;
 
+    // Droits d'acces fins, alignes sur les autres copies du projet : la base est partagee,
+    // et ces colonnes y existent deja. Sans ces champs, Hibernate ne les renseigne pas et
+    // toute creation de compte echoue sur « modules_finance_personnalises doesn't have a
+    // default value » — donc toute creation d'etablissement, l'administrateur etant un compte.
+    @Column(length = 500)
+    private String modulesOptionnels;
+
+    @Column(length = 500)
+    private String modulesFinance;
+    private boolean modulesFinancePersonnalises = false;
+
     public Utilisateur() {
     }
 
@@ -138,5 +149,14 @@ public class Utilisateur {
 
     public void setVerrouilleJusqua(LocalDateTime verrouilleJusqua) {
         this.verrouilleJusqua = verrouilleJusqua;
+    }
+
+    public String getModulesOptionnels() { return modulesOptionnels; }
+    public void setModulesOptionnels(String modulesOptionnels) { this.modulesOptionnels = modulesOptionnels; }
+    public String getModulesFinance() { return modulesFinance; }
+    public void setModulesFinance(String modulesFinance) { this.modulesFinance = modulesFinance; }
+    public boolean isModulesFinancePersonnalises() { return modulesFinancePersonnalises; }
+    public void setModulesFinancePersonnalises(boolean modulesFinancePersonnalises) {
+        this.modulesFinancePersonnalises = modulesFinancePersonnalises;
     }
 }
