@@ -49,8 +49,19 @@ public class SecurityConfig {
                     "/ecole/**",
                     "/h2-console/**", "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**", "/assets/**").permitAll()
                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
+                // Le tresorier inscrit lui-meme un eleve : sans eleve en base aucun encaissement
+                // n'est possible, et une famille qui se presente pour payer repartait sans recu
+                // tant que le secretariat n'avait pas saisi l'inscription. Consultation et creation
+                // seulement — modifier ou supprimer un dossier reste au secretariat.
+                .requestMatchers(HttpMethod.GET, "/secretariat").hasAnyRole("ADMIN", "SECRETAIRE", "TRESORIER")
+                .requestMatchers(HttpMethod.POST, "/secretariat/eleves").hasAnyRole("ADMIN", "SECRETAIRE", "TRESORIER")
                 .requestMatchers("/secretariat/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 .requestMatchers("/passage/**").hasAnyRole("ADMIN", "SECRETAIRE", "COORDONNATEUR")
+                // Les frais de scolarite quittent Parametres, qui est reserve a l'ADMIN : c'est
+                // le travail quotidien de la comptable, et les tarifs changent en cours d'annee.
+                .requestMatchers("/frais/**").hasAnyRole("ADMIN", "TRESORIER")
+                // Grand livre et balance : documents de lecture, sans effet sur les donnees.
+                .requestMatchers("/comptabilite/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/tresorerie/**").hasAnyRole("ADMIN", "TRESORIER")
                 .requestMatchers("/gestion-academique/**").hasRole("ADMIN")
                 // Structure academique universitaire (facultes/departements/filieres/UE) :
