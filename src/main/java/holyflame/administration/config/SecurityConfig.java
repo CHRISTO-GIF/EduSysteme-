@@ -53,18 +53,18 @@ public class SecurityConfig {
                 // n'est possible, et une famille qui se presente pour payer repartait sans recu
                 // tant que le secretariat n'avait pas saisi l'inscription. Consultation et creation
                 // seulement — modifier ou supprimer un dossier reste au secretariat.
-                .requestMatchers(HttpMethod.GET, "/secretariat").hasAnyRole("ADMIN", "SECRETAIRE", "TRESORIER")
-                .requestMatchers(HttpMethod.POST, "/secretariat/eleves").hasAnyRole("ADMIN", "SECRETAIRE", "TRESORIER")
+                .requestMatchers(HttpMethod.GET, "/secretariat").hasAnyRole("ADMIN", "SECRETAIRE", "TRESORIER", "COMPTABLE")
+                .requestMatchers(HttpMethod.POST, "/secretariat/eleves").hasAnyRole("ADMIN", "SECRETAIRE", "TRESORIER", "COMPTABLE")
                 .requestMatchers("/secretariat/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 .requestMatchers("/passage/**").hasAnyRole("ADMIN", "SECRETAIRE", "COORDONNATEUR")
                 // Les frais de scolarite quittent Parametres, qui est reserve a l'ADMIN : c'est
                 // le travail quotidien de la comptable, et les tarifs changent en cours d'annee.
-                .requestMatchers("/frais/**").hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/frais/**").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE")
                 // Grand livre et balance : documents de lecture, sans effet sur les donnees.
-                .requestMatchers("/comptabilite/**").hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/comptabilite/**").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE")
                 // Remises et echeanciers : suivi financier des familles, coeur du poste comptable.
-                .requestMatchers("/suivi-familles/**").hasAnyRole("ADMIN", "TRESORIER")
-                .requestMatchers("/tresorerie/**").hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/suivi-familles/**").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE")
+                .requestMatchers("/tresorerie/**").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE")
                 .requestMatchers("/gestion-academique/**").hasRole("ADMIN")
                 // Structure academique universitaire (facultes/departements/filieres/UE) :
                 // ADMIN gere tout, COORDONNATEUR gere la maquette de sa filiere (cf. cahier des charges module universite)
@@ -77,7 +77,7 @@ public class SecurityConfig {
                 .requestMatchers("/personnel/nouveau", "/personnel/nouveau/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 // Le tresorier et le secretariat consultent les fiches personnel (lecture seule),
                 // sans acces a la modification/documents/comptes du personnel
-                .requestMatchers(HttpMethod.GET, "/personnel", "/personnel/*").hasAnyRole("ADMIN", "ENSEIGNANT", "TRESORIER", "SECRETAIRE", "COORDONNATEUR")
+                .requestMatchers(HttpMethod.GET, "/personnel", "/personnel/*").hasAnyRole("ADMIN", "ENSEIGNANT", "TRESORIER", "COMPTABLE", "SECRETAIRE", "COORDONNATEUR")
                 .requestMatchers("/personnel/**").hasRole("ADMIN")
                 // Le surveillant peut signaler/consulter des absences, mais pas gerer les programmes de cours
                 .requestMatchers("/surveillance/programmes/**").hasAnyRole("ADMIN", "ENSEIGNANT")
@@ -89,14 +89,14 @@ public class SecurityConfig {
                 .requestMatchers("/examens/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
                 .requestMatchers("/bulletins/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "PARENT")
                 .requestMatchers("/portail-parent/**").hasAnyRole("ADMIN", "PARENT")
-                .requestMatchers("/messagerie/**").hasAnyRole("ADMIN", "SECRETAIRE", "ENSEIGNANT", "TRESORIER", "COORDONNATEUR")
+                .requestMatchers("/messagerie/**").hasAnyRole("ADMIN", "SECRETAIRE", "ENSEIGNANT", "TRESORIER", "COMPTABLE", "COORDONNATEUR")
                 // Chaque export est restreint aux roles qui l'utilisent reellement dans l'interface :
                 // les paiements restent reserves a la tresorerie, mais notes/eleves sont aussi
                 // utilises depuis les pages Examens (enseignant) et Secretariat (secretaire).
-                .requestMatchers("/export/paiements/excel").hasAnyRole("ADMIN", "TRESORIER")
-                .requestMatchers("/export/eleves/excel").hasAnyRole("ADMIN", "TRESORIER", "SECRETAIRE")
+                .requestMatchers("/export/paiements/excel").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE")
+                .requestMatchers("/export/eleves/excel").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE", "SECRETAIRE")
                 .requestMatchers("/export/notes/excel").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE")
-                .requestMatchers("/export/**").hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/export/**").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE")
                 .requestMatchers("/parametres/**").hasRole("ADMIN")
                 .requestMatchers("/tableau-enseignant/**").hasAnyRole("ADMIN", "ENSEIGNANT")
                 .requestMatchers("/tableau-eleve/**").hasAnyRole("ADMIN", "ELEVE")
@@ -122,7 +122,11 @@ public class SecurityConfig {
                 // (ex: frais d'inscription lors de la creation d'un eleve), sans acces au reste du module Finances
                 .requestMatchers("/finances/paiements/*/recu", "/finances/paiements/*/renvoyer-email")
                     .hasAnyRole("ADMIN", "TRESORIER", "SECRETAIRE")
-                .requestMatchers("/finances/**").hasAnyRole("ADMIN", "TRESORIER")
+                // Le budget previsionnel et les taux de paie engagent la direction : le comptable
+                // encaisse et justifie, il n'arbitre pas les enveloppes ni la remuneration.
+                .requestMatchers("/finances/budget/**", "/finances/parametres/taux-paie")
+                    .hasAnyRole("ADMIN", "TRESORIER")
+                .requestMatchers("/finances/**").hasAnyRole("ADMIN", "TRESORIER", "COMPTABLE")
                 .requestMatchers("/coordination/**").hasAnyRole("ADMIN", "COORDONNATEUR")
                 // Espace MARKETING : pilote le site vitrine public de l'etablissement
                 // (actualites, galerie, evenements, page a propos) — n'a acces a aucune donnee
@@ -138,7 +142,7 @@ public class SecurityConfig {
                     "SURVEILLANT", "INFIRMIER", "PARENT", "SUPER_ADMIN", "MARKETING")
                 // Journal d'activite : reserve au personnel (chacun n'y voit que ses propres actions,
                 // sauf ADMIN qui voit tout) — un eleve ou un parent n'a aucune raison d'y acceder.
-                .requestMatchers("/journal/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER", "MARKETING")
+                .requestMatchers("/journal/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COMPTABLE", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER", "MARKETING")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

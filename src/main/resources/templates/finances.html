@@ -85,7 +85,7 @@ Exporter
 <button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="depenses" onclick="finSwitchTab('depenses')" type="button">
 <span class="material-symbols-outlined text-[16px]">shopping_cart</span> Depenses
 </button>
-<button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="budget" onclick="finSwitchTab('budget')" type="button">
+<button th:if="${utilisateurConnecte == null or utilisateurConnecte.role != 'COMPTABLE'}" class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="budget" onclick="finSwitchTab('budget')" type="button">
 <span class="material-symbols-outlined text-[16px]">account_balance_wallet</span> Budget
 </button>
 <button class="fin-tab-btn px-xs pb-sm border-b-2 border-transparent text-on-surface-variant font-label-md whitespace-nowrap transition-colors flex items-center gap-xs" data-tab="rapports" onclick="finSwitchTab('rapports')" type="button">
@@ -508,7 +508,7 @@ Rapport detaille
 </div>
 
 <!-- ================= ONGLET BUDGET ================= -->
-<div class="fin-tab-panel hidden space-y-lg" data-panel="budget" id="panel-budget">
+<div class="fin-tab-panel hidden space-y-lg" data-panel="budget" id="panel-budget" th:if="${utilisateurConnecte == null or utilisateurConnecte.role != 'COMPTABLE'}">
 
 <div class="flex justify-between items-end flex-wrap gap-md">
 <div>
