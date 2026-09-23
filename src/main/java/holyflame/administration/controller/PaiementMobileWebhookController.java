@@ -54,7 +54,10 @@ public class PaiementMobileWebhookController {
         return traiter(request);
     }
 
-    private ResponseEntity<String> traiter(HttpServletRequest request) {
+    // synchronized : CinetPay envoie souvent plusieurs notifications quasi simultanees pour la
+    // meme transaction ; sans verrou, deux appels concurrents passaient tous deux le controle
+    // "deja ACCEPTEE" et enregistraient le paiement en double.
+    private synchronized ResponseEntity<String> traiter(HttpServletRequest request) {
         String transactionId = premierNonVide(request.getParameter("cpm_trans_id"), request.getParameter("transaction_id"));
         if (transactionId == null) {
             return ResponseEntity.ok("OK");
@@ -119,9 +122,16 @@ public class PaiementMobileWebhookController {
     }
 
     private String prochainNumeroRecuMobile(Long etabId) {
-        long compte = paiementRepository.findByEtablissementId(etabId).stream()
-            .filter(p -> "MOBILE_MONEY".equals(p.getModePaiement()))
-            .count();
-        return "MM-" + LocalDate.now().getYear() + "-" + String.format("%04d", compte + 1);
+        // Plus grand numero deja attribue pour l'annee + 1 (le simple comptage des paiements
+        // mobile, toutes annees confondues, donnait des numeros en doublon apres une suppression).
+        String prefixe = "MM-" + LocalDate.now().getYear() + "-";
+        long max = paiementRepository.findByEtablissementId(etabId).stream()
+            .map(Paiement::getRecuNumero)
+            .filter(n -> n != null && n.startsWith(prefixe))
+            .map(n -> n.substring(prefixe.length()))
+            .filter(n -> n.matches("\\d{1,9}"))
+            .mapToLong(Long::parseLong)
+            .max().orElse(0);
+        return prefixe + String.format("%04d", max + 1);
     }
 }

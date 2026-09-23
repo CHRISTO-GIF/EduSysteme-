@@ -52,6 +52,7 @@ public class CorrectionController {
         return "examen-bareme";
     }
 
+    @org.springframework.transaction.annotation.Transactional
     @PostMapping("/bareme")
     public String enregistrerBareme(
             @PathVariable Long examenId,
@@ -62,16 +63,26 @@ public class CorrectionController {
 
         Examen examen = examenRepository.findById(examenId).orElseThrow();
         verifierProprietaire(examen);
-        baremeQuestionRepository.deleteByExamenId(examenId);
+        // Mise a jour en place des questions existantes (dans l'ordre) plutot que
+        // "tout supprimer puis recreer" : les points deja saisis (NoteQuestion) referencent
+        // ces questions, et leur suppression echouait sur la contrainte de cle etrangere des
+        // qu'une correction avait commence.
+        List<BaremeQuestion> existantes = baremeQuestionRepository.findByExamenIdOrderByOrdreAsc(examenId);
+        int reutilisees = 0;
         for (int i = 0; i < titre.size(); i++) {
             if (titre.get(i) == null || titre.get(i).isBlank()) continue;
-            BaremeQuestion q = new BaremeQuestion();
+            BaremeQuestion q = reutilisees < existantes.size() ? existantes.get(reutilisees++) : new BaremeQuestion();
             q.setExamen(examen);
             q.setOrdre(i + 1);
             q.setTitre(titre.get(i));
             q.setSousTitre(i < sousTitre.size() ? sousTitre.get(i) : null);
-            q.setBareme(i < bareme.size() ? bareme.get(i) : 0);
+            q.setBareme(i < bareme.size() && bareme.get(i) != null ? bareme.get(i) : 0);
             baremeQuestionRepository.save(q);
+        }
+        for (int k = reutilisees; k < existantes.size(); k++) {
+            BaremeQuestion retiree = existantes.get(k);
+            noteQuestionRepository.deleteByBaremeQuestionId(retiree.getId());
+            baremeQuestionRepository.delete(retiree);
         }
         ra.addFlashAttribute("successMsg", "Bareme enregistre pour cet examen.");
         return "redirect:/examens/" + examenId + "/correction";
@@ -137,6 +148,13 @@ public class CorrectionController {
         Examen examen = examenRepository.findById(examenId).orElseThrow();
         verifierProprietaire(examen);
         Eleve eleve = eleveRepository.findById(eleveId).orElseThrow();
+        // L'eleve (transmis par le formulaire) doit appartenir a la classe de l'examen :
+        // sinon on pourrait noter un eleve d'une autre classe, voire d'un autre etablissement.
+        if (examen.getClasse() == null || eleve.getClasse() == null
+                || !examen.getClasse().getId().equals(eleve.getClasse().getId())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Cet élève n'appartient pas à la classe de l'examen.");
+        }
 
         // La note ne peut etre rattachee a un bulletin que si l'examen a bien un trimestre
         // (le bulletin filtre les notes par trimestre exact : une note sans trimestre n'apparait
@@ -155,6 +173,11 @@ public class CorrectionController {
                             + " n'est affecté à aucune classe avec une année scolaire définie.");
             return "redirect:/examens/" + examenId + "/correction?eleveId=" + eleveId;
         }
+
+        // Verifie AVANT toute ecriture : sinon les points par question etaient deja enregistres
+        // quand l'exception "annee cloturee" interrompait la mise a jour de la note.
+        String anneeScolaireNote = eleve.getClasse().getAnneeScolaire();
+        anneeScolaireService.verifierModifiable(anneeScolaireNote, etablissementService.getCurrentEtablissementId());
 
         List<BaremeQuestion> questions = baremeQuestionRepository.findByExamenIdOrderByOrdreAsc(examenId);
 
@@ -177,9 +200,6 @@ public class CorrectionController {
             nq.setPoints(points);
             noteQuestionRepository.save(nq);
         }
-
-        String anneeScolaireNote = eleve.getClasse().getAnneeScolaire();
-        anneeScolaireService.verifierModifiable(anneeScolaireNote, etablissementService.getCurrentEtablissementId());
 
         Note note = trouverNote(examen, eleve);
         if (note == null) note = new Note();

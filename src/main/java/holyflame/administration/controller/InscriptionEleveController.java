@@ -328,7 +328,7 @@ public class InscriptionEleveController {
         String nomFamille = parts.length > 1 ? parts[1] : parts[0];
 
         Eleve eleve = new Eleve();
-        eleve.setMatricule("HF-" + horlogeService.aujourdHui().getYear() + "-" + String.format("%03d", (eleveRepository.count() + 1)));
+        eleve.setMatricule(eleveRepository.genererMatriculeUnique(horlogeService.aujourdHui().getYear()));
         eleve.setNom(nomFamille.toUpperCase());
         eleve.setPrenom(prenom);
         eleve.setDateNaissance(donnees.dateNaissance);
@@ -340,12 +340,15 @@ public class InscriptionEleveController {
         eleve.setPereTelephone(donnees.pereTelephone);
         eleve.setPereProfession(donnees.pereProfession);
         eleve.setPereEmail(donnees.pereEmail);
-        eleve.setPereCodeAcces(donnees.pereCodeAcces);
+        eleve.setPereCodeAcces(codeAccesParentValide(donnees.pereCodeAcces));
         eleve.setMereNom(donnees.mereNom);
         eleve.setMereTelephone(donnees.mereTelephone);
         eleve.setMereProfession(donnees.mereProfession);
         eleve.setMereEmail(donnees.mereEmail);
-        eleve.setMereCodeAcces(donnees.mereCodeAcces);
+        eleve.setMereCodeAcces(codeAccesParentValide(donnees.mereCodeAcces));
+        if (eleve.getMereCodeAcces() != null && eleve.getMereCodeAcces().equals(eleve.getPereCodeAcces())) {
+            eleve.setMereCodeAcces(codeAccesParentValide(null, true));
+        }
         eleve.setContactUrgenceNom(donnees.contactUrgenceNom);
         eleve.setUrgenceRelation(donnees.urgenceRelation);
         eleve.setContactUrgenceTelephone(donnees.contactUrgenceTelephone);
@@ -423,5 +426,30 @@ public class InscriptionEleveController {
             documentEleveRepository.save(doc);
         } catch (IOException ignored) {
         }
+    }
+
+    /**
+     * Normalise le code d'acces parent saisi (majuscules, comme a la connexion ou le code
+     * tape est mis en majuscules) et le remplace par un code aleatoire s'il est trop court
+     * ou deja utilise par un autre eleve : un code en doublon rattachait le mauvais enfant
+     * et faisait echouer la recherche par code (plusieurs resultats).
+     */
+    private String codeAccesParentValide(String saisi) {
+        String code = saisi != null ? saisi.trim().toUpperCase() : "";
+        if (code.isEmpty()) return null;
+        return codeAccesParentValide(code, code.length() < 6 || eleveRepository.existsByCodeAccesParent(code));
+    }
+
+    private String codeAccesParentValide(String code, boolean regenerer) {
+        if (!regenerer) return code;
+        String caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        String genere;
+        do {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 8; i++) sb.append(caracteres.charAt(random.nextInt(caracteres.length())));
+            genere = sb.toString();
+        } while (eleveRepository.existsByCodeAccesParent(genere));
+        return genere;
     }
 }

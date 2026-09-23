@@ -89,6 +89,12 @@ public class InscriptionParentController {
         Utilisateur utilisateur;
         if (compteExistant.isPresent()) {
             utilisateur = compteExistant.get();
+            // Un compte inactif d'un autre role (ex: personnel desactive par l'administration)
+            // ne doit jamais etre reactive ni voir son mot de passe change par ce formulaire public.
+            if (!"PARENT".equals(utilisateur.getRole())) {
+                model.addAttribute("erreur", "Un compte existe deja pour cet email. Contactez le secretariat de l'etablissement.");
+                return "inscription-parent";
+            }
             if (utilisateur.isActif()) {
                 model.addAttribute("erreur", "Un compte existe deja pour cet email. Connectez-vous directement depuis la page de connexion.");
                 return "inscription-parent";
@@ -122,9 +128,14 @@ public class InscriptionParentController {
             + "<p>Ce lien est valable " + VALIDITE_HEURES + " heures. Si vous n'etes pas a l'origine de cette demande, ignorez cet email : aucun compte ne sera active.</p>";
         boolean envoye = emailService.envoyer(email, "Confirmez votre compte parent EduSystem Pro", corpsHtml);
 
-        model.addAttribute("succes", "Verifiez votre boite mail (" + email + ") et cliquez sur le lien de confirmation pour activer votre compte.");
-        if (!envoye) {
-            model.addAttribute("lienConfirmation", lien);
+        // Le lien de confirmation ne transite QUE par l'email du parent (jamais par la reponse
+        // HTTP) : l'afficher a l'ecran quand l'envoi echoue permettait a quiconque detenant le
+        // code d'acces d'activer le compte sans posseder la boite mail — meme principe que
+        // "mot de passe oublie".
+        if (envoye) {
+            model.addAttribute("succes", "Verifiez votre boite mail (" + email + ") et cliquez sur le lien de confirmation pour activer votre compte.");
+        } else {
+            model.addAttribute("erreur", "L'email de confirmation n'a pas pu etre envoye. Contactez le secretariat de l'etablissement pour activer votre compte.");
         }
         return "inscription-parent";
     }
@@ -133,7 +144,9 @@ public class InscriptionParentController {
     @GetMapping("/confirmer")
     public String confirmer(@RequestParam String token, Model model) {
         Utilisateur utilisateur = utilisateurRepository.findByResetToken(token).orElse(null);
-        if (utilisateur == null || utilisateur.getResetTokenExpiration() == null
+        // Le jeton est partage avec "mot de passe oublie" : on n'active ici que des comptes PARENT,
+        // sinon un lien de reinitialisation suffisait a reactiver un compte personnel desactive.
+        if (utilisateur == null || !"PARENT".equals(utilisateur.getRole()) || utilisateur.getResetTokenExpiration() == null
                 || utilisateur.getResetTokenExpiration().isBefore(LocalDateTime.now())) {
             model.addAttribute("erreur", "Ce lien de confirmation est invalide ou a expire. Recommencez l'inscription avec votre code d'acces.");
             return "inscription-parent";

@@ -52,6 +52,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             case "COORDONNATEUR" -> response.sendRedirect("/coordination");
             case "ELEVE"       -> response.sendRedirect("/portail");
             case "PARENT"      -> response.sendRedirect("/portail-parent");
+            case "MARKETING"   -> response.sendRedirect("/marketing");
             case "ADMIN" -> {
                 // Vérifier si cet admin est aussi le directeur avec délégation active
                 boolean delegue = etabId != null && parametreRepository
@@ -70,5 +71,22 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             }
             default -> response.sendRedirect("/dashboard");
         }
+    }
+
+    /** Page d'accueil de chaque role (hors ADMIN, dont l'accueil est /dashboard). */
+    public static String accueilPour(String role) {
+        return switch (role == null ? "" : role) {
+            case "SUPER_ADMIN"   -> "/super-admin";
+            case "ENSEIGNANT"    -> "/tableau-enseignant";
+            case "SECRETAIRE"    -> "/secretariat";
+            case "SURVEILLANT"   -> "/surveillant";
+            case "INFIRMIER"     -> "/infirmerie";
+            case "TRESORIER"     -> "/finances";
+            case "COORDONNATEUR" -> "/coordination";
+            case "ELEVE"         -> "/portail";
+            case "PARENT"        -> "/portail-parent";
+            case "MARKETING"     -> "/marketing";
+            default              -> "/dashboard";
+        };
     }
 }

@@ -238,7 +238,12 @@ public class NoteController {
         Long etabId = etablissementService.getCurrentEtablissementId();
         noteRepository.findById(id)
                 .filter(n -> n.getEleve() != null && etabId != null && etabId.equals(n.getEleve().getEtablissementId()))
+                // Un enseignant ne supprime que les notes de ses propres matieres/classes
+                .filter(n -> !isEnseignant() || (n.getMatiere() != null && n.getEleve().getClasse() != null
+                        && isAutorise(n.getMatiere().getId(), n.getEleve().getClasse().getId())))
                 .ifPresent(n -> {
+                    // Une note d'une annee scolaire cloturee reste figee (comme a la saisie)
+                    anneeScolaireService.verifierModifiable(n.getAnneeScolaire(), etabId);
                     journalService.log("NOTE_SUPPRIMÉE", "NOTES",
                             n.getEleve().getNom() + " " + n.getEleve().getPrenom() + " — "
                                     + (n.getMatiere() != null ? n.getMatiere().getNom() : "?") + " T"
@@ -431,7 +436,11 @@ public class NoteController {
                 if (valeur < 0 || valeur > 20)
                     continue;
                 Eleve eleve = eleveRepository.findById(eleveId).orElse(null);
-                if (eleve == null)
+                // Les identifiants d'eleves viennent des noms de champs du formulaire : on
+                // n'accepte que les eleves de la classe controlee plus haut (sinon un champ
+                // forge note_<id> permettrait de noter un eleve d'une autre classe, voire
+                // d'un autre etablissement).
+                if (eleve == null || eleve.getClasse() == null || !classeId.equals(eleve.getClasse().getId()))
                     continue;
 
                 // La classe (et donc l'annee scolaire) est obligatoire pour qu'une note soit
@@ -789,7 +798,9 @@ public class NoteController {
             String typeNormalise = Note.normalizeType(type);
             for (LigneImport l : lignes) {
                 Eleve eleve = eleveRepository.findById(l.eleveId).orElse(null);
-                if (eleve == null)
+                // L'apercu en session a pu etre construit pour une autre classe que celle
+                // soumise a la confirmation : on ne garde que les eleves de la classe controlee.
+                if (eleve == null || eleve.getClasse() == null || !classeId.equals(eleve.getClasse().getId()))
                     continue;
                 String anneeScolaireNote = eleve.getClasse() != null ? eleve.getClasse().getAnneeScolaire() : null;
                 if (anneeScolaireNote == null || anneeScolaireNote.isBlank()) {

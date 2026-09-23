@@ -177,6 +177,7 @@ public class DevoirEnseignantController {
         return "redirect:/tableau-enseignant/devoirs/" + id;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     @PostMapping("/{id}/supprimer")
     public String supprimer(@PathVariable Long id, RedirectAttributes ra) {
         Devoir devoir = trouverDevoirAutorise(id);

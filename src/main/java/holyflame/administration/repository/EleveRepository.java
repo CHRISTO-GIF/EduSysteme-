@@ -20,6 +20,24 @@ public interface EleveRepository extends JpaRepository<Eleve, Long> {
     List<Eleve> findAllByEmailParentOrderByNomAsc(String emailParent);
     long countByEtablissementId(Long etablissementId);
     long countByClasseId(Long classeId);
+    boolean existsByMatricule(String matricule);
+
+    @Query("SELECT COUNT(e) > 0 FROM Eleve e WHERE e.pereCodeAcces = :code OR e.mereCodeAcces = :code")
+    boolean existsByCodeAccesParent(@Param("code") String code);
+
+    /**
+     * Matricule sequentiel HF-annee-NNN garanti libre : "count() + 1" seul redonnait un
+     * matricule deja attribue des qu'un eleve avait ete supprime (doublons, puis erreurs
+     * sur l'import de notes qui retrouve les eleves par matricule).
+     */
+    default String genererMatriculeUnique(int annee) {
+        long n = count() + 1;
+        String matricule;
+        do {
+            matricule = "HF-" + annee + "-" + String.format("%03d", n++);
+        } while (existsByMatricule(matricule));
+        return matricule;
+    }
 
     @Query("SELECT e FROM Eleve e WHERE :email IN (e.emailParent, e.pereEmail, e.mereEmail) ORDER BY e.nom ASC")
     List<Eleve> findAllByParentEmailAnyOrderByNomAsc(@Param("email") String email);

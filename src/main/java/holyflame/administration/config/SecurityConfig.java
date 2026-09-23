@@ -25,6 +25,11 @@ public class SecurityConfig {
     @Autowired
     private UtilisateurDetailsService utilisateurDetailsService;
 
+    // Cle de signature des cookies "se souvenir de moi" : a definir en production
+    // (REMEMBER_ME_KEY) plutot que de reutiliser la valeur publique du depot.
+    @org.springframework.beans.factory.annotation.Value("${app.remember-me.key:holyflame-edusystem-remember-me-key}")
+    private String rememberMeKey;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -40,7 +45,7 @@ public class SecurityConfig {
                     // Site vitrine public d'un etablissement (active depuis l'espace MARKETING) —
                     // accessible sans compte, comme n'importe quel site web d'ecole.
                     "/ecole/**",
-                    "/h2-console/**", "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**", "/assets/**").permitAll()
+                    "/css/**", "/js/**", "/fonts/**", "/images/**", "/uploads/**", "/webjars/**", "/assets/**").permitAll()
                 .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/secretariat/**").hasAnyRole("ADMIN", "SECRETAIRE")
                 .requestMatchers("/passage/**").hasAnyRole("ADMIN", "SECRETAIRE", "COORDONNATEUR")
@@ -115,6 +120,16 @@ public class SecurityConfig {
                     "SURVEILLANT", "INFIRMIER", "PARENT", "SUPER_ADMIN", "MARKETING")
                 // Journal d'activite : reserve au personnel (chacun n'y voit que ses propres actions,
                 // sauf ADMIN qui voit tout) — un eleve ou un parent n'a aucune raison d'y acceder.
+                // Emploi du temps : consultation par le personnel ; creation/modification/import
+                // reserves a l'ADMIN (gestion academique). Auparavant tout compte connecte — y
+                // compris ELEVE et PARENT — pouvait creer, modifier ou supprimer des creneaux.
+                .requestMatchers(HttpMethod.GET, "/emploi-du-temps", "/emploi-du-temps/verifier-conflit").hasAnyRole(
+                    "ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER")
+                .requestMatchers("/emploi-du-temps/**").hasRole("ADMIN")
+                // Recherche globale (eleves, personnel) : reservee au personnel qui consulte deja
+                // ces fiches ; un eleve/parent/marketing ne doit pas lister tout l'etablissement.
+                .requestMatchers("/recherche").hasAnyRole(
+                    "ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER")
                 .requestMatchers("/journal/**").hasAnyRole("ADMIN", "ENSEIGNANT", "SECRETAIRE", "TRESORIER", "COORDONNATEUR", "SURVEILLANT", "INFIRMIER", "MARKETING")
                 .anyRequest().authenticated()
             )
@@ -129,13 +144,13 @@ public class SecurityConfig {
                 .permitAll()
             )
             .rememberMe(rm -> rm
-                .key("holyflame-edusystem-remember-me-key")
+                .key(rememberMeKey)
                 .tokenValiditySeconds(14 * 24 * 60 * 60) // 14 jours
                 .userDetailsService(utilisateurDetailsService)
                 .rememberMeParameter("remember-me")
             )
             .headers(h -> h.frameOptions(fo -> fo.sameOrigin()))
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/paiements/mobile/notification"))
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/paiements/mobile/notification"))
             .addFilterAfter(new CsrfTokenEagerLoadFilter(), CsrfFilter.class)
             .addFilterAfter(new FontPreloadFilter(), CsrfTokenEagerLoadFilter.class);
 

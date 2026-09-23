@@ -75,7 +75,8 @@ public class PortailController {
     private Optional<Eleve> resoudreEleveConnecte(Authentication auth) {
         String email = auth != null ? auth.getName() : "";
         Optional<Eleve> eleveOpt = eleveRepository.findByCompteEmail(email);
-        if (eleveOpt.isEmpty()) eleveOpt = eleveRepository.findByEmailParent(email);
+        // findByEmailParent (resultat unique) plantait des qu'un parent avait plusieurs enfants
+        if (eleveOpt.isEmpty()) eleveOpt = eleveRepository.findAllByEmailParentOrderByNomAsc(email).stream().findFirst();
         if (eleveOpt.isEmpty()) return Optional.empty();
 
         Eleve eleveRaw = eleveOpt.get();

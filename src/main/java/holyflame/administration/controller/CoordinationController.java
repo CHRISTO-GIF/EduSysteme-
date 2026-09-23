@@ -190,8 +190,11 @@ public class CoordinationController {
         anneeScolaireService.verifierModifiable(anneeScolaireFiche, etabId);
 
         FicheControle fiche = new FicheControle();
-        if (classeId != null) classeRepository.findById(classeId).ifPresent(fiche::setClasse);
-        if (enseignantId != null) personnelRepository.findById(enseignantId).ifPresent(fiche::setEnseignant);
+        // Classe et enseignant doivent appartenir a l'etablissement courant (ids transmis par le formulaire)
+        if (classeId != null) classeRepository.findById(classeId)
+            .filter(c -> etabId != null && etabId.equals(c.getEtablissementId())).ifPresent(fiche::setClasse);
+        if (enseignantId != null) personnelRepository.findById(enseignantId)
+            .filter(p -> etabId != null && etabId.equals(p.getEtablissementId())).ifPresent(fiche::setEnseignant);
         fiche.setCours(cours);
         fiche.setEffectifs(effectifs);
         fiche.setDateVisite(dateVisite);

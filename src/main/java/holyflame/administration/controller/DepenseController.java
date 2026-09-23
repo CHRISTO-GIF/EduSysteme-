@@ -210,7 +210,9 @@ public class DepenseController {
         d.setDesignation(designation);
         String sens = "CHARGE";
         if (categorieComptableId != null) {
-            CategorieComptable cat = categorieComptableRepository.findById(categorieComptableId).orElse(null);
+            CategorieComptable cat = categorieComptableRepository.findById(categorieComptableId)
+                .filter(c -> etabId != null && etabId.equals(c.getEtablissementId()))
+                .orElse(null);
             if (cat != null) { d.setCategorieComptable(cat); sens = cat.getSens(); }
         }
         d.setSens(sens);

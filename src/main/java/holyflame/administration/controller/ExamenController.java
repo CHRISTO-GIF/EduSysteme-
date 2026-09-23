@@ -37,6 +37,8 @@ public class ExamenController {
     @Autowired private EnseignantAutorisationRepository autorisationRepository;
     @Autowired private EtablissementService etablissementService;
     @Autowired private JournalService journalService;
+    @Autowired private holyflame.administration.repository.NoteQuestionRepository noteQuestionRepository;
+    @Autowired private holyflame.administration.repository.BaremeQuestionRepository baremeQuestionRepository;
     @Autowired private holyflame.administration.service.HorlogeService horlogeService;
 
     private boolean isEnseignant() {
@@ -215,6 +217,7 @@ public class ExamenController {
         return "redirect:/examens";
     }
 
+    @org.springframework.transaction.annotation.Transactional
     @PostMapping("/{id}/supprimer")
     public String supprimer(@PathVariable Long id, RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
@@ -233,6 +236,10 @@ public class ExamenController {
         }
         journalService.log("EXAMEN_SUPPRIMÉ", "EXAMENS",
             (examen.getMatiere() != null ? examen.getMatiere().getNom() : "?") + " — " + examen.getDateExamen());
+        // Le bareme et les points par question referencent l'examen (cle etrangere) :
+        // sans cette purge, tout examen deja configure/corrige etait impossible a supprimer.
+        noteQuestionRepository.deleteByExamenId(examen.getId());
+        baremeQuestionRepository.deleteByExamenId(examen.getId());
         examenRepository.delete(examen);
         ra.addFlashAttribute("successMsg", "Examen supprime.");
         return "redirect:/examens";

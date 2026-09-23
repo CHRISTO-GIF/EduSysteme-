@@ -492,6 +492,10 @@ public class FinancesController {
     @PostMapping("/arrieres/{id}/reglement")
     public String reglerArriere(@PathVariable Long id, @RequestParam Double montantRegle, RedirectAttributes ra) {
         Long etabId = etablissementService.getCurrentEtablissementId();
+        if (montantRegle == null || montantRegle <= 0) {
+            ra.addFlashAttribute("erreur", "Le montant réglé doit être supérieur à 0.");
+            return "redirect:/finances?tab=scolarite";
+        }
         arriereEleveRepository.findById(id)
             .filter(a -> etabId != null && etabId.equals(a.getEtablissementId()))
             .ifPresent(a -> {
@@ -576,7 +580,9 @@ public class FinancesController {
         p.setDescription(description);
         p.setRecuNumero(recuNumero != null && !recuNumero.isBlank() ? recuNumero : prochainNumeroRecu(etabIdCourant, dateEffective));
         if (fraisScolariteId != null && !fraisScolariteId.isBlank()) {
-            fraisScolariteRepository.findById(Long.parseLong(fraisScolariteId)).ifPresent(p::setFraisScolarite);
+            fraisScolariteRepository.findById(Long.parseLong(fraisScolariteId))
+                .filter(f -> etabIdCourant.equals(f.getEtablissementId()))
+                .ifPresent(p::setFraisScolarite);
         }
         var utilisateur = etablissementService.getCurrentUtilisateur();
         if (utilisateur != null) p.setEnregistreParId(utilisateur.getId());
@@ -596,10 +602,17 @@ public class FinancesController {
 
     private String prochainNumeroRecu(Long etabId, LocalDate date) {
         String anneeScolaire = AnneeScolaireUtil.pour(date);
-        long compte = paiementRepository.findByEtablissementId(etabId).stream()
-            .filter(p -> p.getDatePaiement() != null && anneeScolaire.equals(AnneeScolaireUtil.pour(p.getDatePaiement().toLocalDate())))
-            .count();
-        return "HF-" + anneeScolaire + "-" + String.format("%03d", compte + 1);
+        String prefixe = "HF-" + anneeScolaire + "-";
+        // Numero suivant le plus grand deja attribue (et non "nombre de paiements + 1", qui
+        // redonnait un numero de recu existant apres la suppression d'un paiement).
+        long max = paiementRepository.findByEtablissementId(etabId).stream()
+            .map(Paiement::getRecuNumero)
+            .filter(n -> n != null && n.startsWith(prefixe))
+            .map(n -> n.substring(prefixe.length()))
+            .filter(n -> n.matches("\\d{1,9}"))
+            .mapToLong(Long::parseLong)
+            .max().orElse(0);
+        return prefixe + String.format("%03d", max + 1);
     }
 
     @GetMapping("/paiements/{id}/recu")
@@ -848,7 +861,9 @@ public class FinancesController {
 
         LigneBudget l = new LigneBudget();
         l.setDesignation(designation);
-        categorieComptableRepository.findById(categorieComptableId).ifPresent(l::setCategorieComptable);
+        categorieComptableRepository.findById(categorieComptableId)
+            .filter(c -> etabIdBudget != null && etabIdBudget.equals(c.getEtablissementId()))
+            .ifPresent(l::setCategorieComptable);
         l.setMontantPrevu(montantPrevu); l.setMontantReel(montantReel); l.setMois(mois);
         l.setAnneeScolaire(anneeScolaire); l.setNotes(notes); l.setDateCreation(horlogeService.aujourdHui());
         l.setEtablissementId(etabIdBudget);

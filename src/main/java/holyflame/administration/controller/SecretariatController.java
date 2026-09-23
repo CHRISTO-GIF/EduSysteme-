@@ -60,6 +60,8 @@ public class SecretariatController {
     @Autowired private holyflame.administration.service.HorlogeService horlogeService;
     @Autowired private holyflame.administration.service.AnneeScolaireService anneeScolaireService;
     @Autowired private JournalService journalService;
+    @Autowired private holyflame.administration.service.FileStorageService fileStorageService;
+    @jakarta.persistence.PersistenceContext private jakarta.persistence.EntityManager entityManager;
 
     @GetMapping
     public String index(@RequestParam(defaultValue = "false") boolean toutesAnnees, Model model) {
@@ -188,10 +190,34 @@ public class SecretariatController {
         Eleve eleve = eleveRepository.findById(id).orElseThrow();
         verifierProprietaire(eleve, etabId);
         journalService.log("ÉLÈVE_SUPPRIMÉ", "ELEVES", eleve.getNom() + " " + eleve.getPrenom());
+        // Toutes les tables qui referencent l'eleve par cle etrangere doivent etre purgees
+        // avant lui : auparavant seules notes/absences/paiements/retards l'etaient, et la
+        // suppression echouait des que l'eleve avait un pointage, un incident, une retenue,
+        // un dossier infirmerie, un document, un devoir rendu, une decision de passage...
+        entityManager.createQuery("SELECT d.cheminFichier FROM DocumentEleve d WHERE d.eleve.id = :id", String.class)
+            .setParameter("id", id).getResultList()
+            .forEach(chemin -> { if (chemin != null) fileStorageService.delete(chemin); });
+        entityManager.createQuery("SELECT s.fichierPath FROM SoumissionDevoir s WHERE s.eleve.id = :id", String.class)
+            .setParameter("id", id).getResultList()
+            .forEach(chemin -> { if (chemin != null) fileStorageService.delete(chemin); });
+        for (String entite : List.of("NoteQuestion", "SoumissionDevoir", "Retenue", "Incident", "Pointage",
+                "Conduite", "DecisionPassage", "ArriereEleve", "ConditionMedicale", "ConsultationInfirmerie",
+                "AvisParent", "DocumentEleve")) {
+            entityManager.createQuery("DELETE FROM " + entite + " x WHERE x.eleve.id = :id")
+                .setParameter("id", id).executeUpdate();
+        }
+        entityManager.createQuery("DELETE FROM TachePersonnelle t WHERE t.eleveId = :id")
+            .setParameter("id", id).executeUpdate();
         noteRepository.deleteByEleveId(id);
         absenceRepository.deleteByEleveId(id);
         paiementRepository.deleteByEleveId(id);
         retardRepository.deleteByEleveId(id);
+        // Le compte portail de l'eleve ne doit plus permettre de se connecter
+        if (eleve.getCompteEmail() != null && !eleve.getCompteEmail().isBlank()) {
+            utilisateurRepository.findByEmail(eleve.getCompteEmail())
+                .filter(u -> "ELEVE".equals(u.getRole()))
+                .ifPresent(u -> { u.setActif(false); utilisateurRepository.save(u); });
+        }
         eleveRepository.deleteById(id);
         return "redirect:/secretariat";
     }
@@ -500,7 +526,7 @@ public class SecretariatController {
                 eleve.setStatutInscription("INSCRIT");
                 eleve.setDateInscription(horlogeService.aujourdHui());
                 eleve.setEtablissementId(etabId);
-                eleve.setMatricule("HF-" + horlogeService.aujourdHui().getYear() + "-" + String.format("%03d", (eleveRepository.count() + 1)));
+                eleve.setMatricule(eleveRepository.genererMatriculeUnique(horlogeService.aujourdHui().getYear()));
                 if (l.pereEmail != null && !l.pereEmail.isBlank()) eleve.setPereCodeAcces(genererCodeAcces());
                 if (l.mereEmail != null && !l.mereEmail.isBlank()) eleve.setMereCodeAcces(genererCodeAcces());
                 eleveRepository.save(eleve);

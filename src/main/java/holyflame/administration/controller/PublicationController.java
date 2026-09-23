@@ -43,7 +43,9 @@ public class PublicationController {
         pub.setTitre(titre.trim());
         pub.setContenu(contenu.trim());
         pub.setCategorie(categorie);
-        pub.setClasseId(classeId); // null = tous les élèves
+        // Classe cible : ignoree si elle n'appartient pas a l'etablissement (null = tous les eleves)
+        pub.setClasseId(classeId != null && classeRepository.findById(classeId)
+            .filter(c -> etabId != null && etabId.equals(c.getEtablissementId())).isPresent() ? classeId : null);
         pub.setEtablissementId(etabId);
         pub.setDatePublication(horlogeService.maintenant());
         pub.setPubliePar(auth != null ? auth.getName() : "Admin");
@@ -55,7 +57,11 @@ public class PublicationController {
 
     @PostMapping("/{id}/supprimer")
     public String supprimer(@PathVariable Long id, RedirectAttributes ra) {
-        publicationRepository.deleteById(id);
+        // Uniquement une publication de l'etablissement courant (l'id vient de l'URL)
+        Long etabId = etablissementService.getCurrentEtablissementId();
+        publicationRepository.findById(id)
+            .filter(p -> etabId != null && etabId.equals(p.getEtablissementId()))
+            .ifPresent(publicationRepository::delete);
         ra.addFlashAttribute("successMsg", "Publication supprimée.");
         return "redirect:/publications";
     }

@@ -10,6 +10,7 @@ public interface SoumissionDevoirRepository extends JpaRepository<SoumissionDevo
     List<SoumissionDevoir> findByEleveIdOrderByIdDesc(Long eleveId);
     Optional<SoumissionDevoir> findByDevoirIdAndEleveId(Long devoirId, Long eleveId);
     List<SoumissionDevoir> findByDevoirIdOrderByEleveNomAsc(Long devoirId);
+    @org.springframework.transaction.annotation.Transactional
     void deleteByDevoirId(Long devoirId);
     void deleteByEleveId(Long eleveId);
 }

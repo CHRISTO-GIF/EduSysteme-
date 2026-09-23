@@ -35,6 +35,14 @@ public class DashboardController {
         Long etabId = etablissementService.getCurrentEtablissementId();
 
         Utilisateur utilisateurConnecte = etablissementService.getCurrentUtilisateur();
+        // Tableau de bord de direction (finances, budget, effectifs, notes de tout
+        // l'etablissement) : reserve a l'ADMIN. Les autres roles — eleve, parent, marketing
+        // compris — etaient auparavant servis ici ; on les renvoie vers leur propre accueil.
+        String role = utilisateurConnecte != null ? utilisateurConnecte.getRole() : null;
+        if (!"ADMIN".equals(role)) {
+            String accueil = holyflame.administration.config.CustomAuthenticationSuccessHandler.accueilPour(role);
+            return "/dashboard".equals(accueil) ? "redirect:/login?logout" : "redirect:" + accueil;
+        }
         model.addAttribute("utilisateurConnecte", utilisateurConnecte);
         model.addAttribute("nomEtablissement",
             etablissementService.getCurrentEtablissement() != null
