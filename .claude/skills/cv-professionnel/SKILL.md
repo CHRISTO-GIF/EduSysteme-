@@ -68,6 +68,10 @@ Règles :
 
 ## 7. Produire le livrable
 
+- **Point de départ accepté** : texte collé, ancien CV (PDF, Word, photo/capture — lis-le entièrement, y compris par lecture d'image), profil LinkedIn. Extrais toutes les infos, puis applique les étapes 1 à 6.
+- **Accords grammaticaux** : ne devine jamais le genre (ni d'après le prénom, ni d'après la photo). Reprends les accords du texte fourni ; s'il n'y en a pas, demande ou utilise des formulations neutres (« Sens de l'organisation » plutôt que « Organisé(e) »).
+- **Style visuel** : propose 3 styles du catalogue `references/catalogue-modeles.md` adaptés au métier, ou laisse l'utilisateur choisir un numéro (1–24).
+- **Canva disponible** (outils `mcp__Canva__*` ou connecteur Canva) → `create-design` avec format « Resume (A4) » et un brief qui contient le style choisi ET le texte final complet avec la consigne « utiliser exactement ce contenu, sans inventer ». Pour donner du choix, lance 2–3 générations en parallèle avec des styles différents. Photo : téléverse-la avec `create-upload-url` ; si l'envoi échoue, prévois un emplacement photo et explique comment l'ajouter dans Canva. Exporte en PDF et donne le lien d'édition.
 - CV en Word demandé → utilise le skill `anthropic-skills:docx`.
 - CV en PDF → `anthropic-skills:pdf` (ou docx puis export PDF).
 - Sinon, document éditable/partageable → `anthropic-skills:docs`.
